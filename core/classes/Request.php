@@ -1,0 +1,25 @@
+<?php
+
+namespace core\classes;
+
+class Request {
+
+	private static ?Request $_request = null;
+	private string $_requestUri;
+
+	private function __construct() {
+		$this->_requestUri = $_SERVER['REQUEST_URI'];
+		$this->parseRequest();
+	}
+
+	public static function getInstance(): Request {
+		if( static::$_request === null ) {
+			static::$_request = new Request();
+		}
+		return static::$_request;
+	}
+
+	private function parseRequest(): void {
+		$request_parts = preg_split("/\//", $this->_requestUri, -1, PREG_SPLIT_NO_EMPTY);
+	}
+}
