@@ -3,6 +3,7 @@
 namespace core\manager;
 
 use core\abstracts\AController;
+use core\classes\Request;
 
 class ControllerManager {
 
@@ -21,7 +22,7 @@ class ControllerManager {
 				if( file_exists($class_file) ) {
 					$class = Path2Namespace($class_file);
 					$controller = new $class();
-					if( $class instanceof AController ) {
+					if( $controller instanceof AController ) {
 						$route = $controller->getRoute();
 						$this->_controllers[$route] = $class;
 					}
@@ -30,6 +31,7 @@ class ControllerManager {
 				$this->initController($directory.DIRECTORY_SEPARATOR.$value.DIRECTORY_SEPARATOR);
 			}
 		}
+		printDebug($this->_controllers);
 	}
 
 	public static function getInstance(): ControllerManager {
@@ -39,10 +41,42 @@ class ControllerManager {
 		return static::$_manager;
 	}
 
-	public function getController( string $route ): ?AController {
-		return $this->_controllers[$route] ?? null;
-	}
+	public function getController( Request $request ): ?AController {
+		$request_parts = $request->getRequestParts();
+		$temp = "";
+		$route = "";
 
+		// get the route for the controller
+		while( !empty($request_parts) ) {
+			$temp .= "/".array_shift($request_parts);
+			if( isset($this->_controllers[$temp]) ) {
+				$route = $temp;
+				continue;
+			}
+			break;
+		}
+		$controller_class = $this->_controllers[$route];
+		$controller = new $controller_class();
+
+		// get the action for the controller
+		$action_name = "indexAction";
+		if( count($request_parts) > 0 ) {
+			$part = array_shift($request_parts);
+			if( $controller->hasActionFunction($part) ) {
+				$action_name = $controller->getActionFunction($action_name);
+			} else {
+				$controller->addParam($part);
+			}
+		}
+		$controller->setAction($action_name);
+
+		// get the parameters for the controller
+		while( !empty($request_parts) ) {
+			$controller->addParam(array_shift($request_parts));
+		}
+
+		return $controller;
+	}
 
 	public function __toString() {
 		return "core.ControllerManager";

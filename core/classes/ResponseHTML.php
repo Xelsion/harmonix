@@ -6,8 +6,13 @@ use core\abstracts\AResponse;
 
 class ResponseHTML extends AResponse {
 
-	public function getOutput(): string {
-		return "<html></html>";
+	private string $_output;
+
+	public function setOutput( string $output ): void {
+		$this->_output = $output;
 	}
 
+	public function getOutput(): string {
+		return $this->_output;
+	}
 }

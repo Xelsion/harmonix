@@ -9,7 +9,10 @@ class Request {
 
 	private function __construct() {
 		$this->_requestUri = $_SERVER['REQUEST_URI'];
-		$this->parseRequest();
+	}
+
+	public function getRequestUri(): string {
+		return $this->_requestUri;
 	}
 
 	public static function getInstance(): Request {
@@ -19,7 +22,11 @@ class Request {
 		return static::$_request;
 	}
 
-	private function parseRequest(): void {
-		$request_parts = preg_split("/\//", $this->_requestUri, -1, PREG_SPLIT_NO_EMPTY);
+	public function getRequestParts(): array {
+		$parts = preg_split("/\//", $this->_requestUri, -1, PREG_SPLIT_NO_EMPTY);
+		if( empty($parts) ) {
+			$parts[] = "";
+		}
+		return $parts;
 	}
 }

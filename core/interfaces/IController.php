@@ -2,10 +2,10 @@
 
 namespace core\interfaces;
 
+use core\abstracts\AResponse;
+
 interface IController {
 
-	public function setRoute( string $route ): void;
-
-	public function getRoute(): string;
+	public function indexAction(): AResponse;
 
 }

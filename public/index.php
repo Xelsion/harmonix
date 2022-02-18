@@ -8,7 +8,8 @@ require_once( "../functions.php" );
 
 try {
 	ob_start();
-	$system = System::start();
+	$system = System::getInstance();
+	$system->start();
 	$response = $system->getResponse();
 	echo $response;
 	ob_end_flush();
