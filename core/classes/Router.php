@@ -128,10 +128,9 @@ class Router {
 			$result = preg_grep("/^".preg_quote($route, "/")."\/{.*}$/", array_keys($this->_routes));
 			if( count($result) === 1 ) {
 				$route = array_pop($result);
-			} else {
-				// last part wasn't a route parameter sp put it back into our request parts
-				array_unshift($request_parts, $part);
 			}
+			// last part wasn't a route parameter sp put it back into our request parts
+			array_unshift($request_parts, $part);
 			break;
 		}
 		return $route;
@@ -151,6 +150,8 @@ class Router {
 	 * @throws RuntimeException
 	 */
 	private function getValidParameters( AController $controller, string $method, array $params ): ?array {
+		$num_params = count($params);
+		print_debug($num_params);
 		$result = array();
 		try {
 			$reflection = new ReflectionMethod($controller, $method);
@@ -178,8 +179,8 @@ class Router {
 					}
 				}
 			}
-			$result_count = count($result);
-			if( $result_count >= $min_args && $result_count <= $max_args ) {
+			print_debug($min_args." ".$max_args);
+			if( $num_params >= $min_args && $num_params <= $max_args ) {
 				return $result;
 			}
 			throw new RuntimeException("Router: Param count mismatch for method[".$controller."->".$method."]");

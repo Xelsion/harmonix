@@ -21,7 +21,7 @@ function Path2Namespace( string $path ): string {
 	return $path;
 }
 
-function printDebug( $message ) {
+function print_debug( $message ) {
 	if( is_array($message) ) {
 		echo "<pre>";
 		print_r($message);
