@@ -2,11 +2,9 @@
 
 namespace core\abstracts;
 
-use core\classes\Router;
+use core\interfaces\IController;
 
-abstract class AController {
-
-	abstract public function initRoutes( Router $router ): void;
+abstract class AController implements IController {
 
 	public function __toString(): string {
 		return __CLASS__;

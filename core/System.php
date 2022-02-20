@@ -2,11 +2,11 @@
 
 namespace core;
 
+use RuntimeException;
 use core\abstracts\AController;
 use core\classes\Request;
 use core\classes\Router;
 use core\abstracts\AResponse;
-use core\manager\ControllerManager;
 
 class System {
 
@@ -35,7 +35,7 @@ class System {
 			$param = $route["params"];
 			$this->_response = $controller->$action(...$param);
 		} else {
-			throw new \RuntimeException("Controller for request ".$this->_request->getRequestUri()." cant be found!");
+			throw new RuntimeException("Controller for request ".$this->_request->getRequestUri()." cant be found!");
 		}
 	}
 
