@@ -15,7 +15,7 @@ class Router {
 	// the instance of this class
 	private static ?Router $_router = null;
 	// the collection of the collected controllers
-	public array $_routes = array();
+	private array $_routes = array();
 
 	/**
 	 * The class constructor
