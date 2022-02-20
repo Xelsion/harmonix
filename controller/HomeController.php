@@ -15,7 +15,7 @@ class HomeController extends AController {
 	public function initRoutes( Router $router ): void {
 		$router->addRoute("/", __CLASS__."->indexAction");
 		$router->addRoute("/list", __CLASS__."->listAction");
-		$router->addRoute("/list/{page}", __CLASS__."->listAction");
+		$router->addRoute("/list/{page}", __CLASS__."->listDetailAction");
 	}
 
 	public function indexAction(): AResponse {
@@ -24,10 +24,19 @@ class HomeController extends AController {
 		return $response;
 	}
 
-	public function listAction( string $page = "1" ): AResponse {
+	public function listAction(): AResponse {
 		$response = new ResponseHTML();
-		$response->setOutput("Hallo from listAction Page[".$page."]!");
+		$response->setOutput("Hallo from listAction");
 		return $response;
 	}
 
+	public function listDetailAction( int $page ): AResponse {
+		$response = new ResponseHTML();
+		$response->setOutput("Hallo from listDetailAction Page[".$page."]!");
+		return $response;
+	}
+
+	public function __toString(): string {
+		return __CLASS__;
+	}
 }
