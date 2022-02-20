@@ -10,9 +10,8 @@ try {
 	ob_start();
 	$system = System::getInstance();
 	$system->start();
-	$response = $system->getResponse();
-	echo $response;
+	echo $system->getOutput();
 	ob_end_flush();
 } catch( \Exception $e ) {
-
+	echo $e->getMessage()."<br />";
 }

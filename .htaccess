@@ -1,0 +1,8 @@
+RewriteEngine On
+
+RewriteCond %{SERVER_NAME} !^www.
+RewriteRule ^(.*)$ http://www.%{SERVER_NAME} [L,QSA,R=301]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ public/index.php?url=$1 [L]

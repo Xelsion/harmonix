@@ -21,11 +21,13 @@ function Path2Namespace( string $path ): string {
 	return $path;
 }
 
-function printDebug( mixed $message ) {
+function printDebug( $message ) {
 	if( is_array($message) ) {
 		echo "<pre>";
 		print_r($message);
 		echo "</pre>";
+	} elseif( is_bool($message) ) {
+		echo ( ( $message ) ? "true" : "false" )."<br />";
 	} else {
 		echo $message."<br />";
 	}
