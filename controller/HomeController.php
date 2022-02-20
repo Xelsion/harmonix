@@ -6,6 +6,7 @@ use core\abstracts\AResponse;
 use core\abstracts\AController;
 use core\classes\ResponseHTML;
 use core\classes\Router;
+use core\classes\Template;
 
 class HomeController extends AController {
 
@@ -15,13 +16,15 @@ class HomeController extends AController {
 	public function initRoutes( Router $router ): void {
 		$router->addRoute("/", __CLASS__."->indexAction");
 		$router->addRoute("/list", __CLASS__."->listAction");
-		$router->addRoute("/test", __CLASS__."->testAction");
-		$router->addRoute("/test/{page}", __CLASS__."->testDetailAction");
+		$router->addRoute("/products", __CLASS__."->testAction");
+		$router->addRoute("/products/{page}", __CLASS__."->testDetailAction");
 	}
 
 	public function indexAction(): AResponse {
 		$response = new ResponseHTML();
-		$response->setOutput("Hallo from indexAction!");
+		$template = new Template(PATH_VIEWS."template.phtml");
+		$template->addParam("view", new Template(PATH_VIEWS."home/index.phtml"));
+		$response->setOutput($template->parse());
 		return $response;
 	}
 

@@ -151,7 +151,6 @@ class Router {
 	 */
 	private function getValidParameters( AController $controller, string $method, array $params ): ?array {
 		$num_params = count($params);
-		print_debug($num_params);
 		$result = array();
 		try {
 			$reflection = new ReflectionMethod($controller, $method);
@@ -179,7 +178,6 @@ class Router {
 					}
 				}
 			}
-			print_debug($min_args." ".$max_args);
 			if( $num_params >= $min_args && $num_params <= $max_args ) {
 				return $result;
 			}
