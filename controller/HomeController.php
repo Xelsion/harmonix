@@ -4,12 +4,11 @@ namespace controller;
 
 use core\abstracts\AResponse;
 use core\abstracts\AController;
-use core\System;
-use core\classes\Logger;
 use core\classes\ResponseHTML;
 use core\classes\Router;
 use core\classes\Template;
 use models\Actor;
+
 
 /**
  * @author Markus Schröder <xelsion@gmail.com>
@@ -17,15 +16,8 @@ use models\Actor;
  */
 class HomeController extends AController {
 
-	private Logger $_logger;
-
 	public function __construct() {
 
-	}
-
-	public function init(): void {
-		$system = System::getInstance();
-		$this->_logger = $system->logger;
 	}
 
 	public function initRoutes( Router $router ): void {
@@ -36,7 +28,6 @@ class HomeController extends AController {
 	}
 
 	public function indexAction(): AResponse {
-		$this->_logger->log(__CLASS__."::indexAction", __LINE__, "Hallo");
 		$response = new ResponseHTML();
 		$template = new Template(PATH_VIEWS."template.phtml");
 		$template->addParam("view", new Template(PATH_VIEWS."home/index.phtml"));
