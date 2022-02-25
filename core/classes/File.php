@@ -4,6 +4,9 @@ namespace core\classes;
 
 /**
  * The File class
+ *
+ * @author Markus Schröder <xelsion@gmail.com>
+ * @version 1.0.0;
  */
 class File {
 
@@ -66,31 +69,34 @@ class File {
 	}
 
 	/**
-	 * Checks if the current file is writeable and writes the current content
-	 * to the file.
+	 * Adds the given $content to the end of the files content.
+	 * Return true if successful and false if not
+	 *
+	 * @param string $content
+	 * @return bool
+	 */
+	public function append( string $content ): bool {
+		return file_put_contents($this->_file_path, $content, FILE_APPEND);
+	}
+
+	/**
+	 * writes the current content to the current file.
 	 * Return true if successful and false if not
 	 *
 	 * @return bool
 	 */
 	public function save(): bool {
-		if( is_writable($this->_file_path) ) {
-			file_put_contents($this->_file_path, $this->_content);
-			return true;
-		}
-		return true;
+		return file_put_contents($this->_file_path, $this->_content);
 	}
 
 	/**
-	 * Tries to save the current content to the given file path
+	 * Tries to save the current content to the given file path.
 	 * Return true if successful and false if not
 	 *
 	 * @param string $file_path
 	 * @return bool
 	 */
 	public function saveAs( string $file_path ): bool {
-		if( file_put_contents($file_path, $this->_content) ) {
-			return true;
-		}
-		return false;
+		return file_put_contents($file_path, $this->_content);
 	}
 }

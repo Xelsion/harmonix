@@ -2,6 +2,12 @@
 
 namespace core\helper;
 
+/**
+ * Functions that helps with strings
+ *
+ * @author Markus Schröder <xelsion@gmail.com>
+ * @version 1.0.0;
+ */
 class StringHelper {
 
 	public static function getSecureString( string $string ): string {

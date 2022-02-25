@@ -3,12 +3,16 @@
 namespace core\classes;
 
 use core\abstracts\AController;
+use Exception;
 use RuntimeException;
 use ReflectionMethod;
 
 /**
  * The Router Type singleton
  * Collect all the Controllers and returns the proper controller for the curren request
+ *
+ * @author Markus Schröder <xelsion@gmail.com>
+ * @version 1.0.0;
  */
 class Router {
 
@@ -159,13 +163,23 @@ class Router {
 			$min_args = 0;
 			for( $i = 0; $i < $max_args; $i++ ) {
 				$arg_name = $args[$i]->getName();
-				$arg_type = $args[$i]->getType();
+				$arg_type = (string)$args[$i]->getType();
 				$arg_optional = $args[$i]->isOptional();
 				if( !$arg_optional ) {
 					$min_args++;
 				}
 				if( isset($params[$i]) ) {
+					print_debug($arg_type);
 					switch( $arg_type ) {
+						case "bool":
+							if( $params[$i] === "0" || $params[$i] === "1" ) {
+								$result[$arg_name] = (bool)$params[$i];
+							} elseif( strtolower($params[$i]) === "true" || strtolower($params[$i]) === "false" ) {
+								$result[$arg_name] = (bool)$params[$i];
+							} else {
+								throw new RuntimeException("Router: Param type mismatch for method[".$controller."->".$method."]");
+							}
+							break;
 						case "int":
 							if( is_numeric($params[$i]) ) {
 								$result[$arg_name] = (int)$params[$i];
@@ -173,11 +187,19 @@ class Router {
 								throw new RuntimeException("Router: Param type mismatch for method[".$controller."->".$method."]");
 							}
 							break;
-						default:
+						case "string":
 							$result[$arg_name] = $params[$i];
+							break;
+						default:
+							try {
+								$result[$arg_name] = new $arg_type($params[$i]);
+							} catch( Exception $e ) {
+								throw new RuntimeException("Router: Param type mismatch for method[".$controller."->".$method."]");
+							}
 					}
 				}
 			}
+			print_debug($result);
 			if( $num_params >= $min_args && $num_params <= $max_args ) {
 				return $result;
 			}

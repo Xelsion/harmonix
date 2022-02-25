@@ -8,6 +8,9 @@ use core\classes\Router;
 /**
  * The controller interface
  * Defines necessary methods for all controllers
+ *
+ * @author Markus Schröder <xelsion@gmail.com>
+ * @version 1.0.0;
  */
 interface IController {
 

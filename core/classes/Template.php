@@ -6,6 +6,9 @@ use RuntimeException;
 
 /**
  * The Template class
+ *
+ * @author Markus Schröder <xelsion@gmail.com>
+ * @version 1.0.0;
  */
 class Template extends File {
 

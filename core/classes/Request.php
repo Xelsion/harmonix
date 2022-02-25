@@ -5,6 +5,9 @@ namespace core\classes;
 /**
  * The Request Type singleton
  * represents the requested URL
+ *
+ * @author Markus Schröder <xelsion@gmail.com>
+ * @version 1.0.0;
  */
 class Request {
 

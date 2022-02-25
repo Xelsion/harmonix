@@ -4,34 +4,41 @@ namespace core;
 
 use RuntimeException;
 use core\abstracts\AController;
+use core\abstracts\AResponse;
+use core\classes\Logger;
 use core\classes\Request;
 use core\classes\Router;
-use core\abstracts\AResponse;
+
 
 /**
  * The System Class Type singleton
  * This class handles the main procedure from getting a request
  * to return the response output
+ *
+ * @author Markus Schröder <xelsion@gmail.com>
+ * @version 1.0.0;
  */
 class System {
 
 	// the instance of this class
-	private static ?System $_system = null;
+	private static ?System $system = null;
 
-	private Request $_request;
+	private Request $request;
 
-	private Router $_router;
+	private Router $router;
 
-	private AResponse $_response;
+	private AResponse $response;
 
+	private Logger $logger;
 	/**
 	 * The class constructor
 	 * initializes the core\classes\Request
 	 * initializes the core\classes\Router
 	 */
 	private function __construct() {
-		$this->_request = Request::getInstance();
-		$this->_router = Router::getInstance();
+		$this->logger = new Logger("runtime.log");
+		$this->request = Request::getInstance();
+		$this->router = Router::getInstance();
 	}
 
 	/**
@@ -40,10 +47,25 @@ class System {
 	 * @return System
 	 */
 	public static function getInstance(): System {
-		if( static::$_system === null ) {
-			static::$_system = new System();
+		if( static::$system === null ) {
+			echo 'construct system';
+			static::$system = new System();
 		}
-		return static::$_system;
+		return static::$system;
+	}
+
+	public function __isset( $prop ) {
+		return isset($this->$prop);
+	}
+
+	public function __set( string $prop, $value ) {
+		$this->$prop = $value;
+	}
+
+	public function __get( string $prop ) {
+		echo "__get => ".$prop;
+
+		return $this->$prop;
 	}
 
 	/**
@@ -54,18 +76,19 @@ class System {
 	 * @throws RuntimeException - if no valid controller and its method was found
 	 */
 	public function start(): void {
-		$route = $this->_router->getRoute($this->_request);
+		$route = $this->router->getRoute($this->request);
 		$controller = $route["controller"];
+		$controller->init();
 		$method = $route["method"];
-		$args = $param = $route["params"];
+		$params = $route["params"];
 		if( $controller instanceof AController ) {
-			$this->_response = $controller->$method(...$args);
+			$this->response = $controller->$method(...$params);
 		} else {
-			throw new RuntimeException("Controller for request ".$this->_request->getRequestUri()." cant be found!");
+			throw new RuntimeException("Controller for request ".$this->request->getRequestUri()." cant be found!");
 		}
 	}
 
 	public function getOutput(): string {
-		return $this->_response->getOutput();
+		return $this->response->getOutput();
 	}
 }
