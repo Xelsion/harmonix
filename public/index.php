@@ -12,7 +12,7 @@ try {
 	ob_start();
 	$system = System::getInstance();
 	$system->start();
-	$system->getOutput();
+	echo $system->getOutput();
 	ob_end_flush();
 } catch( Exception $e ) {
 	echo "Fatal Error: Please check the Log Files for mor information";

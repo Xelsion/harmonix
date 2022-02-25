@@ -2,6 +2,7 @@
 
 namespace core\classes;
 
+use RuntimeException;
 use DateTime;
 
 /**
@@ -15,15 +16,16 @@ class Logger extends File {
 
 	// The log text format
 	private string $_log_line = "[%s]: [%s][%d]\n\t=> %s\n";
+	private string $_log_type;
 
 	/**
 	 * The class constructor
 	 *
-	 * @param string $log_file
+	 * @param string $log_type
 	 */
 	public function __construct( string $log_type ) {
-		$log_path = $this->getLogPath($log_type);
-		parent::__construct($log_path);
+		$this->_log_type = $log_type;
+		parent::__construct($this->getLogPath($log_type));
 	}
 
 	/**
@@ -33,6 +35,7 @@ class Logger extends File {
 	 * @param string $file
 	 * @param int $line
 	 * @param string $message
+	 * @param array $backtrace
 	 * @return bool
 	 */
 	public function log( string $file, int $line, string $message, array $backtrace = array() ): bool {
@@ -42,6 +45,12 @@ class Logger extends File {
 			foreach( $backtrace as $trace ) {
 				$log .= sprintf("\t=> Trace:[%d] %s%s%s(%s)\n", $trace["line"], $trace["class"], $trace["type"], $trace["function"], implode(", ", $trace["args"]));
 			}
+		}
+
+		// sets the actual file path
+		$this->_file_path = $this->getLogPath($this->_log_type);
+		if( !file_exists($this->_file_path) && !mkdir($this->_file_path, 0777, true) && !is_dir($this->_file_path) ) {
+			throw new RuntimeException(sprintf('Directory "%s" was not created', $this->_file_path));
 		}
 		return $this->append($log);
 	}
@@ -60,9 +69,6 @@ class Logger extends File {
 		$month = strtolower($ts->format("F"));
 		$log_file = $ts->format("d-D").".log";
 		$log_path = PATH_LOGS.$log_type.DIRECTORY_SEPARATOR.$year.DIRECTORY_SEPARATOR.$month;
-		if( !file_exists($log_path) && !mkdir($log_path, 0777, true) && !is_dir($log_path) ) {
-			throw new \RuntimeException(sprintf('Directory "%s" was not created', $log_path));
-		}
 		return $log_path.DIRECTORY_SEPARATOR.$log_file;
 	}
 }

@@ -46,7 +46,6 @@ class System {
 	 */
 	public static function getInstance(): System {
 		if( static::$_system === null ) {
-			echo 'construct system';
 			static::$_system = new System();
 		}
 		return static::$_system;
