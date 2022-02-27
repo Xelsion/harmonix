@@ -40,16 +40,28 @@ class Logger extends File {
 	 */
 	public function log( string $file, int $line, string $message, array $backtrace = array() ): bool {
 		$ts = new DateTime();
+		// Crate the log string
 		$log = sprintf($this->_log_line, $ts->format("H:i:s"), $file, $line, $message);
 		if( !empty($backtrace) ) {
 			foreach( $backtrace as $trace ) {
-				$log .= sprintf("\t=> Trace:[%d] %s%s%s(%s)\n", $trace["line"], $trace["class"], $trace["type"], $trace["function"], implode(", ", $trace["args"]));
+				$args = array();
+				// Go through all arguments and get a representable string for it
+				foreach( $trace["args"] as $arg ) {
+					if( is_object($arg) ) {
+						$args[] = get_class($arg);
+					} else {
+						$args[] = $arg;
+					}
+				}
+				// Add the trace to the log string
+				$log .= sprintf("\t=> Trace:[%d] %s%s%s(%s)\n", $trace["line"], $trace["class"], $trace["type"], $trace["function"], implode(", ", $args));
 			}
 		}
 
-		// sets the actual file path
+		// Sets the actual file path
 		$this->_file_path = $this->getLogPath($this->_log_type);
 		$path_parts = pathinfo($this->_file_path);
+		// Create all necessary folders
 		if( !file_exists($path_parts["dirname"]) && !mkdir($path_parts["dirname"], 0777, true) && !is_dir($path_parts["dirname"]) ) {
 			throw new RuntimeException(sprintf('Directory "%s" was not created', $path_parts["dirname"]));
 		}
@@ -57,8 +69,7 @@ class Logger extends File {
 	}
 
 	/**
-	 * creates the log folder structure and returns the
-	 * path with a formatted file name
+	 * Returns the path with a formatted file name
 	 * folder structure: {log directory}/{year}/{month_name}/{day-weekday}_{file name from constructor}
 	 *
 	 * @param string $log_type

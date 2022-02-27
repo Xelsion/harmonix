@@ -5,6 +5,7 @@ namespace core\classes;
 use core\abstracts\AController;
 use Exception;
 use RuntimeException;
+use ReflectionException;
 use ReflectionMethod;
 
 /**
@@ -97,7 +98,7 @@ class Router {
 				}
 			}
 		} else {
-			throw new RuntimeException("Router: There is no route for [".$route."]!");
+			throw new RuntimeException("Router: There is no route for [".$request->getRequestUri()."]!");
 		}
 		return null;
 	}
@@ -114,26 +115,26 @@ class Router {
 		$route = "";
 
 		if( empty($request_parts) ) {
-			// the request is empty so return the default Controller route
+			// The request is empty so return the default Controller route
 			return "/";
 		}
 
-		// get the route for the controller
+		// Get the route for the controller
 		while( !empty($request_parts) ) {
 			$part = array_shift($request_parts);
 			$temp .= "/".$part;
 			if( $this->hasRoute($temp) ) {
-				// we find a route lets continue
+				// We find a route lets continue
 				$route = $temp;
 				continue;
 			}
 
-			// last part didn't match, but it could be an argument
+			// Last part didn't match, but it could be an argument
 			$result = preg_grep("/^".preg_quote($route, "/")."\/{.*}$/", array_keys($this->_routes));
 			if( count($result) === 1 ) {
 				$route = array_pop($result);
 			}
-			// last part wasn't a route parameter sp put it back into our request parts
+			// Last part wasn't a route parameter sp put it back into our request parts
 			array_unshift($request_parts, $part);
 			break;
 		}
@@ -151,6 +152,7 @@ class Router {
 	 * @param string $method
 	 * @param array $params
 	 * @return array|null
+	 *
 	 * @throws RuntimeException
 	 */
 	private function getValidParameters( AController $controller, string $method, array $params ): ?array {
@@ -161,26 +163,28 @@ class Router {
 			$args = $reflection->getParameters();
 			$max_args = count($args);
 			$min_args = 0;
+			// Go through all parameters of the requested method
 			for( $i = 0; $i < $max_args; $i++ ) {
 				$arg_name = $args[$i]->getName();
 				$arg_type = (string)$args[$i]->getType();
 				$arg_optional = $args[$i]->isOptional();
+				// If the parameter is not optional increase the number of required parameters
 				if( !$arg_optional ) {
 					$min_args++;
 				}
 				if( isset($params[$i]) ) {
+					// Check if the parameters match the expected type and converts it
 					switch( $arg_type ) {
 						case "bool":
-							if( $params[$i] === "0" || $params[$i] === "1" ) {
-								$result[$arg_name] = (bool)$params[$i];
-							} elseif( strtolower($params[$i]) === "true" || strtolower($params[$i]) === "false" ) {
+							$valid_boolean = array( "0", "1", "true", "false" );
+							if( in_array(strtolower($params[$i]), $valid_boolean, true) ) {
 								$result[$arg_name] = (bool)$params[$i];
 							} else {
 								throw new RuntimeException("Router: Param type mismatch for method[".$controller."->".$method."]");
 							}
 							break;
 						case "int":
-							if( is_numeric($params[$i]) ) {
+							if( preg_match("/^\d+$/", $params[$i]) ) {
 								$result[$arg_name] = (int)$params[$i];
 							} else {
 								throw new RuntimeException("Router: Param type mismatch for method[".$controller."->".$method."]");
@@ -198,11 +202,13 @@ class Router {
 					}
 				}
 			}
+			// Check if we have a valid number of parameters.
+			// If so return them
 			if( $num_params >= $min_args && $num_params <= $max_args ) {
 				return $result;
 			}
 			throw new RuntimeException("Router: Param count mismatch for method[".$controller."->".$method."]");
-		} catch( \ReflectionException $e ) {
+		} catch( ReflectionException $e ) {
 			throw new RuntimeException($e->getMessage());
 		}
 	}
@@ -215,17 +221,22 @@ class Router {
 	 */
 	private function initController( string $directory ): void {
 		$files = scandir($directory);
+		// Go through all files/directories in this directory
 		foreach( $files as $file ) {
+			// do we have a file?
 			if( !is_dir($directory.$file) ) {
 				$class_file = $directory.$file;
-				if( file_exists($class_file) ) {
-					$class = Path2Namespace($class_file);
-					$controller = new $class();
-					if( $controller instanceof AController ) {
-						$controller->initRoutes($this);
-					}
+				// Get the namespace of this path
+				$class = Path2Namespace($class_file);
+				// get an instance of this class
+				$controller = new $class();
+				if( $controller instanceof AController ) {
+					// It's a valid Controller so initialize its routes
+					$controller->initRoutes($this);
 				}
+
 			} else if( $file !== "." && $file !== ".." && is_dir($directory.DIRECTORY_SEPARATOR.$file) ) {
+				// Let's go through this subdirectory
 				$this->initController($directory.DIRECTORY_SEPARATOR.$file.DIRECTORY_SEPARATOR);
 			}
 		}

@@ -10,10 +10,9 @@ use RuntimeException;
  * @author Markus Schröder <xelsion@gmail.com>
  * @version 1.0.0;
  */
-class Template extends File {
+class Template extends TemplateData {
 
-	// the data storage for the template
-	private array $_data = array();
+	private string $_file_path;
 
 	/**
 	 * The constructor
@@ -24,31 +23,10 @@ class Template extends File {
 	 * @throws RuntimeException
 	 */
 	public function __construct( string $file_path ) {
-		parent::__construct($file_path);
-		if( !$this->exists() ) {
+		if( !file_exists($file_path) ) {
 			throw new RuntimeException("Template: file[".$file_path."] not found!");
 		}
-	}
-
-	/**
-	 * Adds a key => value pair to the data storage
-	 *
-	 * @param $key
-	 * @param $value
-	 */
-	public function addParam( $key, $value ): void {
-		$this->_data[$key] = $value;
-	}
-
-	/**
-	 * Returns the value vom the data storage by the given key
-	 * or null if the key was not found.
-	 *
-	 * @param $key
-	 * @return mixed|null
-	 */
-	public function getParam( $key ) {
-		return $this->_data[$key] ?? null;
+		$this->_file_path = $file_path;
 	}
 
 	/**

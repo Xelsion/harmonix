@@ -22,7 +22,11 @@ function Path2Namespace( string $path ): string {
 }
 
 function print_debug( $message ) {
-	if( is_array($message) ) {
+	if( is_object($message) ) {
+		echo "<pre>";
+		var_dump($message);
+		echo "</pre>";
+	} elseif( is_array($message) ) {
 		echo "<pre>";
 		print_r($message);
 		echo "</pre>";

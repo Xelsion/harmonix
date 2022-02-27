@@ -29,8 +29,8 @@ class HomeController extends AController {
 
 	public function indexAction(): AResponse {
 		$response = new ResponseHTML();
-		$template = new Template(PATH_VIEWS."template.phtml");
-		$template->addParam("view", new Template(PATH_VIEWS."home/index.phtml"));
+		$template = new Template(PATH_VIEWS."template.html");
+		$template->set("view", new Template(PATH_VIEWS."home/index.html"));
 		$response->setOutput($template->parse());
 		return $response;
 	}

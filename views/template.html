@@ -1,0 +1,62 @@
+<?php
+
+use core\System;
+use core\helper\StringHelper;
+
+$actor = System::getInstance()->getActor();
+
+$view = $this->get("view");
+$view_content = "";
+if( $view instanceof core\classes\Template ) {
+	$view_content = $view->parse();
+}
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title><?= $this->get("title") ?? "Home" ?></title>
+	<link rel="stylesheet" href="<?= PATH_SRC ?>bootstrap/css/bootstrap.css" />
+	<link rel="stylesheet" href="<?= PATH_CSS ?>main.css" />
+	<script src="<?= PATH_SRC ?>bootstrap/js/bootstrap.js"></script>
+	<script src="<?= PATH_SRC ?>vue/vue.js"></script>
+</head>
+<body>
+<header>
+	<div class="row">
+		<div class="col-md">&nbsp;</div>
+		<div class="col-md-4">
+			<?php if( $actor->id === 0 ): ?>
+				<form action="<?= $_SERVER["REQUEST_URI"] ?>" method="POST">
+					<div class="row g-3">
+						<div class="col-auto"><input type="email" name="email" value="" placeholder="E-Mail"
+						                             class="form-control" /></div>
+						<div class="col-auto"><input type="password" name="password" value="" placeholder="Password"
+						                             class="form-control" /></div>
+						<div class="col-auto">
+							<button type="submit" name="login" class="btn btn-primary">Login</button>
+						</div>
+					</div>
+				</form>
+			<?php else: ?>
+				<form action="<?= $_SERVER["REQUEST_URI"] ?>" method="POST">
+					<div class="row g-3">
+						<div class="col-auto">
+							<div class="col-form-label"><?= StringHelper::getSecureString($actor->first_name." ".$actor->last_name) ?></div>
+						</div>
+						<div class="col-auto">
+							<div class="col-form-label"><?= StringHelper::getSecureString($actor->email) ?></div>
+						</div>
+						<div class="col-auto">
+							<button type="submit" name="logout" class="btn btn-primary">Logout</button>
+						</div>
+					</div>
+				</form>
+			<?php endif; ?>
+		</div>
+	</div>
+</header>
+<main><?= $view_content ?></main>
+<footer></footer>
+</body>
+</html>

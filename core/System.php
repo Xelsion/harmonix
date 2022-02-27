@@ -3,8 +3,6 @@
 namespace core;
 
 use Exception;
-use models\Actor;
-use PDO;
 use RuntimeException;
 use core\abstracts\AController;
 use core\abstracts\AResponse;
@@ -13,7 +11,8 @@ use core\classes\Logger;
 use core\manager\ConnectionManager;
 use core\classes\Request;
 use core\classes\Router;
-
+use models\Session;
+use models\Actor;
 
 /**
  * The System Class Type singleton
@@ -25,14 +24,22 @@ use core\classes\Router;
  */
 class System {
 
-	// the instance of this class
+	// The instance of this class
 	private static ?System $_instance = null;
+	// The application configuration
 	private Configuration $_configuration;
+	// The database connection Manager
 	private ConnectionManager $_connection_manager;
+	// The request obj
 	private Request $_request;
+	// The router
 	private Router $_router;
+	// The response
 	private AResponse $_response;
+	// The debug logger
 	private Logger $_debug_logger;
+
+	private Actor $_actor;
 
 	/**
 	 * The class constructor
@@ -68,20 +75,44 @@ class System {
 	 * @throws RuntimeException - if no valid controller and its method was found
 	 */
 	public function start(): string {
-		$connections = $this->_configuration->getSection("connections");
-		foreach( $connections as $name => $conn ) {
-			$this->_connection_manager->addConnection($name, $conn["dns"], $conn["user"], $conn["password"]);
+		try {
+			// Initiate database connections
+			$connections = $this->_configuration->getSection("connections");
+			foreach( $connections as $name => $conn ) {
+				$this->_connection_manager->addConnection($name, $conn["dns"], $conn["user"], $conn["password"]);
+			}
+
+			$session = new Session();
+			$this->_actor = $session->start();
+
+			// Try to get the responsible route for this requested uri
+			$route = $this->_router->getRoute($this->_request);
+			// Get the controller
+			$controller = $route["controller"];
+			// Is it a compatible controller?
+			if( $controller instanceof AController ) {
+				$controller->init();
+				// Get the method and its parameters
+				$method = $route["method"];
+				$params = $route["params"];
+				// Get the Response obj from the controller
+				$this->_response = $controller->$method(...$params);
+				// Return the response output
+				return $this->_response->getOutput();
+			}
+			// No valid controller found
+			throw new RuntimeException("Controller for request ".$this->_request->getRequestUri()." cant be found!");
+		} catch( Exception $e ) {
+			// Pass all exceptions to the index.php
+			throw new RuntimeException($e->getMessage());
 		}
-		$route = $this->_router->getRoute($this->_request);
-		$controller = $route["controller"];
-		$controller->init();
-		$method = $route["method"];
-		$params = $route["params"];
-		if( $controller instanceof AController ) {
-			$this->_response = $controller->$method(...$params);
-			return $this->_response->getOutput();
-		}
-		throw new RuntimeException("Controller for request ".$this->_request->getRequestUri()." cant be found!");
+	}
+
+	/**
+	 * @return Actor
+	 */
+	public function getActor(): Actor {
+		return $this->_actor;
 	}
 
 	/**
@@ -112,7 +143,7 @@ class System {
 	}
 
 	/**
-	 * returns the output from the current AResponse object
+	 * Returns the output from the current AResponse object
 	 *
 	 * @return string
 	 */
