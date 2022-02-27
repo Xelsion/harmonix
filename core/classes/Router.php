@@ -17,7 +17,7 @@ use ReflectionMethod;
 class Router {
 
 	// the instance of this class
-	private static ?Router $_router = null;
+	private static ?Router $_instance = null;
 	// the collection of the collected controllers
 	private array $_routes = array();
 
@@ -35,10 +35,10 @@ class Router {
 	 * @return Router
 	 */
 	public static function getInstance(): Router {
-		if( static::$_router === null ) {
-			static::$_router = new Router();
+		if( static::$_instance === null ) {
+			static::$_instance = new Router();
 		}
-		return static::$_router;
+		return static::$_instance;
 	}
 
 	/**
@@ -169,7 +169,6 @@ class Router {
 					$min_args++;
 				}
 				if( isset($params[$i]) ) {
-					print_debug($arg_type);
 					switch( $arg_type ) {
 						case "bool":
 							if( $params[$i] === "0" || $params[$i] === "1" ) {
@@ -199,7 +198,6 @@ class Router {
 					}
 				}
 			}
-			print_debug($result);
 			if( $num_params >= $min_args && $num_params <= $max_args ) {
 				return $result;
 			}

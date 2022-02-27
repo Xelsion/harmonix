@@ -2,6 +2,8 @@
 
 namespace core\helper;
 
+use core\classes\Configuration;
+
 /**
  * Functions that helps with strings
  *
@@ -39,5 +41,11 @@ class StringHelper {
 			}
 		}
 		return $result;
+	}
+
+	public static function getBCrypt( string $str ): string {
+		$password_config = Configuration::getInstance()->getSection("password");
+		$crypt_options = [ 'cost' => 12, 'salt' => $password_config["salt"] ];
+		return password_hash($str, PASSWORD_BCRYPT, $crypt_options);
 	}
 }

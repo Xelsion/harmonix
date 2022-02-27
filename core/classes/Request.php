@@ -11,10 +11,10 @@ namespace core\classes;
  */
 class Request {
 
-	// the instance of this class
+	// The instance of this class
 	private static ?Request $_request = null;
-	// the requested URI
-	private string $_requestUri;
+	// GET, POST & FILES data from the request
+	private array $_form;
 
 	/**
 	 * The class constructor
@@ -22,7 +22,15 @@ class Request {
 	 * calls the method initController()
 	 */
 	private function __construct() {
-		$this->_requestUri = $_SERVER['REQUEST_URI'];
+		foreach( $_GET as $key => $value ) {
+			$this->_form['GET'][$key] = $value;
+		}
+		foreach( $_POST as $key => $value ) {
+			$this->_form['POST'][$key] = $value;
+		}
+		foreach( $_FILES as $key => $value ) {
+			$this->_form['FILES'][$key] = $value;
+		}
 	}
 
 	/**
@@ -42,7 +50,37 @@ class Request {
 	 * @return string
 	 */
 	public function getRequestUri(): string {
-		return $this->_requestUri;
+		return $_SERVER["REQUEST_URI"];
+	}
+
+	/**
+	 * Returns the requested method
+	 *
+	 * @return string
+	 */
+	public function getRequestMethod(): string {
+		return $_SERVER["REQUEST_METHOD"];
+	}
+
+	/**
+	 * Returns the remote IP address
+	 *
+	 * @return string
+	 */
+	public function getRemoteIP(): string {
+		return $_SERVER["REMOTE_ADDR"];
+	}
+
+	public function getGET(): array {
+		return $this->_form["GET"] ?? array();
+	}
+
+	public function getPOST(): array {
+		return $this->_form["GET"] ?? array();
+	}
+
+	public function getFILES(): array {
+		return $this->_form["FILES"] ?? array();
 	}
 
 	/**
@@ -52,6 +90,6 @@ class Request {
 	 * @return array
 	 */
 	public function getRequestParts(): array {
-		return preg_split("/\//", $this->_requestUri, -1, PREG_SPLIT_NO_EMPTY);
+		return preg_split("/\//", $this->getRequestUri(), -1, PREG_SPLIT_NO_EMPTY);
 	}
 }

@@ -3,10 +3,14 @@
 namespace core;
 
 use Exception;
+use models\Actor;
+use PDO;
 use RuntimeException;
 use core\abstracts\AController;
 use core\abstracts\AResponse;
+use core\classes\Configuration;
 use core\classes\Logger;
+use core\manager\ConnectionManager;
 use core\classes\Request;
 use core\classes\Router;
 
@@ -22,7 +26,9 @@ use core\classes\Router;
 class System {
 
 	// the instance of this class
-	private static ?System $_system = null;
+	private static ?System $_instance = null;
+	private Configuration $_configuration;
+	private ConnectionManager $_connection_manager;
 	private Request $_request;
 	private Router $_router;
 	private AResponse $_response;
@@ -34,7 +40,10 @@ class System {
 	 * initializes the core\classes\Router
 	 */
 	private function __construct() {
+		$this->_configuration = Configuration::getInstance();
 		$this->_debug_logger = new Logger("debug");
+		$this->_connection_manager = new ConnectionManager();
+
 		$this->_request = Request::getInstance();
 		$this->_router = Router::getInstance();
 	}
@@ -45,10 +54,10 @@ class System {
 	 * @return System
 	 */
 	public static function getInstance(): System {
-		if( static::$_system === null ) {
-			static::$_system = new System();
+		if( static::$_instance === null ) {
+			static::$_instance = new System();
 		}
-		return static::$_system;
+		return static::$_instance;
 	}
 
 	/**
@@ -59,6 +68,10 @@ class System {
 	 * @throws RuntimeException - if no valid controller and its method was found
 	 */
 	public function start(): string {
+		$connections = $this->_configuration->getSection("connections");
+		foreach( $connections as $name => $conn ) {
+			$this->_connection_manager->addConnection($name, $conn["dns"], $conn["user"], $conn["password"]);
+		}
 		$route = $this->_router->getRoute($this->_request);
 		$controller = $route["controller"];
 		$controller->init();
@@ -67,19 +80,42 @@ class System {
 		if( $controller instanceof AController ) {
 			$this->_response = $controller->$method(...$params);
 			return $this->_response->getOutput();
-		} else {
-			throw new RuntimeException("Controller for request ".$this->_request->getRequestUri()." cant be found!");
 		}
+		throw new RuntimeException("Controller for request ".$this->_request->getRequestUri()." cant be found!");
 	}
 
+	/**
+	 * Returns a standard Logger for debugging
+	 *
+	 * @return Logger
+	 */
 	public function getDebugLogger(): Logger {
 		return $this->_debug_logger;
 	}
 
+	/**
+	 * Returns the connection manager
+	 *
+	 * @return ConnectionManager
+	 */
+	public function getConnectionManager(): ConnectionManager {
+		return $this->_connection_manager;
+	}
+
+	/**
+	 * Returns the current request object
+	 *
+	 * @return Request
+	 */
 	public function getRequest(): Request {
 		return $this->_request;
 	}
 
+	/**
+	 * returns the output from the current AResponse object
+	 *
+	 * @return string
+	 */
 	public function getOutput(): string {
 		if( $this->_response instanceof AResponse ) {
 			return $this->_response->getOutput();

@@ -49,8 +49,9 @@ class Logger extends File {
 
 		// sets the actual file path
 		$this->_file_path = $this->getLogPath($this->_log_type);
-		if( !file_exists($this->_file_path) && !mkdir($this->_file_path, 0777, true) && !is_dir($this->_file_path) ) {
-			throw new RuntimeException(sprintf('Directory "%s" was not created', $this->_file_path));
+		$path_parts = pathinfo($this->_file_path);
+		if( !file_exists($path_parts["dirname"]) && !mkdir($path_parts["dirname"], 0777, true) && !is_dir($path_parts["dirname"]) ) {
+			throw new RuntimeException(sprintf('Directory "%s" was not created', $path_parts["dirname"]));
 		}
 		return $this->append($log);
 	}

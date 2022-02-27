@@ -4,7 +4,7 @@ namespace controller;
 
 use core\abstracts\AResponse;
 use core\abstracts\AController;
-use core\classes\ResponseHTML;
+use core\classes\responses\ResponseHTML;
 use core\classes\Router;
 use core\classes\Template;
 use models\Actor;
