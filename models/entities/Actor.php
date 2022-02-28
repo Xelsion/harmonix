@@ -62,15 +62,23 @@ class Actor extends AEntity {
 	public function update(): void {
 		$pdo = System::getInstance()->getConnectionManager()->getConnection("mvc");
 		try {
-			$sql = "UPDATE actors SET email=:email, password=:password, first_name=:first_name, last_name=:last_name WHERE id=:id";
-			$stmt = $pdo->prepare($sql);
-			$stmt->bindParam(':id', $this->id, PDO::PARAM_INT);
-			$stmt->bindParam(':email', $this->email, PDO::PARAM_STR);
-			$stmt->bindParam(':password', $this->password, PDO::PARAM_STR);
-			$stmt->bindParam(':first_name', $this->first_name, PDO::PARAM_STR);
-			$stmt->bindParam(':last_name', $this->last_name, PDO::PARAM_STR);
+			$pdo = System::getInstance()->getConnectionManager()->getConnection("mvc");
+			$stmt = $pdo->prepare("SELECT password FROM actors WHERE id=:id");
+			$stmt->bindParam(":id", $this->id, PDO::PARAM_INT);
 			$stmt->execute();
-			$pdo->commit();
+			if( $row = $stmt->fetch() ) {
+				if( $row["password"] !== $this->password ) {
+					$this->password = StringHelper::getBCrypt($this->password);
+				}
+				$sql = "UPDATE actors SET email=:email, password=:password, first_name=:first_name, last_name=:last_name WHERE id=:id";
+				$stmt = $pdo->prepare($sql);
+				$stmt->bindParam(':id', $this->id, PDO::PARAM_INT);
+				$stmt->bindParam(':email', $this->email, PDO::PARAM_STR);
+				$stmt->bindParam(':password', $this->password, PDO::PARAM_STR);
+				$stmt->bindParam(':first_name', $this->first_name, PDO::PARAM_STR);
+				$stmt->bindParam(':last_name', $this->last_name, PDO::PARAM_STR);
+				$stmt->execute();
+			}
 		} catch( PDOException $e ) {
 			throw new RuntimeException($e->getMessage());
 		}

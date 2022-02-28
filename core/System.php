@@ -81,7 +81,6 @@ class System {
 			foreach( $connections as $name => $conn ) {
 				$this->_connection_manager->addConnection($name, $conn["dns"], $conn["user"], $conn["password"]);
 			}
-
 			$session = new Session();
 			$this->_actor = $session->start();
 

@@ -7,6 +7,7 @@ use core\abstracts\AController;
 use core\classes\responses\ResponseHTML;
 use core\classes\Router;
 use core\classes\Template;
+use core\System;
 use models\Actor;
 
 
@@ -28,28 +29,12 @@ class HomeController extends AController {
 	}
 
 	public function indexAction(): AResponse {
+		$actor = System::getInstance()->getActor();
+
 		$response = new ResponseHTML();
 		$template = new Template(PATH_VIEWS."template.html");
 		$template->set("view", new Template(PATH_VIEWS."home/index.html"));
 		$response->setOutput($template->parse());
-		return $response;
-	}
-
-	public function listAction( int $page = 1 ): AResponse {
-		$response = new ResponseHTML();
-		$response->setOutput("Hallo from listAction Page[".$page."]!");
-		return $response;
-	}
-
-	public function testAction(): AResponse {
-		$response = new ResponseHTML();
-		$response->setOutput("Hallo from testAction!");
-		return $response;
-	}
-
-	public function testDetailAction( Actor $actor ): AResponse {
-		$response = new ResponseHTML();
-		$response->setOutput("Hallo from testDetailAction key[]!");
 		return $response;
 	}
 

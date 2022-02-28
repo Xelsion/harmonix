@@ -47,19 +47,24 @@ class Session extends entities\Session {
 		$stmt->bindParam(":email", $email, PDO::PARAM_STR);
 		$stmt->execute();
 		if( $stmt->rowCount() === 1 ) {
+			print_debug("actor found");
 			$actor = $stmt->fetchObject(Actor::class);
 			if( $actor->login_disabled ) {
+				print_debug("actor disabled");
 				$this->_error = "Account is disabled!";
 			} else if( $actor->login_fails >= 3 ) {
+				print_debug("actor disabled");
 				$actor->login_fails = 0;
 				$actor->login_disabled = true;
-				$actor->save();
+				$actor->update();
 				$this->_error = "To many login fails!";
 			} else if( !password_verify($password, $actor->password) ) {
+				print_debug("wrong password");
 				$actor->login_fails++;
-				$actor->save();
+				$actor->update();
 				$this->_error = "EMail/Password is incorrect!";
 			} else {
+				print_debug("login successful");
 				$session_id = MD5(time());
 				$date_time = new DateTime();
 				$date_time->modify("+".$this->_lifetime." hour");

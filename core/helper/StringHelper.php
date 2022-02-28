@@ -44,8 +44,7 @@ class StringHelper {
 	}
 
 	public static function getBCrypt( string $str ): string {
-		$password_config = Configuration::getInstance()->getSection("password");
-		$crypt_options = [ 'cost' => 12, 'salt' => $password_config["salt"] ];
+		$crypt_options = [ 'cost' => 16 ];
 		return password_hash($str, PASSWORD_BCRYPT, $crypt_options);
 	}
 }

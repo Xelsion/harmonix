@@ -41,8 +41,8 @@ CREATE TABLE IF NOT EXISTS `actors`
     DISABLE KEYS */;
 INSERT INTO `actors` (`id`, `email`, `password`, `first_name`, `last_name`, `login_fails`, `login_disabled`, `created`,
                       `updated`, `deleted`)
-VALUES (1, 'xelsion@gmail.com', '$2y$10$aBeM/JO1/k9R6xgRhP93se6afAJ1yaL4lpxlvQO7d.uJeWCvqcXe2', 'Markus', 'Schröder', 0,
-        0, '2022-02-27 01:45:19', NULL, NULL);
+VALUES (1, 'admin@localhost.de', '$2y$16$Di4cP5/7IF4Axo/pGOWb0.JPzsprrUH6AFQPjJJYrsypXUMB6QLei', 'admin', 'super', 0, 0,
+        '2022-02-27 01:45:19', NULL, NULL);
 /*!40000 ALTER TABLE `actors`
     ENABLE KEYS */;
 
@@ -62,7 +62,8 @@ CREATE TABLE IF NOT EXISTS `sessions`
 /*!40000 ALTER TABLE `sessions`
     DISABLE KEYS */;
 INSERT INTO `sessions` (`id`, `actor_id`, `expired`)
-VALUES ('4cbcb67419def5c3afe2b1543cc9ca16', 1, '2022-02-27 19:55:29');
+VALUES ('2dd76c49d9424032dce7aad3585af8e9', 1, '2022-02-28 23:46:26'),
+       ('4cbcb67419def5c3afe2b1543cc9ca16', 1, '2022-02-27 19:55:29');
 /*!40000 ALTER TABLE `sessions`
     ENABLE KEYS */;
 

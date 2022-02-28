@@ -14,7 +14,6 @@ require_once( "../functions.php" );
 
 $runtime_logger = new Logger("runtime");
 try {
-	print_debug($_SERVER);
 	ob_start();
 	$system = System::getInstance();
 	$system->start();
