@@ -41,7 +41,7 @@ CREATE TABLE IF NOT EXISTS `actors`
     DISABLE KEYS */;
 INSERT INTO `actors` (`id`, `email`, `password`, `first_name`, `last_name`, `login_fails`, `login_disabled`, `created`,
                       `updated`, `deleted`)
-VALUES (1, 'admin@localhost.de', '$2y$16$Di4cP5/7IF4Axo/pGOWb0.JPzsprrUH6AFQPjJJYrsypXUMB6QLei', 'admin', 'super', 0, 0,
+VALUES (1, 'admin@localhost.de', '$2y$10$D3JrwZhUeKJ7b2XZnnhXMu5byRZFpIBg07rNSMqIRtf0tNFvEMFZ.', 'admin', 'super', 0, 0,
         '2022-02-27 01:45:19', NULL, NULL);
 /*!40000 ALTER TABLE `actors`
     ENABLE KEYS */;

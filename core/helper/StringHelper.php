@@ -44,7 +44,6 @@ class StringHelper {
 	}
 
 	public static function getBCrypt( string $str ): string {
-		$crypt_options = [ 'cost' => 16 ];
-		return password_hash($str, PASSWORD_BCRYPT, $crypt_options);
+		return password_hash($str, PASSWORD_BCRYPT);
 	}
 }
