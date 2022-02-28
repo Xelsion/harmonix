@@ -4,11 +4,17 @@ session_start();
 use core\classes\Logger;
 use core\System;
 
-require_once( "../constants.php" );
+if( file_exists("../constants_".explode(".", $_SERVER["HTTP_HOST"])[0].".php") ) {
+	$constants_file = "../constants_".explode(".", $_SERVER["HTTP_HOST"])[0].".php";
+} else {
+	$constants_file = "../constants_www.php";
+}
+require_once( $constants_file );
 require_once( "../functions.php" );
 
 $runtime_logger = new Logger("runtime");
 try {
+	print_debug($_SERVER);
 	ob_start();
 	$system = System::getInstance();
 	$system->start();

@@ -47,12 +47,18 @@ Options -Indexes
 </IfModule>
 
 <IfModule mod_rewrite.c>
-    # SEO REDIRECTS
-    RewriteCond %{SERVER_NAME} !^www. [NC]
-    RewriteRule ^(.*)$ http://www.%{SERVER_NAME}/$1 [L,R=301,NC]
+    # SEO ALWAS USE HTTPS
+    RewriteCond %{SERVER_PORT} 80 [NC]
+    RewriteRule ^(public)?(.*)$ https://%{SERVER_NAME}$2 [R=301,L]
 
-    RewriteCond %{REQUEST_URI} (.+)/$ [NC]
-    RewriteRule .+ %1 [L,R=301]
+    # SEO ALWAS USR WWW AS SUBDOMAIN
+    RewriteCond %{HTTP_HOST} !^admin\.
+    RewriteCond %{HTTP_HOST} !^www\. [NC]
+    RewriteRule ^(public)?(.*)$ https://www.%{HTTP_HOST}$2 [R=301,L]
+
+    # SEO REMOVE ENDING SLASH
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^(public)?(.*)/$ /$2 [R=301,L]
 
     # MVC REDIRECTS
     RewriteCond %{REQUEST_FILENAME} !-f
