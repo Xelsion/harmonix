@@ -2,13 +2,13 @@
 
 namespace core\abstracts;
 
-
 use core\interfaces\IController;
 use core\System;
 use core\classes\Configuration;
 use core\classes\Logger;
 use core\classes\Request;
 use core\manager\ConnectionManager;
+use models\Actor;
 
 /**
  * The Abstract version of a Controller
@@ -26,6 +26,8 @@ abstract class AController implements IController {
 	protected ConnectionManager $_connection_manager;
 	// The object the represents the curren Request
 	protected Request $_request;
+	// The current logged in actor
+	protected Actor $_actor;
 
 	/**
 	 * Sets instances from the System and makes them accessible to all
@@ -36,6 +38,7 @@ abstract class AController implements IController {
 		$this->_logger = System::getInstance()->getDebugLogger();
 		$this->_request = System::getInstance()->getRequest();
 		$this->_connection_manager = System::getInstance()->getConnectionManager();
+		$this->_actor = System::getInstance()->getActor();
 	}
 
 	public function __toString(): string {

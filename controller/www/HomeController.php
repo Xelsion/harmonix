@@ -23,20 +23,9 @@ class HomeController extends AController {
 
 	public function initRoutes( Router $router ): void {
 		$router->addRoute("/", __CLASS__."->indexAction");
-		$router->addRoute("/list", __CLASS__."->listAction");
-		$router->addRoute("/actors", __CLASS__."->testAction");
-		$router->addRoute("/actors/{id}", __CLASS__."->testDetailAction");
 	}
 
 	public function indexAction(): AResponse {
-		$actor = System::getInstance()->getActor();
-		if( $actor->id === 1 ) {
-			$actor->first_name = "admin";
-			$actor->last_name = "super";
-			$actor->email = "admin@localhost.de";
-			$actor->password = "nimda";
-			$actor->update();
-		}
 		$response = new ResponseHTML();
 		$template = new Template(PATH_VIEWS."template.html");
 		$template->set("view", new Template(PATH_VIEWS."home/index.html"));
