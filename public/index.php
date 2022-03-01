@@ -4,12 +4,9 @@ session_start();
 use core\classes\Logger;
 use core\System;
 
-if( file_exists("../constants_".explode(".", $_SERVER["HTTP_HOST"])[0].".php") ) {
-	$constants_file = "../constants_".explode(".", $_SERVER["HTTP_HOST"])[0].".php";
-} else {
-	$constants_file = "../constants_www.php";
-}
-require_once( $constants_file );
+define("SUB_DOMAIN", explode(".", $_SERVER["HTTP_HOST"])[0]);
+
+require_once( "../constants.php" );
 require_once( "../functions.php" );
 
 $runtime_logger = new Logger("runtime");
