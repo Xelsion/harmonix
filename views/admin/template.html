@@ -21,39 +21,30 @@ if( $view instanceof core\classes\Template ) {
 	<link rel="stylesheet" href="<?= PATH_CSS ?>main.css" />
 	<link rel="stylesheet" href="<?= PATH_CSS ?>dropdown.css" />
 	<script src="<?= PATH_SRC ?>bootstrap-5.0.2/js/bootstrap.bundle.min.js"></script>
-	<script src="<?= PATH_SRC ?>jquery-3.6.0/vue.js"></script>
+	<script src="<?= PATH_SRC ?>jquery/jquery-3.6.0.min.js"></script>
 </head>
 <body>
 <header>
-	<div class="row">
-		<nav class="dropdown-list">
-			<?= $menu->getAsHtml() ?>
-			<div class="actor-menu float-end">
-				<button class="btn btn-primary dropdown-toggle" type="button" id="ProfileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-					<a href="#" onclick=""><?= ( $actor->id > 0 ) ? $actor->first_name." ".$actor->last_name : "Profile"  ?></a>
-				</button>
-				<div class="dropdown-menu" aria-labelledby="ProfileDropdown">
-					<?php if( $actor->id === 0 ): ?>
-						<form action="<?= $_SERVER["REQUEST_URI"] ?>" method="POST">
-							<div class="row g-3">
-								<div class="col-auto">
-									<input type="email" name="email" value="" placeholder="E-Mail" class="form-control form-control-sm"/>
-								</div>
-								<div class="col-auto">
-									<input type="password" name="password" value="" placeholder="Password" class="form-control form-control-sm" />
-								</div>
-								<div class="col-auto">
-									<button type="submit" name="login" class="btn btn-primary">Login</button>
-								</div>
-							</div>
-						</form>
-					<?php else: ?>
-						<a hrenf="<?= $_SERVER["REQUEST_URI"] ?>" class="dropdown-item">Logout</a>
-					<?php endif; ?>
-				</div>
+	<nav class="dropdown-list">
+		<?= $menu->getAsHtml() ?>
+		<div id="actor-menu">
+			<div class="has-children">
+				<span onclick="$('#actor-menu-dropdown').toggle();" class="button "><?= ( $actor->id > 0 ) ? $actor->first_name." ".$actor->last_name : "Profile"  ?></span>
 			</div>
-		</nav>
-	</div>
+			<div id="actor-menu-dropdown" style="">
+				<?php if( $actor->id === 0 ): ?>
+					<form action="<?= $_SERVER["REQUEST_URI"] ?>" method="POST">
+						<div class="form-row"><input type="email" name="email" value="" placeholder="E-Mail" /></div>
+						<div class="form-row"><input type="password" name="password" value="" placeholder="Password" /></div>
+						<div class="form-row"><button type="submit" name="login">Login</button></div>
+					</form>
+				<?php else: ?>
+					<div class="form-row"><button type="submit" name="logout">Logout</button></div>
+				<?php endif; ?>
+			</div>
+		</div>
+		<div class="cleaner"></div>
+	</nav>
 </header>
 <main><?= $view_content ?></main>
 <footer></footer>
