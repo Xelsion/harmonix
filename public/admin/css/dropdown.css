@@ -1,0 +1,130 @@
+/* css logic */
+.dropdown-list {
+    position: relative;
+}
+
+.dropdown-list a {
+    position: relative;
+    display: inline-block;
+    white-space: nowrap;
+    margin-right: 10px;
+}
+
+.dropdown-list ul {
+    width: fit-content;
+    margin: 0px;
+    padding: 0px;
+}
+
+.dropdown-list li {
+    position: relative;
+    width: fit-content;
+    list-style: none;
+    margin: 0px;
+    padding: 0px;
+}
+
+.dropdown-list li > ul {
+    display: none;
+    position: absolute;
+}
+
+.dropdown-list > ul > li {
+    float: left;
+    width: fit-content;
+}
+
+.dropdown-list > ul > li.has-children::after {
+    position: absolute;
+    content: '';
+    right: 10px;
+    top: 50%;
+    width: 0;
+    height: 0;
+    border-color: #999999;
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-top: 4px solid;
+}
+
+.dropdown-list > ul > li > ul {
+    top: 100%;
+    left: 0px;
+}
+
+.dropdown-list li:hover > ul {
+    display: block;
+}
+
+.dropdown-list * ul > li {
+    width: 100%;
+}
+
+.dropdown-list * ul > li.has-children::after {
+    position: absolute;
+    content: '';
+    right: 10px;
+    top: calc(50% - 4px);
+    width: 0;
+    height: 0;
+    border-color: #999999;
+    border-top: 4px solid transparent;
+    border-bottom: 4px solid transparent;
+    border-left: 4px solid;
+}
+
+.dropdown-list li > ul > li > ul {
+    top: 0px;
+    left: 100%;
+}
+
+/* css styling */
+.dropdown-list {
+    background: linear-gradient(to bottom, #444, #222);
+}
+
+.dropdown-list li > ul {
+    background-color: #222;
+    border: 1px solid #444;
+}
+
+.dropdown-list li > ul > li > ul {
+    top: -1px !important;
+}
+
+.dropdown-list > ul > li {
+    border-right: 1px solid #555;
+}
+
+.dropdown-list > ul > li:last-child {
+
+    border-right: 0px;
+}
+
+.dropdown-list * ul > li {
+    display: block;
+    border-bottom: 1px solid #555;
+}
+
+.dropdown-list * ul > li:last-child {
+    border-bottom: 0px;
+}
+
+.dropdown-list a {
+    color: #ccc;
+    text-decoration: none;
+}
+
+.dropdown-list a:hover {
+    color: #fff;
+}
+
+.dropdown-list > ul > li > a {
+    font-size: 1.0em;
+    padding: 10px 20px;
+}
+
+.dropdown-list li > ul > li > a {
+    font-size: 0.8em;
+    padding: 8px 20px;
+}
