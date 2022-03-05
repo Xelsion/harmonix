@@ -21,7 +21,7 @@ class HomeController extends AController {
 
 	}
 
-	public function initRoutes( Router $router ): void {
+	public function init( Router $router ): void {
 		$router->addRoute("/", __CLASS__."->indexAction");
 	}
 

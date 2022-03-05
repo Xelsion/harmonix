@@ -2,10 +2,10 @@
 session_start();
 
 use core\classes\Logger;
+use core\Core;
 use core\System;
 
 define("SUB_DOMAIN", explode(".", $_SERVER["HTTP_HOST"])[0]);
-
 require_once( "../constants.php" );
 require_once( "../functions.php" );
 

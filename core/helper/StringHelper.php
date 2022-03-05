@@ -12,10 +12,6 @@ use core\classes\Configuration;
  */
 class StringHelper {
 
-	public static function getSecureString( string $string ): string {
-		return htmlentities($string, ENT_QUOTES);
-	}
-
 	public static function getShortString( string $string, int $length, bool $no_word_break = false ): string {
 		$result = $string;
 		if( strlen($string) > $length ) {

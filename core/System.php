@@ -13,6 +13,7 @@ use core\classes\Request;
 use core\classes\Router;
 use models\Session;
 use models\Actor;
+use core\classes\tree\Menu;
 
 /**
  * The System Class Type singleton
@@ -26,20 +27,9 @@ class System {
 
 	// The instance of this class
 	private static ?System $_instance = null;
-	// The application configuration
-	private Configuration $_configuration;
-	// The database connection Manager
-	private ConnectionManager $_connection_manager;
-	// The request obj
-	private Request $_request;
-	// The router
-	private Router $_router;
-	// The response
-	private AResponse $_response;
-	// The debug logger
-	private Logger $_debug_logger;
 
-	private Actor $_actor;
+	// The router
+	private AResponse $_response;
 
 	/**
 	 * The class constructor
@@ -47,12 +37,12 @@ class System {
 	 * initializes the core\classes\Router
 	 */
 	private function __construct() {
-		$this->_configuration = Configuration::getInstance();
-		$this->_debug_logger = new Logger("debug");
-		$this->_connection_manager = new ConnectionManager();
-
-		$this->_request = Request::getInstance();
-		$this->_router = Router::getInstance();
+		Core::$_configuration = Configuration::getInstance();
+		Core::$_debugger = new Logger("debug");
+		Core::$_connection_manager = new ConnectionManager();
+		Core::$_request = Request::getInstance();
+		Core::$_menu = new Menu();
+		Core::$_router = Router::getInstance();
 	}
 
 	/**
@@ -77,20 +67,19 @@ class System {
 	public function start(): string {
 		try {
 			// Initiate database connections
-			$connections = $this->_configuration->getSection("connections");
+			$connections = Core::$_configuration->getSection("connections");
 			foreach( $connections as $name => $conn ) {
-				$this->_connection_manager->addConnection($name, $conn["dns"], $conn["user"], $conn["password"]);
+				Core::$_connection_manager->addConnection($name, $conn["dns"], $conn["user"], $conn["password"]);
 			}
 			$session = new Session();
-			$this->_actor = $session->start();
+			Core::$_actor = $session->start();
 
 			// Try to get the responsible route for this requested uri
-			$route = $this->_router->getRoute($this->_request);
+			$route = Core::$_router->getRoute(Core::$_request);
 			// Get the controller
 			$controller = $route["controller"];
 			// Is it a compatible controller?
 			if( $controller instanceof AController ) {
-				$controller->init();
 				// Get the method and its parameters
 				$method = $route["method"];
 				$params = $route["params"];
@@ -105,40 +94,6 @@ class System {
 			// Pass all exceptions to the index.php
 			throw new RuntimeException($e->getMessage());
 		}
-	}
-
-	/**
-	 * @return Actor
-	 */
-	public function getActor(): Actor {
-		return $this->_actor;
-	}
-
-	/**
-	 * Returns a standard Logger for debugging
-	 *
-	 * @return Logger
-	 */
-	public function getDebugLogger(): Logger {
-		return $this->_debug_logger;
-	}
-
-	/**
-	 * Returns the connection manager
-	 *
-	 * @return ConnectionManager
-	 */
-	public function getConnectionManager(): ConnectionManager {
-		return $this->_connection_manager;
-	}
-
-	/**
-	 * Returns the current request object
-	 *
-	 * @return Request
-	 */
-	public function getRequest(): Request {
-		return $this->_request;
 	}
 
 	/**

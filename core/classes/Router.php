@@ -3,6 +3,7 @@
 namespace core\classes;
 
 use core\abstracts\AController;
+use core\Core;
 use Exception;
 use RuntimeException;
 use ReflectionException;
@@ -52,7 +53,11 @@ class Router {
 	 */
 	public function addRoute( string $route, string $call ): void {
 		if( !isset($this->_routes[$route]) ) {
-			$this->_routes[$route] = $call;
+			if( preg_match("/^(.*)->(.*)/", $call, $matches) ) {
+				$this->_routes[$route] = array( "controller" => $matches[1], 'method' => $matches[2] );
+			} else {
+				$this->_routes[$route] = array( "controller" => $call, 'method' => "indexAction" );
+			}
 		} else {
 			throw new RuntimeException("Router: The route [".$route."] was already taken");
 		}
@@ -87,20 +92,17 @@ class Router {
 		$route = $this->getValidRoute($request_parts);
 		if( $this->hasRoute($route) ) {
 			$call = $this->_routes[$route];
-			if( preg_match("/^(.*)->(.*)/", $call, $matches) ) {
-				$controller = new $matches[1]();
-				$method = $matches[2];
-				try {
-					$params = $this->getValidParameters($controller, $method, $request_parts);
-					return array( "controller" => $controller, "method" => $method, "params" => $params );
-				} catch( RuntimeException $e ) {
-					throw new RuntimeException($e->getMessage());
-				}
+			$controller = new $call["controller"]();
+			$method = $call["method"];
+			try {
+				$params = $this->getValidParameters($controller, $method, $request_parts);
+				return array( "controller" => $controller, "method" => $method, "params" => $params );
+			} catch( RuntimeException $e ) {
+				throw new RuntimeException($e->getMessage());
 			}
 		} else {
 			throw new RuntimeException("Router: There is no route for [".$request->getRequestUri()."]!");
 		}
-		return null;
 	}
 
 	/**
@@ -232,7 +234,7 @@ class Router {
 				$controller = new $class();
 				if( $controller instanceof AController ) {
 					// It's a valid Controller so initialize its routes
-					$controller->initRoutes($this);
+					$controller->init($this);
 				}
 
 			} else if( $file !== "." && $file !== ".." && is_dir($directory.DIRECTORY_SEPARATOR.$file) ) {

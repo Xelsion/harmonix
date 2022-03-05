@@ -11,7 +11,8 @@ class Walker {
     }
 
     public function addNode( Node $node ) : void {
-        $this->_nodes[$node->_id] = $node;
+	    $this->_nodes[$node->_id] = $node;
+	    ksort($this->_nodes);
     }
 
     public function getNode( int $node_id ) : ?Node {

@@ -1,0 +1,196 @@
+/* css logic */
+#navigation {
+    position: relative;
+}
+
+#navigation a {
+    position: relative;
+    display: inline-block;
+    white-space: nowrap;
+    margin-right: 10px;
+}
+
+#navigation ul {
+    width: fit-content;
+    margin: 0px;
+    padding: 0px;
+}
+
+#navigation li {
+    position: relative;
+    width: fit-content;
+    list-style: none;
+    margin: 0px;
+    padding: 0px;
+}
+
+#navigation li > ul {
+    display: none;
+    position: absolute;
+}
+
+#navigation > ul > li {
+    float: left;
+    width: fit-content;
+}
+
+#navigation > ul > li.has-children::after {
+    position: absolute;
+    content: '';
+    right: 10px;
+    top: 50%;
+    width: 0;
+    height: 0;
+    border-color: #999999;
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-top: 4px solid;
+}
+
+#navigation > ul > li > ul {
+    top: 100%;
+    left: 0px;
+}
+
+#navigation li:hover > ul {
+    display: block;
+}
+
+#navigation * ul > li {
+    width: 100%;
+}
+
+#navigation * ul > li.has-children::after {
+    position: absolute;
+    content: '';
+    right: 10px;
+    top: calc(50% - 4px);
+    width: 0;
+    height: 0;
+    border-color: #999999;
+    border-top: 4px solid transparent;
+    border-bottom: 4px solid transparent;
+    border-left: 4px solid;
+}
+
+#navigation li > ul > li > ul {
+    top: 0px;
+    left: 100%;
+}
+
+/* css styling */
+#navigation {
+    background: linear-gradient(to bottom, #444, #222);
+}
+
+#navigation li > ul {
+    background-color: #222;
+    border: 1px solid #444;
+}
+
+#navigation li > ul > li > ul {
+    top: -1px !important;
+}
+
+#navigation > ul > li {
+    border-right: 1px solid #777;
+}
+
+#navigation > ul > li:last-child {
+
+    border-right: 0px;
+}
+
+#navigation * ul > li {
+    display: block;
+    border-bottom: 1px solid #555;
+}
+
+#navigation * ul > li:last-child {
+    border-bottom: 0px;
+}
+
+#navigation a {
+    color: #ccc;
+    text-decoration: none;
+}
+
+#navigation a:hover {
+    color: #fff;
+}
+
+#navigation > ul > li > a {
+    font-size: 1.0em;
+    padding: 10px 20px;
+}
+
+#navigation li > ul > li > a {
+    font-size: 0.8em;
+    padding: 8px 20px;
+}
+
+/* actor menu and login */
+#actor-menu {
+    float: right;
+}
+
+#actor-menu-dropdown {
+    position: absolute;
+    display: none;
+    right: 0px;
+    background-color: #222;
+    border: 1px solid #555;
+}
+
+#actor-menu form {
+    padding: 10px 10px;
+}
+
+#actor-menu input {
+    color: #ccc;
+    background-color: #383838;
+    border: 1px solid #555;
+    border-radius: 2px;
+}
+
+#actor-menu button {
+    width: 100%;
+    text-align: center;
+    background-color: #37532d;
+    border: 1px solid #555;
+    border-radius: 4px;
+    color: #ccc;
+}
+
+#actor-menu button:hover {
+    background-color: #47633d;
+}
+
+#actor-menu .button {
+    position: relative;
+    display: inline-block;
+    text-decoration: none;
+    padding: 10px 20px;
+    margin-right: 10px;
+}
+
+#actor-menu .has-children::after {
+    position: absolute;
+    content: '';
+    right: 10px;
+    top: 50%;
+    width: 0;
+    height: 0;
+    border-color: #999999;
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-top: 4px solid;
+}
+
+#actor-menu .form-row {
+    margin-top: 10px;
+}
+
+#actor-menu .form-row {
+    margin-top: 10px;
+}

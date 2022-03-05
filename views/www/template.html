@@ -1,13 +1,13 @@
 <?php
 
-use core\System;
-use core\helper\StringHelper;
+use core\Core;
 
-$actor = System::getInstance()->getActor();
+$actor = Core::$_actor;
+$menu = Core::$_menu;
 
 $view = $this->get("view");
 $view_content = "";
-if( $view instanceof core\classes\Template ) {
+if( $view instanceof \core\classes\Template ) {
 	$view_content = $view->parse();
 }
 ?>
@@ -42,10 +42,10 @@ if( $view instanceof core\classes\Template ) {
 				<form action="<?= $_SERVER["REQUEST_URI"] ?>" method="POST">
 					<div class="row g-3">
 						<div class="col-auto">
-							<div class="col-form-label"><?= StringHelper::getSecureString($actor->first_name." ".$actor->last_name) ?></div>
+							<div class="col-form-label"><?= escaped_html($actor->first_name." ".$actor->last_name) ?></div>
 						</div>
 						<div class="col-auto">
-							<div class="col-form-label"><?= StringHelper::getSecureString($actor->email) ?></div>
+							<div class="col-form-label"><?= escaped_html($actor->email) ?></div>
 						</div>
 						<div class="col-auto">
 							<button type="submit" name="logout" class="btn btn-primary">Logout</button>

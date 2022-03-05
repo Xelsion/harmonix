@@ -77,7 +77,7 @@ class Session extends entities\Session {
 	}
 
 	/**
-	 * Log out the current Actor
+	 * Log out the current actor
 	 */
 	public function logout(): void {
 		if( isset($_COOKIE["session"]) && $_COOKIE["session"] === $this->id ) {

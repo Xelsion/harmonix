@@ -1,67 +1,10 @@
+html {
+    min-width: 758px !important;
+}
+
 body {
     background-color: #383838;
     color: #ccc;
-}
-
-#actor-menu {
-    float: right;
-}
-
-#actor-menu-dropdown {
-    position: absolute;
-    display: none;
-    right: 0px;
-    background-color: #222;
-    border: 1px solid #555;
-}
-
-#actor-menu form {
-    padding: 10px 10px;
-}
-
-#actor-menu input {
-    color: #ccc;
-    background-color: #383838;
-    border: 1px solid #555;
-    border-radius: 2px;
-}
-
-#actor-menu button {
-    width: 100%;
-    text-align: center;
-    background-color: #585858;
-    border: 1px solid #555;
-    border-radius: 4px;
-    color: #ccc;
-}
-
-#actor-menu .button {
-    position: relative;
-    display: inline-block;
-    text-decoration: none;
-    padding: 10px 20px;
-    margin-right: 10px;
-}
-
-#actor-menu .has-children::after {
-    position: absolute;
-    content: '';
-    right: 10px;
-    top: 50%;
-    width: 0;
-    height: 0;
-    border-color: #999999;
-    border-left: 4px solid transparent;
-    border-right: 4px solid transparent;
-    border-top: 4px solid;
-}
-
-#actor-menu .form-row {
-    margin-top: 10px;
-}
-
-#actor-menu .form-row {
-    margin-top: 10px;
 }
 
 .arrow-up {

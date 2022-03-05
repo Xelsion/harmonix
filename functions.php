@@ -21,6 +21,10 @@ function Path2Namespace( string $path ): string {
 	return $path;
 }
 
+function escaped_html( string $string ): string {
+	return htmlentities($string, ENT_QUOTES);
+}
+
 function print_debug( $message ) {
 	if( is_object($message) ) {
 		echo "<pre>";

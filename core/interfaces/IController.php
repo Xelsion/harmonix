@@ -20,7 +20,7 @@ interface IController {
 	 *
 	 * @param Router $router
 	 */
-	public function initRoutes( Router $router ): void;
+	public function init( Router $router ): void;
 
 	/**
 	 * The default method that will be called if no

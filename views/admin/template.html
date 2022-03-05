@@ -1,14 +1,13 @@
 <?php
 
-use core\System;
-use core\helper\StringHelper;
+use \core\Core;
 
-$actor = System::getInstance()->getActor();
+$actor = Core::$_actor;
+$menu = Core::$_menu;
 
 $view = $this->get("view");
-$menu = $this->get("navigation");
 $view_content = "";
-if( $view instanceof core\classes\Template ) {
+if( $view instanceof \core\classes\Template ) {
 	$view_content = $view->parse();
 }
 ?>
@@ -19,17 +18,18 @@ if( $view instanceof core\classes\Template ) {
 	<title><?= $this->get("title") ?? "Home" ?></title>
 	<link rel="stylesheet" href="<?= PATH_SRC ?>bootstrap-5.0.2/css/bootstrap.min.css" />
 	<link rel="stylesheet" href="<?= PATH_CSS ?>main.css" />
-	<link rel="stylesheet" href="<?= PATH_CSS ?>dropdown.css" />
+	<link rel="stylesheet" href="<?= PATH_CSS ?>navigation.css" />
 	<script src="<?= PATH_SRC ?>bootstrap-5.0.2/js/bootstrap.bundle.min.js"></script>
 	<script src="<?= PATH_SRC ?>jquery/jquery-3.6.0.min.js"></script>
 </head>
 <body>
 <header>
-	<nav class="dropdown-list">
+	<nav id="navigation">
 		<?= $menu->getAsHtml() ?>
 		<div id="actor-menu">
 			<div class="has-children">
-				<span onclick="$('#actor-menu-dropdown').toggle();" class="button "><?= ( $actor->id > 0 ) ? $actor->first_name." ".$actor->last_name : "Profile"  ?></span>
+				<span onclick="$('#actor-menu-dropdown').toggle();"
+				      class="button "><?= ( $actor->id > 0 ) ? $actor->first_name." ".$actor->last_name : "Profile" ?></span>
 			</div>
 			<div id="actor-menu-dropdown" style="">
 				<?php if( $actor->id === 0 ): ?>
