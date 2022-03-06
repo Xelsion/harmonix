@@ -54,7 +54,7 @@ Options -Indexes
     # SEO ALWAS USR WWW AS SUBDOMAIN
     RewriteCond %{HTTP_HOST} !^admin\.
     RewriteCond %{HTTP_HOST} !^www\. [NC]
-    RewriteRule ^(public)?(.*)$ http://www.%{HTTP_HOST}$2 [R=301,L]
+    RewriteRule ^(public)?(.*)$ https://www.%{HTTP_HOST}$2 [R=301,L]
 
     # SEO REMOVE ENDING SLASH
     RewriteCond %{REQUEST_FILENAME} !-d

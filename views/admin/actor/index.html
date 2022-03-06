@@ -1,4 +1,26 @@
 <?php
 $this->set("title", "Benutzer");
+
+$actor_list = $this->get("result_list");
 ?>
 <div>Actors!</div>
+<div class="container-fluid">
+	<table class="table table-dark table-striped">
+		<tr>
+			<th>ID</th>
+			<th>E-Mail</th>
+			<th>Vorname</th>
+			<th>Nachname</th>
+			<th>Optionen</th>
+		</tr>
+		<?php foreach( $actor_list as $actor ): ?>
+			<tr>
+				<td><?= escaped_html($actor->id) ?></td>
+				<td><?= escaped_html($actor->email) ?></td>
+				<td><?= escaped_html($actor->first_name) ?></td>
+				<td><?= escaped_html($actor->last_name) ?></td>
+				<td><a href="/actors/update/<?= $actor->id ?>">Edit</a></td>
+			</tr>
+		<?php endforeach; ?>
+	</table>
+</div>

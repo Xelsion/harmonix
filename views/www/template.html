@@ -1,13 +1,14 @@
 <?php
 
 use core\Core;
+use core\classes\Template;
 
 $actor = Core::$_actor;
 $menu = Core::$_menu;
 
 $view = $this->get("view");
 $view_content = "";
-if( $view instanceof \core\classes\Template ) {
+if( $view instanceof Template ) {
 	$view_content = $view->parse();
 }
 ?>
@@ -19,7 +20,6 @@ if( $view instanceof \core\classes\Template ) {
 	<link rel="stylesheet" href="<?= PATH_SRC ?>bootstrap/css/bootstrap.css" />
 	<link rel="stylesheet" href="<?= PATH_CSS ?>main.css" />
 	<script src="<?= PATH_SRC ?>bootstrap/js/bootstrap.js"></script>
-	<script src="<?= PATH_SRC ?>vue/vue.js"></script>
 </head>
 <body>
 <header>
@@ -29,10 +29,14 @@ if( $view instanceof \core\classes\Template ) {
 			<?php if( $actor->id === 0 ): ?>
 				<form action="<?= $_SERVER["REQUEST_URI"] ?>" method="POST">
 					<div class="row g-3">
-						<div class="col-auto"><input type="email" name="email" value="" placeholder="E-Mail"
-						                             class="form-control" /></div>
-						<div class="col-auto"><input type="password" name="password" value="" placeholder="Password"
-						                             class="form-control" /></div>
+						<div class="col-auto"><label>
+								<input type="email" name="email" value="" placeholder="E-Mail"
+								       class="form-control" />
+							</label></div>
+						<div class="col-auto"><label>
+								<input type="password" name="password" value="" placeholder="Password"
+								       class="form-control" />
+							</label></div>
 						<div class="col-auto">
 							<button type="submit" name="login" class="btn btn-primary">Login</button>
 						</div>

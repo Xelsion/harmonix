@@ -1,0 +1,37 @@
+<?php
+global $lang;
+$this->set("title", "Benutzer erstellen");
+?>
+<h1>Neuen Benutzer anlegen</h1>
+<div class="container-fluid">
+	<form action="\actors\create" method="POST" class="needs-validation" novalidate>
+		<div class="form-group">
+			<label for="email">E-Mail</label>
+			<input type="email" name="email" value="" id="email" required />
+			<div class="invalid-feedback"><?= escaped_html($lang["required"]["email"]) ?></div>
+		</div>
+		<div class="form-group">
+			<label for="password">Passwort</label>
+			<input type="password" name="password" value="" id="password" required />
+			<div class="invalid-feedback"><?= escaped_html($lang["required"]["password"]) ?></div>
+		</div>
+		<div class="form-group">
+			<label for="password_verify">Passwort Wiederholung</label>
+			<input type="password" name="password_verify" value="" id="password_verify" required />
+			<div class="invalid-feedback"><?= escaped_html($lang["required"]["password_verify"]) ?></div>
+		</div>
+		<div class="form-group">
+			<label for="first_name">Vorname</label>
+			<input type="text" name="first_name" value="" id="first_name" required />
+			<div class="invalid-feedback"><?= escaped_html($lang["required"]["first_name"]) ?></div>
+		</div>
+		<div class="form-group">
+			<label for="last_name">Nachname</label>
+			<input type="text" name="last_name" value="" id="last_name" required />
+			<div class="invalid-feedback"><?= escaped_html($lang["required"]["last_name"]) ?></div>
+		</div>
+		<div class="form-group clearfix">
+			<button type="submit" name="create" class="submit float-end">Erstellen</button>
+		</div>
+	</form>
+</div>

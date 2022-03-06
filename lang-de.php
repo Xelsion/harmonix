@@ -1,0 +1,2 @@
+<?php
+$lang = array( 'required' => array( 'email' => "E-Mail muss angegeben werden!", 'password' => "Passwort muss angegeben werden!", 'password_verify' => "Passwörter stimmen nicht überein!", 'first_name' => "Vorname muss angegeben werden!", 'last_name' => "Nachname muss angegeben werden!", ), );

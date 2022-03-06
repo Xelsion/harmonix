@@ -7,45 +7,9 @@ body {
     color: #ccc;
 }
 
-.arrow-up {
-    width: 0;
-    height: 0;
-    border-color: #999999;
-    border-left: 4px solid transparent;
-    border-right: 4px solid transparent;
-    border-bottom: 4px solid;
-}
-
-.arrow-down {
-    width: 0;
-    height: 0;
-    border-color: #999999;
-    border-left: 4px solid transparent;
-    border-right: 4px solid transparent;
-    border-top: 4px solid;
-}
-
-.arrow-right {
-    width: 0;
-    height: 0;
-    border-color: #999999;
-    border-top: 4px solid transparent;
-    border-bottom: 4px solid transparent;
-    border-left: 4px solid;
-}
-
-.arrow-left {
-    width: 0;
-    height: 0;
-    border-color: #999999;
-    border-top: 4px solid transparent;
-    border-bottom: 4px solid transparent;
-    border-right: 4px solid;
-}
-
 .cleaner {
     clear: both;
-    width: 0px;
-    height: 0px;
+    width: 0;
+    height: 0;
     overflow: hidden;
 }

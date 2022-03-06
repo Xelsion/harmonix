@@ -28,6 +28,6 @@ interface IController {
 	 *
 	 * @return AResponse
 	 */
-	public function indexAction(): AResponse;
+	public function index(): AResponse;
 
 }

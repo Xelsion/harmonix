@@ -2,12 +2,12 @@
 
 namespace models\entities;
 
+use core\Core;
 use PDO;
 use PDOException;
 use RuntimeException;
 use core\abstracts\AEntity;
 use core\helper\StringHelper;
-use core\System;
 
 class Actor extends AEntity {
 
@@ -24,7 +24,7 @@ class Actor extends AEntity {
 
 	public function __construct( int $id = 0 ) {
 		if( $id > 0 ) {
-			$pdo = System::getInstance()->getConnectionManager()->getConnection("mvc");
+			$pdo = Core::$_connection_manager->getConnection("mvc");
 			$stmt = $pdo->prepare("SELECT * FROM actors WHERE id=:id");
 			$stmt->bindParam(":id", $id, PDO::PARAM_INT);
 			$stmt->setFetchMode(PDO::FETCH_INTO, $this);
@@ -39,13 +39,14 @@ class Actor extends AEntity {
 	 * @see \core\interfaces\IEntity
 	 */
 	public function create(): int {
-		$pdo = System::getInstance()->getConnectionManager()->getConnection("mvc");
 		try {
+			$pdo = Core::$_connection_manager->getConnection("mvc");
 			$sql = "INSERT INTO actors (email, password, first_name, last_name) VALUES (:email, :password, :first_name, :last_name)";
 			$this->password = StringHelper::getBCrypt($this->password);
 			$stmt = $pdo->prepare($sql);
+			$encrypted_pass = StringHelper::getBCrypt($this->password);
 			$stmt->bindParam(':email', $this->email, PDO::PARAM_STR);
-			$stmt->bindParam(':password', StringHelper::getBCrypt($this->password), PDO::PARAM_STR);
+			$stmt->bindParam(':password', $encrypted_pass, PDO::PARAM_STR);
 			$stmt->bindParam(':first_name', $this->first_name, PDO::PARAM_STR);
 			$stmt->bindParam(':last_name', $this->last_name, PDO::PARAM_STR);
 			$stmt->execute();
@@ -60,15 +61,16 @@ class Actor extends AEntity {
 	 * @see \core\interfaces\IEntity
 	 */
 	public function update(): void {
-		$pdo = System::getInstance()->getConnectionManager()->getConnection("mvc");
 		try {
-			$pdo = System::getInstance()->getConnectionManager()->getConnection("mvc");
+			$pdo = Core::$_connection_manager->getConnection("mvc");
 			$stmt = $pdo->prepare("SELECT password FROM actors WHERE id=:id");
 			$stmt->bindParam(":id", $this->id, PDO::PARAM_INT);
 			$stmt->execute();
 			if( $row = $stmt->fetch() ) {
-				if( $row["password"] !== $this->password ) {
+				if( $this->password !== '' && $row["password"] !== $this->password ) {
 					$this->password = StringHelper::getBCrypt($this->password);
+				} else {
+					$this->password = $row["password"];
 				}
 				$sql = "UPDATE actors SET email=:email, password=:password, first_name=:first_name, last_name=:last_name WHERE id=:id";
 				$stmt = $pdo->prepare($sql);
@@ -90,7 +92,7 @@ class Actor extends AEntity {
 	 */
 	public function delete(): bool {
 		if( $this->id > 0 ) {
-			$pdo = System::getInstance()->getConnectionManager()->getConnection("mvc");
+			$pdo = Core::$_connection_manager->getConnection("mvc");
 			try {
 				$stmt = $pdo->prepare("DELETE FROM actors WHERE id=:id");
 				$stmt->bindParam(":id", $this->id, PDO::PARAM_INT);

@@ -48,16 +48,15 @@ class Router {
 	 * The call looks like "ControllerName->methodName"
 	 *
 	 * @param string $route
-	 * @param string $call
-	 * @throws RuntimeException
+	 * @param string $class
+	 * @param string|null $method
 	 */
-	public function addRoute( string $route, string $call ): void {
+	public function addRoute( string $route, string $class, ?string $method = null ): void {
 		if( !isset($this->_routes[$route]) ) {
-			if( preg_match("/^(.*)->(.*)/", $call, $matches) ) {
-				$this->_routes[$route] = array( "controller" => $matches[1], 'method' => $matches[2] );
-			} else {
-				$this->_routes[$route] = array( "controller" => $call, 'method' => "indexAction" );
+			if( is_null($method) ) {
+				$method = "index";
 			}
+			$this->_routes[$route] = array( "controller" => $class, 'method' => $method );
 		} else {
 			throw new RuntimeException("Router: The route [".$route."] was already taken");
 		}
@@ -73,7 +72,8 @@ class Router {
 		if( isset($this->_routes[$route]) ) {
 			return true;
 		}
-		return false;
+		$matches = preg_grep("/^".preg_quote($route, '/')."/i", array_keys($this->_routes));
+		return count($matches) > 0;
 	}
 
 	/**

@@ -1,13 +1,14 @@
 <?php
 
-use \core\Core;
+use core\Core;
+use core\classes\Template;
 
 $actor = Core::$_actor;
 $menu = Core::$_menu;
 
 $view = $this->get("view");
 $view_content = "";
-if( $view instanceof \core\classes\Template ) {
+if( $view instanceof Template ) {
 	$view_content = $view->parse();
 }
 ?>
@@ -19,8 +20,10 @@ if( $view instanceof \core\classes\Template ) {
 	<link rel="stylesheet" href="<?= PATH_SRC ?>bootstrap-5.0.2/css/bootstrap.min.css" />
 	<link rel="stylesheet" href="<?= PATH_CSS ?>main.css" />
 	<link rel="stylesheet" href="<?= PATH_CSS ?>navigation.css" />
+	<link rel="stylesheet" href="<?= PATH_CSS ?>forms.css" />
 	<script src="<?= PATH_SRC ?>bootstrap-5.0.2/js/bootstrap.bundle.min.js"></script>
 	<script src="<?= PATH_SRC ?>jquery/jquery-3.6.0.min.js"></script>
+	<script src="<?= PATH_JS ?>main.js"></script>
 </head>
 <body>
 <header>
@@ -32,15 +35,27 @@ if( $view instanceof \core\classes\Template ) {
 				      class="button "><?= ( $actor->id > 0 ) ? $actor->first_name." ".$actor->last_name : "Profile" ?></span>
 			</div>
 			<div id="actor-menu-dropdown" style="">
-				<?php if( $actor->id === 0 ): ?>
-					<form action="<?= $_SERVER["REQUEST_URI"] ?>" method="POST">
-						<div class="form-row"><input type="email" name="email" value="" placeholder="E-Mail" /></div>
-						<div class="form-row"><input type="password" name="password" value="" placeholder="Password" /></div>
-						<div class="form-row"><button type="submit" name="login">Login</button></div>
-					</form>
-				<?php else: ?>
-					<div class="form-row"><button type="submit" name="logout">Logout</button></div>
-				<?php endif; ?>
+				<form action="<?= $_SERVER["REQUEST_URI"] ?>" method="POST">
+					<?php if( $actor->id === 0 ): ?>
+						<div class="form-row">
+							<label>
+								<input type="email" name="email" value="" placeholder="E-Mail" />
+							</label>
+						</div>
+						<div class="form-row">
+							<label>
+								<input type="password" name="password" value="" placeholder="Password" />
+							</label>
+						</div>
+						<div class="form-row">
+							<button type="submit" name="login">Login</button>
+						</div>
+					<?php else: ?>
+						<div class="form-row">
+							<button type="submit" name="logout">Logout</button>
+						</div>
+					<?php endif; ?>
+				</form>
 			</div>
 		</div>
 		<div class="cleaner"></div>

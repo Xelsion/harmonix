@@ -17,11 +17,11 @@ use core\classes\tree\MenuItem;
 class HomeController extends AController {
 
 	public function init( Router $router ): void {
-		static::$_menu->insertMenuItem(1, null, "Home", "/");
+		static::$_menu->insertMenuItem(100, null, "Home", "/");
 		$router->addRoute("/", __CLASS__);
 	}
 
-	public function indexAction(): AResponse {
+	public function index(): AResponse {
 		$response = new ResponseHTML();
 		$template = new Template(PATH_VIEWS."template.html");
 		$template->set("navigation", static::$_menu);

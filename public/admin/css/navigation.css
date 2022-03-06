@@ -1,6 +1,7 @@
 /* css logic */
 #navigation {
     position: relative;
+    z-index: 100;
 }
 
 #navigation a {
@@ -12,16 +13,16 @@
 
 #navigation ul {
     width: fit-content;
-    margin: 0px;
-    padding: 0px;
+    margin: 0;
+    padding: 0;
 }
 
 #navigation li {
     position: relative;
     width: fit-content;
     list-style: none;
-    margin: 0px;
-    padding: 0px;
+    margin: 0;
+    padding: 0;
 }
 
 #navigation li > ul {
@@ -49,7 +50,7 @@
 
 #navigation > ul > li > ul {
     top: 100%;
-    left: 0px;
+    left: 0;
 }
 
 #navigation li:hover > ul {
@@ -74,7 +75,7 @@
 }
 
 #navigation li > ul > li > ul {
-    top: 0px;
+    top: 0;
     left: 100%;
 }
 
@@ -98,7 +99,7 @@
 
 #navigation > ul > li:last-child {
 
-    border-right: 0px;
+    border-right: 0;
 }
 
 #navigation * ul > li {
@@ -107,7 +108,7 @@
 }
 
 #navigation * ul > li:last-child {
-    border-bottom: 0px;
+    border-bottom: 0;
 }
 
 #navigation a {
@@ -132,12 +133,13 @@
 /* actor menu and login */
 #actor-menu {
     float: right;
+    z-index: 100;
 }
 
 #actor-menu-dropdown {
     position: absolute;
     display: none;
-    right: 0px;
+    right: 0;
     background-color: #222;
     border: 1px solid #555;
 }

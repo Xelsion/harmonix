@@ -6,7 +6,7 @@ use PDO;
 use PDOException;
 use RuntimeException;
 
-use core\System;
+use core\Core;
 
 class ActorRole extends entities\ActorRole {
 
@@ -25,7 +25,7 @@ class ActorRole extends entities\ActorRole {
 	public function getChildRoles(): array {
 		$children = array();
 		try {
-			$pdo = System::getInstance()->getConnectionManager()->getConnection("mvc");
+			$pdo = Core::$_connection_manager->getConnection("mvc");
 			$stmt = $pdo->prepare("SELECT * FROM actor_roles WHERE child_of=:id");
 			$stmt->bindParam(":id", $this->id, PDO::PARAM_INT);
 			$stmt->setFetchMode(PDO::FETCH_OBJ, __CLASS__);

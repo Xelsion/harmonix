@@ -7,6 +7,7 @@ use core\System;
 
 define("SUB_DOMAIN", explode(".", $_SERVER["HTTP_HOST"])[0]);
 require_once( "../constants.php" );
+require_once( "../lang-de.php" );
 require_once( "../functions.php" );
 
 $runtime_logger = new Logger("runtime");

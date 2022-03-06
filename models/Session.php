@@ -6,7 +6,8 @@ use PDO;
 use DateTime;
 use Exception;
 use RuntimeException;
-use core\System;
+
+use core\Core;
 
 class Session extends entities\Session {
 
@@ -42,7 +43,7 @@ class Session extends entities\Session {
 	 * @throws Exception
 	 */
 	public function login( string $email, string $password ): Actor {
-		$pdo = System::getInstance()->getConnectionManager()->getConnection("mvc");
+		$pdo = Core::$_connection_manager->getConnection("mvc");
 		$stmt = $pdo->prepare("SELECT * FROM actors WHERE email=:email");
 		$stmt->bindParam(":email", $email, PDO::PARAM_STR);
 		$stmt->execute();
