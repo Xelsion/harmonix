@@ -17,8 +17,11 @@ use core\classes\tree\MenuItem;
 class HomeController extends AController {
 
 	public function init( Router $router ): void {
-		static::$_menu->insertMenuItem(100, null, "Home", "/");
+		// Add routes to router
 		$router->addRoute("/", __CLASS__);
+
+		// Add MenuItems to the Menu
+		static::$_menu->insertMenuItem(100, null, "Home", "/");
 	}
 
 	public function index(): AResponse {

@@ -2,6 +2,13 @@
 
 namespace core\interfaces;
 
+/**
+ * The Entity interface
+ * Defines necessary methods for all entities
+ *
+ * @author Markus Schröder <xelsion@gmail.com>
+ * @version 1.0.0;
+ */
 interface IEntity {
 
 	/**

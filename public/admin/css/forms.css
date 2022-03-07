@@ -23,6 +23,11 @@ form input {
     width: 100%;
 }
 
+form input:disabled {
+    color: #7d7d7d;
+    background-color: #282828;
+}
+
 form input[type=checkbox] {
     margin-right: 10px;
 }
@@ -34,6 +39,11 @@ form select {
     border-radius: 2px;
     padding: 5px;
     width: 100%;
+}
+
+form select:disabled {
+    color: #7d7d7d;
+    background-color: #282828;
 }
 
 form.was-validated select:invalid,
@@ -67,6 +77,11 @@ form button {
 
 form button.submit {
     background-color: #37532d;
+}
+
+form button.submit:disabled {
+    color: #7d7d7d !important;
+    background-color: #17330d !important;
 }
 
 form button.submit:hover {

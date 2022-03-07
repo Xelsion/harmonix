@@ -23,18 +23,19 @@ class Request {
 	 */
 	private function __construct() {
 		foreach( $_GET as $key => $value ) {
-			$this->_form['GET'][$key] = $value;
+			$this->_form[$key] = $value;
 		}
 		foreach( $_POST as $key => $value ) {
-			$this->_form['POST'][$key] = $value;
+			$this->_form[$key] = $value;
 		}
 		foreach( $_FILES as $key => $value ) {
-			$this->_form['FILES'][$key] = $value;
+			$this->_form[$key] = $value;
 		}
 	}
 
 	/**
 	 * The initializer for this class
+	 *
 	 * @return Request
 	 */
 	public static function getInstance(): Request {
@@ -71,16 +72,22 @@ class Request {
 		return $_SERVER["REMOTE_ADDR"];
 	}
 
-	public function getGET(): array {
-		return $this->_form["GET"] ?? array();
+	/**
+	 * Returns all submitted key => value pairs
+	 *
+	 * @return array
+	 */
+	public function getAll(): array {
+		return $this->_form;
 	}
 
-	public function getPOST(): array {
-		return $this->_form["GET"] ?? array();
-	}
-
-	public function getFILES(): array {
-		return $this->_form["FILES"] ?? array();
+	/**
+	 * Returns the value from the submitted pairs
+	 * by its key
+	 *
+	 */
+	public function get( string $key ) {
+		return $this->_form[$key] ?? null;
 	}
 
 	/**

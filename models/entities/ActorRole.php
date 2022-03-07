@@ -17,6 +17,8 @@ class ActorRole extends AEntity {
 	public int $rights_all = 0b0000;
 	public int $rights_group = 0b0000;
 	public int $rights_own = 0b0000;
+	public bool $is_default = false;
+	public bool $is_protected = false;
 
 	public function __construct( int $id = 0 ) {
 		if( $id > 0 ) {

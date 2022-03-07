@@ -8,7 +8,19 @@ use core\Core;
 
 class Actor extends entities\Actor {
 
-	public static function find( array $conditions ) {
+	public array $_permissions = array();
+
+	public function __construct( int $id = 0 ) {
+		parent::__construct($id);
+	}
+
+	/**
+	 * Returns all actors that mach the conditions
+	 *
+	 * @param array $conditions
+	 * @return array|false|null
+	 */
+	public static function find( array $conditions ): ?array {
 		if( empty($conditions) ) {
 			return static::findAll();
 		}
@@ -28,7 +40,12 @@ class Actor extends entities\Actor {
 		return $stmt->fetchAll(PDO::FETCH_CLASS, __CLASS__);
 	}
 
-	public static function findAll() {
+	/**
+	 * Returns all actors
+	 *
+	 * @return array|false
+	 */
+	public static function findAll(): ?array {
 		$index = 0;
 		$limit = 20;
 		$pdo = Core::$_connection_manager->getConnection("mvc");
@@ -39,8 +56,50 @@ class Actor extends entities\Actor {
 		return $stmt->fetchAll(PDO::FETCH_CLASS, __CLASS__);
 	}
 
-    public function toTableRow() {
-        return "<div></div>";
-    }
+	public function getRole( string $controller, string $method ): ActorRole {
+		if( $this->id > 0 ) {
+			if( empty($this->_permissions) ) {
+				$this->initPermission();
+			}
+
+			if( isset($this->_permissions[SUB_DOMAIN][$controller][$method]) ) {
+				return $this->_permissions[SUB_DOMAIN][$controller][$method];
+			}
+
+			if( isset($this->_permissions[SUB_DOMAIN][$controller][null]) ) {
+				return $this->_permissions[SUB_DOMAIN][$controller][null];
+			}
+
+			if( isset($this->_permissions[SUB_DOMAIN][null][null]) ) {
+				return $this->_permissions[SUB_DOMAIN][null][null];
+			}
+		}
+		$result = ActorRole::find(array(
+			array(
+				"is_default",
+				"=",
+				1
+			)
+		));
+		return $result[0];
+	}
+
+	private function initPermission(): void {
+		$permissions = ActorPermission::find(array(
+			array(
+				"actor_id",
+				"=",
+				$this->id
+			)
+		));
+
+		foreach( $permissions as $permission ) {
+			$this->_permissions[$permission->path][$permission->controller][$permission->method] = $permission->getRole();
+		}
+	}
+
+	public function toTableRow() {
+		return "<div></div>";
+	}
 
 }

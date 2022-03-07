@@ -9,7 +9,15 @@ use core\classes\Router;
 use core\classes\tree\Menu;
 use core\manager\ConnectionManager;
 use models\Actor;
+use models\ActorRole;
 
+/**
+ * The core class holds all important object
+ * accessible from anywhere
+ *
+ * @author Markus Schröder <xelsion@gmail.com>
+ * @version 1.0.0;
+ */
 class Core {
 
 	// The application configuration
@@ -29,6 +37,9 @@ class Core {
 
 	// The current actor
 	public static Actor $_actor;
+
+	// The current actor role
+	public static ActorRole $_actor_role;
 
 	// The router
 	public static Router $_router;

@@ -7,13 +7,31 @@ use PDO;
 
 use core\interfaces\IEntity;
 
+/**
+ * The Abstract version of a Entity
+ *
+ * @author Markus Schröder <xelsion@gmail.com>
+ * @version 1.0.0;
+ */
 abstract class AEntity implements IEntity {
 
+	/**
+	 * Converts a string to a DateTime object
+	 *
+	 * @param string $datetime
+	 * @return DateTime|false
+	 */
 	public function str2DateTime( string $datetime ) {
 		return DateTime::createFromFormat("Y-m-d H:i:s", $datetime);
 	}
 
-	protected static function getParamType( $value ): ?int {
+	/**
+	 * Returns the PDO::PARAM type of the given value
+	 *
+	 * @param $value
+	 * @return int
+	 */
+	protected static function getParamType( $value ): int {
 		if( is_null($value) ) {
 			return PDO::PARAM_NULL;
 		}

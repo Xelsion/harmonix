@@ -15,6 +15,10 @@ class ActorRole extends entities\ActorRole {
 	public static int $CAN_UPDATE = 0b0010;
 	public static int $CAN_DELETE = 0b0001;
 
+	public function __construct( int $id = 0 ) {
+		parent::__construct($id);
+	}
+
 	public static function find( array $conditions ) {
 		if( empty($conditions) ) {
 			return static::findAll();

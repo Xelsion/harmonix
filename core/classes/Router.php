@@ -34,6 +34,7 @@ class Router {
 
 	/**
 	 * The initializer for this class
+	 *
 	 * @return Router
 	 */
 	public static function getInstance(): Router {
@@ -253,6 +254,13 @@ class Router {
 		}
 	}
 
+	/**
+	 * Collect all Controllers from all "subdomains" and returns them
+	 * in an array
+	 *
+	 * @param string $directory
+	 * @param array $results
+	 */
 	public function getAllRoutes( string $directory, array &$results ): void {
 		$files = scandir($directory);
 		// Go through all files/directories in this directory

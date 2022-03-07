@@ -7,6 +7,15 @@ use PDO;
 
 class ActorPermission extends entities\ActorPermission {
 
+	private ?ActorRole $_role = null;
+
+	public function __construct( int $id = 0 ) {
+		parent::__construct($id);
+		if( $this->role_id > 0 ) {
+			$this->_role = new ActorRole($this->role_id);
+		}
+	}
+
 	public static function find( array $conditions ) {
 		if( empty($conditions) ) {
 			return static::findAll();
@@ -38,4 +47,7 @@ class ActorPermission extends entities\ActorPermission {
 		return $stmt->fetchAll(PDO::FETCH_CLASS, __CLASS__);
 	}
 
+	public function getRole(): ?ActorRole {
+		return $this->_role;
+	}
 }

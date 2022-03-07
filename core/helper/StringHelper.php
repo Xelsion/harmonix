@@ -12,6 +12,17 @@ use core\classes\Configuration;
  */
 class StringHelper {
 
+	/**
+	 * Shortens the given string to the given length
+	 * and returns the string.
+	 * if np_word_brake is true it will keep all words intact
+	 * and don't break them
+	 *
+	 * @param string $string
+	 * @param int $length
+	 * @param bool $no_word_break
+	 * @return string
+	 */
 	public static function getShortString( string $string, int $length, bool $no_word_break = false ): string {
 		$result = $string;
 		if( strlen($string) > $length ) {
@@ -39,6 +50,12 @@ class StringHelper {
 		return $result;
 	}
 
+	/**
+	 * Returns a BCrypt string from the given string
+	 *
+	 * @param string $str
+	 * @return string
+	 */
 	public static function getBCrypt( string $str ): string {
 		return password_hash($str, PASSWORD_BCRYPT);
 	}

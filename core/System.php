@@ -83,13 +83,16 @@ class System {
 				// Get the method and its parameters
 				$method = $route["method"];
 				$params = $route["params"];
+				// Set the actor role for the current request
+				Core::$_actor_role = Core::$_actor->getRole(get_class($controller), $method);
 				// Get the Response obj from the controller
 				$this->_response = $controller->$method(...$params);
+				$this->_response->setHeaders();
 				// Return the response output
 				return $this->_response->getOutput();
 			}
 			// No valid controller found
-			throw new RuntimeException("Controller for request ".$this->_request->getRequestUri()." cant be found!");
+			throw new RuntimeException("Controller for request ".Core::$_request->getRequestUri()." cant be found!");
 		} catch( Exception $e ) {
 			// Pass all exceptions to the index.php
 			throw new RuntimeException($e->getMessage());

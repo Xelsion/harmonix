@@ -7,6 +7,7 @@ use core\abstracts\AResponse;
 use core\classes\responses\ResponseHTML;
 use core\classes\Router;
 use core\classes\Template;
+use core\Core;
 use models\Actor;
 use models\ActorRole;
 use models\ActorPermission;
@@ -39,6 +40,10 @@ class ActorController extends AController {
 	}
 
 	public function create(): AResponse {
+		if( !Core::$_actor_role->canCreateAll() ) {
+			redirect("/error/403");
+		}
+
 		if( isset($_POST['create']) ) {
 			$is_valid = $this->postIsValid();
 			if( $is_valid ) {
@@ -60,6 +65,10 @@ class ActorController extends AController {
 	}
 
 	public function update( Actor $actor ): AResponse {
+		if( !Core::$_actor_role->canUpdateAll() ) {
+			redirect("/error/403");
+		}
+
 		if( isset($_POST['cancel']) ) {
 			redirect("/actors");
 		}
@@ -84,6 +93,10 @@ class ActorController extends AController {
 	}
 
 	public function roles( Actor $actor ): AResponse {
+		if( !Core::$_actor_role->canUpdateAll() ) {
+			redirect("/error/403");
+		}
+
 		if( isset($_POST['cancel']) ) {
 			redirect("/actors");
 		}

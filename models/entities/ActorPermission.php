@@ -17,6 +17,17 @@ class ActorPermission extends AEntity {
 	public ?string $controller = null;
 	public ?string $method = null;
 
+	public function __construct( int $id = 0 ) {
+		if( $id > 0 ) {
+			$pdo = Core::$_connection_manager->getConnection("mvc");
+			$stmt = $pdo->prepare("SELECT * FROM actor_permissions WHERE id=:id");
+			$stmt->bindParam(":id", $id, PDO::PARAM_INT);
+			$stmt->setFetchMode(PDO::FETCH_INTO, $this);
+			$stmt->execute();
+			$stmt->fetch();
+		}
+	}
+
 	/**
 	 * @inheritDoc
 	 */

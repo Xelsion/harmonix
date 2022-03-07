@@ -2,6 +2,13 @@
 
 namespace core\classes;
 
+/**
+ * This class can hold key => value pairs that
+ * will be shared by all used templates
+ *
+ * @author Markus Schröder <xelsion@gmail.com>
+ * @version 1.0.0;
+ */
 class TemplateData {
 
 	// the data storage for the template
