@@ -11,6 +11,10 @@
     margin-right: 10px;
 }
 
+#navigation * ul > li > a {
+    display: block;
+}
+
 #navigation ul {
     width: fit-content;
     margin: 0;
@@ -94,12 +98,7 @@
 }
 
 #navigation > ul > li {
-    border-right: 1px solid #777;
-}
-
-#navigation > ul > li:last-child {
-
-    border-right: 0;
+    border-right: 1px solid #000;
 }
 
 #navigation * ul > li {

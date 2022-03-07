@@ -1,0 +1,34 @@
+<?php
+global $lang;
+$this->set("title", "Rollen");
+
+$role_list = $this->get("result_list");
+?>
+<div>Actors!</div>
+<div class="container-fluid">
+	<table class="table table-dark table-striped">
+		<tr>
+			<th>ID</th>
+			<th>Name</th>
+			<th>Unterrolle von</th>
+			<th>Rechte: Alle</th>
+			<th>Rechte: Gruppe</th>
+			<th>Rechte: Eigene</th>
+			<th>Optionen</th>
+		</tr>
+		<?php foreach( $role_list as $role ):
+			$parent = $role->getParent();
+			$rights = $role->getStringArray();
+			?>
+			<tr>
+				<td><?= escaped_html($role->id) ?></td>
+				<td><?= escaped_html($role->name) ?></td>
+				<td><?= ( !is_null($parent) ) ? escaped_html($parent->name) : "- keine -" ?></td>
+				<td><?= escaped_html(implode(", ", $rights["all"])) ?></td>
+				<td><?= escaped_html(implode(", ", $rights["group"])) ?></td>
+				<td><?= escaped_html(implode(", ", $rights["own"])) ?></td>
+				<td><a href="/actor-roles/<?= $role->id ?>">Edit</a></td>
+			</tr>
+		<?php endforeach; ?>
+	</table>
+</div>

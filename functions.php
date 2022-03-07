@@ -25,6 +25,11 @@ function escaped_html( string $string ): string {
 	return htmlentities($string, ENT_QUOTES);
 }
 
+function redirect( string $url ) {
+	header("Location: https://".$_SERVER["HTTP_HOST"].$url);
+	die();
+}
+
 function print_debug( $message ) {
 	if( is_object($message) ) {
 		echo "<pre>";

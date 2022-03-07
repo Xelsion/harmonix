@@ -19,7 +19,10 @@ $actor_list = $this->get("result_list");
 				<td><?= escaped_html($actor->email) ?></td>
 				<td><?= escaped_html($actor->first_name) ?></td>
 				<td><?= escaped_html($actor->last_name) ?></td>
-				<td><a href="/actors/update/<?= $actor->id ?>">Edit</a></td>
+				<td>
+					<a href="/actors/<?= $actor->id ?>">Edit</a>
+					<a href="/actors/roles/<?= $actor->id ?>">Rollen</a>
+				</td>
 			</tr>
 		<?php endforeach; ?>
 	</table>

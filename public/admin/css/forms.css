@@ -20,8 +20,23 @@ form input {
     border: 1px solid #555;
     border-radius: 2px;
     padding: 5px;
+    width: 100%;
 }
 
+form input[type=checkbox] {
+    margin-right: 10px;
+}
+
+form select {
+    color: #ccc;
+    background-color: #383838;
+    border: 1px solid #555;
+    border-radius: 2px;
+    padding: 5px;
+    width: 100%;
+}
+
+form.was-validated select:invalid,
 form.was-validated input:invalid {
     border-color: #dc3545;
     padding-right: calc(1.5em + .75rem);
@@ -31,6 +46,7 @@ form.was-validated input:invalid {
     background-size: calc(.75em + .375rem) calc(.75em + .375rem);
 }
 
+form.was-validated select:valid,
 form.was-validated input:valid {
     border-color: #198754;
     padding-right: calc(1.5em + .75rem);
@@ -58,9 +74,9 @@ form button.submit:hover {
 }
 
 form button.cancel {
-    background-color: #37532d;
+    background-color: #642a2a;
 }
 
 form button.cancel:hover {
-    background-color: #47633d;
+    background-color: #743a3a;
 }

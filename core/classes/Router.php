@@ -44,6 +44,15 @@ class Router {
 	}
 
 	/**
+	 * Returns an array of all collected routes
+	 *
+	 * @return array
+	 */
+	public function getRoutes(): array {
+		return $this->_routes;
+	}
+
+	/**
 	 * Sets a route for a specific call.
 	 * The call looks like "ControllerName->methodName"
 	 *
@@ -239,7 +248,42 @@ class Router {
 
 			} else if( $file !== "." && $file !== ".." && is_dir($directory.DIRECTORY_SEPARATOR.$file) ) {
 				// Let's go through this subdirectory
-				$this->initController($directory.DIRECTORY_SEPARATOR.$file.DIRECTORY_SEPARATOR);
+				$this->initController($directory.$file.DIRECTORY_SEPARATOR);
+			}
+		}
+	}
+
+	public function getAllRoutes( string $directory, array &$results ): void {
+		$files = scandir($directory);
+		// Go through all files/directories in this directory
+		foreach( $files as $file ) {
+			// do we have a file?
+			if( !is_dir($directory.$file) ) {
+				$class_file = $directory.$file;
+				// Get the namespace of this path
+				$class = Path2Namespace($class_file);
+				// get an instance of this class
+				$controller = new $class();
+				if( $controller instanceof AController ) {
+					// It's a valid Controller so initialize its routes
+					$methods = get_class_methods($controller);
+					foreach( $methods as $method ) {
+						try {
+							$reflection = new ReflectionMethod($controller, $method);
+							$return_type = $reflection->getReturnType();
+							if( !is_null($return_type) && $return_type->getName() === "core\abstracts\AResponse" ) {
+								$pattern = "/^controller\\".DIRECTORY_SEPARATOR."(.*)\\".DIRECTORY_SEPARATOR."/";
+								preg_match($pattern, $class, $matches);
+								$results[$matches[1]][$class][] = $method;
+							}
+						} catch( ReflectionException $e ) {
+							throw new RuntimeException($e->getMessage());
+						}
+					}
+				}
+			} else if( $file !== "." && $file !== ".." && is_dir($directory.DIRECTORY_SEPARATOR.$file) ) {
+				// Let's go through this subdirectory
+				$this->getAllRoutes($directory.$file.DIRECTORY_SEPARATOR, $results);
 			}
 		}
 	}

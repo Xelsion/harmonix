@@ -32,10 +32,10 @@ class ActorRole extends AEntity {
 	public function create() {
 		try {
 			$pdo = Core::$_connection_manager->getConnection("mvc");
-			$sql = "INSERT INTO actor_roles (child_of, name, rights_all, rights_group, rights_own) VALUES (:group_of, :name, :rights_all, :rights_group, :rights_own)";
+			$sql = "INSERT INTO actor_roles (child_of, name, rights_all, rights_group, rights_own) VALUES (:child_of, :name, :rights_all, :rights_group, :rights_own)";
 			$stmt = $pdo->prepare($sql);
 			$stmt->bindParam(':child_of', $this->child_of, PDO::PARAM_INT);
-			$stmt->bindParam(':name', $this->name, PDO::PARAM_STR);
+			$stmt->bindParam(':name', $this->name);
 			$stmt->bindParam(':rights_all', $this->rights_all, PDO::PARAM_INT);
 			$stmt->bindParam(':rights_group', $this->rights_group, PDO::PARAM_INT);
 			$stmt->bindParam(':rights_own', $this->rights_own, PDO::PARAM_INT);
@@ -54,7 +54,7 @@ class ActorRole extends AEntity {
 				$sql = "UPDATE actor_roles SET child_of=:child_of, name=:name, rights_all=:rights_all, rights_group=:rights_group, rights_own=:rights_own WHERE id=:id";
 				$stmt = $pdo->prepare($sql);
 				$stmt->bindParam(':id', $this->id, PDO::PARAM_INT);
-				$stmt->bindParam(':child_of', $this->group_of, PDO::PARAM_INT);
+				$stmt->bindParam(':child_of', $this->child_of, PDO::PARAM_INT);
 				$stmt->bindParam(':name', $this->name, PDO::PARAM_STR);
 				$stmt->bindParam(':rights_all', $this->rights_all, PDO::PARAM_INT);
 				$stmt->bindParam(':rights_group', $this->rights_group, PDO::PARAM_INT);

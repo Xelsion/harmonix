@@ -1,11 +1,10 @@
 <?php
-global $lang;
 $this->set("title", "Benutzer bearbeiten");
 $actor = $this->get("actor");
 ?>
 <h1>Neuen Benutzer anlegen</h1>
 <div class="container-fluid">
-	<form action="\actors\update\<?= $actor->id ?>" method="POST" class="needs-validation" novalidate>
+	<form action="/actors/<?= $actor->id ?>" method="POST" class="needs-validation" novalidate>
 		<div class="form-group">
 			<label for="email">E-Mail</label>
 			<input type="email" name="email" value="<?= escaped_html($actor->email) ?>" id="email" required />
@@ -34,8 +33,8 @@ $actor = $this->get("actor");
 			<div class="invalid-feedback"><?= escaped_html($lang["required"]["last_name"]) ?></div>
 		</div>
 		<div class="form-group clearfix">
-			<button type="submit" name="cancel" class="cancel float-start">Abbrechen</button>
-			<button type="submit" name="update" class="submit float-end">Speichern</button>
+			<button type="submit" name="cancel" class="cancel float-start"><?= escaped_html($lang["cancel"]) ?></button>
+			<button type="submit" name="update" class="submit float-end"><?= escaped_html($lang["save"]) ?></button>
 		</div>
 	</form>
 </div>

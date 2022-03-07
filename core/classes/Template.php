@@ -35,6 +35,7 @@ class Template extends TemplateData {
 	 * @return string
 	 */
 	public function parse(): string {
+		global $lang;
 		ob_start();
 		require( $this->_file_path );
 		return ob_get_clean();

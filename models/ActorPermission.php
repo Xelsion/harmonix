@@ -2,11 +2,10 @@
 
 namespace models;
 
+use core\Core;
 use PDO;
 
-use core\Core;
-
-class Actor extends entities\Actor {
+class ActorPermission extends entities\ActorPermission {
 
 	public static function find( array $conditions ) {
 		if( empty($conditions) ) {
@@ -19,7 +18,7 @@ class Actor extends entities\Actor {
 		}
 
 		$pdo = Core::$_connection_manager->getConnection("mvc");
-		$sql = "SELECT * FROM actors WHERE ".implode(" AND ", $columns);
+		$sql = "SELECT * FROM actor_permissions WHERE ".implode(" AND ", $columns);
 		$stmt = $pdo->prepare($sql);
 		foreach( $conditions as $condition ) {
 			$stmt->bindParam(":".$condition[0], $condition[2], static::getParamType($condition[2]));
@@ -32,15 +31,11 @@ class Actor extends entities\Actor {
 		$index = 0;
 		$limit = 20;
 		$pdo = Core::$_connection_manager->getConnection("mvc");
-		$stmt = $pdo->prepare("SELECT * FROM actors LIMIT :index, :max");
+		$stmt = $pdo->prepare("SELECT * FROM actor_permissions LIMIT :index, :max");
 		$stmt->bindParam("index", $index, PDO::PARAM_INT);
 		$stmt->bindParam("max", $limit, PDO::PARAM_INT);
 		$stmt->execute();
 		return $stmt->fetchAll(PDO::FETCH_CLASS, __CLASS__);
 	}
-
-    public function toTableRow() {
-        return "<div></div>";
-    }
 
 }

@@ -8,14 +8,18 @@ use core\classes\responses\ResponseHTML;
 use core\classes\Router;
 use core\classes\Template;
 use models\Actor;
+use models\ActorRole;
+use models\ActorPermission;
 
 class ActorController extends AController {
 
 	public function init( Router $router ): void {
 		// Add routes to router
 		$router->addRoute("/actors", __CLASS__);
+		$router->addRoute("/actors/{actor}", __CLASS__, "update");
 		$router->addRoute("/actors/create", __CLASS__, "create");
-		$router->addRoute("/actors/update/{actor}", __CLASS__, "update");
+		$router->addRoute("/actors/roles/{actor}", __CLASS__, "roles");
+
 		// Add MenuItems to the Menu
 		static::$_menu->insertMenuItem(200, null, "Benutzer", "/actors");
 		static::$_menu->insertMenuItem(210, 200, "Benutzer erstellen", "/actors/create");
@@ -44,6 +48,7 @@ class ActorController extends AController {
 				$actor->first_name = $_POST["first_name"];
 				$actor->last_name = $_POST["last_name"];
 				$actor->create();
+				redirect("/actors");
 			}
 		}
 		$response = new ResponseHTML();
@@ -55,6 +60,9 @@ class ActorController extends AController {
 	}
 
 	public function update( Actor $actor ): AResponse {
+		if( isset($_POST['cancel']) ) {
+			redirect("/actors");
+		}
 		if( isset($_POST['update']) ) {
 			$is_valid = $this->postIsValid();
 			if( $is_valid ) {
@@ -63,6 +71,7 @@ class ActorController extends AController {
 				$actor->first_name = $_POST["first_name"];
 				$actor->last_name = $_POST["last_name"];
 				$actor->update();
+				redirect("/actors");
 			}
 		}
 		$response = new ResponseHTML();
@@ -74,6 +83,66 @@ class ActorController extends AController {
 		return $response;
 	}
 
+	public function roles( Actor $actor ): AResponse {
+		if( isset($_POST['cancel']) ) {
+			redirect("/actors");
+		}
+		if( isset($_POST['update']) ) {
+			$roles = array();
+			foreach( $_POST['role'] as $path => $entry_path ) {
+				if( (int)$entry_path["role"] > 0 ) {
+					$roles[$path][""][""] = $entry_path["role"];
+				}
+				foreach( $entry_path["controller"] as $controller => $entry_controller ) {
+					$controller = str_replace("-", "\\", $controller);
+					if( (int)$entry_controller["role"] > 0 ) {
+						$roles[$path][$controller][""] = $entry_controller["role"];
+					}
+					foreach( $entry_controller["method"] as $method => $role ) {
+						if( (int)$role > 0 ) {
+							$roles[$path][$controller][$method] = $role;
+						}
+					}
+				}
+			}
+			$actor_permission = new ActorPermission();
+			$actor_permission->actor_id = $actor->id;
+			$actor_permission->delete();
+			foreach( $roles as $path => $controllers ) {
+				foreach( $controllers as $controller => $methods ) {
+					foreach( $methods as $method => $role ) {
+						$actor_permission = new ActorPermission();
+						$actor_permission->actor_id = $actor->id;
+						$actor_permission->role_id = $role;
+						$actor_permission->path = $path;
+						$actor_permission->controller = ( $controller !== '' ) ? $controller : null;
+						$actor_permission->method = ( $method !== '' ) ? $method : null;
+						$actor_permission->create();
+					}
+				}
+			}
+		}
+
+		$response = new ResponseHTML();
+		$template = new Template(PATH_VIEWS."template.html");
+
+		$role_options = ActorRole::findAll();
+		$actor_permissions = ActorPermission::find(array(
+			array(
+				"actor_id",
+				"=",
+				$actor->id
+			)
+		));
+
+		$template->set("navigation", static::$_menu);
+		$template->set("actor", $actor);
+		$template->set("role_options", $role_options);
+		$template->set("actor_permissions", $actor_permissions);
+		$template->set("view", new Template(PATH_VIEWS."actor/roles.html"));
+		$response->setOutput($template->parse());
+		return $response;
+	}
 
 	private function postIsValid(): bool {
 		$is_valid = true;
