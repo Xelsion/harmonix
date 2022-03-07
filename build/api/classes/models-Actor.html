@@ -1,0 +1,1239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>Documentation</title>
+
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<base href="../">
+	<link rel="icon" href="images/favicon.ico" />
+	<link rel="stylesheet" href="css/normalize.css">
+	<link rel="stylesheet" href="css/base.css">
+	<link rel="preconnect" href="https://fonts.gstatic.com">
+	<link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@400;600;700&display=swap" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@400;600;700&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="css/template.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.0/css/all.min.css" integrity="sha256-ybRkN9dBjhcS2qrW1z+hfCxq+1aBdwyQM5wlQoQVt/0=" crossorigin="anonymous" />
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.23.0/themes/prism-okaidia.css">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.23.0/plugins/line-numbers/prism-line-numbers.css">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.23.0/plugins/line-highlight/prism-line-highlight.css">
+	<script src="https://cdn.jsdelivr.net/npm/fuse.js@3.4.6"></script>
+	<script src="https://cdn.jsdelivr.net/npm/css-vars-ponyfill@2"></script>
+	<script src="js/search.js"></script>
+	<script defer src="js/searchIndex.js"></script>
+</head>
+<body id="top">
+<header class="phpdocumentor-header phpdocumentor-section">
+	<h1 class="phpdocumentor-title"><a href="" class="phpdocumentor-title__link">Documentation</a></h1>
+	<input class="phpdocumentor-header__menu-button" type="checkbox" id="menu-button" name="menu-button" />
+	<label class="phpdocumentor-header__menu-icon" for="menu-button">
+		<i class="fas fa-bars"></i>
+	</label>
+	<section data-search-form class="phpdocumentor-search">
+		<label>
+			<span class="visually-hidden">Search for</span>
+			<svg class="phpdocumentor-search__icon" width="21" height="20" viewBox="0 0 21 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+				<circle cx="7.5" cy="7.5" r="6.5" stroke="currentColor" stroke-width="2" />
+				<line x1="12.4892" y1="12.2727" x2="19.1559" y2="18.9393" stroke="currentColor" stroke-width="3" />
+			</svg>
+			<input type="search" class="phpdocumentor-field phpdocumentor-search__field" placeholder="Loading .." disabled />
+		</label>
+	</section>
+
+	<nav class="phpdocumentor-topnav">
+		<ul class="phpdocumentor-topnav__menu">
+		</ul>
+	</nav>
+</header>
+
+<main class="phpdocumentor">
+	<div class="phpdocumentor-section">
+		<input class="phpdocumentor-sidebar__menu-button" type="checkbox" id="sidebar-button" name="sidebar-button" />
+		<label class="phpdocumentor-sidebar__menu-icon" for="sidebar-button">
+			Menu
+		</label>
+		<aside class="phpdocumentor-column -four phpdocumentor-sidebar">
+			<section class="phpdocumentor-sidebar__category">
+				<h2 class="phpdocumentor-sidebar__category-header">Namespaces</h2>
+				<h4 class="phpdocumentor-sidebar__root-namespace">
+					<a href="namespaces/controller.html" class="">controller</a>
+				</h4>
+				<ul class="phpdocumentor-list">
+					<li>
+						<a href="namespaces/controller-admin.html" class="">admin</a>
+
+					</li>
+					<li>
+						<a href="namespaces/controller-www.html" class="">www</a>
+
+					</li>
+				</ul>
+
+				<h4 class="phpdocumentor-sidebar__root-namespace">
+					<a href="namespaces/core.html" class="">core</a>
+				</h4>
+				<ul class="phpdocumentor-list">
+					<li>
+						<a href="namespaces/core-abstracts.html" class="">abstracts</a>
+
+					</li>
+					<li>
+						<a href="namespaces/core-classes.html" class="">classes</a>
+
+					</li>
+					<li>
+						<a href="namespaces/core-helper.html" class="">helper</a>
+
+					</li>
+					<li>
+						<a href="namespaces/core-interfaces.html" class="">interfaces</a>
+
+					</li>
+					<li>
+						<a href="namespaces/core-manager.html" class="">manager</a>
+
+					</li>
+				</ul>
+
+				<h4 class="phpdocumentor-sidebar__root-namespace">
+					<a href="namespaces/models.html" class="">models</a>
+				</h4>
+				<ul class="phpdocumentor-list">
+					<li>
+						<a href="namespaces/models-entities.html" class="">entities</a>
+
+					</li>
+				</ul>
+
+			</section>
+			<section class="phpdocumentor-sidebar__category">
+				<h2 class="phpdocumentor-sidebar__category-header">Packages</h2>
+				<h4 class="phpdocumentor-sidebar__root-namespace">
+					<a href="packages/Application.html" class="">Application</a>
+				</h4>
+
+			</section>
+
+			<section class="phpdocumentor-sidebar__category">
+				<h2 class="phpdocumentor-sidebar__category-header">Reports</h2>
+				<h3 class="phpdocumentor-sidebar__root-package"><a href="reports/deprecated.html">Deprecated</a></h3>
+				<h3 class="phpdocumentor-sidebar__root-package"><a href="reports/errors.html">Errors</a></h3>
+				<h3 class="phpdocumentor-sidebar__root-package"><a href="reports/markers.html">Markers</a></h3>
+			</section>
+
+			<section class="phpdocumentor-sidebar__category">
+				<h2 class="phpdocumentor-sidebar__category-header">Indices</h2>
+				<h3 class="phpdocumentor-sidebar__root-package"><a href="indices/files.html">Files</a></h3>
+			</section>
+		</aside>
+
+		<div class="phpdocumentor-column -eight phpdocumentor-content">
+			<ul class="phpdocumentor-breadcrumbs">
+				<li class="phpdocumentor-breadcrumb"><a href="namespaces/models.html">models</a></li>
+			</ul>
+
+			<article class="phpdocumentor-element -class">
+				<h2 class="phpdocumentor-content__title">
+					Actor
+
+					<span class="phpdocumentor-element__extends">
+        extends <a href="classes/models-entities-Actor.html"><abbr title="\models\entities\Actor">Actor</abbr></a>
+    </span>
+
+					<div class="phpdocumentor-element__package">
+						in package
+						<ul class="phpdocumentor-breadcrumbs">
+							<li class="phpdocumentor-breadcrumb"><a href="packages/Application.html">Application</a>
+							</li>
+						</ul>
+					</div>
+
+
+				</h2>
+
+				<aside class="phpdocumentor-element-found-in">
+					<abbr class="phpdocumentor-element-found-in__file" title="models/Actor.php"><a href="files/models-actor.html"><abbr title="models/Actor.php">Actor.php</abbr></a></abbr>
+					:
+					<span class="phpdocumentor-element-found-in__line">9</span>
+
+				</aside>
+
+				<p class="phpdocumentor-summary">The Abstract version of a Entity</p>
+
+
+				<h3 id="toc">
+					Table of Contents
+					<a href="#toc" class="headerlink"><i class="fas fa-link"></i></a>
+				</h3>
+
+				<dl class="phpdocumentor-table-of-contents">
+					<dt class="phpdocumentor-table-of-contents__entry -property -public">
+						<a href="classes/models-Actor.html#property__permissions">$_permissions</a>
+						<span>
+                        &nbsp;: array&lt;string|int, mixed&gt;            </span>
+					</dt>
+					<dd></dd>
+
+					<dt class="phpdocumentor-table-of-contents__entry -property -public">
+						<a href="classes/models-entities-Actor.html#property_created">$created</a>
+						<span>
+                        &nbsp;: string            </span>
+					</dt>
+					<dd></dd>
+
+					<dt class="phpdocumentor-table-of-contents__entry -property -public">
+						<a href="classes/models-entities-Actor.html#property_deleted">$deleted</a>
+						<span>
+                        &nbsp;: string|null            </span>
+					</dt>
+					<dd></dd>
+
+					<dt class="phpdocumentor-table-of-contents__entry -property -public">
+						<a href="classes/models-entities-Actor.html#property_email">$email</a>
+						<span>
+                        &nbsp;: string            </span>
+					</dt>
+					<dd></dd>
+
+					<dt class="phpdocumentor-table-of-contents__entry -property -public">
+						<a href="classes/models-entities-Actor.html#property_first_name">$first_name</a>
+						<span>
+                        &nbsp;: string            </span>
+					</dt>
+					<dd></dd>
+
+					<dt class="phpdocumentor-table-of-contents__entry -property -public">
+						<a href="classes/models-entities-Actor.html#property_id">$id</a>
+						<span>
+                        &nbsp;: int            </span>
+					</dt>
+					<dd></dd>
+
+					<dt class="phpdocumentor-table-of-contents__entry -property -public">
+						<a href="classes/models-entities-Actor.html#property_last_name">$last_name</a>
+						<span>
+                        &nbsp;: string            </span>
+					</dt>
+					<dd></dd>
+
+					<dt class="phpdocumentor-table-of-contents__entry -property -public">
+						<a href="classes/models-entities-Actor.html#property_login_disabled">$login_disabled</a>
+						<span>
+                        &nbsp;: bool            </span>
+					</dt>
+					<dd></dd>
+
+					<dt class="phpdocumentor-table-of-contents__entry -property -public">
+						<a href="classes/models-entities-Actor.html#property_login_fails">$login_fails</a>
+						<span>
+                        &nbsp;: int            </span>
+					</dt>
+					<dd></dd>
+
+					<dt class="phpdocumentor-table-of-contents__entry -property -public">
+						<a href="classes/models-entities-Actor.html#property_password">$password</a>
+						<span>
+                        &nbsp;: string            </span>
+					</dt>
+					<dd></dd>
+
+					<dt class="phpdocumentor-table-of-contents__entry -property -public">
+						<a href="classes/models-entities-Actor.html#property_updated">$updated</a>
+						<span>
+                        &nbsp;: string|null            </span>
+					</dt>
+					<dd></dd>
+
+					<dt class="phpdocumentor-table-of-contents__entry -method -public">
+						<a href="classes/models-Actor.html#method___construct">__construct()</a>
+						<span>
+                                &nbsp;: mixed    </span>
+					</dt>
+					<dd></dd>
+
+					<dt class="phpdocumentor-table-of-contents__entry -method -public">
+						<a href="classes/models-entities-Actor.html#method_create">create()</a>
+						<span>
+                                &nbsp;: int    </span>
+					</dt>
+					<dd></dd>
+
+					<dt class="phpdocumentor-table-of-contents__entry -method -public">
+						<a href="classes/models-entities-Actor.html#method_delete">delete()</a>
+						<span>
+                                &nbsp;: bool    </span>
+					</dt>
+					<dd></dd>
+
+					<dt class="phpdocumentor-table-of-contents__entry -method -public">
+						<a href="classes/models-Actor.html#method_find">find()</a>
+						<span>
+                                &nbsp;: array&lt;string|int, mixed&gt;|false|null    </span>
+					</dt>
+					<dd>Returns all actors that mach the conditions</dd>
+
+					<dt class="phpdocumentor-table-of-contents__entry -method -public">
+						<a href="classes/models-Actor.html#method_findAll">findAll()</a>
+						<span>
+                                &nbsp;: array&lt;string|int, mixed&gt;|false    </span>
+					</dt>
+					<dd>Returns all actors</dd>
+
+					<dt class="phpdocumentor-table-of-contents__entry -method -public">
+						<a href="classes/models-Actor.html#method_getRole">getRole()</a>
+						<span>
+                                &nbsp;: <a href="classes/models-ActorRole.html"><abbr title="\models\ActorRole">ActorRole</abbr></a>    </span>
+					</dt>
+					<dd></dd>
+
+					<dt class="phpdocumentor-table-of-contents__entry -method -public">
+						<a href="classes/core-abstracts-AEntity.html#method_str2DateTime">str2DateTime()</a>
+						<span>
+                                &nbsp;: <abbr title="\DateTime">DateTime</abbr>|false    </span>
+					</dt>
+					<dd>Converts a string to a DateTime object</dd>
+
+					<dt class="phpdocumentor-table-of-contents__entry -method -public">
+						<a href="classes/models-Actor.html#method_toTableRow">toTableRow()</a>
+						<span>
+                                &nbsp;: mixed    </span>
+					</dt>
+					<dd></dd>
+
+					<dt class="phpdocumentor-table-of-contents__entry -method -public">
+						<a href="classes/models-entities-Actor.html#method_update">update()</a>
+						<span>
+                                &nbsp;: void    </span>
+					</dt>
+					<dd></dd>
+
+					<dt class="phpdocumentor-table-of-contents__entry -method -protected">
+						<a href="classes/core-abstracts-AEntity.html#method_getParamType">getParamType()</a>
+						<span>
+                                &nbsp;: int    </span>
+					</dt>
+					<dd>Returns the PDO::PARAM type of the given value</dd>
+
+					<dt class="phpdocumentor-table-of-contents__entry -method -private">
+						<a href="classes/models-Actor.html#method_initPermission">initPermission()</a>
+						<span>
+                                &nbsp;: void    </span>
+					</dt>
+					<dd></dd>
+
+				</dl>
+
+
+				<section class="phpdocumentor-properties">
+					<h3 class="phpdocumentor-elements__header" id="properties">
+						Properties
+						<a href="classes/models-Actor.html#properties" class="headerlink"><i class="fas fa-link"></i></a>
+					</h3>
+					<article
+							class="
+            phpdocumentor-element
+            -property
+            -public
+                                                        "
+					>
+						<h4 class="phpdocumentor-element__name" id="property__permissions">
+							$_permissions
+							<a href="classes/models-Actor.html#property__permissions" class="headerlink"><i class="fas fa-link"></i></a>
+							<span class="phpdocumentor-element__modifiers">
+                                </span>
+						</h4>
+						<aside class="phpdocumentor-element-found-in">
+							<abbr class="phpdocumentor-element-found-in__file" title="models/Actor.php"><a href="files/models-actor.html"><abbr title="models/Actor.php">Actor.php</abbr></a></abbr>
+							:
+							<span class="phpdocumentor-element-found-in__line">11</span>
+
+						</aside>
+
+
+						<code class="phpdocumentor-code phpdocumentor-signature ">
+							<span class="phpdocumentor-signature__visibility">public</span>
+							<span class="phpdocumentor-signature__type">array&lt;string|int, mixed&gt;</span>
+							<span class="phpdocumentor-signature__name">$_permissions</span>
+							= <span class="phpdocumentor-signature__default-value">array()</span></code>
+
+						<section class="phpdocumentor-description"></section>
+
+						<section class="phpdocumentor-description"></section>
+
+
+					</article>
+					<article
+							class="
+            phpdocumentor-element
+            -property
+            -public
+                                                        "
+					>
+						<h4 class="phpdocumentor-element__name" id="property_created">
+							$created
+							<a href="classes/models-entities-Actor.html#property_created" class="headerlink"><i class="fas fa-link"></i></a>
+							<span class="phpdocumentor-element__modifiers">
+                                </span>
+						</h4>
+						<aside class="phpdocumentor-element-found-in">
+							<abbr class="phpdocumentor-element-found-in__file" title="models/entities/Actor.php"><a href="files/models-entities-actor.html"><abbr title="models/entities/Actor.php">Actor.php</abbr></a></abbr>
+							:
+							<span class="phpdocumentor-element-found-in__line">21</span>
+
+						</aside>
+
+
+						<code class="phpdocumentor-code phpdocumentor-signature ">
+							<span class="phpdocumentor-signature__visibility">public</span>
+							<span class="phpdocumentor-signature__type">string</span>
+							<span class="phpdocumentor-signature__name">$created</span>
+						</code>
+
+						<section class="phpdocumentor-description"></section>
+
+						<section class="phpdocumentor-description"></section>
+
+
+					</article>
+					<article
+							class="
+            phpdocumentor-element
+            -property
+            -public
+                                                        "
+					>
+						<h4 class="phpdocumentor-element__name" id="property_deleted">
+							$deleted
+							<a href="classes/models-entities-Actor.html#property_deleted" class="headerlink"><i class="fas fa-link"></i></a>
+							<span class="phpdocumentor-element__modifiers">
+                                </span>
+						</h4>
+						<aside class="phpdocumentor-element-found-in">
+							<abbr class="phpdocumentor-element-found-in__file" title="models/entities/Actor.php"><a href="files/models-entities-actor.html"><abbr title="models/entities/Actor.php">Actor.php</abbr></a></abbr>
+							:
+							<span class="phpdocumentor-element-found-in__line">23</span>
+
+						</aside>
+
+
+						<code class="phpdocumentor-code phpdocumentor-signature ">
+							<span class="phpdocumentor-signature__visibility">public</span>
+							<span class="phpdocumentor-signature__type">string|null</span>
+							<span class="phpdocumentor-signature__name">$deleted</span>
+						</code>
+
+						<section class="phpdocumentor-description"></section>
+
+						<section class="phpdocumentor-description"></section>
+
+
+					</article>
+					<article
+							class="
+            phpdocumentor-element
+            -property
+            -public
+                                                        "
+					>
+						<h4 class="phpdocumentor-element__name" id="property_email">
+							$email
+							<a href="classes/models-entities-Actor.html#property_email" class="headerlink"><i class="fas fa-link"></i></a>
+							<span class="phpdocumentor-element__modifiers">
+                                </span>
+						</h4>
+						<aside class="phpdocumentor-element-found-in">
+							<abbr class="phpdocumentor-element-found-in__file" title="models/entities/Actor.php"><a href="files/models-entities-actor.html"><abbr title="models/entities/Actor.php">Actor.php</abbr></a></abbr>
+							:
+							<span class="phpdocumentor-element-found-in__line">15</span>
+
+						</aside>
+
+
+						<code class="phpdocumentor-code phpdocumentor-signature ">
+							<span class="phpdocumentor-signature__visibility">public</span>
+							<span class="phpdocumentor-signature__type">string</span>
+							<span class="phpdocumentor-signature__name">$email</span>
+							= <span class="phpdocumentor-signature__default-value">&quot;&quot;</span></code>
+
+						<section class="phpdocumentor-description"></section>
+
+						<section class="phpdocumentor-description"></section>
+
+
+					</article>
+					<article
+							class="
+            phpdocumentor-element
+            -property
+            -public
+                                                        "
+					>
+						<h4 class="phpdocumentor-element__name" id="property_first_name">
+							$first_name
+							<a href="classes/models-entities-Actor.html#property_first_name" class="headerlink"><i class="fas fa-link"></i></a>
+							<span class="phpdocumentor-element__modifiers">
+                                </span>
+						</h4>
+						<aside class="phpdocumentor-element-found-in">
+							<abbr class="phpdocumentor-element-found-in__file" title="models/entities/Actor.php"><a href="files/models-entities-actor.html"><abbr title="models/entities/Actor.php">Actor.php</abbr></a></abbr>
+							:
+							<span class="phpdocumentor-element-found-in__line">17</span>
+
+						</aside>
+
+
+						<code class="phpdocumentor-code phpdocumentor-signature ">
+							<span class="phpdocumentor-signature__visibility">public</span>
+							<span class="phpdocumentor-signature__type">string</span>
+							<span class="phpdocumentor-signature__name">$first_name</span>
+							= <span class="phpdocumentor-signature__default-value">&quot;&quot;</span></code>
+
+						<section class="phpdocumentor-description"></section>
+
+						<section class="phpdocumentor-description"></section>
+
+
+					</article>
+					<article
+							class="
+            phpdocumentor-element
+            -property
+            -public
+                                                        "
+					>
+						<h4 class="phpdocumentor-element__name" id="property_id">
+							$id
+							<a href="classes/models-entities-Actor.html#property_id" class="headerlink"><i class="fas fa-link"></i></a>
+							<span class="phpdocumentor-element__modifiers">
+                                </span>
+						</h4>
+						<aside class="phpdocumentor-element-found-in">
+							<abbr class="phpdocumentor-element-found-in__file" title="models/entities/Actor.php"><a href="files/models-entities-actor.html"><abbr title="models/entities/Actor.php">Actor.php</abbr></a></abbr>
+							:
+							<span class="phpdocumentor-element-found-in__line">14</span>
+
+						</aside>
+
+
+						<code class="phpdocumentor-code phpdocumentor-signature ">
+							<span class="phpdocumentor-signature__visibility">public</span>
+							<span class="phpdocumentor-signature__type">int</span>
+							<span class="phpdocumentor-signature__name">$id</span>
+							= <span class="phpdocumentor-signature__default-value">0</span></code>
+
+						<section class="phpdocumentor-description"></section>
+
+						<section class="phpdocumentor-description"></section>
+
+
+					</article>
+					<article
+							class="
+            phpdocumentor-element
+            -property
+            -public
+                                                        "
+					>
+						<h4 class="phpdocumentor-element__name" id="property_last_name">
+							$last_name
+							<a href="classes/models-entities-Actor.html#property_last_name" class="headerlink"><i class="fas fa-link"></i></a>
+							<span class="phpdocumentor-element__modifiers">
+                                </span>
+						</h4>
+						<aside class="phpdocumentor-element-found-in">
+							<abbr class="phpdocumentor-element-found-in__file" title="models/entities/Actor.php"><a href="files/models-entities-actor.html"><abbr title="models/entities/Actor.php">Actor.php</abbr></a></abbr>
+							:
+							<span class="phpdocumentor-element-found-in__line">18</span>
+
+						</aside>
+
+
+						<code class="phpdocumentor-code phpdocumentor-signature ">
+							<span class="phpdocumentor-signature__visibility">public</span>
+							<span class="phpdocumentor-signature__type">string</span>
+							<span class="phpdocumentor-signature__name">$last_name</span>
+							= <span class="phpdocumentor-signature__default-value">&quot;&quot;</span></code>
+
+						<section class="phpdocumentor-description"></section>
+
+						<section class="phpdocumentor-description"></section>
+
+
+					</article>
+					<article
+							class="
+            phpdocumentor-element
+            -property
+            -public
+                                                        "
+					>
+						<h4 class="phpdocumentor-element__name" id="property_login_disabled">
+							$login_disabled
+							<a href="classes/models-entities-Actor.html#property_login_disabled" class="headerlink"><i class="fas fa-link"></i></a>
+							<span class="phpdocumentor-element__modifiers">
+                                </span>
+						</h4>
+						<aside class="phpdocumentor-element-found-in">
+							<abbr class="phpdocumentor-element-found-in__file" title="models/entities/Actor.php"><a href="files/models-entities-actor.html"><abbr title="models/entities/Actor.php">Actor.php</abbr></a></abbr>
+							:
+							<span class="phpdocumentor-element-found-in__line">20</span>
+
+						</aside>
+
+
+						<code class="phpdocumentor-code phpdocumentor-signature ">
+							<span class="phpdocumentor-signature__visibility">public</span>
+							<span class="phpdocumentor-signature__type">bool</span>
+							<span class="phpdocumentor-signature__name">$login_disabled</span>
+							= <span class="phpdocumentor-signature__default-value">false</span></code>
+
+						<section class="phpdocumentor-description"></section>
+
+						<section class="phpdocumentor-description"></section>
+
+
+					</article>
+					<article
+							class="
+            phpdocumentor-element
+            -property
+            -public
+                                                        "
+					>
+						<h4 class="phpdocumentor-element__name" id="property_login_fails">
+							$login_fails
+							<a href="classes/models-entities-Actor.html#property_login_fails" class="headerlink"><i class="fas fa-link"></i></a>
+							<span class="phpdocumentor-element__modifiers">
+                                </span>
+						</h4>
+						<aside class="phpdocumentor-element-found-in">
+							<abbr class="phpdocumentor-element-found-in__file" title="models/entities/Actor.php"><a href="files/models-entities-actor.html"><abbr title="models/entities/Actor.php">Actor.php</abbr></a></abbr>
+							:
+							<span class="phpdocumentor-element-found-in__line">19</span>
+
+						</aside>
+
+
+						<code class="phpdocumentor-code phpdocumentor-signature ">
+							<span class="phpdocumentor-signature__visibility">public</span>
+							<span class="phpdocumentor-signature__type">int</span>
+							<span class="phpdocumentor-signature__name">$login_fails</span>
+							= <span class="phpdocumentor-signature__default-value">0</span></code>
+
+						<section class="phpdocumentor-description"></section>
+
+						<section class="phpdocumentor-description"></section>
+
+
+					</article>
+					<article
+							class="
+            phpdocumentor-element
+            -property
+            -public
+                                                        "
+					>
+						<h4 class="phpdocumentor-element__name" id="property_password">
+							$password
+							<a href="classes/models-entities-Actor.html#property_password" class="headerlink"><i class="fas fa-link"></i></a>
+							<span class="phpdocumentor-element__modifiers">
+                                </span>
+						</h4>
+						<aside class="phpdocumentor-element-found-in">
+							<abbr class="phpdocumentor-element-found-in__file" title="models/entities/Actor.php"><a href="files/models-entities-actor.html"><abbr title="models/entities/Actor.php">Actor.php</abbr></a></abbr>
+							:
+							<span class="phpdocumentor-element-found-in__line">16</span>
+
+						</aside>
+
+
+						<code class="phpdocumentor-code phpdocumentor-signature ">
+							<span class="phpdocumentor-signature__visibility">public</span>
+							<span class="phpdocumentor-signature__type">string</span>
+							<span class="phpdocumentor-signature__name">$password</span>
+							= <span class="phpdocumentor-signature__default-value">&quot;&quot;</span></code>
+
+						<section class="phpdocumentor-description"></section>
+
+						<section class="phpdocumentor-description"></section>
+
+
+					</article>
+					<article
+							class="
+            phpdocumentor-element
+            -property
+            -public
+                                                        "
+					>
+						<h4 class="phpdocumentor-element__name" id="property_updated">
+							$updated
+							<a href="classes/models-entities-Actor.html#property_updated" class="headerlink"><i class="fas fa-link"></i></a>
+							<span class="phpdocumentor-element__modifiers">
+                                </span>
+						</h4>
+						<aside class="phpdocumentor-element-found-in">
+							<abbr class="phpdocumentor-element-found-in__file" title="models/entities/Actor.php"><a href="files/models-entities-actor.html"><abbr title="models/entities/Actor.php">Actor.php</abbr></a></abbr>
+							:
+							<span class="phpdocumentor-element-found-in__line">22</span>
+
+						</aside>
+
+
+						<code class="phpdocumentor-code phpdocumentor-signature ">
+							<span class="phpdocumentor-signature__visibility">public</span>
+							<span class="phpdocumentor-signature__type">string|null</span>
+							<span class="phpdocumentor-signature__name">$updated</span>
+						</code>
+
+						<section class="phpdocumentor-description"></section>
+
+						<section class="phpdocumentor-description"></section>
+
+
+					</article>
+				</section>
+
+				<section class="phpdocumentor-methods">
+					<h3 class="phpdocumentor-elements__header" id="methods">
+						Methods
+						<a href="classes/models-Actor.html#methods" class="headerlink"><i class="fas fa-link"></i></a>
+					</h3>
+					<article
+							class="phpdocumentor-element
+            -method
+            -public
+                                                        "
+					>
+						<h4 class="phpdocumentor-element__name" id="method___construct">
+							__construct()
+							<a href="classes/models-Actor.html#method___construct" class="headerlink"><i class="fas fa-link"></i></a>
+						</h4>
+						<aside class="phpdocumentor-element-found-in">
+							<abbr class="phpdocumentor-element-found-in__file" title="models/Actor.php"><a href="files/models-actor.html"><abbr title="models/Actor.php">Actor.php</abbr></a></abbr>
+							:
+							<span class="phpdocumentor-element-found-in__line">13</span>
+
+						</aside>
+
+
+						<code class="phpdocumentor-code phpdocumentor-signature ">
+							<span class="phpdocumentor-signature__visibility">public</span>
+							<span class="phpdocumentor-signature__name">__construct</span><span>(</span><span class="phpdocumentor-signature__argument"><span class="phpdocumentor-signature__argument__return-type">int&nbsp;</span><span class="phpdocumentor-signature__argument__name">$id</span></span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">mixed</span></code>
+
+						<section class="phpdocumentor-description"></section>
+
+						<h5 class="phpdocumentor-argument-list__heading">Parameters</h5>
+						<dl class="phpdocumentor-argument-list">
+							<dt class="phpdocumentor-argument-list__entry">
+								<span class="phpdocumentor-signature__argument__name">$id</span>
+								: <span class="phpdocumentor-signature__argument__return-type">int</span>
+							</dt>
+							<dd class="phpdocumentor-argument-list__definition">
+								<section class="phpdocumentor-description"></section>
+
+							</dd>
+						</dl>
+
+
+						<h5 class="phpdocumentor-return-value__heading">Return values</h5>
+						<span class="phpdocumentor-signature__response_type">mixed</span>
+						&mdash;
+
+
+					</article>
+					<article
+							class="phpdocumentor-element
+            -method
+            -public
+                                                        "
+					>
+						<h4 class="phpdocumentor-element__name" id="method_create">
+							create()
+							<a href="classes/models-entities-Actor.html#method_create" class="headerlink"><i class="fas fa-link"></i></a>
+						</h4>
+						<aside class="phpdocumentor-element-found-in">
+							<abbr class="phpdocumentor-element-found-in__file" title="models/entities/Actor.php"><a href="files/models-entities-actor.html"><abbr title="models/entities/Actor.php">Actor.php</abbr></a></abbr>
+							:
+							<span class="phpdocumentor-element-found-in__line">41</span>
+
+						</aside>
+
+
+						<code class="phpdocumentor-code phpdocumentor-signature ">
+							<span class="phpdocumentor-signature__visibility">public</span>
+							<span class="phpdocumentor-signature__name">create</span><span>(</span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">int</span></code>
+
+
+						<h5 class="phpdocumentor-tag-list__heading" id="tags">
+							Tags
+							<a href="#tags" class="headerlink"><i class="fas fa-link"></i></a>
+						</h5>
+						<dl class="phpdocumentor-tag-list">
+							<dt class="phpdocumentor-tag-list__entry">
+								<span class="phpdocumentor-tag__name">see</span>
+							</dt>
+							<dd class="phpdocumentor-tag-list__definition">
+								<span class="phpdocumentor-tag-link"><a href="classes/core-interfaces-IEntity.html"><abbr title="\core\interfaces\IEntity">IEntity</abbr></a></span>
+
+
+							</dd>
+						</dl>
+
+						<h5 class="phpdocumentor-return-value__heading">Return values</h5>
+						<span class="phpdocumentor-signature__response_type">int</span>
+						&mdash;
+
+
+					</article>
+					<article
+							class="phpdocumentor-element
+            -method
+            -public
+                                                        "
+					>
+						<h4 class="phpdocumentor-element__name" id="method_delete">
+							delete()
+							<a href="classes/models-entities-Actor.html#method_delete" class="headerlink"><i class="fas fa-link"></i></a>
+						</h4>
+						<aside class="phpdocumentor-element-found-in">
+							<abbr class="phpdocumentor-element-found-in__file" title="models/entities/Actor.php"><a href="files/models-entities-actor.html"><abbr title="models/entities/Actor.php">Actor.php</abbr></a></abbr>
+							:
+							<span class="phpdocumentor-element-found-in__line">93</span>
+
+						</aside>
+
+
+						<code class="phpdocumentor-code phpdocumentor-signature ">
+							<span class="phpdocumentor-signature__visibility">public</span>
+							<span class="phpdocumentor-signature__name">delete</span><span>(</span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">bool</span></code>
+
+
+						<h5 class="phpdocumentor-tag-list__heading" id="tags">
+							Tags
+							<a href="#tags" class="headerlink"><i class="fas fa-link"></i></a>
+						</h5>
+						<dl class="phpdocumentor-tag-list">
+							<dt class="phpdocumentor-tag-list__entry">
+								<span class="phpdocumentor-tag__name">see</span>
+							</dt>
+							<dd class="phpdocumentor-tag-list__definition">
+								<span class="phpdocumentor-tag-link"><a href="classes/core-interfaces-IEntity.html"><abbr title="\core\interfaces\IEntity">IEntity</abbr></a></span>
+
+
+							</dd>
+						</dl>
+
+						<h5 class="phpdocumentor-return-value__heading">Return values</h5>
+						<span class="phpdocumentor-signature__response_type">bool</span>
+						&mdash;
+
+
+					</article>
+					<article
+							class="phpdocumentor-element
+            -method
+            -public
+                                    -static                    "
+					>
+						<h4 class="phpdocumentor-element__name" id="method_find">
+							find()
+							<a href="classes/models-Actor.html#method_find" class="headerlink"><i class="fas fa-link"></i></a>
+						</h4>
+						<aside class="phpdocumentor-element-found-in">
+							<abbr class="phpdocumentor-element-found-in__file" title="models/Actor.php"><a href="files/models-actor.html"><abbr title="models/Actor.php">Actor.php</abbr></a></abbr>
+							:
+							<span class="phpdocumentor-element-found-in__line">23</span>
+
+						</aside>
+
+						<p class="phpdocumentor-summary">Returns all actors that mach the conditions</p>
+
+						<code class="phpdocumentor-code phpdocumentor-signature ">
+							<span class="phpdocumentor-signature__visibility">public</span>
+							<span class="phpdocumentor-signature__static">static</span>
+							<span class="phpdocumentor-signature__name">find</span><span>(</span><span class="phpdocumentor-signature__argument"><span class="phpdocumentor-signature__argument__return-type">array&lt;string|int, mixed&gt;&nbsp;</span><span class="phpdocumentor-signature__argument__name">$conditions</span></span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">array&lt;string|int, mixed&gt;|false|null</span></code>
+
+
+						<h5 class="phpdocumentor-argument-list__heading">Parameters</h5>
+						<dl class="phpdocumentor-argument-list">
+							<dt class="phpdocumentor-argument-list__entry">
+								<span class="phpdocumentor-signature__argument__name">$conditions</span>
+								:
+								<span class="phpdocumentor-signature__argument__return-type">array&lt;string|int, mixed&gt;</span>
+							</dt>
+							<dd class="phpdocumentor-argument-list__definition">
+
+							</dd>
+						</dl>
+
+
+						<h5 class="phpdocumentor-return-value__heading">Return values</h5>
+						<span class="phpdocumentor-signature__response_type">array&lt;string|int, mixed&gt;|false|null</span>
+						&mdash;
+
+
+					</article>
+					<article
+							class="phpdocumentor-element
+            -method
+            -public
+                                    -static                    "
+					>
+						<h4 class="phpdocumentor-element__name" id="method_findAll">
+							findAll()
+							<a href="classes/models-Actor.html#method_findAll" class="headerlink"><i class="fas fa-link"></i></a>
+						</h4>
+						<aside class="phpdocumentor-element-found-in">
+							<abbr class="phpdocumentor-element-found-in__file" title="models/Actor.php"><a href="files/models-actor.html"><abbr title="models/Actor.php">Actor.php</abbr></a></abbr>
+							:
+							<span class="phpdocumentor-element-found-in__line">48</span>
+
+						</aside>
+
+						<p class="phpdocumentor-summary">Returns all actors</p>
+
+						<code class="phpdocumentor-code phpdocumentor-signature ">
+							<span class="phpdocumentor-signature__visibility">public</span>
+							<span class="phpdocumentor-signature__static">static</span>
+							<span class="phpdocumentor-signature__name">findAll</span><span>(</span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">array&lt;string|int, mixed&gt;|false</span></code>
+
+
+						<h5 class="phpdocumentor-return-value__heading">Return values</h5>
+						<span class="phpdocumentor-signature__response_type">array&lt;string|int, mixed&gt;|false</span>
+						&mdash;
+
+
+					</article>
+					<article
+							class="phpdocumentor-element
+            -method
+            -public
+                                                        "
+					>
+						<h4 class="phpdocumentor-element__name" id="method_getRole">
+							getRole()
+							<a href="classes/models-Actor.html#method_getRole" class="headerlink"><i class="fas fa-link"></i></a>
+						</h4>
+						<aside class="phpdocumentor-element-found-in">
+							<abbr class="phpdocumentor-element-found-in__file" title="models/Actor.php"><a href="files/models-actor.html"><abbr title="models/Actor.php">Actor.php</abbr></a></abbr>
+							:
+							<span class="phpdocumentor-element-found-in__line">59</span>
+
+						</aside>
+
+
+						<code class="phpdocumentor-code phpdocumentor-signature ">
+							<span class="phpdocumentor-signature__visibility">public</span>
+							<span class="phpdocumentor-signature__name">getRole</span><span>(</span><span class="phpdocumentor-signature__argument"><span class="phpdocumentor-signature__argument__return-type">string&nbsp;</span><span class="phpdocumentor-signature__argument__name">$controller</span></span><span class="phpdocumentor-signature__argument"><span>, </span><span class="phpdocumentor-signature__argument__return-type">string&nbsp;</span><span class="phpdocumentor-signature__argument__name">$method</span></span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type"><a href="classes/models-ActorRole.html"><abbr title="\models\ActorRole">ActorRole</abbr></a></span></code>
+
+						<section class="phpdocumentor-description"></section>
+
+						<h5 class="phpdocumentor-argument-list__heading">Parameters</h5>
+						<dl class="phpdocumentor-argument-list">
+							<dt class="phpdocumentor-argument-list__entry">
+								<span class="phpdocumentor-signature__argument__name">$controller</span>
+								: <span class="phpdocumentor-signature__argument__return-type">string</span>
+							</dt>
+							<dd class="phpdocumentor-argument-list__definition">
+								<section class="phpdocumentor-description"></section>
+
+							</dd>
+							<dt class="phpdocumentor-argument-list__entry">
+								<span class="phpdocumentor-signature__argument__name">$method</span>
+								: <span class="phpdocumentor-signature__argument__return-type">string</span>
+							</dt>
+							<dd class="phpdocumentor-argument-list__definition">
+								<section class="phpdocumentor-description"></section>
+
+							</dd>
+						</dl>
+
+
+						<h5 class="phpdocumentor-return-value__heading">Return values</h5>
+						<span class="phpdocumentor-signature__response_type"><a href="classes/models-ActorRole.html"><abbr title="\models\ActorRole">ActorRole</abbr></a></span>
+						&mdash;
+
+
+					</article>
+					<article
+							class="phpdocumentor-element
+            -method
+            -public
+                                                        "
+					>
+						<h4 class="phpdocumentor-element__name" id="method_str2DateTime">
+							str2DateTime()
+							<a href="classes/core-abstracts-AEntity.html#method_str2DateTime" class="headerlink"><i class="fas fa-link"></i></a>
+						</h4>
+						<aside class="phpdocumentor-element-found-in">
+							<abbr class="phpdocumentor-element-found-in__file" title="core/abstracts/AEntity.php"><a href="files/core-abstracts-aentity.html"><abbr title="core/abstracts/AEntity.php">AEntity.php</abbr></a></abbr>
+							:
+							<span class="phpdocumentor-element-found-in__line">24</span>
+
+						</aside>
+
+						<p class="phpdocumentor-summary">Converts a string to a DateTime object</p>
+
+						<code class="phpdocumentor-code phpdocumentor-signature ">
+							<span class="phpdocumentor-signature__visibility">public</span>
+							<span class="phpdocumentor-signature__name">str2DateTime</span><span>(</span><span class="phpdocumentor-signature__argument"><span class="phpdocumentor-signature__argument__return-type">string&nbsp;</span><span class="phpdocumentor-signature__argument__name">$datetime</span></span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type"><abbr title="\DateTime">DateTime</abbr>|false</span></code>
+
+
+						<h5 class="phpdocumentor-argument-list__heading">Parameters</h5>
+						<dl class="phpdocumentor-argument-list">
+							<dt class="phpdocumentor-argument-list__entry">
+								<span class="phpdocumentor-signature__argument__name">$datetime</span>
+								: <span class="phpdocumentor-signature__argument__return-type">string</span>
+							</dt>
+							<dd class="phpdocumentor-argument-list__definition">
+
+							</dd>
+						</dl>
+
+
+						<h5 class="phpdocumentor-return-value__heading">Return values</h5>
+						<span class="phpdocumentor-signature__response_type"><abbr title="\DateTime">DateTime</abbr>|false</span>
+						&mdash;
+
+
+					</article>
+					<article
+							class="phpdocumentor-element
+            -method
+            -public
+                                                        "
+					>
+						<h4 class="phpdocumentor-element__name" id="method_toTableRow">
+							toTableRow()
+							<a href="classes/models-Actor.html#method_toTableRow" class="headerlink"><i class="fas fa-link"></i></a>
+						</h4>
+						<aside class="phpdocumentor-element-found-in">
+							<abbr class="phpdocumentor-element-found-in__file" title="models/Actor.php"><a href="files/models-actor.html"><abbr title="models/Actor.php">Actor.php</abbr></a></abbr>
+							:
+							<span class="phpdocumentor-element-found-in__line">101</span>
+
+						</aside>
+
+
+						<code class="phpdocumentor-code phpdocumentor-signature ">
+							<span class="phpdocumentor-signature__visibility">public</span>
+							<span class="phpdocumentor-signature__name">toTableRow</span><span>(</span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">mixed</span></code>
+
+						<section class="phpdocumentor-description"></section>
+
+
+						<h5 class="phpdocumentor-return-value__heading">Return values</h5>
+						<span class="phpdocumentor-signature__response_type">mixed</span>
+						&mdash;
+
+
+					</article>
+					<article
+							class="phpdocumentor-element
+            -method
+            -public
+                                                        "
+					>
+						<h4 class="phpdocumentor-element__name" id="method_update">
+							update()
+							<a href="classes/models-entities-Actor.html#method_update" class="headerlink"><i class="fas fa-link"></i></a>
+						</h4>
+						<aside class="phpdocumentor-element-found-in">
+							<abbr class="phpdocumentor-element-found-in__file" title="models/entities/Actor.php"><a href="files/models-entities-actor.html"><abbr title="models/entities/Actor.php">Actor.php</abbr></a></abbr>
+							:
+							<span class="phpdocumentor-element-found-in__line">63</span>
+
+						</aside>
+
+
+						<code class="phpdocumentor-code phpdocumentor-signature ">
+							<span class="phpdocumentor-signature__visibility">public</span>
+							<span class="phpdocumentor-signature__name">update</span><span>(</span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">void</span></code>
+
+
+						<h5 class="phpdocumentor-tag-list__heading" id="tags">
+							Tags
+							<a href="#tags" class="headerlink"><i class="fas fa-link"></i></a>
+						</h5>
+						<dl class="phpdocumentor-tag-list">
+							<dt class="phpdocumentor-tag-list__entry">
+								<span class="phpdocumentor-tag__name">see</span>
+							</dt>
+							<dd class="phpdocumentor-tag-list__definition">
+								<span class="phpdocumentor-tag-link"><a href="classes/core-interfaces-IEntity.html"><abbr title="\core\interfaces\IEntity">IEntity</abbr></a></span>
+
+
+							</dd>
+						</dl>
+
+						<h5 class="phpdocumentor-return-value__heading">Return values</h5>
+						<span class="phpdocumentor-signature__response_type">void</span>
+						&mdash;
+
+
+					</article>
+					<article
+							class="phpdocumentor-element
+            -method
+            -protected
+                                    -static                    "
+					>
+						<h4 class="phpdocumentor-element__name" id="method_getParamType">
+							getParamType()
+							<a href="classes/core-abstracts-AEntity.html#method_getParamType" class="headerlink"><i class="fas fa-link"></i></a>
+						</h4>
+						<aside class="phpdocumentor-element-found-in">
+							<abbr class="phpdocumentor-element-found-in__file" title="core/abstracts/AEntity.php"><a href="files/core-abstracts-aentity.html"><abbr title="core/abstracts/AEntity.php">AEntity.php</abbr></a></abbr>
+							:
+							<span class="phpdocumentor-element-found-in__line">34</span>
+
+						</aside>
+
+						<p class="phpdocumentor-summary">Returns the PDO::PARAM type of the given value</p>
+
+						<code class="phpdocumentor-code phpdocumentor-signature ">
+							<span class="phpdocumentor-signature__visibility">protected</span>
+							<span class="phpdocumentor-signature__static">static</span>
+							<span class="phpdocumentor-signature__name">getParamType</span><span>(</span><span class="phpdocumentor-signature__argument"><span class="phpdocumentor-signature__argument__return-type"><a href=""><abbr title=""></abbr></a>&nbsp;</span><span class="phpdocumentor-signature__argument__name">$value</span></span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">int</span></code>
+
+
+						<h5 class="phpdocumentor-argument-list__heading">Parameters</h5>
+						<dl class="phpdocumentor-argument-list">
+							<dt class="phpdocumentor-argument-list__entry">
+								<span class="phpdocumentor-signature__argument__name">$value</span>
+								:
+								<span class="phpdocumentor-signature__argument__return-type"><a href=""><abbr title=""></abbr></a></span>
+							</dt>
+							<dd class="phpdocumentor-argument-list__definition">
+
+							</dd>
+						</dl>
+
+
+						<h5 class="phpdocumentor-return-value__heading">Return values</h5>
+						<span class="phpdocumentor-signature__response_type">int</span>
+						&mdash;
+
+
+					</article>
+					<article
+							class="phpdocumentor-element
+            -method
+            -private
+                                                        "
+					>
+						<h4 class="phpdocumentor-element__name" id="method_initPermission">
+							initPermission()
+							<a href="classes/models-Actor.html#method_initPermission" class="headerlink"><i class="fas fa-link"></i></a>
+						</h4>
+						<aside class="phpdocumentor-element-found-in">
+							<abbr class="phpdocumentor-element-found-in__file" title="models/Actor.php"><a href="files/models-actor.html"><abbr title="models/Actor.php">Actor.php</abbr></a></abbr>
+							:
+							<span class="phpdocumentor-element-found-in__line">87</span>
+
+						</aside>
+
+
+						<code class="phpdocumentor-code phpdocumentor-signature ">
+							<span class="phpdocumentor-signature__visibility">private</span>
+							<span class="phpdocumentor-signature__name">initPermission</span><span>(</span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">void</span></code>
+
+						<section class="phpdocumentor-description"></section>
+
+
+						<h5 class="phpdocumentor-return-value__heading">Return values</h5>
+						<span class="phpdocumentor-signature__response_type">void</span>
+						&mdash;
+
+
+					</article>
+				</section>
+
+
+				<script type="text/javascript">
+					function loadExternalCodeSnippets(line) {
+						Array.prototype.slice.call(document.querySelectorAll('pre[data-src]')).forEach((pre) => {
+							var src = pre.getAttribute('data-src').replace(/\\/g, '/');
+							var extension = (src.match(/\.(\w+)$/) || [, ''])[1];
+							var language = 'php';
+
+							var code = document.createElement('code');
+							code.className = 'language-' + language;
+
+							pre.textContent = '';
+
+							pre.setAttribute('data-line', line)
+							code.textContent = 'Loading…';
+
+							pre.appendChild(code);
+
+							var xhr = new XMLHttpRequest();
+
+							xhr.open('GET', src, true);
+
+							xhr.onreadystatechange = function () {
+								if (xhr.readyState == 4) {
+
+									if (xhr.status < 400 && xhr.responseText) {
+										code.textContent = xhr.responseText;
+
+										Prism.highlightElement(code);
+									} else if (xhr.status >= 400) {
+										code.textContent = '✖ Error ' + xhr.status + ' while fetching file: ' + xhr.statusText;
+									} else {
+										code.textContent = '✖ Error: File does not exist, is empty or trying to view from localhost';
+									}
+								}
+							};
+
+							xhr.send(null);
+						});
+					}
+
+					var modals = document.querySelectorAll("[data-modal]");
+
+					modals.forEach(function (trigger) {
+						trigger.addEventListener("click", function (event) {
+							//event.preventDefault();
+							const modal = document.getElementById(trigger.dataset.modal);
+							modal.classList.add("phpdocumentor-modal__open");
+							loadExternalCodeSnippets(trigger.dataset.line)
+							const exits = modal.querySelectorAll("[data-exit-button]");
+							exits.forEach(function (exit) {
+								exit.addEventListener("click", function (event) {
+									event.preventDefault();
+									modal.classList.remove("phpdocumentor-modal__open");
+								});
+							});
+						});
+					});
+				</script>
+
+			</article>
+			<section data-search-results class="phpdocumentor-search-results phpdocumentor-search-results--hidden">
+				<section class="phpdocumentor-search-results__dialog">
+					<header class="phpdocumentor-search-results__header">
+						<h2 class="phpdocumentor-search-results__title">Search results</h2>
+						<button class="phpdocumentor-search-results__close"><i class="fas fa-times"></i></button>
+					</header>
+					<section class="phpdocumentor-search-results__body">
+						<ul class="phpdocumentor-search-results__entries"></ul>
+					</section>
+				</section>
+			</section>
+		</div>
+	</div>
+	<a href="classes/models-Actor.html#top" class="phpdocumentor-back-to-top"><i class="fas fa-chevron-circle-up"></i></a>
+
+</main>
+
+<script>
+	cssVars({});
+</script>
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.23.0/prism.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.23.0/plugins/autoloader/prism-autoloader.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.23.0/plugins/line-numbers/prism-line-numbers.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.23.0/plugins/line-highlight/prism-line-highlight.min.js"></script>
+</body>
+</html>
