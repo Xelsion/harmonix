@@ -21,6 +21,7 @@ if( $view instanceof Template ) {
 	<link rel="stylesheet" href="<?= PATH_CSS ?>main.css" />
 	<link rel="stylesheet" href="<?= PATH_CSS ?>navigation.css" />
 	<link rel="stylesheet" href="<?= PATH_CSS ?>forms.css" />
+	<link rel="stylesheet" href="<?= PATH_CSS ?>tables.css" />
 	<script src="<?= PATH_SRC ?>bootstrap-5.0.2/js/bootstrap.bundle.min.js"></script>
 	<script src="<?= PATH_SRC ?>jquery/jquery-3.6.0.min.js"></script>
 	<script src="<?= PATH_JS ?>main.js"></script>
@@ -31,8 +32,7 @@ if( $view instanceof Template ) {
 		<?= $menu->getAsHtml() ?>
 		<div id="actor-menu">
 			<div class="has-children">
-				<span onclick="$('#actor-menu-dropdown').toggle();"
-				      class="button "><?= ( $actor->id > 0 ) ? $actor->first_name." ".$actor->last_name : "Profile" ?></span>
+				<span onclick="$('#actor-menu-dropdown').toggle();" class="menu-item"><?= ( $actor->id > 0 ) ? $actor->first_name." ".$actor->last_name : "Profile" ?></span>
 			</div>
 			<div id="actor-menu-dropdown" style="">
 				<form action="<?= $_SERVER["REQUEST_URI"] ?>" method="POST">

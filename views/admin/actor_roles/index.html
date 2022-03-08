@@ -4,17 +4,17 @@ $this->set("title", "Rollen");
 
 $role_list = $this->get("result_list");
 ?>
-<div>Actors!</div>
 <div class="container-fluid">
+	<h1>Rollen</h1>
 	<table class="table table-dark table-striped">
 		<tr>
 			<th>ID</th>
-			<th>Name</th>
+			<th class="col-md-2">Name</th>
 			<th>Unterrolle von</th>
 			<th>Rechte: Alle</th>
 			<th>Rechte: Gruppe</th>
 			<th>Rechte: Eigene</th>
-			<th>Optionen</th>
+			<th class="col-md-2">Optionen</th>
 		</tr>
 		<?php foreach( $role_list as $role ):
 			$parent = $role->getParent();
@@ -27,7 +27,9 @@ $role_list = $this->get("result_list");
 				<td><?= escaped_html(implode(", ", $rights["all"])) ?></td>
 				<td><?= escaped_html(implode(", ", $rights["group"])) ?></td>
 				<td><?= escaped_html(implode(", ", $rights["own"])) ?></td>
-				<td><a href="/actor-roles/<?= $role->id ?>">Edit</a></td>
+				<td class="text-nowrap">
+					<a href="/actor-roles/<?= $role->id ?>" class="button"><?= escaped_html($lang['edit']) ?></a>
+				</td>
 			</tr>
 		<?php endforeach; ?>
 	</table>

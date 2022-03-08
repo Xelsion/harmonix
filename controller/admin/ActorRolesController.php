@@ -7,12 +7,20 @@ use core\abstracts\AController;
 use core\classes\responses\ResponseHTML;
 use core\classes\Router;
 use core\classes\Template;
+use core\Core;
 use models\ActorRole;
 
+/**
+ * @see \core\abstracts\AController
+ *
+ * @author Markus Schröder <xelsion@gmail.com>
+ * @version 1.0.0;
+ */
 class ActorRolesController extends AController {
 
 	/**
-	 * @inheritDoc
+	 * @param Router $router
+	 * @see \core\interfaces\IController
 	 */
 	public function init( Router $router ): void {
 		// Add routes to router
@@ -21,12 +29,13 @@ class ActorRolesController extends AController {
 		$router->addRoute("/actor-roles/create", __CLASS__, "create");
 
 		// Add MenuItems to the Menu
-		static::$_menu->insertMenuItem(300, null, "Rollen", "/actor-roles");
-		static::$_menu->insertMenuItem(310, 300, "Rolle erstellen", "/actor-roles/create");
+		Core::$_menu->insertMenuItem(300, null, "Rollen", "/actor-roles");
+		Core::$_menu->insertMenuItem(310, 300, "Rolle erstellen", "/actor-roles/create");
 	}
 
 	/**
-	 * @inheritDoc
+	 * @see \core\interfaces\IController
+	 * @return AResponse
 	 */
 	public function index(): AResponse {
 		$response = new ResponseHTML();
@@ -34,7 +43,7 @@ class ActorRolesController extends AController {
 
 		$results = ActorRole::findAll();
 
-		$template->set("navigation", static::$_menu);
+		$template->set("navigation", Core::$_menu);
 		$template->set("result_list", $results);
 		$template->set("view", new Template(PATH_VIEWS."actor_roles/index.html"));
 		$response->setOutput($template->parse());
@@ -62,7 +71,7 @@ class ActorRolesController extends AController {
 
 		$response = new ResponseHTML();
 		$template = new Template(PATH_VIEWS."template.html");
-		$template->set("navigation", static::$_menu);
+		$template->set("navigation", Core::$_menu);
 		$template->set("option_list", $results);
 		$template->set("view", new Template(PATH_VIEWS."actor_roles/create.html"));
 		$response->setOutput($template->parse());
@@ -74,8 +83,10 @@ class ActorRolesController extends AController {
 			redirect("/actor-roles");
 		}
 		if( isset($_POST['update']) ) {
+
 			$is_valid = $this->postIsValid();
 			if( $is_valid ) {
+
 				$all = ( isset($_POST["all"]) ) ? $this->getPermissions($_POST["all"]) : 0b000;
 				$group = ( isset($_POST["group"]) ) ? $this->getPermissions($_POST["group"]) : 0b000;
 				$own = ( isset($_POST["own"]) ) ? $this->getPermissions($_POST["own"]) : 0b000;
@@ -99,7 +110,7 @@ class ActorRolesController extends AController {
 		$template = new Template(PATH_VIEWS."template.html");
 		$template->set("role", $role);
 		$template->set("option_list", $results);
-		$template->set("navigation", static::$_menu);
+		$template->set("navigation", Core::$_menu);
 		$template->set("view", new Template(PATH_VIEWS."actor_roles/edit.html"));
 		$response->setOutput($template->parse());
 		return $response;

@@ -9,8 +9,16 @@ use RuntimeException;
 use core\abstracts\AEntity;
 use core\helper\StringHelper;
 
+/**
+ * The Actor entity
+ * Represents a single entry in the database
+ *
+ * @author Markus Schröder <xelsion@gmail.com>
+ * @version 1.0.0;
+ */
 class Actor extends AEntity {
 
+	// the columns
 	public int $id = 0;
 	public string $email = "";
 	public string $password = "";
@@ -22,6 +30,12 @@ class Actor extends AEntity {
 	public ?string $updated;
 	public ?string $deleted;
 
+	/**
+	 * The constructor loads the database content into this object.
+	 * If id is 0 the entity will be empty
+	 *
+	 * @param int $id
+	 */
 	public function __construct( int $id = 0 ) {
 		if( $id > 0 ) {
 			$pdo = Core::$_connection_manager->getConnection("mvc");
@@ -35,7 +49,6 @@ class Actor extends AEntity {
 
 	/**
 	 * @return int
-	 *
 	 * @see \core\interfaces\IEntity
 	 */
 	public function create(): int {
@@ -87,8 +100,8 @@ class Actor extends AEntity {
 	}
 
 	/**
-	 * @return bool
 	 * @see \core\interfaces\IEntity
+	 * @return bool
 	 */
 	public function delete(): bool {
 		if( $this->id > 0 ) {

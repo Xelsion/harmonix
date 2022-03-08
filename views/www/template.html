@@ -17,9 +17,14 @@ if( $view instanceof Template ) {
 <head>
 	<meta charset="UTF-8">
 	<title><?= $this->get("title") ?? "Home" ?></title>
-	<link rel="stylesheet" href="<?= PATH_SRC ?>bootstrap/css/bootstrap.css" />
+	<link rel="stylesheet" href="<?= PATH_SRC ?>bootstrap-5.0.2/css/bootstrap.min.css" />
 	<link rel="stylesheet" href="<?= PATH_CSS ?>main.css" />
-	<script src="<?= PATH_SRC ?>bootstrap/js/bootstrap.js"></script>
+	<link rel="stylesheet" href="<?= PATH_CSS ?>navigation.css" />
+	<link rel="stylesheet" href="<?= PATH_CSS ?>forms.css" />
+	<link rel="stylesheet" href="<?= PATH_CSS ?>tables.css" />
+	<script src="<?= PATH_SRC ?>bootstrap-5.0.2/js/bootstrap.bundle.min.js"></script>
+	<script src="<?= PATH_SRC ?>jquery/jquery-3.6.0.min.js"></script>
+	<script src="<?= PATH_JS ?>main.js"></script>
 </head>
 <body>
 <header>

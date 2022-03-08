@@ -9,8 +9,16 @@ use RuntimeException;
 use core\Core;
 use core\abstracts\AEntity;
 
+/**
+ * The ActorRole entity
+ * Represents a single entry in the database
+ *
+ * @author Markus Schröder <xelsion@gmail.com>
+ * @version 1.0.0;
+ */
 class ActorRole extends AEntity {
 
+	// The columns
 	public int $id = 0;
 	public ?int $child_of = null;
 	public string $name = "";
@@ -20,6 +28,12 @@ class ActorRole extends AEntity {
 	public bool $is_default = false;
 	public bool $is_protected = false;
 
+	/**
+	 * The constructor loads the database content into this object.
+	 * If id is 0 the entity will be empty
+	 *
+	 * @param int $id
+	 */
 	public function __construct( int $id = 0 ) {
 		if( $id > 0 ) {
 			$pdo = Core::$_connection_manager->getConnection("mvc");
@@ -31,7 +45,11 @@ class ActorRole extends AEntity {
 		}
 	}
 
-	public function create() {
+	/**
+	 * @return string
+	 * @see \core\interfaces\IEntity
+	 */
+	public function create(): ?string {
 		try {
 			$pdo = Core::$_connection_manager->getConnection("mvc");
 			$sql = "INSERT INTO actor_roles (child_of, name, rights_all, rights_group, rights_own) VALUES (:child_of, :name, :rights_all, :rights_group, :rights_own)";
@@ -49,6 +67,9 @@ class ActorRole extends AEntity {
 		return $insert_id;
 	}
 
+	/**
+	 * @see \core\interfaces\IEntity
+	 */
 	public function update(): void {
 		if( $this->id > 0 ) {
 			try {
@@ -68,6 +89,10 @@ class ActorRole extends AEntity {
 		}
 	}
 
+	/**
+	 * @return bool
+	 * @see \core\interfaces\IEntity
+	 */
 	public function delete(): bool {
 		if( $this->id > 0 ) {
 			try {

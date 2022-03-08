@@ -9,10 +9,17 @@ use core\classes\Router;
 use core\classes\Template;
 use core\Core;
 
+/**
+ * @see \core\abstracts\AController
+ *
+ * @author Markus Schröder <xelsion@gmail.com>
+ * @version 1.0.0;
+ */
 class ErrorController extends AController {
 
 	/**
-	 * @inheritDoc
+	 * @param Router $router
+	 * @see \core\interfaces\IController
 	 */
 	public function init( Router $router ): void {
 		// Add routes to router
@@ -20,12 +27,13 @@ class ErrorController extends AController {
 	}
 
 	/**
-	 * @inheritDoc
+	 * @see \core\interfaces\IController
+	 * @return AResponse
 	 */
 	public function index(): AResponse {
 		$response = new ResponseHTML();
 		$template = new Template(PATH_VIEWS."template.html");
-		$template->set("navigation", static::$_menu);
+		$template->set("navigation", Core::$_menu);
 		$template->set("view", new Template(PATH_VIEWS."home/index.html"));
 		$response->setOutput($template->parse());
 		return $response;
@@ -35,7 +43,7 @@ class ErrorController extends AController {
 		$response = new ResponseHTML();
 		$response->status_code = $error_code;
 		$template = new Template(PATH_VIEWS."template.html");
-		$template->set("navigation", static::$_menu);
+		$template->set("navigation", Core::$_menu);
 		$template->set("view", new Template(PATH_VIEWS."error/".$error_code.".html"));
 		$response->setOutput($template->parse());
 		return $response;

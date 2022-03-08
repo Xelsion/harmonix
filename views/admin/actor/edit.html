@@ -1,9 +1,10 @@
 <?php
+global $lang;
 $this->set("title", "Benutzer bearbeiten");
 $actor = $this->get("actor");
 ?>
-<h1>Neuen Benutzer anlegen</h1>
 <div class="container-fluid">
+	<h1>Neuen Benutzer anlegen</h1>
 	<form action="/actors/<?= $actor->id ?>" method="POST" class="needs-validation" novalidate>
 		<div class="form-group">
 			<label for="email">E-Mail</label>

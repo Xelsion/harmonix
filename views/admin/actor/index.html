@@ -1,17 +1,18 @@
 <?php
+global $lang;
 $this->set("title", "Benutzer");
 
 $actor_list = $this->get("result_list");
 ?>
-<div>Actors!</div>
 <div class="container-fluid">
+	<h1>Benutzer</h1>
 	<table class="table table-dark table-striped">
 		<tr>
 			<th>ID</th>
-			<th>E-Mail</th>
+			<th class="col-md-2">E-Mail</th>
 			<th>Vorname</th>
 			<th>Nachname</th>
-			<th>Optionen</th>
+			<th class="col-md-3">Optionen</th>
 		</tr>
 		<?php foreach( $actor_list as $actor ): ?>
 			<tr>
@@ -19,9 +20,10 @@ $actor_list = $this->get("result_list");
 				<td><?= escaped_html($actor->email) ?></td>
 				<td><?= escaped_html($actor->first_name) ?></td>
 				<td><?= escaped_html($actor->last_name) ?></td>
-				<td>
-					<a href="/actors/<?= $actor->id ?>">Edit</a>
-					<a href="/actors/roles/<?= $actor->id ?>">Rollen</a>
+				<td class="text-nowrap">
+					<a href="/actors/roles/<?= $actor->id ?>" class="button"><?= escaped_html($lang["roles"]) ?></a>
+					<a href="/actors/<?= $actor->id ?>" class="button"><?= escaped_html($lang["edit"]) ?></a>
+					<a href="/actors/<?= $actor->id ?>" class="button-negativ"><?= escaped_html($lang["delete"]) ?></a>
 				</td>
 			</tr>
 		<?php endforeach; ?>

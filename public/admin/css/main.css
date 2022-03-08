@@ -7,28 +7,55 @@ body {
     color: #ccc;
 }
 
-table {
-
+h1 {
+    font-size: 1.6em;
+    padding: 10px 15px;
 }
 
-table tbody {
-
+a,
+a:visited,
+a:hover {
+    color: #ccc;
+    text-decoration: none;
 }
 
-table tr.table-row {
-
+.button,
+.button-positiv,
+.button-negativ {
+    padding: 4px 15px;
+    color: #ccc;
+    border: 1px solid #555;
+    border-radius: 4px;
 }
 
-table th.table-col {
-    padding: 5px 10px;
+.button:disabled,
+.button-positiv:disabled,
+.button-negativ:disabled {
+    color: #7d7d7d !important;
 }
 
-table td.table-col {
-    padding: 5px 30px 5px 10px;
+.button {
+    background: linear-gradient(to bottom, #444, #333);
 }
 
-table td.table-col:last-child {
-    padding: 5px 10px 5px 10px;
+.button:hover {
+    background: linear-gradient(to bottom, #333, #444);
+}
+
+.button-positiv {
+    background: linear-gradient(to bottom, #37532d, #47633d);
+}
+
+.button-positiv:hover {
+    background: linear-gradient(to bottom, #47633d, #37532d);
+}
+
+.button-negativ {
+    background: linear-gradient(to bottom, #642a2a, #541a1a);
+}
+
+.button-negativ:hover {
+    background: linear-gradient(to bottom, #541a1a, #642a2a);
 }
 
 .cleaner {

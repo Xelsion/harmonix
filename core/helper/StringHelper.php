@@ -12,6 +12,9 @@ use core\classes\Configuration;
  */
 class StringHelper {
 
+	private static string $enc_key = 'Q#?9Q=M-&m$@o>>7\ZC$:~?:oRx%@uubnH>YrNwLjt,ieoLK;Mw%,xn2NPhs*c2<>SZQV&NbQA5W_vN;p=UVVd^vHWK&e`;xp9Mpr`azgvUXPph~Zd*2Eh/zx-5,dMmm';
+	private static string $enc_iv = '5657372598585078';
+
 	/**
 	 * Shortens the given string to the given length
 	 * and returns the string.
@@ -58,5 +61,24 @@ class StringHelper {
 	 */
 	public static function getBCrypt( string $str ): string {
 		return password_hash($str, PASSWORD_BCRYPT);
+	}
+
+	public static function encrypt( string $string ): string {
+		$ciphering = "AES-128-CTR";
+		$iv_length = openssl_cipher_iv_length($ciphering);
+		$options = 0;
+		$encryption_iv = static::$enc_iv;
+		$encryption_key = static::$enc_key;
+		/** @noinspection EncryptionInitializationVectorRandomnessInspection */
+		return openssl_encrypt($string, $ciphering, $encryption_key, $options, $encryption_iv);
+	}
+
+	public static function decrypt( string $string ): string {
+		$ciphering = "AES-128-CTR";
+		$iv_length = openssl_cipher_iv_length($ciphering);
+		$options = 0;
+		$decryption_iv = static::$enc_iv;
+		$decryption_key = static::$enc_key;
+		return openssl_decrypt($string, $ciphering, $decryption_key, $options, $decryption_iv);
 	}
 }

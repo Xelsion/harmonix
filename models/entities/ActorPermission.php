@@ -9,14 +9,28 @@ use RuntimeException;
 use core\abstracts\AEntity;
 use core\Core;
 
+/**
+ * The ActorPermission entity
+ * Represents a single entry in the database
+ *
+ * @author Markus Schröder <xelsion@gmail.com>
+ * @version 1.0.0;
+ */
 class ActorPermission extends AEntity {
 
+	// The columns
 	public int $actor_id = 0;
 	public int $role_id = 0;
 	public string $path = "";
 	public ?string $controller = null;
 	public ?string $method = null;
 
+	/**
+	 * The constructor loads the database content into this object.
+	 * If id is 0 the entity will be empty
+	 *
+	 * @param int $id
+	 */
 	public function __construct( int $id = 0 ) {
 		if( $id > 0 ) {
 			$pdo = Core::$_connection_manager->getConnection("mvc");
@@ -29,7 +43,8 @@ class ActorPermission extends AEntity {
 	}
 
 	/**
-	 * @inheritDoc
+	 * @return int
+	 * @see \core\interfaces\IEntity
 	 */
 	public function create(): ?int {
 		try {
@@ -50,14 +65,15 @@ class ActorPermission extends AEntity {
 	}
 
 	/**
-	 * @inheritDoc
+	 * @see \core\interfaces\IEntity
 	 */
 	public function update(): void {
 
 	}
 
 	/**
-	 * @inheritDoc
+	 * @see \core\interfaces\IEntity
+	 * @return bool
 	 */
 	public function delete(): bool {
 		$pdo = Core::$_connection_manager->getConnection("mvc");

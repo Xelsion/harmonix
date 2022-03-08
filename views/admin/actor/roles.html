@@ -1,4 +1,5 @@
 <?php
+global $lang;
 
 use core\Core;
 
@@ -12,19 +13,21 @@ foreach( $actor_permissions as $ap ) {
 }
 $role_options = $this->get("role_options");
 ?>
-<div>Benutzer Rollen</div>
 <div class="container-fluid">
+	<h1>Benutzer Rollen</h1>
 	<form action="/actors/roles/<?= $actor->id ?>" method="POST" class="needs-validation" novalidate>
 		<table class="table table-dark align-middle">
 			<tr class="table-row">
 				<td class="table-col" colspan="3">Bereich</td>
 				<td class="table-col">
-					<select onchange="showPath(this.value)">
-						<option value="">- Bitte wählen -</option>
-						<?php foreach( array_keys($routes) as $path ) { ?>
-							<option value="<?= $path ?>"><?= $path ?></option>
-						<?php } ?>
-					</select>
+					<label>
+						<select onchange="showPath(this.value)">
+							<option value="">- Global -</option>
+							<?php foreach( array_keys($routes) as $path ) { ?>
+								<option value="<?= $path ?>"><?= $path ?></option>
+							<?php } ?>
+						</select>
+					</label>
 				</td>
 			</tr>
 			<tr>
@@ -39,62 +42,64 @@ $role_options = $this->get("role_options");
 					<td class="table-col"></td>
 					<td class="table-col"></td>
 					<td class="table-col">
-						<select name="role[<?= $path ?>][role]">
-							<option value="">- keine -</option>
-							<?php foreach( $role_options as $role ) {
-								$curr_role = $permissions[$path][""][""] ?? 0;
-								?>
-								<option value="<?= $role->id ?>"<?= ( $curr_role === $role->id ) ? ' selected' : '' ?>><?= escaped_html($role->name) ?></option>option>
-							<?php } ?>
-						</select>
+						<label>
+							<select name="role[<?= $path ?>][role]">
+								<option value="">- keine -</option>
+								<?php foreach( $role_options as $role ) {
+									$curr_role = $permissions[$path][""][""] ?? 0;
+									?>
+									<option value="<?= $role->id ?>"<?= ( $curr_role === $role->id ) ? ' selected' : '' ?>><?= escaped_html($role->name) ?></option>option>
+								<?php } ?>
+							</select>
+						</label>
 					</td>
 				</tr>
-				<tr class="table-row">
-					<tbody id="<?= $path ?>" class="toggles" style="display: none;">
-					<?php foreach( $controllers as $controller => $methods ) {
-						$curr_role = $permissions[$path][$controller][""] ?? 0;
-						$controller_name = str_replace("\\", "-", $controller);
-						?>
-						<tr class="table-row">
-							<td class="table-col"><?= $path ?></td>
-							<td class="table-col"><?= $controller ?></td>
-							<td class="table-col"></td>
-							<td class="table-col">
+				<tbody id="<?= $path ?>" class="toggles" style="display: none;">
+				<?php foreach( $controllers as $controller => $methods ) {
+					$curr_role = $permissions[$path][$controller][""] ?? 0;
+					$controller_name = str_replace("\\", "-", $controller);
+					?>
+					<tr class="table-row">
+						<td class="table-col"><?= $path ?></td>
+						<td class="table-col"><?= $controller ?></td>
+						<td class="table-col"></td>
+						<td class="table-col">
+							<label>
 								<select name="role[<?= $path ?>][controller][<?= $controller_name ?>][role]">
 									<option value="">- keine -</option>
 									<?php foreach( $role_options as $role ) { ?>
 										<option value="<?= $role->id ?>"<?= ( $curr_role === $role->id ) ? ' selected' : '' ?>><?= escaped_html($role->name) ?></option>option>
 									<?php } ?>
 								</select>
-							</td>
-						</tr>
-						<?php foreach( $methods as $method ) {
-							$curr_role = $permissions[$path][$controller][$method] ?? 0;
-							?>
-							<tr class="table-row">
-								<td class="table-col"><?= $path ?></td>
-								<td class="table-col"><?= $controller ?></td>
-								<td class="table-col"><?= $method ?></td>
-								<td class="table-col">
+							</label>
+						</td>
+					</tr>
+					<?php foreach( $methods as $method ) {
+						$curr_role = $permissions[$path][$controller][$method] ?? 0;
+						?>
+						<tr class="table-row">
+							<td class="table-col"><?= $path ?></td>
+							<td class="table-col"><?= $controller ?></td>
+							<td class="table-col"><?= $method ?></td>
+							<td class="table-col">
+								<label>
 									<select name="role[<?= $path ?>][controller][<?= $controller_name ?>][method][<?= $method ?>]">
 										<option value="">- keine -</option>
 										<?php foreach( $role_options as $role ) { ?>
 											<option value="<?= $role->id ?>"<?= ( $curr_role === $role->id ) ? ' selected' : '' ?>><?= escaped_html($role->name) ?></option>option>
 										<?php } ?>
 									</select>
-								</td>
-							</tr>
-						<?php } ?>
+								</label>
+							</td>
+						</tr>
 					<?php } ?>
-					</tbody>
-				</tr>
+				<?php } ?>
+				</tbody>
 			<?php } ?>
 			<tr class="form-row">
 				<td colspan="4" class="table_col clearfix">
-					<button type="submit" name="cancel"
-					        class="cancel float-start"><?= escaped_html($lang["cancel"]) ?></button>
-					<button type="submit" name="update"
-					        class="submit float-end"><?= escaped_html($lang["save"]) ?></button>
+					<button type="submit" name="cancel" class="cancel float-start"><?= escaped_html($lang["cancel"]) ?></button>
+					<button type="submit" name="update" class="submit float-end"><?= escaped_html($lang["save"]) ?></button>
 				</td>
 			</tr>
 		</table>

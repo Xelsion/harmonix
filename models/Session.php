@@ -9,9 +9,15 @@ use RuntimeException;
 
 use core\Core;
 
+/**
+ * The Session
+ *
+ * @author Markus Schröder <xelsion@gmail.com>
+ * @version 1.0.0;
+ */
 class Session extends entities\Session {
 
-	private int $_lifetime = 1;
+	private int $_lifetime = 2;
 	private string $_error;
 
 	public function start(): Actor {

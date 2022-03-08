@@ -1,9 +1,13 @@
 <?php
 global $lang;
 
+use core\Core;
+use models\ActorRole;
+
+$actor_role = Core::$_actor_role;
 $this->set("title", "Rolle bearbeiten");
 $role = $this->get("role");
-$protected = $role->is_protected;
+$protected = ( $role->is_protected && !$actor_role->canUpdateALl() );
 $role_option = $this->get("option_list");
 ?>
 <h1>Rolle bearbeiten</h1>
@@ -33,19 +37,19 @@ $role_option = $this->get("option_list");
 				</td>
 				<td class="table-col align-top">
 					<div class="clearfix">
-						<input type="checkbox" name="all[read]" value="x" id="all_read" class="form-check-input float-start"<?= ( $protected ) ? ' disabled' : '' ?><?= ( $role->canReadALl() ) ? ' checked' : '' ?> />
+						<input type="checkbox" name="all[read]" value="x" id="all_read" class="form-check-input float-start"<?= ( $protected ) ? ' disabled' : '' ?><?= ( $role->rights_all & ActorRole::$CAN_READ ) ? ' checked' : '' ?> />
 						<label for="all_read" class="form-check-label float-end"><?= escaped_html($lang["read"]) ?></label>
 					</div>
 					<div class="clearfix">
-						<input type="checkbox" name="all[create]" value="x" id="all_create" class="form-check-input float-start"<?= ( $protected ) ? ' disabled' : '' ?><?= ( $role->canCreateALl() ) ? ' checked' : '' ?> />
+						<input type="checkbox" name="all[create]" value="x" id="all_create" class="form-check-input float-start"<?= ( $protected ) ? ' disabled' : '' ?><?= ( $role->rights_all & ActorRole::$CAN_CREATE ) ? ' checked' : '' ?> />
 						<label for="all_create" class="form-check-label float-end"><?= escaped_html($lang["create"]) ?></label>
 					</div>
 					<div class="clearfix">
-						<input type="checkbox" name="all[update]" value="x" id="all_update" class="form-check-input float-start"<?= ( $protected ) ? ' disabled' : '' ?><?= ( $role->canUpdateALl() ) ? ' checked' : '' ?> />
+						<input type="checkbox" name="all[update]" value="x" id="all_update" class="form-check-input float-start"<?= ( $protected ) ? ' disabled' : '' ?><?= ( $role->rights_all & ActorRole::$CAN_UPDATE ) ? ' checked' : '' ?> />
 						<label for="all_update" class="form-check-label float-end"><?= escaped_html($lang["update"]) ?></label>
 					</div>
 					<div class="clearfix">
-						<input type="checkbox" name="all[delete]" value="x" id="all_delete" class="form-check-input float-start"<?= ( $protected ) ? ' disabled' : '' ?><?= ( $role->canDeleteALl() ) ? ' checked' : '' ?> />
+						<input type="checkbox" name="all[delete]" value="x" id="all_delete" class="form-check-input float-start"<?= ( $protected ) ? ' disabled' : '' ?><?= ( $role->rights_all & ActorRole::$CAN_DELETE ) ? ' checked' : '' ?> />
 						<label for="all_delete" class="form-check-label float-end"><?= escaped_html($lang["delete"]) ?></label>
 					</div>
 				</td>
@@ -57,19 +61,19 @@ $role_option = $this->get("option_list");
 				</td>
 				<td class="table-col align-top">
 					<div class="clearfix">
-						<input type="checkbox" name="group[read]" value="x" id="group_read" class="form-check-input float-start"<?= ( $protected ) ? ' disabled' : '' ?><?= ( $role->canReadGroup() ) ? ' checked' : '' ?> />
+						<input type="checkbox" name="group[read]" value="x" id="group_read" class="form-check-input float-start"<?= ( $protected ) ? ' disabled' : '' ?><?= ( $role->rights_group & ActorRole::$CAN_READ ) ? ' checked' : '' ?> />
 						<label for="group_read" class="form-check-label float-end"><?= escaped_html($lang["read"]) ?></label>
 					</div>
 					<div class="clearfix">
-						<input type="checkbox" name="group[create]" value="x" id="group_create" class="form-check-input float-start"<?= ( $protected ) ? ' disabled' : '' ?><?= ( $role->canCreateGroup() ) ? ' checked' : '' ?> />
+						<input type="checkbox" name="group[create]" value="x" id="group_create" class="form-check-input float-start"<?= ( $protected ) ? ' disabled' : '' ?><?= ( $role->rights_group & ActorRole::$CAN_CREATE ) ? ' checked' : '' ?> />
 						<label for="group_create" class="form-check-label float-end"><?= escaped_html($lang["create"]) ?></label>
 					</div>
 					<div class="clearfix">
-						<input type="checkbox" name="group[update]" value="x" id="group_update" class="form-check-input float-start"<?= ( $protected ) ? ' disabled' : '' ?><?= ( $role->canUpdateGroup() ) ? ' checked' : '' ?> />
+						<input type="checkbox" name="group[update]" value="x" id="group_update" class="form-check-input float-start"<?= ( $protected ) ? ' disabled' : '' ?><?= ( $role->rights_group & ActorRole::$CAN_UPDATE ) ? ' checked' : '' ?> />
 						<label for="group_update" class="form-check-label float-end"><?= escaped_html($lang["update"]) ?></label>
 					</div>
 					<div class="clearfix">
-						<input type="checkbox" name="group[delete]" value="x" id="group_delete" class="form-check-input float-start"<?= ( $protected ) ? ' disabled' : '' ?><?= ( $role->canDeleteGroup() ) ? ' checked' : '' ?> />
+						<input type="checkbox" name="group[delete]" value="x" id="group_delete" class="form-check-input float-start"<?= ( $protected ) ? ' disabled' : '' ?><?= ( $role->rights_group & ActorRole::$CAN_DELETE ) ? ' checked' : '' ?> />
 						<label for="group_delete" class="form-check-label float-end"><?= escaped_html($lang["delete"]) ?></label>
 					</div>
 				</td>
@@ -80,19 +84,19 @@ $role_option = $this->get("option_list");
 				</td>
 				<td class="table-col align-top">
 					<div class="clearfix">
-						<input type="checkbox" name="own[read]" value="x" id="own_read" class="form-check-input float-start"<?= ( $protected ) ? ' disabled' : '' ?><?= ( $role->canReadOwn() ) ? ' checked' : '' ?> />
+						<input type="checkbox" name="own[read]" value="x" id="own_read" class="form-check-input float-start"<?= ( $protected ) ? ' disabled' : '' ?><?= ( $role->rights_own & ActorRole::$CAN_READ ) ? ' checked' : '' ?> />
 						<label for="own_read" class="form-check-label float-end"><?= escaped_html($lang["read"]) ?></label>
 					</div>
 					<div class="clearfix">
-						<input type="checkbox" name="own[create]" value="x" id="own_create" class="form-check-input float-start"<?= ( $protected ) ? ' disabled' : '' ?><?= ( $role->canCreateOwn() ) ? ' checked' : '' ?> />
+						<input type="checkbox" name="own[create]" value="x" id="own_create" class="form-check-input float-start"<?= ( $protected ) ? ' disabled' : '' ?><?= ( $role->rights_own & ActorRole::$CAN_CREATE ) ? ' checked' : '' ?> />
 						<label for="own_create" class="form-check-label float-end"><?= escaped_html($lang["create"]) ?></label>
 					</div>
 					<div class="clearfix">
-						<input type="checkbox" name="own[update]" value="x" id="own_update" class="form-check-input float-start"<?= ( $protected ) ? ' disabled' : '' ?><?= ( $role->canUpdateOwn() ) ? ' checked' : '' ?> />
+						<input type="checkbox" name="own[update]" value="x" id="own_update" class="form-check-input float-start"<?= ( $protected ) ? ' disabled' : '' ?><?= ( $role->rights_own & ActorRole::$CAN_UPDATE ) ? ' checked' : '' ?> />
 						<label for="own_update" class="form-check-label float-end"><?= escaped_html($lang["update"]) ?></label>
 					</div>
 					<div class="clearfix">
-						<input type="checkbox" name="own[delete]" value="x" id="own_delete" class="form-check-input float-start"<?= ( $protected ) ? ' disabled' : '' ?><?= ( $role->canDeleteOwn() ) ? ' checked' : '' ?> />
+						<input type="checkbox" name="own[delete]" value="x" id="own_delete" class="form-check-input float-start"<?= ( $protected ) ? ' disabled' : '' ?><?= ( $role->rights_own & ActorRole::$CAN_DELETE ) ? ' checked' : '' ?> />
 						<label for="own_delete" class="form-check-label float-end"><?= escaped_html($lang["delete"]) ?></label>
 					</div>
 				</td>

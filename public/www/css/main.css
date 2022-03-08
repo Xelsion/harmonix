@@ -1,4 +1,40 @@
+html {
+    min-width: 758px !important;
+}
+
 body {
-    background-color: #282828;
-    color: #efefef;
+    background-color: #383838;
+    color: #ccc;
+}
+
+h1 {
+    font-size: 1.6em;
+    padding: 10px 15px;
+}
+
+a,
+a:visited,
+a:hover {
+    color: #ccc;
+    text-decoration: none;
+}
+
+.button {
+    padding: 4px 15px;
+    background: linear-gradient(to bottom, #444, #333);
+    color: #ccc;
+    border: 1px solid #555;
+    border-radius: 4px;
+}
+
+.button:hover {
+    background: linear-gradient(to bottom, #333, #444);
+}
+
+
+.cleaner {
+    clear: both;
+    width: 0;
+    height: 0;
+    overflow: hidden;
 }

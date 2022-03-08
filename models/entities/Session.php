@@ -10,12 +10,25 @@ use RuntimeException;
 use core\abstracts\AEntity;
 use core\System;
 
+/**
+ * The Session entity
+ * Represents a single entry in the database
+ *
+ * @author Markus Schröder <xelsion@gmail.com>
+ * @version 1.0.0;
+ */
 class Session extends AEntity {
 
+	// The columns
 	public string $id = "";
 	public int $actor_id = 0;
 	public string $expired = "";
 
+	/**
+	 * The constructor loads the database content into this object.
+	 * If a session was set it will load it else it will return an
+	 * empty entity
+	 */
 	public function __construct() {
 		if( isset($_COOKIE["session"]) ) {
 			$pdo = Core::$_connection_manager->getConnection("mvc");
@@ -64,8 +77,8 @@ class Session extends AEntity {
 	}
 
 	/**
-	 * @return bool
 	 * @see \core\interfaces\IEntity
+	 * @return bool
 	 */
 	public function delete(): bool {
 		if( $this->id !== "" ) {

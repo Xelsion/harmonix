@@ -12,8 +12,18 @@ use models\Actor;
 use models\ActorRole;
 use models\ActorPermission;
 
+/**
+ * @see \core\abstracts\AController
+ *
+ * @author Markus Schröder <xelsion@gmail.com>
+ * @version 1.0.0;
+ */
 class ActorController extends AController {
 
+	/**
+	 * @param Router $router
+	 * @see \core\interfaces\IController
+	 */
 	public function init( Router $router ): void {
 		// Add routes to router
 		$router->addRoute("/actors", __CLASS__);
@@ -22,17 +32,21 @@ class ActorController extends AController {
 		$router->addRoute("/actors/roles/{actor}", __CLASS__, "roles");
 
 		// Add MenuItems to the Menu
-		static::$_menu->insertMenuItem(200, null, "Benutzer", "/actors");
-		static::$_menu->insertMenuItem(210, 200, "Benutzer erstellen", "/actors/create");
+		Core::$_menu->insertMenuItem(200, null, "Benutzer", "/actors");
+		Core::$_menu->insertMenuItem(210, 200, "Benutzer erstellen", "/actors/create");
 	}
 
+	/**
+	 * @return AResponse
+	 * @see \core\interfaces\IController
+	 */
 	public function index(): AResponse {
 		$response = new ResponseHTML();
 		$template = new Template(PATH_VIEWS."template.html");
 
 		$results = Actor::findAll();
 
-		$template->set("navigation", static::$_menu);
+		$template->set("navigation", Core::$_menu);
 		$template->set("result_list", $results);
 		$template->set("view", new Template(PATH_VIEWS."actor/index.html"));
 		$response->setOutput($template->parse());
@@ -58,7 +72,7 @@ class ActorController extends AController {
 		}
 		$response = new ResponseHTML();
 		$template = new Template(PATH_VIEWS."template.html");
-		$template->set("navigation", static::$_menu);
+		$template->set("navigation", Core::$_menu);
 		$template->set("view", new Template(PATH_VIEWS."actor/create.html"));
 		$response->setOutput($template->parse());
 		return $response;
@@ -86,7 +100,7 @@ class ActorController extends AController {
 		$response = new ResponseHTML();
 		$template = new Template(PATH_VIEWS."template.html");
 		$template->set("actor", $actor);
-		$template->set("navigation", static::$_menu);
+		$template->set("navigation", Core::$_menu);
 		$template->set("view", new Template(PATH_VIEWS."actor/edit.html"));
 		$response->setOutput($template->parse());
 		return $response;
@@ -96,11 +110,12 @@ class ActorController extends AController {
 		if( !Core::$_actor_role->canUpdateAll() ) {
 			redirect("/error/403");
 		}
-
 		if( isset($_POST['cancel']) ) {
 			redirect("/actors");
 		}
+
 		if( isset($_POST['update']) ) {
+
 			$roles = array();
 			foreach( $_POST['role'] as $path => $entry_path ) {
 				if( (int)$entry_path["role"] > 0 ) {
@@ -148,7 +163,7 @@ class ActorController extends AController {
 			)
 		));
 
-		$template->set("navigation", static::$_menu);
+		$template->set("navigation", Core::$_menu);
 		$template->set("actor", $actor);
 		$template->set("role_options", $role_options);
 		$template->set("actor_permissions", $actor_permissions);

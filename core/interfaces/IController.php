@@ -15,10 +15,12 @@ use core\classes\Router;
 interface IController {
 
 	/**
-	 * This function will add all routes it has
-	 * to the given Router
+	 * This function will add all routes it has to the given Router
+	 * It can also add MenuItems to the navigation Menu (The Menu
+	 * is accessible through the Core class)
 	 *
 	 * @param Router $router
+	 * @see \core\Core
 	 */
 	public function init( Router $router ): void;
 
