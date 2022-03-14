@@ -35,27 +35,39 @@ if( $view instanceof Template ) {
 				<span onclick="$('#actor-menu-dropdown').toggle();" class="menu-item"><?= ( $actor->id > 0 ) ? $actor->first_name." ".$actor->last_name : "Profile" ?></span>
 			</div>
 			<div id="actor-menu-dropdown" style="">
-				<form action="<?= $_SERVER["REQUEST_URI"] ?>" method="POST">
+				<menu>
+					<ul
+					">
 					<?php if( $actor->id === 0 ): ?>
-						<div class="form-row">
-							<label>
-								<input type="email" name="email" value="" placeholder="E-Mail" />
-							</label>
-						</div>
-						<div class="form-row">
-							<label>
-								<input type="password" name="password" value="" placeholder="Password" />
-							</label>
-						</div>
-						<div class="form-row">
-							<button type="submit" name="login">Login</button>
-						</div>
+						<li>
+							<form action="<?= $_SERVER["REQUEST_URI"] ?>" method="POST">
+								<div class="form-row">
+									<label>
+										<input type="email" name="email" value="" placeholder="E-Mail" />
+									</label>
+								</div>
+								<div class="form-row">
+									<label>
+										<input type="password" name="password" value="" placeholder="Password" autocomplete="new-password" />
+									</label>
+								</div>
+								<div class="form-row">
+									<button type="submit" name="login">Login</button>
+								</div>
+							</form>
+						</li>
 					<?php else: ?>
-						<div class="form-row">
-							<button type="submit" name="logout">Logout</button>
-						</div>
+						<li>
+							<a href="https://www.harmonix.de">www-Bereich</a>
+						</li>
+						<li>
+							<form action="<?= $_SERVER["REQUEST_URI"] ?>" method="POST">
+								<button type="submit" name="logout" class="link">Logout</button>
+							</form>
+						</li>
 					<?php endif; ?>
-				</form>
+					</ul>
+				</menu>
 			</div>
 		</div>
 		<div class="cleaner"></div>

@@ -1,15 +1,41 @@
+@font-face {
+    font-family: "Comfortaa";
+    src: url("./fonts/Comfortaa-Regular.ttf") format("truetype")
+}
+
+@font-face {
+    font-family: "Comfortaa-Light";
+    src: url("./fonts/Comfortaa-Light.ttf") format("truetype")
+}
+
+@font-face {
+    font-family: "Comfortaa-Bold";
+    src: url("./fonts/Comfortaa-Bold.ttf") format("truetype")
+}
+
 html {
     min-width: 758px !important;
 }
 
 body {
-    background-color: #383838;
+    background-color: #111;
     color: #ccc;
 }
 
 h1 {
     font-size: 1.6em;
     padding: 10px 15px;
+}
+
+h2 {
+    font-size: 1.4em;
+    padding: 10px 15px;
+}
+
+.content-block {
+    padding: 20px;
+    background-color: #2c2c2c;
+    border-radius: 8px;
 }
 
 a,
@@ -22,6 +48,8 @@ a:hover {
 .button,
 .button-positiv,
 .button-negativ {
+    font-family: Comfortaa, Helvetica, sans-serif;
+    font-size: 0.9em;
     padding: 4px 15px;
     color: #ccc;
     border: 1px solid #555;
@@ -34,28 +62,52 @@ a:hover {
     color: #7d7d7d !important;
 }
 
-.button {
-    background: linear-gradient(to bottom, #444, #333);
+.button-default {
+    background: linear-gradient(to bottom, #444, #111);
 }
 
-.button:hover {
-    background: linear-gradient(to bottom, #333, #444);
+.button-default:hover {
+    background: linear-gradient(to bottom, #111, #444);
 }
 
 .button-positiv {
-    background: linear-gradient(to bottom, #37532d, #47633d);
+    background: linear-gradient(to bottom, #47633d, #17330d);
 }
 
 .button-positiv:hover {
-    background: linear-gradient(to bottom, #47633d, #37532d);
+    background: linear-gradient(to bottom, #17330d, #47633d);
 }
 
 .button-negativ {
-    background: linear-gradient(to bottom, #642a2a, #541a1a);
+    background: linear-gradient(to bottom, #642a2a, #340a0a);
 }
 
 .button-negativ:hover {
-    background: linear-gradient(to bottom, #541a1a, #642a2a);
+    background: linear-gradient(to bottom, #340a0a, #642a2a);
+}
+
+.slide-down {
+    position: relative;
+    content: '';
+    top: 50%;
+    width: 0;
+    height: 0;
+    border-color: #999999;
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-top: 4px solid;
+}
+
+.slide-up {
+    position: relative;
+    content: '';
+    top: 50%;
+    width: 0;
+    height: 0;
+    border-color: #999999;
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-bottom: 4px solid;
 }
 
 .cleaner {

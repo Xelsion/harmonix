@@ -1,13 +1,17 @@
 form {
     background-color: #222;
-    padding: 15px 20px 5px 20px;
-    width: fit-content;
+    padding: 15px 40px 5px 40px;
+    width: 100%;
     margin: 0 auto;
-    border-radius: 4px;
+    border-radius: 10px;
 }
 
-form > div {
+form div.row {
     margin-bottom: 10px;
+}
+
+form div.row > div.table-col {
+    padding: 4px 0px;
 }
 
 form label {

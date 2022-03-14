@@ -102,10 +102,14 @@ $role_option = $this->get("option_list");
 				</td>
 			</tr>
 		</table>
-
-		<div class="form-group clearfix">
-			<button type="submit" name="cancel" class="cancel float-start"><?= escaped_html($lang["cancel"]) ?></button>
-			<button type="submit" name="update" class="submit float-end"<?= ( $protected ) ? ' disabled' : '' ?>><?= escaped_html($lang["save"]) ?></button>
+		<div class="form-group row">
+			<div class="col-auto">
+				<button type="submit" name="cancel" class="button button-default"><?= escaped_html($lang["cancel"]) ?></button>
+			</div>
+			<div class="col"></div>
+			<div class="col-auto">
+				<button type="submit" name="update" class="button button-positiv"<?= ( $protected ) ? ' disabled' : '' ?>><?= escaped_html($lang["save"]) ?></button>
+			</div>
 		</div>
 	</form>
 </div>

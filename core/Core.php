@@ -7,6 +7,7 @@ use core\classes\Logger;
 use core\classes\Request;
 use core\classes\Router;
 use core\classes\tree\Menu;
+use core\classes\tree\RoleTree;
 use core\manager\ConnectionManager;
 use models\Actor;
 use models\ActorRole;
@@ -34,6 +35,9 @@ class Core {
 
 	// The Menu
 	public static Menu $_menu;
+
+	// The Menu
+	public static RoleTree $_role_tree;
 
 	// The current actor
 	public static Actor $_actor;

@@ -67,12 +67,18 @@ class ActorController extends AController {
 				$actor->first_name = $_POST["first_name"];
 				$actor->last_name = $_POST["last_name"];
 				$actor->create();
+				$this->savePermissions($actor);
 				redirect("/actors");
 			}
 		}
+
+		$role_options = ActorRole::findAll();
+		$actor_permissions = array();
 		$response = new ResponseHTML();
 		$template = new Template(PATH_VIEWS."template.html");
 		$template->set("navigation", Core::$_menu);
+		$template->set("role_options", $role_options);
+		$template->set("actor_permissions", $actor_permissions);
 		$template->set("view", new Template(PATH_VIEWS."actor/create.html"));
 		$response->setOutput($template->parse());
 		return $response;
@@ -107,7 +113,7 @@ class ActorController extends AController {
 	}
 
 	public function roles( Actor $actor ): AResponse {
-		if( !Core::$_actor_role->canUpdateAll() ) {
+		if( !Core::$_actor_role->canUpdateGroup() ) {
 			redirect("/error/403");
 		}
 		if( isset($_POST['cancel']) ) {
@@ -115,40 +121,8 @@ class ActorController extends AController {
 		}
 
 		if( isset($_POST['update']) ) {
-
-			$roles = array();
-			foreach( $_POST['role'] as $path => $entry_path ) {
-				if( (int)$entry_path["role"] > 0 ) {
-					$roles[$path][""][""] = $entry_path["role"];
-				}
-				foreach( $entry_path["controller"] as $controller => $entry_controller ) {
-					$controller = str_replace("-", "\\", $controller);
-					if( (int)$entry_controller["role"] > 0 ) {
-						$roles[$path][$controller][""] = $entry_controller["role"];
-					}
-					foreach( $entry_controller["method"] as $method => $role ) {
-						if( (int)$role > 0 ) {
-							$roles[$path][$controller][$method] = $role;
-						}
-					}
-				}
-			}
-			$actor_permission = new ActorPermission();
-			$actor_permission->actor_id = $actor->id;
-			$actor_permission->delete();
-			foreach( $roles as $path => $controllers ) {
-				foreach( $controllers as $controller => $methods ) {
-					foreach( $methods as $method => $role ) {
-						$actor_permission = new ActorPermission();
-						$actor_permission->actor_id = $actor->id;
-						$actor_permission->role_id = $role;
-						$actor_permission->path = $path;
-						$actor_permission->controller = ( $controller !== '' ) ? $controller : null;
-						$actor_permission->method = ( $method !== '' ) ? $method : null;
-						$actor_permission->create();
-					}
-				}
-			}
+			$this->savePermissions($actor);
+			redirect("/actors");
 		}
 
 		$response = new ResponseHTML();
@@ -190,6 +164,45 @@ class ActorController extends AController {
 			$is_valid = false;
 		}
 		return $is_valid;
+	}
+
+	private function savePermissions( Actor $actor ): void {
+		if( $actor->id === 0 ) {
+			return;
+		}
+		$roles = array();
+		foreach( $_POST['role'] as $path => $entry_path ) {
+			if( (int)$entry_path["role"] > 0 ) {
+				$roles[$path][""][""] = $entry_path["role"];
+			}
+			foreach( $entry_path["controller"] as $controller => $entry_controller ) {
+				$controller = str_replace("-", "\\", $controller);
+				if( (int)$entry_controller["role"] > 0 ) {
+					$roles[$path][$controller][""] = $entry_controller["role"];
+				}
+				foreach( $entry_controller["method"] as $method => $role ) {
+					if( (int)$role > 0 ) {
+						$roles[$path][$controller][$method] = $role;
+					}
+				}
+			}
+		}
+		$actor_permission = new ActorPermission();
+		$actor_permission->actor_id = $actor->id;
+		$actor_permission->delete();
+		foreach( $roles as $path => $controllers ) {
+			foreach( $controllers as $controller => $methods ) {
+				foreach( $methods as $method => $role ) {
+					$actor_permission = new ActorPermission();
+					$actor_permission->actor_id = $actor->id;
+					$actor_permission->role_id = $role;
+					$actor_permission->path = $path;
+					$actor_permission->controller = ( $controller !== '' ) ? $controller : null;
+					$actor_permission->method = ( $method !== '' ) ? $method : null;
+					$actor_permission->create();
+				}
+			}
+		}
 	}
 
 	public function __toString(): string {

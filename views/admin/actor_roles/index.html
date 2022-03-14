@@ -28,7 +28,7 @@ $role_list = $this->get("result_list");
 				<td><?= escaped_html(implode(", ", $rights["group"])) ?></td>
 				<td><?= escaped_html(implode(", ", $rights["own"])) ?></td>
 				<td class="text-nowrap">
-					<a href="/actor-roles/<?= $role->id ?>" class="button"><?= escaped_html($lang['edit']) ?></a>
+					<a href="/actor-roles/<?= $role->id ?>" class="button button-default"><?= escaped_html($lang['edit']) ?></a>
 				</td>
 			</tr>
 		<?php endforeach; ?>

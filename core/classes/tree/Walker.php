@@ -109,7 +109,7 @@ class Walker {
 	 * @param bool $exclude_self
 	 * @return array
 	 */
-	public function getSiblingsOf( int $node_id, $exclude_self = true ): array {
+	public function getSiblingsOf( int $node_id, bool $exclude_self = true ): array {
 		$siblings = array();
 		$node = $this->getNode($node_id);
 		if( !is_null($node) ) {
@@ -152,5 +152,4 @@ class Walker {
 		}
 		return $descendants;
 	}
-
 }

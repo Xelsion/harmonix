@@ -1,0 +1,26 @@
+<?php
+
+namespace core\classes\tree;
+
+use models\ActorRole;
+
+class RoleTree extends Walker {
+
+	private static ?RoleTree $_instance = null;
+
+	private function __construct() {
+		parent::__construct();
+		$actor_roles = ActorRole::findAll();
+		foreach( $actor_roles as $role ) {
+			$this->addNode($role);
+		}
+	}
+
+	public static function getInstance(): RoleTree {
+		if( static::$_instance === null ) {
+			static::$_instance = new RoleTree();
+		}
+		return static::$_instance;
+	}
+
+}

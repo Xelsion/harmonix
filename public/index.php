@@ -1,6 +1,4 @@
 <?php
-session_start();
-
 use core\classes\Logger;
 use core\Core;
 use core\System;

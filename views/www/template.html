@@ -4,6 +4,8 @@ use core\Core;
 use core\classes\Template;
 
 $actor = Core::$_actor;
+$actor_role = Core::$_actor_role;
+
 $menu = Core::$_menu;
 
 $view = $this->get("view");
@@ -24,46 +26,55 @@ if( $view instanceof Template ) {
 	<link rel="stylesheet" href="<?= PATH_CSS ?>tables.css" />
 	<script src="<?= PATH_SRC ?>bootstrap-5.0.2/js/bootstrap.bundle.min.js"></script>
 	<script src="<?= PATH_SRC ?>jquery/jquery-3.6.0.min.js"></script>
-	<script src="<?= PATH_JS ?>main.js"></script>
 </head>
 <body>
 <header>
-	<div class="row">
-		<div class="col-md">&nbsp;</div>
-		<div class="col-md-4">
-			<?php if( $actor->id === 0 ): ?>
-				<form action="<?= $_SERVER["REQUEST_URI"] ?>" method="POST">
-					<div class="row g-3">
-						<div class="col-auto"><label>
-								<input type="email" name="email" value="" placeholder="E-Mail"
-								       class="form-control" />
-							</label></div>
-						<div class="col-auto"><label>
-								<input type="password" name="password" value="" placeholder="Password"
-								       class="form-control" />
-							</label></div>
-						<div class="col-auto">
-							<button type="submit" name="login" class="btn btn-primary">Login</button>
-						</div>
-					</div>
-				</form>
-			<?php else: ?>
-				<form action="<?= $_SERVER["REQUEST_URI"] ?>" method="POST">
-					<div class="row g-3">
-						<div class="col-auto">
-							<div class="col-form-label"><?= escaped_html($actor->first_name." ".$actor->last_name) ?></div>
-						</div>
-						<div class="col-auto">
-							<div class="col-form-label"><?= escaped_html($actor->email) ?></div>
-						</div>
-						<div class="col-auto">
-							<button type="submit" name="logout" class="btn btn-primary">Logout</button>
-						</div>
-					</div>
-				</form>
-			<?php endif; ?>
+	<nav id="navigation">
+		<?= $menu->getAsHtml() ?>
+		<div id="actor-menu">
+			<div class="has-children">
+				<span onclick="$('#actor-menu-dropdown').toggle();" class="menu-item"><?= ( $actor->id > 0 ) ? $actor->first_name." ".$actor->last_name : "Profile" ?></span>
+			</div>
+			<div id="actor-menu-dropdown" style="">
+				<menu>
+					<ul
+					">
+					<?php if( $actor->id === 0 ): ?>
+						<li>
+							<form action="<?= $_SERVER["REQUEST_URI"] ?>" method="POST">
+								<div class="form-row">
+									<label>
+										<input type="email" name="email" value="" placeholder="E-Mail" />
+									</label>
+								</div>
+								<div class="form-row">
+									<label>
+										<input type="password" name="password" value="" placeholder="Password" autocomplete="new-password" />
+									</label>
+								</div>
+								<div class="form-row">
+									<button type="submit" name="login">Login</button>
+								</div>
+							</form>
+						</li>
+					<?php else: ?>
+						<?php if( $actor_role->canReadAll() ) { ?>
+							<li>
+								<a href="https://admin.harmonix.de">Admin-Bereich</a>
+							</li>
+						<?php } ?>
+						<li>
+							<form action="<?= $_SERVER["REQUEST_URI"] ?>" method="POST">
+								<button type="submit" name="logout" class="link">Logout</button>
+							</form>
+						</li>
+					<?php endif; ?>
+					</ul>
+				</menu>
+			</div>
 		</div>
-	</div>
+		<div class="cleaner"></div>
+	</nav>
 </header>
 <main><?= $view_content ?></main>
 <footer></footer>

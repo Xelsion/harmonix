@@ -7,9 +7,7 @@ use core\abstracts\AController;
 use core\classes\responses\ResponseHTML;
 use core\classes\Router;
 use core\classes\Template;
-use core\System;
-use models\Actor;
-
+use core\Core;
 
 /**
  * @author Markus Schröder <xelsion@gmail.com>
@@ -23,6 +21,8 @@ class HomeController extends AController {
 
 	public function init( Router $router ): void {
 		$router->addRoute("/", __CLASS__);
+
+		Core::$_menu->insertMenuItem(100, null, "Home", "/");
 	}
 
 	public function index(): AResponse {

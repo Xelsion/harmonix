@@ -2,6 +2,7 @@
 
 namespace core;
 
+use core\classes\tree\RoleTree;
 use Exception;
 use RuntimeException;
 use core\abstracts\AController;
@@ -12,7 +13,6 @@ use core\manager\ConnectionManager;
 use core\classes\Request;
 use core\classes\Router;
 use models\Session;
-use models\Actor;
 use core\classes\tree\Menu;
 
 /**
@@ -66,11 +66,18 @@ class System {
 	 */
 	public function start(): string {
 		try {
+			$cookie = Core::$_configuration->getSection("cookie");
+			ini_set('session.cookie_domain', $cookie["domain"]);
+			session_start();
+
 			// Initiate database connections
 			$connections = Core::$_configuration->getSection("connections");
 			foreach( $connections as $name => $conn ) {
 				Core::$_connection_manager->addConnection($name, $conn["dns"], $conn["user"], $conn["password"]);
 			}
+			// initiate actor roles tree
+			Core::$_role_tree = RoleTree::getInstance();
+			// initiate the session
 			$session = new Session();
 			Core::$_actor = $session->start();
 

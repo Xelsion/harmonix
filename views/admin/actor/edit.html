@@ -5,37 +5,42 @@ $actor = $this->get("actor");
 ?>
 <div class="container-fluid">
 	<h1>Neuen Benutzer anlegen</h1>
-	<form action="/actors/<?= $actor->id ?>" method="POST" class="needs-validation" novalidate>
-		<div class="form-group">
+	<form action="/actors/<?= $actor->id ?>" method="POST" class="needs-validation" autocomplete="off" novalidate>
+		<div class="form-group row">
 			<label for="email">E-Mail</label>
 			<input type="email" name="email" value="<?= escaped_html($actor->email) ?>" id="email" required />
 			<div class="invalid-feedback"><?= escaped_html($lang["required"]["email"]) ?></div>
 		</div>
-		<div class="form-group">
+		<div class="form-group row">
 			<label for="password">Passwort</label>
-			<input type="password" name="password" value="" id="password" />
+			<input type="password" name="password" value="" autocomplete="new-password" id="password" />
 			<div class="invalid-feedback"><?= escaped_html($lang["required"]["password"]) ?></div>
 		</div>
-		<div class="form-group">
+		<div class="form-group row">
 			<label for="password_verify">Passwort Wiederholung</label>
-			<input type="password" name="password_verify" value="" id="password_verify" />
+			<input type="password" name="password_verify" value="" autocomplete="new-password" id="password_verify" />
 			<div class="invalid-feedback"><?= escaped_html($lang["required"]["password_verify"]) ?></div>
 		</div>
-		<div class="form-group">
+		<div class="form-group row">
 			<label for="first_name">Vorname</label>
 			<input type="text" name="first_name" value="<?= escaped_html($actor->first_name) ?>" id="first_name"
 			       required />
 			<div class="invalid-feedback"><?= escaped_html($lang["required"]["first_name"]) ?></div>
 		</div>
-		<div class="form-group">
+		<div class="form-group row">
 			<label for="last_name">Nachname</label>
 			<input type="text" name="last_name" value="<?= escaped_html($actor->last_name) ?>" id="last_name"
 			       required />
 			<div class="invalid-feedback"><?= escaped_html($lang["required"]["last_name"]) ?></div>
 		</div>
-		<div class="form-group clearfix">
-			<button type="submit" name="cancel" class="cancel float-start"><?= escaped_html($lang["cancel"]) ?></button>
-			<button type="submit" name="update" class="submit float-end"><?= escaped_html($lang["save"]) ?></button>
+		<div class="form-group row clearfix">
+			<div class="col-auto">
+				<button type="submit" name="cancel" class="button button-default float-start"><?= escaped_html($lang["cancel"]) ?></button>
+			</div>
+			<div class="col"></div>
+			<div class="col-auto">
+				<button type="submit" name="update" class="button button-positiv float-end"><?= escaped_html($lang["save"]) ?></button>
+			</div>
 		</div>
 	</form>
 </div>

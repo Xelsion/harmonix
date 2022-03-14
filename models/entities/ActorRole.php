@@ -7,7 +7,7 @@ use PDOException;
 use RuntimeException;
 
 use core\Core;
-use core\abstracts\AEntity;
+use core\abstracts\AEntityNode;
 
 /**
  * The ActorRole entity
@@ -16,7 +16,7 @@ use core\abstracts\AEntity;
  * @author Markus Schröder <xelsion@gmail.com>
  * @version 1.0.0;
  */
-class ActorRole extends AEntity {
+class ActorRole extends AEntityNode {
 
 	// The columns
 	public int $id = 0;
@@ -43,6 +43,7 @@ class ActorRole extends AEntity {
 			$stmt->execute();
 			$stmt->fetch();
 		}
+		parent::__construct($this->id, $this->child_of, $this->name);
 	}
 
 	/**

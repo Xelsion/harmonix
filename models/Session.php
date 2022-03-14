@@ -17,10 +17,18 @@ use core\Core;
  */
 class Session extends entities\Session {
 
-	private int $_lifetime = 2;
+	private string $_cookie_path = "/";
+	private string $_cookie_domain = "";
+	private int $_cookie_lifetime = 2;
+	private bool $_cookie_secure = false;
 	private string $_error;
 
 	public function start(): Actor {
+		$configuration = Core::$_configuration->getSection("cookie");
+		$this->_cookie_domain = $configuration["domain"];
+		$this->_cookie_lifetime = $configuration["lifetime"];
+		$this->_cookie_secure = $configuration["secure"];
+
 		if( isset($_POST["login"], $_POST["email"], $_POST["password"]) ) {
 			try {
 				return $this->login($_POST["email"], $_POST["password"]);
@@ -50,7 +58,7 @@ class Session extends entities\Session {
 	 */
 	public function login( string $email, string $password ): Actor {
 		$pdo = Core::$_connection_manager->getConnection("mvc");
-		$stmt = $pdo->prepare("SELECT * FROM actors WHERE email=:email");
+		$stmt = $pdo->prepare("SELECT * FROM actors WHERE email=:email AND deleted IS NULL");
 		$stmt->bindParam(":email", $email, PDO::PARAM_STR);
 		$stmt->execute();
 		if( $stmt->rowCount() === 1 ) {
@@ -69,12 +77,19 @@ class Session extends entities\Session {
 			} else {
 				$session_id = MD5(time());
 				$date_time = new DateTime();
-				$date_time->modify("+".$this->_lifetime." hour");
+				$date_time->modify("+".$this->_cookie_lifetime." hour");
 				$this->id = $session_id;
 				$this->actor_id = $actor->id;
 				$this->expired = $date_time->format("Y-m-d H:i:s");
 				$this->create();
-				setcookie("session", $session_id, $date_time->getTimestamp());
+
+				$cookie_options = array(
+					'expires' => $date_time->getTimestamp(),
+					'path'    => $this->_cookie_path,
+					'domain'  => $this->_cookie_domain,
+					'secure'  => $this->_cookie_secure
+				);
+				setcookie("session", $session_id, $cookie_options);
 				return $actor;
 			}
 		} else {
@@ -90,7 +105,13 @@ class Session extends entities\Session {
 		if( isset($_COOKIE["session"]) && $_COOKIE["session"] === $this->id ) {
 			$this->delete();
 			$this->actor_id = 0;
-			setcookie("session", "", time() - 1);
+			$cookie_options = array(
+				'expires' => time() - 3600,
+				'path'    => $this->_cookie_path,
+				'domain'  => $this->_cookie_domain,
+				'secure'  => $this->_cookie_secure
+			);
+			setcookie("session", "", $cookie_options);
 		}
 	}
 
