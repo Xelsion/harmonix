@@ -33,8 +33,8 @@ class System {
 
 	/**
 	 * The class constructor
-	 * initializes the core\classes\Request
-	 * initializes the core\classes\Router
+     *
+	 * Initialize core objects
 	 */
 	private function __construct() {
 		Core::$_configuration = Configuration::getInstance();

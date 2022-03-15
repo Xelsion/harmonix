@@ -6,9 +6,9 @@ use core\helper\StringHelper;
 
 class Cacheable extends File {
 
-
 	public function saveToCache( string $content ) {
 		$this->setContent(StringHelper::encrypt($content));
+
 	}
 
 	public function loadFromCache() {

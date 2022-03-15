@@ -42,6 +42,18 @@ class Walker {
 		return $this->_nodes[$node_id] ?? null;
 	}
 
+    /**
+     * Returns the parent node of the node with the given
+     * id or null if it has no parent
+     *
+     * @param int $node_id
+     * @return Node|null
+     */
+    public function getParentOf( int $node_id ): ?Node {
+        $node = $this->getNode($node_id);
+        return ( !is_null($node) ) ? $this->getNode($node->_child_of) : null;
+    }
+
 	/**
 	 * Returns true id the node by the given id das
 	 * any child nodes
@@ -52,18 +64,6 @@ class Walker {
 	public function hasChildren( ?int $node_id ): bool {
 		$children = $this->getChildrenOf($node_id);
 		return ( !empty($children) );
-	}
-
-	/**
-	 * Returns the parent node of the node with the given
-	 * id or null if it has no parent
-	 *
-	 * @param int $node_id
-	 * @return Node|null
-	 */
-	public function getParentOf( int $node_id ): ?Node {
-		$node = $this->getNode($node_id);
-		return ( !is_null($node) ) ? $this->getNode($node->_child_of) : null;
 	}
 
 	/**
@@ -83,6 +83,25 @@ class Walker {
 		return $children;
 	}
 
+    /**
+     * Checks if the first node is an ancestor of the second node
+     *
+     * @param int $node_id
+     * @param int $descendant_id
+     * @return bool
+     */
+    public function isNodeAncestorOf( int $node_id, int $descendant_id ) : bool {
+        $curr_node = $descendant_id;
+        $parent_node = $this->getParentOf($curr_node);
+        while( !is_null($parent_node) ) {
+            if( $parent_node->_id === $node_id ) {
+                return true;
+            }
+            $parent_node = $this->getParentOf($parent_node->_id);
+        }
+        return false;
+    }
+
 	/**
 	 * Returns all ancestor nodes of the node with the given id
 	 * or an empty array if it has none
@@ -99,6 +118,53 @@ class Walker {
 		}
 		return $ancestors;
 	}
+
+    /**
+     * Checks if the first node is a descendant of the second node
+     *
+     * @param int $node_id
+     * @param int $ancestor_id
+     * @return bool
+     */
+    public function isNodeDescendantOf( int $node_id, int $ancestor_id ) : bool {
+        return $this->isNodeAncestorOf($ancestor_id, $node_id);
+    }
+
+    /**
+     * Returns all descendant nodes of the node with the given id
+     * or an empty array if it has none
+     *
+     * @param int $node_id
+     * @param array $results
+     * @return array
+     */
+    public function getDescendantsOf( int $node_id, array &$results = array() ): array {
+        $descendants = $results;
+        $curr_children = $this->getChildrenOf($node_id);
+        foreach( $curr_children as $id => $child ) {
+            $descendants[$id] = $child;
+            if( $child->hasChildren() ) {
+                $this->getDescendantsOf($child->_id, $descendants);
+            }
+        }
+        return $descendants;
+    }
+
+    /**
+     * Checks if the first node is a sibling of the second node
+     *
+     * @param int $node_id
+     * @param int $sibling_id
+     * @return bool
+     */
+    public function isNodeSiblingOf( int $node_id, int $sibling_id) : bool {
+        $node1 = $this->getNode($node_id);
+        $node2 = $this->getNode($sibling_id);
+        if( !is_null($node1) && !is_null($node2) ) {
+            return ( $node1->_child_of === $node2->_child_of);
+        }
+        return false;
+    }
 
 	/**
 	 * Returns all sibling nodes of the node with the given id
@@ -131,25 +197,5 @@ class Walker {
 			}
 		}
 		return $siblings;
-	}
-
-	/**
-	 * Returns all descendant nodes of the node with the given id
-	 * or an empty array if it has none
-	 *
-	 * @param int $node_id
-	 * @param array $results
-	 * @return array
-	 */
-	public function getDescendantsOf( int $node_id, array &$results = array() ): array {
-		$descendants = $results;
-		$curr_children = $this->getChildrenOf($node_id);
-		foreach( $curr_children as $id => $child ) {
-			$descendants[$id] = $child;
-			if( $child->hasChildren() ) {
-				$this->getDescendantsOf($child->_id, $descendants);
-			}
-		}
-		return $descendants;
 	}
 }

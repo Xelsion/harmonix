@@ -8,6 +8,11 @@ class RoleTree extends Walker {
 
 	private static ?RoleTree $_instance = null;
 
+    /**
+     * The class constructor
+     *
+     * Collect all actor roles and add then to the tree
+     */
 	private function __construct() {
 		parent::__construct();
 		$actor_roles = ActorRole::findAll();
@@ -16,6 +21,11 @@ class RoleTree extends Walker {
 		}
 	}
 
+    /**
+     * The initializer for this class
+     *
+     * @return RoleTree
+     */
 	public static function getInstance(): RoleTree {
 		if( static::$_instance === null ) {
 			static::$_instance = new RoleTree();

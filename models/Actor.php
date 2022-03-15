@@ -119,7 +119,10 @@ class Actor extends entities\Actor {
 				1
 			)
 		));
-		return $result[0];
+        if( count($result) === 1 ) {
+            return $result[0];
+        }
+		return new ActorRole();
 	}
 
 	/**

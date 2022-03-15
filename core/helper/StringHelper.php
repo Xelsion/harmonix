@@ -53,6 +53,11 @@ class StringHelper {
 		return $result;
 	}
 
+    public static function getRandomString() {
+
+
+    }
+
 	/**
 	 * Returns a BCrypt string from the given string
 	 *

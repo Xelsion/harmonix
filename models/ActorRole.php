@@ -111,9 +111,9 @@ class ActorRole extends entities\ActorRole {
 			$pdo = Core::$_connection_manager->getConnection("mvc");
 			$stmt = $pdo->prepare("SELECT * FROM actor_roles WHERE child_of=:id");
 			$stmt->bindParam(":id", $this->id, PDO::PARAM_INT);
-			$stmt->setFetchMode(PDO::FETCH_OBJ, __CLASS__);
 			$stmt->execute();
-			while( $child = $stmt->fetch() ) {
+            $results = $stmt->fetchAll(PDO::FETCH_CLASS, __CLASS__);
+			foreach( $results as $child ) {
 				$children[] = $child;
 			}
 		} catch( PDOException $e ) {
