@@ -1,7 +1,6 @@
 <?php
-use core\classes\Logger;
-use core\Core;
-use core\System;
+use system\classes\Logger;
+use system\Process;
 
 define("SUB_DOMAIN", explode(".", $_SERVER["HTTP_HOST"])[0]);
 require_once( "../constants.php" );
@@ -11,9 +10,9 @@ require_once( "../functions.php" );
 $runtime_logger = new Logger("runtime");
 try {
 	ob_start();
-	$system = System::getInstance();
-	$system->start();
-	echo $system->getOutput();
+	$process = Process::getInstance();
+    $process->start();
+	echo $process->getResult();
 	ob_end_flush();
 } catch( Exception $e ) {
 	echo "Error: Please check the Log Files for mor information";

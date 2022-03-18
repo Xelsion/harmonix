@@ -141,652 +141,652 @@ Search.appendIndex(
 		"summary": "",
 		"url": "classes/controller-www-HomeController.html#method___toString"
 	}, {
-		"fqsen": "\\core\\abstracts\\AController",
+		"fqsen": "\\system\\abstracts\\AController",
 		"name": "AController",
 		"summary": "The\u0020Abstract\u0020version\u0020of\u0020a\u0020Controller",
 		"url": "classes/core-abstracts-AController.html"
 	}, {
-		"fqsen": "\\core\\abstracts\\AController\u003A\u003A__toString\u0028\u0029",
+		"fqsen": "\\system\\abstracts\\AController\u003A\u003A__toString\u0028\u0029",
 		"name": "__toString",
 		"summary": "",
 		"url": "classes/core-abstracts-AController.html#method___toString"
 	}, {
-		"fqsen": "\\core\\abstracts\\AEntity",
+		"fqsen": "\\system\\abstracts\\AEntity",
 		"name": "AEntity",
 		"summary": "The\u0020Abstract\u0020version\u0020of\u0020a\u0020Entity",
 		"url": "classes/core-abstracts-AEntity.html"
 	}, {
-		"fqsen": "\\core\\abstracts\\AEntity\u003A\u003Astr2DateTime\u0028\u0029",
+		"fqsen": "\\system\\abstracts\\AEntity\u003A\u003Astr2DateTime\u0028\u0029",
 		"name": "str2DateTime",
 		"summary": "Converts\u0020a\u0020string\u0020to\u0020a\u0020DateTime\u0020object",
 		"url": "classes/core-abstracts-AEntity.html#method_str2DateTime"
 	}, {
-		"fqsen": "\\core\\abstracts\\AEntity\u003A\u003AgetParamType\u0028\u0029",
+		"fqsen": "\\system\\abstracts\\AEntity\u003A\u003AgetParamType\u0028\u0029",
 		"name": "getParamType",
 		"summary": "Returns\u0020the\u0020PDO\u003A\u003APARAM\u0020type\u0020of\u0020the\u0020given\u0020value",
 		"url": "classes/core-abstracts-AEntity.html#method_getParamType"
 	}, {
-		"fqsen": "\\core\\abstracts\\AResponse",
+		"fqsen": "\\system\\abstracts\\AResponse",
 		"name": "AResponse",
 		"summary": "The\u0020Abstract\u0020version\u0020of\u0020a\u0020Response",
 		"url": "classes/core-abstracts-AResponse.html"
 	}, {
-		"fqsen": "\\core\\abstracts\\AResponse\u003A\u003AsetOutput\u0028\u0029",
+		"fqsen": "\\system\\abstracts\\AResponse\u003A\u003AsetOutput\u0028\u0029",
 		"name": "setOutput",
 		"summary": "Sets\u0020the\u0020output\u0020content\u0020of\u0020the\u0020response",
 		"url": "classes/core-abstracts-AResponse.html#method_setOutput"
 	}, {
-		"fqsen": "\\core\\abstracts\\AResponse\u003A\u003AgetOutput\u0028\u0029",
+		"fqsen": "\\system\\abstracts\\AResponse\u003A\u003AgetOutput\u0028\u0029",
 		"name": "getOutput",
 		"summary": "Returns\u0020the\u0020content\u0020of\u0020the\u0020response",
 		"url": "classes/core-abstracts-AResponse.html#method_getOutput"
 	}, {
-		"fqsen": "\\core\\abstracts\\AResponse\u003A\u003A\u0024_output",
+		"fqsen": "\\system\\abstracts\\AResponse\u003A\u003A\u0024_output",
 		"name": "_output",
 		"summary": "",
 		"url": "classes/core-abstracts-AResponse.html#property__output"
 	}, {
-		"fqsen": "\\core\\classes\\Configuration",
+		"fqsen": "\\system\\classes\\Configuration",
 		"name": "Configuration",
 		"summary": "The\u0020Configuration\u0020type\u0020singleton\nCollect\u0020all\u0020the\u0020configurations\u0020and\u0020stores\u0020them\u0020in\u0020an\u0020array",
 		"url": "classes/core-classes-Configuration.html"
 	}, {
-		"fqsen": "\\core\\classes\\Configuration\u003A\u003A__construct\u0028\u0029",
+		"fqsen": "\\system\\classes\\Configuration\u003A\u003A__construct\u0028\u0029",
 		"name": "__construct",
 		"summary": "The\u0020class\u0020constructor\nwill\u0020be\u0020called\u0020once\u0020by\u0020the\u0020static\u0020method\u0020getInstance\u0028\u0029\nParses\u0020the\u0020\u007Bconfiguration\u007D.ini",
 		"url": "classes/core-classes-Configuration.html#method___construct"
 	}, {
-		"fqsen": "\\core\\classes\\Configuration\u003A\u003AgetInstance\u0028\u0029",
+		"fqsen": "\\system\\classes\\Configuration\u003A\u003AgetInstance\u0028\u0029",
 		"name": "getInstance",
 		"summary": "The\u0020initializer\u0020for\u0020this\u0020class",
 		"url": "classes/core-classes-Configuration.html#method_getInstance"
 	}, {
-		"fqsen": "\\core\\classes\\Configuration\u003A\u003AgetConfig\u0028\u0029",
+		"fqsen": "\\system\\classes\\Configuration\u003A\u003AgetConfig\u0028\u0029",
 		"name": "getConfig",
 		"summary": "Returns\u0020the\u0020whole\u0020configuration",
 		"url": "classes/core-classes-Configuration.html#method_getConfig"
 	}, {
-		"fqsen": "\\core\\classes\\Configuration\u003A\u003AgetSection\u0028\u0029",
+		"fqsen": "\\system\\classes\\Configuration\u003A\u003AgetSection\u0028\u0029",
 		"name": "getSection",
 		"summary": "Returns\u0020a\u0020specific\u0020section\u0020of\u0020the\u0020configuration",
 		"url": "classes/core-classes-Configuration.html#method_getSection"
 	}, {
-		"fqsen": "\\core\\classes\\Configuration\u003A\u003A\u0024_instance",
+		"fqsen": "\\system\\classes\\Configuration\u003A\u003A\u0024_instance",
 		"name": "_instance",
 		"summary": "",
 		"url": "classes/core-classes-Configuration.html#property__instance"
 	}, {
-		"fqsen": "\\core\\classes\\Configuration\u003A\u003A\u0024_config",
+		"fqsen": "\\system\\classes\\Configuration\u003A\u003A\u0024_config",
 		"name": "_config",
 		"summary": "",
 		"url": "classes/core-classes-Configuration.html#property__config"
 	}, {
-		"fqsen": "\\core\\classes\\File",
+		"fqsen": "\\system\\classes\\File",
 		"name": "File",
 		"summary": "The\u0020File\u0020class",
 		"url": "classes/core-classes-File.html"
 	}, {
-		"fqsen": "\\core\\classes\\File\u003A\u003A__construct\u0028\u0029",
+		"fqsen": "\\system\\classes\\File\u003A\u003A__construct\u0028\u0029",
 		"name": "__construct",
 		"summary": "The\u0020constructor\nSets\u0020the\u0020file\u0020path",
 		"url": "classes/core-classes-File.html#method___construct"
 	}, {
-		"fqsen": "\\core\\classes\\File\u003A\u003Aexists\u0028\u0029",
+		"fqsen": "\\system\\classes\\File\u003A\u003Aexists\u0028\u0029",
 		"name": "exists",
 		"summary": "Checks\u0020if\u0020the\u0020current\u0020file\u0020exists",
 		"url": "classes/core-classes-File.html#method_exists"
 	}, {
-		"fqsen": "\\core\\classes\\File\u003A\u003AsetContent\u0028\u0029",
+		"fqsen": "\\system\\classes\\File\u003A\u003AsetContent\u0028\u0029",
 		"name": "setContent",
 		"summary": "Sets\u0020the\u0020file\u0020content",
 		"url": "classes/core-classes-File.html#method_setContent"
 	}, {
-		"fqsen": "\\core\\classes\\File\u003A\u003AgetContent\u0028\u0029",
+		"fqsen": "\\system\\classes\\File\u003A\u003AgetContent\u0028\u0029",
 		"name": "getContent",
 		"summary": "Returns\u0020the\u0020content\u0020of\u0020the\u0020file",
 		"url": "classes/core-classes-File.html#method_getContent"
 	}, {
-		"fqsen": "\\core\\classes\\File\u003A\u003Aread\u0028\u0029",
+		"fqsen": "\\system\\classes\\File\u003A\u003Aread\u0028\u0029",
 		"name": "read",
 		"summary": "Checks\u0020if\u0020the\u0020file\u0020exists\u0020and\u0020reads\u0020its\u0020content\u0020if\u0020it\u0020does.",
 		"url": "classes/core-classes-File.html#method_read"
 	}, {
-		"fqsen": "\\core\\classes\\File\u003A\u003Aappend\u0028\u0029",
+		"fqsen": "\\system\\classes\\File\u003A\u003Aappend\u0028\u0029",
 		"name": "append",
 		"summary": "Adds\u0020the\u0020given\u0020\u0024content\u0020to\u0020the\u0020end\u0020of\u0020the\u0020files\u0020content.",
 		"url": "classes/core-classes-File.html#method_append"
 	}, {
-		"fqsen": "\\core\\classes\\File\u003A\u003Asave\u0028\u0029",
+		"fqsen": "\\system\\classes\\File\u003A\u003Asave\u0028\u0029",
 		"name": "save",
 		"summary": "writes\u0020the\u0020current\u0020content\u0020to\u0020the\u0020current\u0020file.",
 		"url": "classes/core-classes-File.html#method_save"
 	}, {
-		"fqsen": "\\core\\classes\\File\u003A\u003AsaveAs\u0028\u0029",
+		"fqsen": "\\system\\classes\\File\u003A\u003AsaveAs\u0028\u0029",
 		"name": "saveAs",
 		"summary": "Tries\u0020to\u0020save\u0020the\u0020current\u0020content\u0020to\u0020the\u0020given\u0020file\u0020path.",
 		"url": "classes/core-classes-File.html#method_saveAs"
 	}, {
-		"fqsen": "\\core\\classes\\File\u003A\u003A\u0024_file_path",
+		"fqsen": "\\system\\classes\\File\u003A\u003A\u0024_file_path",
 		"name": "_file_path",
 		"summary": "",
 		"url": "classes/core-classes-File.html#property__file_path"
 	}, {
-		"fqsen": "\\core\\classes\\File\u003A\u003A\u0024_content",
+		"fqsen": "\\system\\classes\\File\u003A\u003A\u0024_content",
 		"name": "_content",
 		"summary": "",
 		"url": "classes/core-classes-File.html#property__content"
 	}, {
-		"fqsen": "\\core\\classes\\Logger",
+		"fqsen": "\\system\\classes\\Logger",
 		"name": "Logger",
 		"summary": "The\u0020Logger\ncreates\u0020a\u0020Logfile\u0020and\u0020stores\u0020log\u0020information",
 		"url": "classes/core-classes-Logger.html"
 	}, {
-		"fqsen": "\\core\\classes\\Logger\u003A\u003A__construct\u0028\u0029",
+		"fqsen": "\\system\\classes\\Logger\u003A\u003A__construct\u0028\u0029",
 		"name": "__construct",
 		"summary": "The\u0020class\u0020constructor",
 		"url": "classes/core-classes-Logger.html#method___construct"
 	}, {
-		"fqsen": "\\core\\classes\\Logger\u003A\u003Alog\u0028\u0029",
+		"fqsen": "\\system\\classes\\Logger\u003A\u003Alog\u0028\u0029",
 		"name": "log",
 		"summary": "Appends\u0020the\u0020formatted\u0020log\u0020text\u0020to\u0020the\u0020log\u0020file\nReturn\u0020true\u0020if\u0020successful\u0020and\u0020false\u0020if\u0020not",
 		"url": "classes/core-classes-Logger.html#method_log"
 	}, {
-		"fqsen": "\\core\\classes\\Logger\u003A\u003AgetLogPath\u0028\u0029",
+		"fqsen": "\\system\\classes\\Logger\u003A\u003AgetLogPath\u0028\u0029",
 		"name": "getLogPath",
 		"summary": "Returns\u0020the\u0020path\u0020with\u0020a\u0020formatted\u0020file\u0020name\nfolder\u0020structure\u003A\u0020\u007Blog\u0020directory\u007D\/\u007Byear\u007D\/\u007Bmonth_name\u007D\/\u007Bday\u002Dweekday\u007D_\u007Bfile\u0020name\u0020from\u0020constructor\u007D",
 		"url": "classes/core-classes-Logger.html#method_getLogPath"
 	}, {
-		"fqsen": "\\core\\classes\\Logger\u003A\u003A\u0024_log_line",
+		"fqsen": "\\system\\classes\\Logger\u003A\u003A\u0024_log_line",
 		"name": "_log_line",
 		"summary": "",
 		"url": "classes/core-classes-Logger.html#property__log_line"
 	}, {
-		"fqsen": "\\core\\classes\\Logger\u003A\u003A\u0024_log_type",
+		"fqsen": "\\system\\classes\\Logger\u003A\u003A\u0024_log_type",
 		"name": "_log_type",
 		"summary": "",
 		"url": "classes/core-classes-Logger.html#property__log_type"
 	}, {
-		"fqsen": "\\core\\classes\\Request",
+		"fqsen": "\\system\\classes\\Request",
 		"name": "Request",
 		"summary": "The\u0020Request\u0020Type\u0020singleton\nrepresents\u0020the\u0020requested\u0020URL",
 		"url": "classes/core-classes-Request.html"
 	}, {
-		"fqsen": "\\core\\classes\\Request\u003A\u003A__construct\u0028\u0029",
+		"fqsen": "\\system\\classes\\Request\u003A\u003A__construct\u0028\u0029",
 		"name": "__construct",
 		"summary": "The\u0020class\u0020constructor\nsets\u0020the\u0020current\u0020requested\u0020uri\ncalls\u0020the\u0020method\u0020initController\u0028\u0029",
 		"url": "classes/core-classes-Request.html#method___construct"
 	}, {
-		"fqsen": "\\core\\classes\\Request\u003A\u003AgetInstance\u0028\u0029",
+		"fqsen": "\\system\\classes\\Request\u003A\u003AgetInstance\u0028\u0029",
 		"name": "getInstance",
 		"summary": "The\u0020initializer\u0020for\u0020this\u0020class",
 		"url": "classes/core-classes-Request.html#method_getInstance"
 	}, {
-		"fqsen": "\\core\\classes\\Request\u003A\u003AgetRequestUri\u0028\u0029",
+		"fqsen": "\\system\\classes\\Request\u003A\u003AgetRequestUri\u0028\u0029",
 		"name": "getRequestUri",
 		"summary": "Returns\u0020the\u0020requested\u0020uri",
 		"url": "classes/core-classes-Request.html#method_getRequestUri"
 	}, {
-		"fqsen": "\\core\\classes\\Request\u003A\u003AgetRequestMethod\u0028\u0029",
+		"fqsen": "\\system\\classes\\Request\u003A\u003AgetRequestMethod\u0028\u0029",
 		"name": "getRequestMethod",
 		"summary": "Returns\u0020the\u0020requested\u0020method",
 		"url": "classes/core-classes-Request.html#method_getRequestMethod"
 	}, {
-		"fqsen": "\\core\\classes\\Request\u003A\u003AgetRemoteIP\u0028\u0029",
+		"fqsen": "\\system\\classes\\Request\u003A\u003AgetRemoteIP\u0028\u0029",
 		"name": "getRemoteIP",
 		"summary": "Returns\u0020the\u0020remote\u0020IP\u0020address",
 		"url": "classes/core-classes-Request.html#method_getRemoteIP"
 	}, {
-		"fqsen": "\\core\\classes\\Request\u003A\u003AgetAll\u0028\u0029",
+		"fqsen": "\\system\\classes\\Request\u003A\u003AgetAll\u0028\u0029",
 		"name": "getAll",
 		"summary": "Returns\u0020all\u0020submitted\u0020key\u0020\u003D\u003E\u0020value\u0020pairs",
 		"url": "classes/core-classes-Request.html#method_getAll"
 	}, {
-		"fqsen": "\\core\\classes\\Request\u003A\u003Aget\u0028\u0029",
+		"fqsen": "\\system\\classes\\Request\u003A\u003Aget\u0028\u0029",
 		"name": "get",
 		"summary": "Returns\u0020the\u0020value\u0020from\u0020the\u0020submitted\u0020pairs\nby\u0020its\u0020key",
 		"url": "classes/core-classes-Request.html#method_get"
 	}, {
-		"fqsen": "\\core\\classes\\Request\u003A\u003AgetRequestParts\u0028\u0029",
+		"fqsen": "\\system\\classes\\Request\u003A\u003AgetRequestParts\u0028\u0029",
 		"name": "getRequestParts",
 		"summary": "Split\u0020the\u0020requested\u0020uri\u0020into\u0020parts\u0020and\nreturns\u0020them\u0020as\u0020an\u0020array",
 		"url": "classes/core-classes-Request.html#method_getRequestParts"
 	}, {
-		"fqsen": "\\core\\classes\\Request\u003A\u003A\u0024_request",
+		"fqsen": "\\system\\classes\\Request\u003A\u003A\u0024_request",
 		"name": "_request",
 		"summary": "",
 		"url": "classes/core-classes-Request.html#property__request"
 	}, {
-		"fqsen": "\\core\\classes\\Request\u003A\u003A\u0024_form",
+		"fqsen": "\\system\\classes\\Request\u003A\u003A\u0024_form",
 		"name": "_form",
 		"summary": "",
 		"url": "classes/core-classes-Request.html#property__form"
 	}, {
-		"fqsen": "\\core\\classes\\responses\\ResponseHTML",
+		"fqsen": "\\system\\classes\\responses\\ResponseHTML",
 		"name": "ResponseHTML",
 		"summary": "A\u0020Response\u0020for\u0020HTML\u0020content",
 		"url": "classes/core-classes-responses-ResponseHTML.html"
 	}, {
-		"fqsen": "\\core\\classes\\responses\\ResponseHTML\u003A\u003AsetHeaders\u0028\u0029",
+		"fqsen": "\\system\\classes\\responses\\ResponseHTML\u003A\u003AsetHeaders\u0028\u0029",
 		"name": "setHeaders",
 		"summary": "",
 		"url": "classes/core-classes-responses-ResponseHTML.html#method_setHeaders"
 	}, {
-		"fqsen": "\\core\\classes\\responses\\ResponseHTML\u003A\u003A\u0024status_code",
+		"fqsen": "\\system\\classes\\responses\\ResponseHTML\u003A\u003A\u0024status_code",
 		"name": "status_code",
 		"summary": "",
 		"url": "classes/core-classes-responses-ResponseHTML.html#property_status_code"
 	}, {
-		"fqsen": "\\core\\classes\\Router",
+		"fqsen": "\\system\\classes\\Router",
 		"name": "Router",
 		"summary": "The\u0020Router\u0020Type\u0020singleton\nCollect\u0020all\u0020the\u0020Controllers\u0020and\u0020returns\u0020the\u0020proper\u0020controller\u0020for\u0020the\u0020curren\u0020request",
 		"url": "classes/core-classes-Router.html"
 	}, {
-		"fqsen": "\\core\\classes\\Router\u003A\u003A__construct\u0028\u0029",
+		"fqsen": "\\system\\classes\\Router\u003A\u003A__construct\u0028\u0029",
 		"name": "__construct",
 		"summary": "The\u0020class\u0020constructor\nwill\u0020be\u0020called\u0020once\u0020by\u0020the\u0020static\u0020method\u0020getInstance\u0028\u0029\ncalls\u0020the\u0020method\u0020initController\u0028\u0029",
 		"url": "classes/core-classes-Router.html#method___construct"
 	}, {
-		"fqsen": "\\core\\classes\\Router\u003A\u003AgetInstance\u0028\u0029",
+		"fqsen": "\\system\\classes\\Router\u003A\u003AgetInstance\u0028\u0029",
 		"name": "getInstance",
 		"summary": "The\u0020initializer\u0020for\u0020this\u0020class",
 		"url": "classes/core-classes-Router.html#method_getInstance"
 	}, {
-		"fqsen": "\\core\\classes\\Router\u003A\u003AgetRoutes\u0028\u0029",
+		"fqsen": "\\system\\classes\\Router\u003A\u003AgetRoutes\u0028\u0029",
 		"name": "getRoutes",
 		"summary": "Returns\u0020an\u0020array\u0020of\u0020all\u0020collected\u0020routes",
 		"url": "classes/core-classes-Router.html#method_getRoutes"
 	}, {
-		"fqsen": "\\core\\classes\\Router\u003A\u003AaddRoute\u0028\u0029",
+		"fqsen": "\\system\\classes\\Router\u003A\u003AaddRoute\u0028\u0029",
 		"name": "addRoute",
 		"summary": "Sets\u0020a\u0020route\u0020for\u0020a\u0020specific\u0020call.",
 		"url": "classes/core-classes-Router.html#method_addRoute"
 	}, {
-		"fqsen": "\\core\\classes\\Router\u003A\u003AhasRoute\u0028\u0029",
+		"fqsen": "\\system\\classes\\Router\u003A\u003AhasRoute\u0028\u0029",
 		"name": "hasRoute",
 		"summary": "Checks\u0020if\u0020the\u0020given\u0020\u0024route\u0020is\u0020in\u0020our\u0020controller\u0020collection",
 		"url": "classes/core-classes-Router.html#method_hasRoute"
 	}, {
-		"fqsen": "\\core\\classes\\Router\u003A\u003AgetRoute\u0028\u0029",
+		"fqsen": "\\system\\classes\\Router\u003A\u003AgetRoute\u0028\u0029",
 		"name": "getRoute",
 		"summary": "The\u0020getRoute\u0020method\u0020will\u0020check\u0020the\u0020given\u0020\u0024request\nfor\u0020a\u0020valid\u0020Controller\u0020and\u0020the\u0020requested\u0020method\nthe\u0020returned\u0020array\u0020will\u0020be\u0020like\u003A\n\u005B\u0022controller\u0022\u0020\u003D\u003E\u0020\u007BController\u0020instance\u007D,\u0020\u0022method\u0022\u0020\u003D\u003E\u0020\u007BMethode\u0020name\u007D,\u0020\u0022params\u0022\u0020\u003D\u003E\u0020\u007BArray\u0020of\u0020formatted\u0020args\u007D\u005D",
 		"url": "classes/core-classes-Router.html#method_getRoute"
 	}, {
-		"fqsen": "\\core\\classes\\Router\u003A\u003AgetValidRoute\u0028\u0029",
+		"fqsen": "\\system\\classes\\Router\u003A\u003AgetValidRoute\u0028\u0029",
 		"name": "getValidRoute",
 		"summary": "Parses\u0020the\u0020\u0024request\u0020array\u0020and\u0020returns\u0020the\u0020route\u0020to\u0020the\nmatching\u0020controller",
 		"url": "classes/core-classes-Router.html#method_getValidRoute"
 	}, {
-		"fqsen": "\\core\\classes\\Router\u003A\u003AgetValidParameters\u0028\u0029",
+		"fqsen": "\\system\\classes\\Router\u003A\u003AgetValidParameters\u0028\u0029",
 		"name": "getValidParameters",
 		"summary": "Checks\u0020if\u0020the\u0020needed\u0020parameters\u0020of\u0020the\u0020controller\u0020method\nmatches\u0020the\u0020given\u0020parameters\u0020in\u0020the\u0020request.",
 		"url": "classes/core-classes-Router.html#method_getValidParameters"
 	}, {
-		"fqsen": "\\core\\classes\\Router\u003A\u003AinitController\u0028\u0029",
+		"fqsen": "\\system\\classes\\Router\u003A\u003AinitController\u0028\u0029",
 		"name": "initController",
-		"summary": "Walks\u0020through\u0020the\u0020given\u0020\u0024directory\u0020and\u0020collects\u0020all\nClasses\u0020that\u0020are\u0020an\u0020instance\u0020of\u0020core\\abstracts\\AController",
+		"summary": "Walks\u0020through\u0020the\u0020given\u0020\u0024directory\u0020and\u0020collects\u0020all\nClasses\u0020that\u0020are\u0020an\u0020instance\u0020of\u0020system\\abstracts\\AController",
 		"url": "classes/core-classes-Router.html#method_initController"
 	}, {
-		"fqsen": "\\core\\classes\\Router\u003A\u003AgetAllRoutes\u0028\u0029",
+		"fqsen": "\\system\\classes\\Router\u003A\u003AgetAllRoutes\u0028\u0029",
 		"name": "getAllRoutes",
 		"summary": "Collect\u0020all\u0020Controllers\u0020from\u0020all\u0020\u0022subdomains\u0022\u0020and\u0020returns\u0020them\nin\u0020an\u0020array",
 		"url": "classes/core-classes-Router.html#method_getAllRoutes"
 	}, {
-		"fqsen": "\\core\\classes\\Router\u003A\u003A\u0024_instance",
+		"fqsen": "\\system\\classes\\Router\u003A\u003A\u0024_instance",
 		"name": "_instance",
 		"summary": "",
 		"url": "classes/core-classes-Router.html#property__instance"
 	}, {
-		"fqsen": "\\core\\classes\\Router\u003A\u003A\u0024_routes",
+		"fqsen": "\\system\\classes\\Router\u003A\u003A\u0024_routes",
 		"name": "_routes",
 		"summary": "",
 		"url": "classes/core-classes-Router.html#property__routes"
 	}, {
-		"fqsen": "\\core\\classes\\Template",
+		"fqsen": "\\system\\classes\\Template",
 		"name": "Template",
 		"summary": "The\u0020Template\u0020class",
 		"url": "classes/core-classes-Template.html"
 	}, {
-		"fqsen": "\\core\\classes\\Template\u003A\u003A__construct\u0028\u0029",
+		"fqsen": "\\system\\classes\\Template\u003A\u003A__construct\u0028\u0029",
 		"name": "__construct",
 		"summary": "The\u0020constructor\nSets\u0020the\u0020file\u0020path\u0020of\u0020the\u0020template\nThrows\u0020an\u0020exception\u0020if\u0020the\u0020file\u0020was\u0020not\u0020found",
 		"url": "classes/core-classes-Template.html#method___construct"
 	}, {
-		"fqsen": "\\core\\classes\\Template\u003A\u003Aparse\u0028\u0029",
+		"fqsen": "\\system\\classes\\Template\u003A\u003Aparse\u0028\u0029",
 		"name": "parse",
 		"summary": "Includes\u0020the\u0020template\u0020file\u0020and\u0020returns\u0020its\u0020output",
 		"url": "classes/core-classes-Template.html#method_parse"
 	}, {
-		"fqsen": "\\core\\classes\\Template\u003A\u003A\u0024_file_path",
+		"fqsen": "\\system\\classes\\Template\u003A\u003A\u0024_file_path",
 		"name": "_file_path",
 		"summary": "",
 		"url": "classes/core-classes-Template.html#property__file_path"
 	}, {
-		"fqsen": "\\core\\classes\\TemplateData",
+		"fqsen": "\\system\\classes\\TemplateData",
 		"name": "TemplateData",
 		"summary": "This\u0020class\u0020can\u0020hold\u0020key\u0020\u003D\u003E\u0020value\u0020pairs\u0020that\nwill\u0020be\u0020shared\u0020by\u0020all\u0020used\u0020templates",
 		"url": "classes/core-classes-TemplateData.html"
 	}, {
-		"fqsen": "\\core\\classes\\TemplateData\u003A\u003Aset\u0028\u0029",
+		"fqsen": "\\system\\classes\\TemplateData\u003A\u003Aset\u0028\u0029",
 		"name": "set",
 		"summary": "Adds\u0020a\u0020key\u0020\u003D\u003E\u0020value\u0020pair\u0020to\u0020the\u0020data\u0020storage",
 		"url": "classes/core-classes-TemplateData.html#method_set"
 	}, {
-		"fqsen": "\\core\\classes\\TemplateData\u003A\u003Aget\u0028\u0029",
+		"fqsen": "\\system\\classes\\TemplateData\u003A\u003Aget\u0028\u0029",
 		"name": "get",
 		"summary": "Returns\u0020the\u0020value\u0020vom\u0020the\u0020data\u0020storage\u0020by\u0020the\u0020given\u0020key\nor\u0020null\u0020if\u0020the\u0020key\u0020was\u0020not\u0020found.",
 		"url": "classes/core-classes-TemplateData.html#method_get"
 	}, {
-		"fqsen": "\\core\\classes\\TemplateData\u003A\u003AtoArray\u0028\u0029",
+		"fqsen": "\\system\\classes\\TemplateData\u003A\u003AtoArray\u0028\u0029",
 		"name": "toArray",
 		"summary": "Adds\u0020the\u0020value\u0020to\u0020an\u0020array\u0020the\u0020array\u0020\u0024name\u0020at\u0020\u0024index\u0020to\u0020the\u0020data\u0020storage",
 		"url": "classes/core-classes-TemplateData.html#method_toArray"
 	}, {
-		"fqsen": "\\core\\classes\\TemplateData\u003A\u003AfromArray\u0028\u0029",
+		"fqsen": "\\system\\classes\\TemplateData\u003A\u003AfromArray\u0028\u0029",
 		"name": "fromArray",
 		"summary": "Returns\u0020the\u0020value\u0020from\u0020an\u0020array\u0020in\u0020the\u0020data\u0020storage\u0020by\u0020the\u0020given\u0020\u0024name\nand\u0020\u0024index\u0020or\u0020null\u0020if\u0020the\u0020key\u0020was\u0020not\u0020found.",
 		"url": "classes/core-classes-TemplateData.html#method_fromArray"
 	}, {
-		"fqsen": "\\core\\classes\\TemplateData\u003A\u003A\u0024_data",
+		"fqsen": "\\system\\classes\\TemplateData\u003A\u003A\u0024_data",
 		"name": "_data",
 		"summary": "",
 		"url": "classes/core-classes-TemplateData.html#property__data"
 	}, {
-		"fqsen": "\\core\\classes\\tree\\Menu",
+		"fqsen": "\\system\\classes\\tree\\Menu",
 		"name": "Menu",
 		"summary": "The\u0020Menu\u0020class\u0020extends\u0020Walker\nRepresents\u0020a\u0020tree\u0020structured\u0020Menu",
 		"url": "classes/core-classes-tree-Menu.html"
 	}, {
-		"fqsen": "\\core\\classes\\tree\\Menu\u003A\u003AaddMenuItem\u0028\u0029",
+		"fqsen": "\\system\\classes\\tree\\Menu\u003A\u003AaddMenuItem\u0028\u0029",
 		"name": "addMenuItem",
 		"summary": "Adds\u0020a\u0020MenuItem\u0020the\u0020tree\u0020structure",
 		"url": "classes/core-classes-tree-Menu.html#method_addMenuItem"
 	}, {
-		"fqsen": "\\core\\classes\\tree\\Menu\u003A\u003AinsertMenuItem\u0028\u0029",
+		"fqsen": "\\system\\classes\\tree\\Menu\u003A\u003AinsertMenuItem\u0028\u0029",
 		"name": "insertMenuItem",
 		"summary": "Created\u0020a\u0020new\u0020MenuItem\u0020and\u0020adds\u0020it\u0020to\u0020the\ntree\u0020structure",
 		"url": "classes/core-classes-tree-Menu.html#method_insertMenuItem"
 	}, {
-		"fqsen": "\\core\\classes\\tree\\Menu\u003A\u003AgetAsHtml\u0028\u0029",
+		"fqsen": "\\system\\classes\\tree\\Menu\u003A\u003AgetAsHtml\u0028\u0029",
 		"name": "getAsHtml",
 		"summary": "Returns\u0020the\u0020menu\u0020as\u0020html\u0020\u003Cul\u003E\u003Cli\u003E\u0020string",
 		"url": "classes/core-classes-tree-Menu.html#method_getAsHtml"
 	}, {
-		"fqsen": "\\core\\classes\\tree\\Menu\u003A\u003AbuildHtmlTree\u0028\u0029",
+		"fqsen": "\\system\\classes\\tree\\Menu\u003A\u003AbuildHtmlTree\u0028\u0029",
 		"name": "buildHtmlTree",
 		"summary": "builds\u0020the\u0020\u003Cul\u003E\u003Cli\u003E\u0020structure\u0020from\u0020the\u0020menu\u0020as\u0020tree",
 		"url": "classes/core-classes-tree-Menu.html#method_buildHtmlTree"
 	}, {
-		"fqsen": "\\core\\classes\\tree\\MenuItem",
+		"fqsen": "\\system\\classes\\tree\\MenuItem",
 		"name": "MenuItem",
 		"summary": "The\u0020MenuItem\u0020class\u0020extends\u0020the\u0020Node\nCan\u0020be\u0020added\u0020to\u0020the\u0020Menu",
 		"url": "classes/core-classes-tree-MenuItem.html"
 	}, {
-		"fqsen": "\\core\\classes\\tree\\MenuItem\u003A\u003A__construct\u0028\u0029",
+		"fqsen": "\\system\\classes\\tree\\MenuItem\u003A\u003A__construct\u0028\u0029",
 		"name": "__construct",
 		"summary": "The\u0020constructor\u0020creates\u0020a\u0020MenuItem",
 		"url": "classes/core-classes-tree-MenuItem.html#method___construct"
 	}, {
-		"fqsen": "\\core\\classes\\tree\\MenuItem\u003A\u003AgetLink\u0028\u0029",
+		"fqsen": "\\system\\classes\\tree\\MenuItem\u003A\u003AgetLink\u0028\u0029",
 		"name": "getLink",
 		"summary": "Returns\u0020the\u0020target\u0020url\u0020in\u0020a\u0020html\u0020\u003Ca\u003E\u0020tag",
 		"url": "classes/core-classes-tree-MenuItem.html#method_getLink"
 	}, {
-		"fqsen": "\\core\\classes\\tree\\MenuItem\u003A\u003A\u0024_target",
+		"fqsen": "\\system\\classes\\tree\\MenuItem\u003A\u003A\u0024_target",
 		"name": "_target",
 		"summary": "",
 		"url": "classes/core-classes-tree-MenuItem.html#property__target"
 	}, {
-		"fqsen": "\\core\\classes\\tree\\Node",
+		"fqsen": "\\system\\classes\\tree\\TreeNode",
 		"name": "Node",
 		"summary": "The\u0020Node\u0020class\nCan\u0020be\u0020added\u0020to\u0020the\u0020Tree\u0020Walker",
 		"url": "classes/core-classes-tree-Node.html"
 	}, {
-		"fqsen": "\\core\\classes\\tree\\Node\u003A\u003A__construct\u0028\u0029",
+		"fqsen": "\\system\\classes\\tree\\TreeNode\u003A\u003A__construct\u0028\u0029",
 		"name": "__construct",
 		"summary": "The\u0020constructor\u0020creates\u0020a\u0020Node",
 		"url": "classes/core-classes-tree-Node.html#method___construct"
 	}, {
-		"fqsen": "\\core\\classes\\tree\\Node\u003A\u003A\u0024_id",
+		"fqsen": "\\system\\classes\\tree\\TreeNode\u003A\u003A\u0024_id",
 		"name": "_id",
 		"summary": "",
 		"url": "classes/core-classes-tree-Node.html#property__id"
 	}, {
-		"fqsen": "\\core\\classes\\tree\\Node\u003A\u003A\u0024_child_of",
+		"fqsen": "\\system\\classes\\tree\\TreeNode\u003A\u003A\u0024_child_of",
 		"name": "_child_of",
 		"summary": "",
 		"url": "classes/core-classes-tree-Node.html#property__child_of"
 	}, {
-		"fqsen": "\\core\\classes\\tree\\Node\u003A\u003A\u0024_name",
+		"fqsen": "\\system\\classes\\tree\\TreeNode\u003A\u003A\u0024_name",
 		"name": "_name",
 		"summary": "",
 		"url": "classes/core-classes-tree-Node.html#property__name"
 	}, {
-		"fqsen": "\\core\\classes\\tree\\Walker",
+		"fqsen": "\\system\\classes\\tree\\TreeWalker",
 		"name": "Walker",
 		"summary": "The\u0020Walker\u0020class\nAllows\u0020to\u0020navigate\u0020to\u0020a\u0020Tree\u0020structure\u0020represented\u0020by\u0020an\u0020array",
 		"url": "classes/core-classes-tree-Walker.html"
 	}, {
-		"fqsen": "\\core\\classes\\tree\\Walker\u003A\u003A__construct\u0028\u0029",
+		"fqsen": "\\system\\classes\\tree\\TreeWalker\u003A\u003A__construct\u0028\u0029",
 		"name": "__construct",
 		"summary": "The\u0020constructor",
 		"url": "classes/core-classes-tree-Walker.html#method___construct"
 	}, {
-		"fqsen": "\\core\\classes\\tree\\Walker\u003A\u003AaddNode\u0028\u0029",
+		"fqsen": "\\system\\classes\\tree\\TreeWalker\u003A\u003AaddNode\u0028\u0029",
 		"name": "addNode",
 		"summary": "Adds\u0020a\u0020Node\u0020to\u0020the\u0020Tree\u0020structure",
 		"url": "classes/core-classes-tree-Walker.html#method_addNode"
 	}, {
-		"fqsen": "\\core\\classes\\tree\\Walker\u003A\u003AgetNode\u0028\u0029",
+		"fqsen": "\\system\\classes\\tree\\TreeWalker\u003A\u003AgetNode\u0028\u0029",
 		"name": "getNode",
 		"summary": "Returns\u0020a\u0020node\u0020by\u0020the\u0020given\u0020id\u0020or\u0020null\u0020if\nthe\u0020node\u0020was\u0020not\u0020found",
 		"url": "classes/core-classes-tree-Walker.html#method_getNode"
 	}, {
-		"fqsen": "\\core\\classes\\tree\\Walker\u003A\u003AhasChildren\u0028\u0029",
+		"fqsen": "\\system\\classes\\tree\\TreeWalker\u003A\u003AhasChildren\u0028\u0029",
 		"name": "hasChildren",
 		"summary": "Returns\u0020true\u0020id\u0020the\u0020node\u0020by\u0020the\u0020given\u0020id\u0020das\nany\u0020child\u0020nodes",
 		"url": "classes/core-classes-tree-Walker.html#method_hasChildren"
 	}, {
-		"fqsen": "\\core\\classes\\tree\\Walker\u003A\u003AgetParentOf\u0028\u0029",
+		"fqsen": "\\system\\classes\\tree\\TreeWalker\u003A\u003AgetParentOf\u0028\u0029",
 		"name": "getParentOf",
 		"summary": "Returns\u0020the\u0020parent\u0020node\u0020of\u0020the\u0020node\u0020with\u0020the\u0020given\nid\u0020or\u0020null\u0020if\u0020it\u0020has\u0020no\u0020parent",
 		"url": "classes/core-classes-tree-Walker.html#method_getParentOf"
 	}, {
-		"fqsen": "\\core\\classes\\tree\\Walker\u003A\u003AgetChildrenOf\u0028\u0029",
+		"fqsen": "\\system\\classes\\tree\\TreeWalker\u003A\u003AgetChildrenOf\u0028\u0029",
 		"name": "getChildrenOf",
 		"summary": "Returns\u0020all\u0020child\u0020nodes\u0020of\u0020the\u0020node\u0020with\u0020the\u0020given\u0020id\nor\u0020an\u0020empty\u0020array\u0020if\u0020it\u0020has\u0020none",
 		"url": "classes/core-classes-tree-Walker.html#method_getChildrenOf"
 	}, {
-		"fqsen": "\\core\\classes\\tree\\Walker\u003A\u003AgetAncestorsOf\u0028\u0029",
+		"fqsen": "\\system\\classes\\tree\\TreeWalker\u003A\u003AgetAncestorsOf\u0028\u0029",
 		"name": "getAncestorsOf",
 		"summary": "Returns\u0020all\u0020ancestor\u0020nodes\u0020of\u0020the\u0020node\u0020with\u0020the\u0020given\u0020id\nor\u0020an\u0020empty\u0020array\u0020if\u0020it\u0020has\u0020none",
 		"url": "classes/core-classes-tree-Walker.html#method_getAncestorsOf"
 	}, {
-		"fqsen": "\\core\\classes\\tree\\Walker\u003A\u003AgetSiblingsOf\u0028\u0029",
+		"fqsen": "\\system\\classes\\tree\\TreeWalker\u003A\u003AgetSiblingsOf\u0028\u0029",
 		"name": "getSiblingsOf",
 		"summary": "Returns\u0020all\u0020sibling\u0020nodes\u0020of\u0020the\u0020node\u0020with\u0020the\u0020given\u0020id\nor\u0020an\u0020empty\u0020array\u0020if\u0020it\u0020has\u0020none.",
 		"url": "classes/core-classes-tree-Walker.html#method_getSiblingsOf"
 	}, {
-		"fqsen": "\\core\\classes\\tree\\Walker\u003A\u003AgetDescendantsOf\u0028\u0029",
+		"fqsen": "\\system\\classes\\tree\\TreeWalker\u003A\u003AgetDescendantsOf\u0028\u0029",
 		"name": "getDescendantsOf",
 		"summary": "Returns\u0020all\u0020descendant\u0020nodes\u0020of\u0020the\u0020node\u0020with\u0020the\u0020given\u0020id\nor\u0020an\u0020empty\u0020array\u0020if\u0020it\u0020has\u0020none",
 		"url": "classes/core-classes-tree-Walker.html#method_getDescendantsOf"
 	}, {
-		"fqsen": "\\core\\classes\\tree\\Walker\u003A\u003A\u0024_nodes",
+		"fqsen": "\\system\\classes\\tree\\TreeWalker\u003A\u003A\u0024_nodes",
 		"name": "_nodes",
 		"summary": "",
 		"url": "classes/core-classes-tree-Walker.html#property__nodes"
 	}, {
-		"fqsen": "\\core\\Core",
+		"fqsen": "\\system\\Core",
 		"name": "Core",
-		"summary": "The\u0020core\u0020class\u0020holds\u0020all\u0020important\u0020object\naccessible\u0020from\u0020anywhere",
+		"summary": "The\u0020system\u0020class\u0020holds\u0020all\u0020important\u0020object\naccessible\u0020from\u0020anywhere",
 		"url": "classes/core-Core.html"
 	}, {
-		"fqsen": "\\core\\Core\u003A\u003A\u0024_configuration",
+		"fqsen": "\\system\\Core\u003A\u003A\u0024_configuration",
 		"name": "_configuration",
 		"summary": "",
 		"url": "classes/core-Core.html#property__configuration"
 	}, {
-		"fqsen": "\\core\\Core\u003A\u003A\u0024_connection_manager",
+		"fqsen": "\\system\\Core\u003A\u003A\u0024_connection_manager",
 		"name": "_connection_manager",
 		"summary": "",
 		"url": "classes/core-Core.html#property__connection_manager"
 	}, {
-		"fqsen": "\\core\\Core\u003A\u003A\u0024_debugger",
+		"fqsen": "\\system\\Core\u003A\u003A\u0024_debugger",
 		"name": "_debugger",
 		"summary": "",
 		"url": "classes/core-Core.html#property__debugger"
 	}, {
-		"fqsen": "\\core\\Core\u003A\u003A\u0024_request",
+		"fqsen": "\\system\\Core\u003A\u003A\u0024_request",
 		"name": "_request",
 		"summary": "",
 		"url": "classes/core-Core.html#property__request"
 	}, {
-		"fqsen": "\\core\\Core\u003A\u003A\u0024_menu",
+		"fqsen": "\\system\\Core\u003A\u003A\u0024_menu",
 		"name": "_menu",
 		"summary": "",
 		"url": "classes/core-Core.html#property__menu"
 	}, {
-		"fqsen": "\\core\\Core\u003A\u003A\u0024_actor",
+		"fqsen": "\\system\\Core\u003A\u003A\u0024_actor",
 		"name": "_actor",
 		"summary": "",
 		"url": "classes/core-Core.html#property__actor"
 	}, {
-		"fqsen": "\\core\\Core\u003A\u003A\u0024_actor_role",
+		"fqsen": "\\system\\Core\u003A\u003A\u0024_actor_role",
 		"name": "_actor_role",
 		"summary": "",
 		"url": "classes/core-Core.html#property__actor_role"
 	}, {
-		"fqsen": "\\core\\Core\u003A\u003A\u0024_router",
+		"fqsen": "\\system\\Core\u003A\u003A\u0024_router",
 		"name": "_router",
 		"summary": "",
 		"url": "classes/core-Core.html#property__router"
 	}, {
-		"fqsen": "\\core\\helper\\StringHelper",
+		"fqsen": "\\system\\helper\\StringHelper",
 		"name": "StringHelper",
 		"summary": "Functions\u0020that\u0020helps\u0020with\u0020strings",
 		"url": "classes/core-helper-StringHelper.html"
 	}, {
-		"fqsen": "\\core\\helper\\StringHelper\u003A\u003AgetShortString\u0028\u0029",
+		"fqsen": "\\system\\helper\\StringHelper\u003A\u003AgetShortString\u0028\u0029",
 		"name": "getShortString",
 		"summary": "Shortens\u0020the\u0020given\u0020string\u0020to\u0020the\u0020given\u0020length\nand\u0020returns\u0020the\u0020string.",
 		"url": "classes/core-helper-StringHelper.html#method_getShortString"
 	}, {
-		"fqsen": "\\core\\helper\\StringHelper\u003A\u003AgetBCrypt\u0028\u0029",
+		"fqsen": "\\system\\helper\\StringHelper\u003A\u003AgetBCrypt\u0028\u0029",
 		"name": "getBCrypt",
 		"summary": "Returns\u0020a\u0020BCrypt\u0020string\u0020from\u0020the\u0020given\u0020string",
 		"url": "classes/core-helper-StringHelper.html#method_getBCrypt"
 	}, {
-		"fqsen": "\\core\\interfaces\\IController",
+		"fqsen": "\\system\\interfaces\\IController",
 		"name": "IController",
 		"summary": "The\u0020controller\u0020interface\nDefines\u0020necessary\u0020methods\u0020for\u0020all\u0020controllers",
 		"url": "classes/core-interfaces-IController.html"
 	}, {
-		"fqsen": "\\core\\interfaces\\IController\u003A\u003Ainit\u0028\u0029",
+		"fqsen": "\\system\\interfaces\\IController\u003A\u003Ainit\u0028\u0029",
 		"name": "init",
 		"summary": "This\u0020function\u0020will\u0020add\u0020all\u0020routes\u0020it\u0020has\nto\u0020the\u0020given\u0020Router",
 		"url": "classes/core-interfaces-IController.html#method_init"
 	}, {
-		"fqsen": "\\core\\interfaces\\IController\u003A\u003Aindex\u0028\u0029",
+		"fqsen": "\\system\\interfaces\\IController\u003A\u003Aindex\u0028\u0029",
 		"name": "index",
 		"summary": "The\u0020default\u0020method\u0020that\u0020will\u0020be\u0020called\u0020if\u0020no\nspecific\u0020method\u0020was\u0020requested\u0020by\u0020the\u0020request.",
 		"url": "classes/core-interfaces-IController.html#method_index"
 	}, {
-		"fqsen": "\\core\\interfaces\\IEntity",
+		"fqsen": "\\system\\interfaces\\IEntity",
 		"name": "IEntity",
 		"summary": "The\u0020Entity\u0020interface\nDefines\u0020necessary\u0020methods\u0020for\u0020all\u0020entities",
 		"url": "classes/core-interfaces-IEntity.html"
 	}, {
-		"fqsen": "\\core\\interfaces\\IEntity\u003A\u003Acreate\u0028\u0029",
+		"fqsen": "\\system\\interfaces\\IEntity\u003A\u003Acreate\u0028\u0029",
 		"name": "create",
 		"summary": "Creates\u0020an\u0020entry\u0020in\u0020the\u0020database\u0020with\u0020the\u0020current\u0020object\nand\u0020tries\u0020to\u0020return\u0020the\u0020id\u0020of\u0020the\u0020new\u0020entry",
 		"url": "classes/core-interfaces-IEntity.html#method_create"
 	}, {
-		"fqsen": "\\core\\interfaces\\IEntity\u003A\u003Aupdate\u0028\u0029",
+		"fqsen": "\\system\\interfaces\\IEntity\u003A\u003Aupdate\u0028\u0029",
 		"name": "update",
 		"summary": "Updates\u0020an\u0020entry\u0020in\u0020the\u0020database\u0020with\u0020the\u0020current\u0020object",
 		"url": "classes/core-interfaces-IEntity.html#method_update"
 	}, {
-		"fqsen": "\\core\\interfaces\\IEntity\u003A\u003Adelete\u0028\u0029",
+		"fqsen": "\\system\\interfaces\\IEntity\u003A\u003Adelete\u0028\u0029",
 		"name": "delete",
 		"summary": "Deletes\u0020the\u0020current\u0020object\u0020from\u0020the\u0020database\nReturns\u0020true\u0020if\u0020successful\u0020else\u0020false",
 		"url": "classes/core-interfaces-IEntity.html#method_delete"
 	}, {
-		"fqsen": "\\core\\interfaces\\IResponse",
+		"fqsen": "\\system\\interfaces\\IResponse",
 		"name": "IResponse",
 		"summary": "The\u0020Response\u0020interface\nDefines\u0020necessary\u0020methods\u0020for\u0020all\u0020responses",
 		"url": "classes/core-interfaces-IResponse.html"
 	}, {
-		"fqsen": "\\core\\interfaces\\IResponse\u003A\u003AsetHeaders\u0028\u0029",
+		"fqsen": "\\system\\interfaces\\IResponse\u003A\u003AsetHeaders\u0028\u0029",
 		"name": "setHeaders",
 		"summary": "sets\u0020the\u0020headers\u0020for\u0020the\u0020response",
 		"url": "classes/core-interfaces-IResponse.html#method_setHeaders"
 	}, {
-		"fqsen": "\\core\\manager\\ConnectionManager",
+		"fqsen": "\\system\\manager\\ConnectionManager",
 		"name": "ConnectionManager",
 		"summary": "This\u0020class\u0020will\u0020handle\u0020all\u0020database\u0020connections\nrequired\u0020by\u0020the\u0020application",
 		"url": "classes/core-manager-ConnectionManager.html"
 	}, {
-		"fqsen": "\\core\\manager\\ConnectionManager\u003A\u003A__construct\u0028\u0029",
+		"fqsen": "\\system\\manager\\ConnectionManager\u003A\u003A__construct\u0028\u0029",
 		"name": "__construct",
 		"summary": "the\u0020class\u0020constructor",
 		"url": "classes/core-manager-ConnectionManager.html#method___construct"
 	}, {
-		"fqsen": "\\core\\manager\\ConnectionManager\u003A\u003AaddConnection\u0028\u0029",
+		"fqsen": "\\system\\manager\\ConnectionManager\u003A\u003AaddConnection\u0028\u0029",
 		"name": "addConnection",
 		"summary": "Adds\u0020a\u0020connection\u0020the\u0020available\u0020connections",
 		"url": "classes/core-manager-ConnectionManager.html#method_addConnection"
 	}, {
-		"fqsen": "\\core\\manager\\ConnectionManager\u003A\u003AgetConnection\u0028\u0029",
+		"fqsen": "\\system\\manager\\ConnectionManager\u003A\u003AgetConnection\u0028\u0029",
 		"name": "getConnection",
 		"summary": "Returns\u0020a\u0020connections\nFirst\u0020checks\u0020if\u0020the\u0020connection\u0020is\u0020already\u0020active,\u0020if\u0020so\u0020returns\u0020it\nelse\u0020it\u0020activates\u0020the\u0020connection,\u0020stores\u0020it\u0020to\u0020the\u0020active\u0020connections\nand\u0020returns\u0020it.",
 		"url": "classes/core-manager-ConnectionManager.html#method_getConnection"
 	}, {
-		"fqsen": "\\core\\manager\\ConnectionManager\u003A\u003A\u0024_connections",
+		"fqsen": "\\system\\manager\\ConnectionManager\u003A\u003A\u0024_connections",
 		"name": "_connections",
 		"summary": "",
 		"url": "classes/core-manager-ConnectionManager.html#property__connections"
 	}, {
-		"fqsen": "\\core\\manager\\ConnectionManager\u003A\u003A\u0024_active_connections",
+		"fqsen": "\\system\\manager\\ConnectionManager\u003A\u003A\u0024_active_connections",
 		"name": "_active_connections",
 		"summary": "",
 		"url": "classes/core-manager-ConnectionManager.html#property__active_connections"
 	}, {
-		"fqsen": "\\core\\manager\\ConnectionManager\u003A\u003A\u0024options",
+		"fqsen": "\\system\\manager\\ConnectionManager\u003A\u003A\u0024options",
 		"name": "options",
 		"summary": "",
 		"url": "classes/core-manager-ConnectionManager.html#property_options"
 	}, {
-		"fqsen": "\\core\\System",
+		"fqsen": "\\system\\System",
 		"name": "System",
 		"summary": "The\u0020System\u0020Class\u0020Type\u0020singleton\nThis\u0020class\u0020handles\u0020the\u0020main\u0020procedure\u0020from\u0020getting\u0020a\u0020request\nto\u0020return\u0020the\u0020response\u0020output",
 		"url": "classes/core-System.html"
 	}, {
-		"fqsen": "\\core\\System\u003A\u003A__construct\u0028\u0029",
+		"fqsen": "\\system\\System\u003A\u003A__construct\u0028\u0029",
 		"name": "__construct",
-		"summary": "The\u0020class\u0020constructor\ninitializes\u0020the\u0020core\\classes\\Request\ninitializes\u0020the\u0020core\\classes\\Router",
+		"summary": "The\u0020class\u0020constructor\ninitializes\u0020the\u0020system\\classes\\Request\ninitializes\u0020the\u0020system\\classes\\Router",
 		"url": "classes/core-System.html#method___construct"
 	}, {
-		"fqsen": "\\core\\System\u003A\u003AgetInstance\u0028\u0029",
+		"fqsen": "\\system\\System\u003A\u003AgetInstance\u0028\u0029",
 		"name": "getInstance",
 		"summary": "The\u0020initializer\u0020for\u0020this\u0020class",
 		"url": "classes/core-System.html#method_getInstance"
 	}, {
-		"fqsen": "\\core\\System\u003A\u003Astart\u0028\u0029",
+		"fqsen": "\\system\\System\u003A\u003Astart\u0028\u0029",
 		"name": "start",
 		"summary": "Gets\u0020the\u0020required\u0020controller\u0020for\u0020the\u0020current\u0020request\nand\u0020performs\u0020the\u0020requested\u0020method.",
 		"url": "classes/core-System.html#method_start"
 	}, {
-		"fqsen": "\\core\\System\u003A\u003AgetOutput\u0028\u0029",
+		"fqsen": "\\system\\System\u003A\u003AgetOutput\u0028\u0029",
 		"name": "getOutput",
 		"summary": "Returns\u0020the\u0020output\u0020from\u0020the\u0020current\u0020AResponse\u0020object",
 		"url": "classes/core-System.html#method_getOutput"
 	}, {
-		"fqsen": "\\core\\System\u003A\u003A\u0024_instance",
+		"fqsen": "\\system\\System\u003A\u003A\u0024_instance",
 		"name": "_instance",
 		"summary": "",
 		"url": "classes/core-System.html#property__instance"
 	}, {
-		"fqsen": "\\core\\System\u003A\u003A\u0024_response",
+		"fqsen": "\\system\\System\u003A\u003A\u0024_response",
 		"name": "_response",
 		"summary": "",
 		"url": "classes/core-System.html#property__response"
@@ -1286,42 +1286,42 @@ Search.appendIndex(
 		"summary": "",
 		"url": "namespaces/controller-www.html"
 	}, {
-		"fqsen": "\\core\\abstracts",
+		"fqsen": "\\system\\abstracts",
 		"name": "abstracts",
 		"summary": "",
 		"url": "namespaces/core-abstracts.html"
 	}, {
-		"fqsen": "\\core\\classes",
+		"fqsen": "\\system\\classes",
 		"name": "classes",
 		"summary": "",
 		"url": "namespaces/core-classes.html"
 	}, {
-		"fqsen": "\\core\\classes\\responses",
+		"fqsen": "\\system\\classes\\responses",
 		"name": "responses",
 		"summary": "",
 		"url": "namespaces/core-classes-responses.html"
 	}, {
-		"fqsen": "\\core\\classes\\tree",
+		"fqsen": "\\system\\classes\\tree",
 		"name": "tree",
 		"summary": "",
 		"url": "namespaces/core-classes-tree.html"
 	}, {
-		"fqsen": "\\core",
+		"fqsen": "\\system",
 		"name": "core",
 		"summary": "",
 		"url": "namespaces/core.html"
 	}, {
-		"fqsen": "\\core\\helper",
+		"fqsen": "\\system\\helper",
 		"name": "helper",
 		"summary": "",
 		"url": "namespaces/core-helper.html"
 	}, {
-		"fqsen": "\\core\\interfaces",
+		"fqsen": "\\system\\interfaces",
 		"name": "interfaces",
 		"summary": "",
 		"url": "namespaces/core-interfaces.html"
 	}, {
-		"fqsen": "\\core\\manager",
+		"fqsen": "\\system\\manager",
 		"name": "manager",
 		"summary": "",
 		"url": "namespaces/core-manager.html"

@@ -6,8 +6,8 @@ use PDO;
 use PDOException;
 use RuntimeException;
 
-use core\Core;
-use core\abstracts\AEntityNode;
+use system\Core;
+use system\abstracts\AEntityTreeNode;
 
 /**
  * The ActorRole entity
@@ -16,7 +16,7 @@ use core\abstracts\AEntityNode;
  * @author Markus Schröder <xelsion@gmail.com>
  * @version 1.0.0;
  */
-class ActorRole extends AEntityNode {
+class ActorRole extends AEntityTreeNode {
 
 	// The columns
 	public int $id = 0;
@@ -48,7 +48,7 @@ class ActorRole extends AEntityNode {
 
 	/**
 	 * @return string
-	 * @see \core\interfaces\IEntity
+	 * @see \system\interfaces\IEntity
 	 */
 	public function create(): ?string {
 		try {
@@ -69,7 +69,7 @@ class ActorRole extends AEntityNode {
 	}
 
 	/**
-	 * @see \core\interfaces\IEntity
+	 * @see \system\interfaces\IEntity
 	 */
 	public function update(): void {
 		if( $this->id > 0 ) {
@@ -92,7 +92,7 @@ class ActorRole extends AEntityNode {
 
 	/**
 	 * @return bool
-	 * @see \core\interfaces\IEntity
+	 * @see \system\interfaces\IEntity
 	 */
 	public function delete(): bool {
 		if( $this->id > 0 ) {

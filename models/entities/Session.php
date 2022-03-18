@@ -2,13 +2,13 @@
 
 namespace models\entities;
 
-use core\Core;
+use system\Core;
 use PDO;
 use PDOException;
 use RuntimeException;
 
-use core\abstracts\AEntity;
-use core\System;
+use system\abstracts\AEntity;
+use system\System;
 
 /**
  * The Session entity
@@ -42,7 +42,7 @@ class Session extends AEntity {
 
 	/**
 	 * @return string
-	 * @see \core\interfaces\IEntity
+	 * @see \system\interfaces\IEntity
 	 */
 	public function create(): string {
 		try {
@@ -60,7 +60,7 @@ class Session extends AEntity {
 	}
 
 	/**
-	 * @see \core\interfaces\IEntity
+	 * @see \system\interfaces\IEntity
 	 */
 	public function update(): void {
 		try {
@@ -77,7 +77,7 @@ class Session extends AEntity {
 	}
 
 	/**
-	 * @see \core\interfaces\IEntity
+	 * @see \system\interfaces\IEntity
 	 * @return bool
 	 */
 	public function delete(): bool {

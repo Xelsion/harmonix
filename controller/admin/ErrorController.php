@@ -2,15 +2,14 @@
 
 namespace controller\admin;
 
-use core\abstracts\AController;
-use core\abstracts\AResponse;
-use core\classes\responses\ResponseHTML;
-use core\classes\Router;
-use core\classes\Template;
-use core\Core;
+use system\abstracts\AController;
+use system\abstracts\AResponse;
+use system\classes\responses\ResponseHTML;
+use system\classes\Router;
+use system\classes\Template;
 
 /**
- * @see \core\abstracts\AController
+ * @see \system\abstracts\AController
  *
  * @author Markus Schröder <xelsion@gmail.com>
  * @version 1.0.0;
@@ -19,7 +18,7 @@ class ErrorController extends AController {
 
 	/**
 	 * @param Router $router
-	 * @see \core\interfaces\IController
+	 * @see \system\interfaces\IController
 	 */
 	public function init( Router $router ): void {
 		// Add routes to router
@@ -27,13 +26,13 @@ class ErrorController extends AController {
 	}
 
 	/**
-	 * @see \core\interfaces\IController
+	 * @see \system\interfaces\IController
 	 * @return AResponse
 	 */
 	public function index(): AResponse {
 		$response = new ResponseHTML();
 		$template = new Template(PATH_VIEWS."template.html");
-		$template->set("navigation", Core::$_menu);
+		$template->set("navigation", $this::$_menu);
 		$template->set("view", new Template(PATH_VIEWS."home/index.html"));
 		$response->setOutput($template->parse());
 		return $response;
@@ -43,7 +42,7 @@ class ErrorController extends AController {
 		$response = new ResponseHTML();
 		$response->status_code = $error_code;
 		$template = new Template(PATH_VIEWS."template.html");
-		$template->set("navigation", Core::$_menu);
+		$template->set("navigation", $this::$_menu);
 		$template->set("view", new Template(PATH_VIEWS."error/".$error_code.".html"));
 		$response->setOutput($template->parse());
 		return $response;

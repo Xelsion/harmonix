@@ -4,7 +4,7 @@ namespace models;
 
 use PDO;
 
-use core\Core;
+use system\Core;
 
 /**
  * The Actor

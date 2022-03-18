@@ -1,16 +1,13 @@
 <?php
 
-use core\Core;
-use core\classes\Template;
+use system\Core;
+use system\classes\Template;
 
 $actor = Core::$_actor;
 $menu = Core::$_menu;
 
 $view = $this->get("view");
-$view_content = "";
-if( $view instanceof Template ) {
-	$view_content = $view->parse();
-}
+$view_content = ( $view instanceof Template ) ? $view->parse() : "";
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -36,36 +33,35 @@ if( $view instanceof Template ) {
 			</div>
 			<div id="actor-menu-dropdown" style="">
 				<menu>
-					<ul
-					">
-					<?php if( $actor->id === 0 ): ?>
-						<li>
-							<form action="<?= $_SERVER["REQUEST_URI"] ?>" method="POST">
-								<div class="form-row">
-									<label>
-										<input type="email" name="email" value="" placeholder="E-Mail" />
-									</label>
-								</div>
-								<div class="form-row">
-									<label>
-										<input type="password" name="password" value="" placeholder="Password" autocomplete="new-password" />
-									</label>
-								</div>
-								<div class="form-row">
-									<button type="submit" name="login">Login</button>
-								</div>
-							</form>
-						</li>
-					<?php else: ?>
-						<li>
-							<a href="https://www.harmonix.de">www-Bereich</a>
-						</li>
-						<li>
-							<form action="<?= $_SERVER["REQUEST_URI"] ?>" method="POST">
-								<button type="submit" name="logout" class="link">Logout</button>
-							</form>
-						</li>
-					<?php endif; ?>
+					<ul>
+						<?php if( $actor->id === 0 ): ?>
+							<li>
+								<form action="<?= $_SERVER["REQUEST_URI"] ?>" method="POST">
+									<div class="form-row">
+										<label>
+											<input type="email" name="email" value="" placeholder="E-Mail" />
+										</label>
+									</div>
+									<div class="form-row">
+										<label>
+											<input type="password" name="password" value="" placeholder="Password" autocomplete="new-password" />
+										</label>
+									</div>
+									<div class="form-row">
+										<button type="submit" name="login">Login</button>
+									</div>
+								</form>
+							</li>
+						<?php else: ?>
+							<li>
+								<a href="https://www.harmonix.de">www-Bereich</a>
+							</li>
+							<li>
+								<form action="<?= $_SERVER["REQUEST_URI"] ?>" method="POST">
+									<button type="submit" name="logout" class="link">Logout</button>
+								</form>
+							</li>
+						<?php endif; ?>
 					</ul>
 				</menu>
 			</div>

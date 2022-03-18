@@ -7,7 +7,7 @@ use DateTime;
 use Exception;
 use RuntimeException;
 
-use core\Core;
+use system\Core;
 
 /**
  * The Session

@@ -2,12 +2,12 @@
 
 namespace models\entities;
 
-use core\Core;
+use system\Core;
 use PDO;
 use PDOException;
 use RuntimeException;
-use core\abstracts\AEntity;
-use core\helper\StringHelper;
+use system\abstracts\AEntity;
+use system\helper\StringHelper;
 
 /**
  * The Actor entity
@@ -49,7 +49,7 @@ class Actor extends AEntity {
 
 	/**
 	 * @return int
-	 * @see \core\interfaces\IEntity
+	 * @see \system\interfaces\IEntity
 	 */
 	public function create(): int {
 		try {
@@ -73,7 +73,7 @@ class Actor extends AEntity {
 	}
 
 	/**
-	 * @see \core\interfaces\IEntity
+	 * @see \system\interfaces\IEntity
 	 */
 	public function update(): void {
 		try {
@@ -104,7 +104,7 @@ class Actor extends AEntity {
 	}
 
 	/**
-	 * @see \core\interfaces\IEntity
+	 * @see \system\interfaces\IEntity
 	 * @return bool
 	 */
 	public function delete(): bool {

@@ -6,7 +6,7 @@ use PDO;
 use PDOException;
 use RuntimeException;
 
-use core\Core;
+use system\Core;
 
 /**
  * The Actor Role

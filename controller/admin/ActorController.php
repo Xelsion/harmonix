@@ -2,18 +2,17 @@
 
 namespace controller\admin;
 
-use core\abstracts\AController;
-use core\abstracts\AResponse;
-use core\classes\responses\ResponseHTML;
-use core\classes\Router;
-use core\classes\Template;
-use core\Core;
+use system\abstracts\AController;
+use system\abstracts\AResponse;
+use system\classes\Router;
+use system\classes\Template;
+use system\classes\responses\ResponseHTML;
 use models\Actor;
 use models\ActorRole;
 use models\ActorPermission;
 
 /**
- * @see \core\abstracts\AController
+ * @see \system\abstracts\AController
  *
  * @author Markus Schröder <xelsion@gmail.com>
  * @version 1.0.0;
@@ -22,7 +21,7 @@ class ActorController extends AController {
 
 	/**
 	 * @param Router $router
-	 * @see \core\interfaces\IController
+	 * @see \system\interfaces\IController
 	 */
 	public function init( Router $router ): void {
 		// Add routes to router
@@ -32,13 +31,13 @@ class ActorController extends AController {
 		$router->addRoute("/actors/roles/{actor}", __CLASS__, "roles");
 
 		// Add MenuItems to the Menu
-		Core::$_menu->insertMenuItem(200, null, "Benutzer", "/actors");
-		Core::$_menu->insertMenuItem(210, 200, "Benutzer erstellen", "/actors/create");
+		$this::$_menu->insertMenuItem(200, null, "Benutzer", "/actors");
+        $this::$_menu->insertMenuItem(210, 200, "Benutzer erstellen", "/actors/create");
 	}
 
 	/**
 	 * @return AResponse
-	 * @see \core\interfaces\IController
+	 * @see \system\interfaces\IController
 	 */
 	public function index(): AResponse {
 		$response = new ResponseHTML();
@@ -46,7 +45,7 @@ class ActorController extends AController {
 
 		$results = Actor::findAll();
 
-		$template->set("navigation", Core::$_menu);
+		$template->set("navigation", $this::$_menu);
 		$template->set("result_list", $results);
 		$template->set("view", new Template(PATH_VIEWS."actor/index.html"));
 		$response->setOutput($template->parse());
@@ -54,7 +53,7 @@ class ActorController extends AController {
 	}
 
 	public function create(): AResponse {
-		if( !Core::$_actor_role->canCreateAll() ) {
+		if( !$this::$_actor_role->canCreateAll() ) {
 			redirect("/error/403");
 		}
 
@@ -76,7 +75,7 @@ class ActorController extends AController {
 		$actor_permissions = array();
 		$response = new ResponseHTML();
 		$template = new Template(PATH_VIEWS."template.html");
-		$template->set("navigation", Core::$_menu);
+		$template->set("navigation", $this::$_menu);
 		$template->set("role_options", $role_options);
 		$template->set("actor_permissions", $actor_permissions);
 		$template->set("view", new Template(PATH_VIEWS."actor/create.html"));
@@ -85,7 +84,7 @@ class ActorController extends AController {
 	}
 
 	public function update( Actor $actor ): AResponse {
-		if( !Core::$_actor_role->canUpdateAll() ) {
+		if( !$this::$_actor_role->canUpdateAll() ) {
 			redirect("/error/403");
 		}
 
@@ -106,14 +105,14 @@ class ActorController extends AController {
 		$response = new ResponseHTML();
 		$template = new Template(PATH_VIEWS."template.html");
 		$template->set("actor", $actor);
-		$template->set("navigation", Core::$_menu);
+		$template->set("navigation", $this::$_menu);
 		$template->set("view", new Template(PATH_VIEWS."actor/edit.html"));
 		$response->setOutput($template->parse());
 		return $response;
 	}
 
 	public function roles( Actor $actor ): AResponse {
-		if( !Core::$_actor_role->canUpdateGroup() ) {
+		if( !$this::$_actor_role->canUpdateGroup() ) {
 			redirect("/error/403");
 		}
 		if( isset($_POST['cancel']) ) {
@@ -137,7 +136,7 @@ class ActorController extends AController {
 			)
 		));
 
-		$template->set("navigation", Core::$_menu);
+		$template->set("navigation", $this::$_menu);
 		$template->set("actor", $actor);
 		$template->set("role_options", $role_options);
 		$template->set("actor_permissions", $actor_permissions);
@@ -173,12 +172,12 @@ class ActorController extends AController {
 		$roles = array();
 		foreach( $_POST['role'] as $path => $entry_path ) {
 			if( (int)$entry_path["role"] > 0 ) {
-				$roles[$path][""][""] = $entry_path["role"];
+				$roles[$path][null][null] = $entry_path["role"];
 			}
 			foreach( $entry_path["controller"] as $controller => $entry_controller ) {
 				$controller = str_replace("-", "\\", $controller);
 				if( (int)$entry_controller["role"] > 0 ) {
-					$roles[$path][$controller][""] = $entry_controller["role"];
+					$roles[$path][$controller][null] = $entry_controller["role"];
 				}
 				foreach( $entry_controller["method"] as $method => $role ) {
 					if( (int)$role > 0 ) {

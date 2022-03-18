@@ -2,16 +2,15 @@
 
 namespace controller\admin;
 
-use core\abstracts\AResponse;
-use core\abstracts\AController;
-use core\classes\responses\ResponseHTML;
-use core\classes\Router;
-use core\classes\Template;
-use core\Core;
+use system\abstracts\AResponse;
+use system\abstracts\AController;
+use system\classes\responses\ResponseHTML;
+use system\classes\Router;
+use system\classes\Template;
 use models\ActorRole;
 
 /**
- * @see \core\abstracts\AController
+ * @see \system\abstracts\AController
  *
  * @author Markus Schröder <xelsion@gmail.com>
  * @version 1.0.0;
@@ -20,7 +19,7 @@ class ActorRolesController extends AController {
 
 	/**
 	 * @param Router $router
-	 * @see \core\interfaces\IController
+	 * @see \system\interfaces\IController
 	 */
 	public function init( Router $router ): void {
 		// Add routes to router
@@ -29,12 +28,12 @@ class ActorRolesController extends AController {
 		$router->addRoute("/actor-roles/create", __CLASS__, "create");
 
 		// Add MenuItems to the Menu
-		Core::$_menu->insertMenuItem(300, null, "Rollen", "/actor-roles");
-		Core::$_menu->insertMenuItem(310, 300, "Rolle erstellen", "/actor-roles/create");
+		$this::$_menu->insertMenuItem(300, null, "Rollen", "/actor-roles");
+        $this::$_menu->insertMenuItem(310, 300, "Rolle erstellen", "/actor-roles/create");
 	}
 
 	/**
-	 * @see \core\interfaces\IController
+	 * @see \system\interfaces\IController
 	 * @return AResponse
 	 */
 	public function index(): AResponse {
@@ -43,7 +42,7 @@ class ActorRolesController extends AController {
 
 		$results = ActorRole::findAll();
 
-		$template->set("navigation", Core::$_menu);
+		$template->set("navigation", $this::$_menu);
 		$template->set("result_list", $results);
 		$template->set("view", new Template(PATH_VIEWS."actor_roles/index.html"));
 		$response->setOutput($template->parse());
@@ -71,7 +70,7 @@ class ActorRolesController extends AController {
 
 		$response = new ResponseHTML();
 		$template = new Template(PATH_VIEWS."template.html");
-		$template->set("navigation", Core::$_menu);
+		$template->set("navigation", $this::$_menu);
 		$template->set("option_list", $results);
 		$template->set("view", new Template(PATH_VIEWS."actor_roles/create.html"));
 		$response->setOutput($template->parse());
@@ -110,7 +109,7 @@ class ActorRolesController extends AController {
 		$template = new Template(PATH_VIEWS."template.html");
 		$template->set("role", $role);
 		$template->set("option_list", $results);
-		$template->set("navigation", Core::$_menu);
+		$template->set("navigation", $this::$_menu);
 		$template->set("view", new Template(PATH_VIEWS."actor_roles/edit.html"));
 		$response->setOutput($template->parse());
 		return $response;

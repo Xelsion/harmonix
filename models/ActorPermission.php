@@ -2,7 +2,7 @@
 
 namespace models;
 
-use core\Core;
+use system\Core;
 use PDO;
 
 /**

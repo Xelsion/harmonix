@@ -2,12 +2,11 @@
 
 namespace controller\www;
 
-use core\abstracts\AResponse;
-use core\abstracts\AController;
-use core\classes\responses\ResponseHTML;
-use core\classes\Router;
-use core\classes\Template;
-use core\Core;
+use system\abstracts\AResponse;
+use system\abstracts\AController;
+use system\classes\responses\ResponseHTML;
+use system\classes\Router;
+use system\classes\Template;
 
 /**
  * @author Markus Schröder <xelsion@gmail.com>
@@ -22,7 +21,7 @@ class HomeController extends AController {
 	public function init( Router $router ): void {
 		$router->addRoute("/", __CLASS__);
 
-		Core::$_menu->insertMenuItem(100, null, "Home", "/");
+        $this::$_menu->insertMenuItem(100, null, "Home", "/");
 	}
 
 	public function index(): AResponse {

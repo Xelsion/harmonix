@@ -6,8 +6,8 @@ use PDO;
 use PDOException;
 use RuntimeException;
 
-use core\abstracts\AEntity;
-use core\Core;
+use system\abstracts\AEntity;
+use system\Core;
 
 /**
  * The ActorPermission entity
@@ -44,7 +44,7 @@ class ActorPermission extends AEntity {
 
 	/**
 	 * @return int
-	 * @see \core\interfaces\IEntity
+	 * @see \system\interfaces\IEntity
 	 */
 	public function create(): ?int {
 		try {
@@ -65,14 +65,14 @@ class ActorPermission extends AEntity {
 	}
 
 	/**
-	 * @see \core\interfaces\IEntity
+	 * @see \system\interfaces\IEntity
 	 */
 	public function update(): void {
 
 	}
 
 	/**
-	 * @see \core\interfaces\IEntity
+	 * @see \system\interfaces\IEntity
 	 * @return bool
 	 */
 	public function delete(): bool {
