@@ -21,9 +21,23 @@ class ErrorController extends AController {
 	 * @see \system\interfaces\IController
 	 */
 	public function init( Router $router ): void {
-		// Add routes to router
-		$router->addRoute("/error/{error_code}", __CLASS__, "error");
+        // Add routes to router
+        $routes = $this->getRoutes();
+        foreach( $routes as $url => $route ) {
+            $router->addRoute($url, $route["controller"], $route["method"] );
+        }
 	}
+
+    /**
+     * @return array[]
+     * @see \system\interfaces\IController
+     */
+    public function getRoutes(): array {
+        return array(
+            "/error" => array("controller" => __CLASS__, "method" => "index"),
+            "/error/{error_code}" => array("controller" => __CLASS__, "method" => "error")
+        );
+    }
 
 	/**
 	 * @see \system\interfaces\IController

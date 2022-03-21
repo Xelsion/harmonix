@@ -22,11 +22,24 @@ class HomeController extends AController {
 	 */
 	public function init( Router $router ): void {
 		// Add routes to router
-		$router->addRoute("/", __CLASS__);
+        $routes = $this->getRoutes();
+        foreach( $routes as $url => $route ) {
+            $router->addRoute($url, $route["controller"], $route["method"] );
+        }
 
 		// Add MenuItems to the Menu
         $this::$_menu->insertMenuItem(100, null, "Home", "/");
 	}
+
+    /**
+     * @return array[]
+     * @see \system\interfaces\IController
+     */
+    public function getRoutes(): array {
+        return array(
+            "/" => array("controller" => __CLASS__, "method" => "index")
+        );
+    }
 
 	/**
 	 * @return AResponse

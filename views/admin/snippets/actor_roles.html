@@ -33,6 +33,7 @@ $role_options = $this->get("role_options");
 	<div class="col-1">Bereich</div>
 	<div class="col">Controller</div>
 	<div class="col-2">Methode</div>
+	<div class="col-2">URL</div>
 	<div class="col-2">Rolle</div>
 </div>
 <?php foreach( $routes as $path => $controllers ) {
@@ -43,6 +44,7 @@ $role_options = $this->get("role_options");
 		<div class="col-auto" style="width: 20px;"></div>
 		<div class="col-1 table-col text-nowrap"><?= $path ?></div>
 		<div class="col table-col text-nowrap"></div>
+		<div class="col-2 table-col text-nowrap"></div>
 		<div class="col-2 table-col text-nowrap"></div>
 		<div class="col-2">
 			<label>
@@ -71,6 +73,7 @@ $role_options = $this->get("role_options");
 				<div class="col-1 table-col text-nowrap" style="cursor: pointer;" onclick="toggleDisplayMethods('<?= $path."-".$controller_name ?>');"><?= $path ?></div>
 				<div class="col table-col text-nowrap" style="cursor: pointer;" onclick="toggleDisplayMethods('<?= $path."-".$controller_name ?>');"><?= $controller ?></div>
 				<div class="col-2 table-col text-nowrap" style="cursor: pointer;" onclick="toggleDisplayMethods('<?= $path."-".$controller_name ?>');"></div>
+				<div class="col-2 table-col text-nowrap"></div>
 				<div class="col-2">
 					<label>
 						<select name="role[<?= $path ?>][controller][<?= $controller_name ?>][role]"<?= $is_protected ?>>
@@ -86,7 +89,7 @@ $role_options = $this->get("role_options");
 				</div>
 			</div>
 			<div id="<?= $path."-".$controller_name ?>" class="method-toggle" style="display:none;">
-				<?php foreach( $methods as $method ) {
+				<?php foreach( $methods as $method => $url ) {
 					$curr_role = $permissions[$path][$controller][$method] ?? 0;
 					$is_protected = ( $curr_actor_role->isDescendantOf(new ActorRole($curr_role)) ) ? ' readonly' : '';
 					?>
@@ -95,6 +98,7 @@ $role_options = $this->get("role_options");
 						<div class="col-1 table-col text-nowrap"></div>
 						<div class="col table-col text-nowrap"></div>
 						<div class="col-2 table-col text-nowrap"><?= $method ?></div>
+						<div class="col-2 table-col text-nowrap"><?= $url ?></div>
 						<div class="col-2">
 							<label>
 								<select name="role[<?= $path ?>][controller][<?= $controller_name ?>][method][<?= $method ?>]"<?= $is_disabled ?>>

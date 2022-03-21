@@ -25,15 +25,28 @@ class ActorController extends AController {
 	 */
 	public function init( Router $router ): void {
 		// Add routes to router
-		$router->addRoute("/actors", __CLASS__);
-		$router->addRoute("/actors/{actor}", __CLASS__, "update");
-		$router->addRoute("/actors/create", __CLASS__, "create");
-		$router->addRoute("/actors/roles/{actor}", __CLASS__, "roles");
+        $routes = $this->getRoutes();
+        foreach( $routes as $url => $route ) {
+            $router->addRoute($url, $route["controller"], $route["method"] );
+        }
 
 		// Add MenuItems to the Menu
 		$this::$_menu->insertMenuItem(200, null, "Benutzer", "/actors");
         $this::$_menu->insertMenuItem(210, 200, "Benutzer erstellen", "/actors/create");
 	}
+
+    /**
+     * @return array[]
+     * @see \system\interfaces\IController
+     */
+    public function getRoutes(): array {
+        return array(
+            "/actors" => array("controller" => __CLASS__, "method" => "index"),
+            "/actors/{actor}" => array("controller" => __CLASS__, "method" => "update"),
+            "/actors/create" => array("controller" => __CLASS__, "method" => "create"),
+            "/actors/roles/{actor}" => array("controller" => __CLASS__, "method" => "roles")
+        );
+    }
 
 	/**
 	 * @return AResponse

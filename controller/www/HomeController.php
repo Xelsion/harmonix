@@ -14,16 +14,35 @@ use system\classes\Template;
  */
 class HomeController extends AController {
 
-	public function __construct() {
-
-	}
-
+    /**
+     * @param Router $router
+     * @see \system\interfaces\IController
+     */
 	public function init( Router $router ): void {
-		$router->addRoute("/", __CLASS__);
+        // Add routes to router
+        $routes = $this->getRoutes();
+        foreach( $routes as $url => $route ) {
+            $router->addRoute($url, $route["controller"], $route["method"] );
+        }
 
+        // Add MenuItems to the Menu
         $this::$_menu->insertMenuItem(100, null, "Home", "/");
 	}
 
+    /**
+     * @return array[]
+     * @see \system\interfaces\IController
+     */
+    public function getRoutes(): array {
+        return array(
+            "/" => array("controller" => __CLASS__, "method" => "index")
+        );
+    }
+
+    /**
+     * @return AResponse
+     * @see \system\interfaces\IController
+     */
 	public function index(): AResponse {
 		$response = new ResponseHTML();
 		$template = new Template(PATH_VIEWS."template.html");
@@ -35,4 +54,6 @@ class HomeController extends AController {
 	public function __toString(): string {
 		return __CLASS__;
 	}
+
+
 }

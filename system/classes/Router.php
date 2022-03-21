@@ -268,26 +268,23 @@ class Router {
 			// do we have a file?
 			if( !is_dir($directory.$file) ) {
 				$class_file = $directory.$file;
-				// Get the namespace of this path
+
+                // Get the namespace of this path
 				$class = Path2Namespace($class_file);
+
+                // get the controller path
+                $pattern = "/^controller\\".DIRECTORY_SEPARATOR."(.*)\\".DIRECTORY_SEPARATOR."/";
+                preg_match($pattern, $class, $matches);
+                $domain = $matches[1];
+
 				// get an instance of this class
 				$controller = new $class();
 				if( $controller instanceof AController ) {
-					// It's a valid Controller so initialize its routes
-					$methods = get_class_methods($controller);
-					foreach( $methods as $method ) {
-						try {
-							$reflection = new ReflectionMethod($controller, $method);
-							$return_type = $reflection->getReturnType();
-							if( !is_null($return_type) && $return_type->getName() === "system\abstracts\AResponse" ) {
-								$pattern = "/^controller\\".DIRECTORY_SEPARATOR."(.*)\\".DIRECTORY_SEPARATOR."/";
-								preg_match($pattern, $class, $matches);
-								$results[$matches[1]][$class][] = $method;
-							}
-						} catch( ReflectionException $e ) {
-							throw new RuntimeException($e->getMessage());
-						}
-					}
+                    $routes = $controller->getRoutes();
+
+                    foreach( $routes as $url => $route ) {
+                        $results[$domain][$route["controller"]][$route["method"]] = $url;
+                    }
 				}
 			} else if( $file !== "." && $file !== ".." && is_dir($directory.DIRECTORY_SEPARATOR.$file) ) {
 				// Let's go through this subdirectory

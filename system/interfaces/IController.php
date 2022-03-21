@@ -24,6 +24,23 @@ interface IController {
 	 */
 	public function init( Router $router ): void;
 
+    /**
+     * Returns all routes of the controller in an array.
+     * The array structure is like:
+     * <p>
+     * [
+     *      url => array[
+     *          "controller" => the controller class,
+     *          "method" => the controller method
+     *      ],
+     *      ...
+     * ]
+     * </p>
+     *
+     * @return array
+     */
+    public function getRoutes() : array;
+
 	/**
 	 * The default method that will be called if no
 	 * specific method was requested by the request.

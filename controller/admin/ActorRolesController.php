@@ -22,15 +22,28 @@ class ActorRolesController extends AController {
 	 * @see \system\interfaces\IController
 	 */
 	public function init( Router $router ): void {
-		// Add routes to router
-		$router->addRoute("/actor-roles", __CLASS__);
-		$router->addRoute("/actor-roles/{role}", __CLASS__, "update");
-		$router->addRoute("/actor-roles/create", __CLASS__, "create");
+        // Add routes to router
+        $routes = $this->getRoutes();
+        foreach( $routes as $url => $route ) {
+            $router->addRoute($url, $route["controller"], $route["method"] );
+        }
 
 		// Add MenuItems to the Menu
 		$this::$_menu->insertMenuItem(300, null, "Rollen", "/actor-roles");
         $this::$_menu->insertMenuItem(310, 300, "Rolle erstellen", "/actor-roles/create");
 	}
+
+    /**
+     * @return array[]
+     * @see \system\interfaces\IController
+     */
+    public function getRoutes(): array {
+        return array(
+            "/actor-roles" => array("controller" => __CLASS__, "method" => "index"),
+            "/actor-roles/{role}" => array("controller" => __CLASS__, "method" => "update"),
+            "/actor-roles/create" => array("controller" => __CLASS__, "method" => "create")
+        );
+    }
 
 	/**
 	 * @see \system\interfaces\IController
