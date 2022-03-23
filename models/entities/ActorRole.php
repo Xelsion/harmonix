@@ -50,7 +50,7 @@ class ActorRole extends AEntityTreeNode {
 	 * @return string
 	 * @see \system\interfaces\IEntity
 	 */
-	public function create(): ?string {
+	public function create(): void {
 		try {
 			$pdo = Core::$_connection_manager->getConnection("mvc");
 			$sql = "INSERT INTO actor_roles (child_of, name, rights_all, rights_group, rights_own) VALUES (:child_of, :name, :rights_all, :rights_group, :rights_own)";
@@ -61,11 +61,10 @@ class ActorRole extends AEntityTreeNode {
 			$stmt->bindParam(':rights_group', $this->rights_group, PDO::PARAM_INT);
 			$stmt->bindParam(':rights_own', $this->rights_own, PDO::PARAM_INT);
 			$stmt->execute();
-			$insert_id = $pdo->lastInsertId();
+			$this->id = $pdo->lastInsertId();
 		} catch( PDOException $e ) {
 			throw new RuntimeException($e->getMessage());
 		}
-		return $insert_id;
 	}
 
 	/**

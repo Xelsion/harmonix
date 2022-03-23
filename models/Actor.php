@@ -47,15 +47,15 @@ class Actor extends entities\Actor {
 		}
 
 		$columns = array();
-		foreach( $conditions as $condition ) {
-			$columns[] = $condition[0].$condition[1].":".$condition[0];
+		foreach( $conditions as $i => $condition ) {
+			$columns[] = $condition[0].$condition[1].":".$i;
 		}
 
 		$pdo = Core::$_connection_manager->getConnection("mvc");
 		$sql = "SELECT * FROM actors WHERE ".implode(" AND ", $columns);
 		$stmt = $pdo->prepare($sql);
-		foreach( $conditions as $condition ) {
-			$stmt->bindParam(":".$condition[0], $condition[2], static::getParamType($condition[2]));
+		foreach( $conditions as $i => $condition ) {
+			$stmt->bindParam(":".$i, $condition[2], static::getParamType($condition[2]));
 		}
 		$stmt->execute();
 		return $stmt->fetchAll(PDO::FETCH_CLASS, __CLASS__);

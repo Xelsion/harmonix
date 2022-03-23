@@ -15,7 +15,7 @@ interface IEntity {
 	 * Creates an entry in the database with the current object
 	 * and tries to return the id of the new entry
 	 */
-	public function create();
+	public function create(): void;
 
 	/**
 	 * Updates an entry in the database with the current object

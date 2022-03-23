@@ -48,10 +48,10 @@ class Actor extends AEntity {
 	}
 
 	/**
-	 * @return int
+	 *
 	 * @see \system\interfaces\IEntity
 	 */
-	public function create(): int {
+	public function create(): void {
 		try {
 			$pdo = Core::$_connection_manager->getConnection("mvc");
 			$sql = "INSERT INTO actors (email, password, first_name, last_name, login_fails, login_disabled) VALUES (:email, :password, :first_name, :last_name, :login_fails, :login_disabled)";
@@ -64,12 +64,10 @@ class Actor extends AEntity {
 			$stmt->bindParam(':login_fails', $this->login_fails, PDO::PARAM_INT);
 			$stmt->bindParam(':login_disabled', $this->login_disabled, PDO::PARAM_INT);
 			$stmt->execute();
-			$insert_id = $pdo->lastInsertId();
-			$this->id = $insert_id;
+			$this->id = $pdo->lastInsertId();
 		} catch( PDOException $e ) {
 			throw new RuntimeException($e->getMessage());
 		}
-		return $insert_id;
 	}
 
 	/**

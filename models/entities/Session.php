@@ -44,7 +44,7 @@ class Session extends AEntity {
 	 * @return string
 	 * @see \system\interfaces\IEntity
 	 */
-	public function create(): string {
+	public function create(): void {
 		try {
 			$pdo = Core::$_connection_manager->getConnection("mvc");
 			$sql = "INSERT INTO sessions (id, actor_id, expired) VALUES (:id, :actor_id, :expired)";
@@ -53,7 +53,6 @@ class Session extends AEntity {
 			$stmt->bindParam(':actor_id', $this->actor_id, PDO::PARAM_INT);
 			$stmt->bindParam(':expired', $this->expired, PDO::PARAM_STR);
 			$stmt->execute();
-			return $this->id;
 		} catch( PDOException $e ) {
 			throw new RuntimeException($e->getMessage());
 		}

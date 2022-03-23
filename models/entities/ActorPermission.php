@@ -43,10 +43,9 @@ class ActorPermission extends AEntity {
 	}
 
 	/**
-	 * @return int
 	 * @see \system\interfaces\IEntity
 	 */
-	public function create(): ?int {
+	public function create(): void {
 		try {
 			$pdo = Core::$_connection_manager->getConnection("mvc");
 			$sql = "INSERT INTO actor_permissions (actor_id, role_id, path, controller, method) VALUES (:actor_id, :role_id, :path, :controller, :method)";
@@ -57,11 +56,9 @@ class ActorPermission extends AEntity {
 			$stmt->bindParam(':controller', $this->controller, PDO::PARAM_STR);
 			$stmt->bindParam(':method', $this->method, PDO::PARAM_STR);
 			$stmt->execute();
-			$insert_id = $pdo->lastInsertId();
 		} catch( PDOException $e ) {
 			throw new RuntimeException($e->getMessage());
 		}
-		return $insert_id;
 	}
 
 	/**
