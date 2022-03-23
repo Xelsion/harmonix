@@ -58,9 +58,9 @@ class Session extends entities\Session {
 	 */
 	public function login( string $email, string $password ): Actor {
 		$pdo = Core::$_connection_manager->getConnection("mvc");
-		$stmt = $pdo->prepare("SELECT * FROM actors WHERE email=:email AND deleted IS NULL");
-		$stmt->bindParam(":email", $email, PDO::PARAM_STR);
-		$stmt->execute();
+		$pdo->prepare("SELECT * FROM actors WHERE email=:email AND deleted IS NULL");
+		$pdo->bindParam(":email", $email, PDO::PARAM_STR);
+		$stmt = $pdo->execute();
 		if( $stmt->rowCount() === 1 ) {
 			$actor = $stmt->fetchObject(Actor::class);
 			if( $actor->login_disabled ) {

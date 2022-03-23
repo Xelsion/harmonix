@@ -32,11 +32,10 @@ class Session extends AEntity {
 	public function __construct() {
 		if( isset($_COOKIE["session"]) ) {
 			$pdo = Core::$_connection_manager->getConnection("mvc");
-			$stmt = $pdo->prepare("SELECT * FROM sessions WHERE id=:id");
-			$stmt->bindParam(":id", $_COOKIE["session"], PDO::PARAM_STR);
-			$stmt->setFetchMode(PDO::FETCH_INTO, $this);
-			$stmt->execute();
-			$stmt->fetch();
+			$pdo->prepare("SELECT * FROM sessions WHERE id=:id");
+			$pdo->bindParam(":id", $_COOKIE["session"]);
+			$pdo->setFetchMode(PDO::FETCH_INTO, $this);
+			$pdo->execute()->fetch();
 		}
 	}
 
@@ -48,11 +47,11 @@ class Session extends AEntity {
 		try {
 			$pdo = Core::$_connection_manager->getConnection("mvc");
 			$sql = "INSERT INTO sessions (id, actor_id, expired) VALUES (:id, :actor_id, :expired)";
-			$stmt = $pdo->prepare($sql);
-			$stmt->bindParam(':id', $this->id, PDO::PARAM_STR);
-			$stmt->bindParam(':actor_id', $this->actor_id, PDO::PARAM_INT);
-			$stmt->bindParam(':expired', $this->expired, PDO::PARAM_STR);
-			$stmt->execute();
+			$pdo->prepare($sql);
+			$pdo->bindParam(':id', $this->id, PDO::PARAM_STR);
+			$pdo->bindParam(':actor_id', $this->actor_id, PDO::PARAM_INT);
+			$pdo->bindParam(':expired', $this->expired, PDO::PARAM_STR);
+			$pdo->execute();
 		} catch( PDOException $e ) {
 			throw new RuntimeException($e->getMessage());
 		}
@@ -65,11 +64,11 @@ class Session extends AEntity {
 		try {
 			$pdo = Core::$_connection_manager->getConnection("mvc");
 			$sql = "UPDATE sessions SET actor_id=:actor_id, expired=:expired WHERE id=:id";
-			$stmt = $pdo->prepare($sql);
-			$stmt->bindParam(':id', $this->id, PDO::PARAM_STR);
-			$stmt->bindParam(':actor_id', $this->actor_id, PDO::PARAM_INT);
-			$stmt->bindParam(':expired', $this->expired, PDO::PARAM_STR);
-			$stmt->execute();
+			$pdo->prepare($sql);
+			$pdo->bindParam(':id', $this->id, PDO::PARAM_STR);
+			$pdo->bindParam(':actor_id', $this->actor_id, PDO::PARAM_INT);
+			$pdo->bindParam(':expired', $this->expired, PDO::PARAM_STR);
+			$pdo->execute();
 		} catch( PDOException $e ) {
 			throw new RuntimeException($e->getMessage());
 		}
@@ -83,9 +82,9 @@ class Session extends AEntity {
 		if( $this->id !== "" ) {
 			try {
 				$pdo = Core::$_connection_manager->getConnection("mvc");
-				$stmt = $pdo->prepare("DELETE FROM sessions WHERE id=:id");
-				$stmt->bindParam(":id", $this->id, PDO::PARAM_INT);
-				$stmt->execute();
+				$pdo->prepare("DELETE FROM sessions WHERE id=:id");
+				$pdo->bindParam(":id", $this->id, PDO::PARAM_INT);
+				$pdo->execute();
 				return true;
 			} catch( PDOException $e ) {
 				throw new RuntimeException($e->getMessage());

@@ -5,6 +5,7 @@ namespace system\manager;
 use PDO;
 use PDOException;
 use RuntimeException;
+use system\classes\PDOConnection;
 
 /**
  * This class will handle all database connections
@@ -69,7 +70,7 @@ class ConnectionManager {
 			$conn_array = $this->_connections[$name];
 			try {
 				// try to establish the connection
-				$conn = new PDO($conn_array["dns"], $conn_array["user"], $conn_array["pass"], $this->options);
+				$conn = new PDOConnection($conn_array["dns"], $conn_array["user"], $conn_array["pass"], $this->options);
 				// add it to the active connections
 				$this->_active_connections[$name] = $conn;
 				return $conn;

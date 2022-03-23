@@ -54,12 +54,11 @@ class ActorPermission extends entities\ActorPermission {
 
 		$pdo = Core::$_connection_manager->getConnection("mvc");
 		$sql = "SELECT * FROM actor_permissions WHERE ".implode(" AND ", $columns);
-		$stmt = $pdo->prepare($sql);
+		$pdo->prepare($sql);
 		foreach( $conditions as $i => $condition ) {
-			$stmt->bindParam(":".$i, $condition[2], static::getParamType($condition[2]));
+			$pdo->bindParam(":".$i, $condition[2], static::getParamType($condition[2]));
 		}
-		$stmt->execute();
-		return $stmt->fetchAll(PDO::FETCH_CLASS, __CLASS__);
+		return $pdo->execute()->fetchAll(PDO::FETCH_CLASS, __CLASS__);
 	}
 
 	/**
@@ -75,14 +74,13 @@ class ActorPermission extends entities\ActorPermission {
 	public static function findAll( int $index = 0, int $limit = 0 ) {
 		$pdo = Core::$_connection_manager->getConnection("mvc");
 		if( $limit > 0 ) {
-			$stmt = $pdo->prepare("SELECT * FROM actor_permissions LIMIT :index, :max");
-			$stmt->bindParam("index", $index, PDO::PARAM_INT);
-			$stmt->bindParam("max", $limit, PDO::PARAM_INT);
+			$pdo->prepare("SELECT * FROM actor_permissions LIMIT :index, :max");
+			$pdo->bindParam("index", $index, PDO::PARAM_INT);
+			$pdo->bindParam("max", $limit, PDO::PARAM_INT);
 		} else {
-			$stmt = $pdo->prepare("SELECT * FROM actor_permissions");
+			$pdo->prepare("SELECT * FROM actor_permissions");
 		}
-		$stmt->execute();
-		return $stmt->fetchAll(PDO::FETCH_CLASS, __CLASS__);
+		return $pdo->execute()->fetchAll(PDO::FETCH_CLASS, __CLASS__);
 	}
 
 	/**

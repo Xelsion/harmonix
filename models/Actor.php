@@ -53,12 +53,11 @@ class Actor extends entities\Actor {
 
 		$pdo = Core::$_connection_manager->getConnection("mvc");
 		$sql = "SELECT * FROM actors WHERE ".implode(" AND ", $columns);
-		$stmt = $pdo->prepare($sql);
+		$pdo->prepare($sql);
 		foreach( $conditions as $i => $condition ) {
-			$stmt->bindParam(":".$i, $condition[2], static::getParamType($condition[2]));
+			$pdo->bindParam(":".$i, $condition[2], static::getParamType($condition[2]));
 		}
-		$stmt->execute();
-		return $stmt->fetchAll(PDO::FETCH_CLASS, __CLASS__);
+		return $pdo->execute()->fetchAll(PDO::FETCH_CLASS, __CLASS__);
 	}
 
 	/**
@@ -74,14 +73,13 @@ class Actor extends entities\Actor {
 	public static function findAll( int $index = 0, int $limit = 0 ): ?array {
 		$pdo = Core::$_connection_manager->getConnection("mvc");
 		if( $limit > 0 ) {
-			$stmt = $pdo->prepare("SELECT * FROM actors LIMIT :index, :max");
-			$stmt->bindParam("index", $index, PDO::PARAM_INT);
-			$stmt->bindParam("max", $limit, PDO::PARAM_INT);
+			$pdo->prepare("SELECT * FROM actors LIMIT :index, :max");
+			$pdo->bindParam("index", $index, PDO::PARAM_INT);
+			$pdo->bindParam("max", $limit, PDO::PARAM_INT);
 		} else {
-			$stmt = $pdo->prepare("SELECT * FROM actors");
+			$pdo->prepare("SELECT * FROM actors");
 		}
-		$stmt->execute();
-		return $stmt->fetchAll(PDO::FETCH_CLASS, __CLASS__);
+		return $pdo->execute()->fetchAll(PDO::FETCH_CLASS, __CLASS__);
 	}
 
 	/**

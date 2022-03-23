@@ -57,12 +57,11 @@ class ActorRole extends entities\ActorRole {
 
 		$pdo = Core::$_connection_manager->getConnection("mvc");
 		$sql = "SELECT * FROM actor_roles WHERE ".implode(" AND ", $columns);
-		$stmt = $pdo->prepare($sql);
+		$pdo->prepare($sql);
 		foreach( $conditions as $i => $condition ) {
-			$stmt->bindParam(":".$i, $condition[2], static::getParamType($condition[2]));
+			$pdo->bindParam(":".$i, $condition[2], static::getParamType($condition[2]));
 		}
-		$stmt->execute();
-		return $stmt->fetchAll(PDO::FETCH_CLASS, __CLASS__);
+		return $pdo->execute()->fetchAll(PDO::FETCH_CLASS, __CLASS__);
 	}
 
 	/**
@@ -78,14 +77,13 @@ class ActorRole extends entities\ActorRole {
 	public static function findAll( int $index = 0, int $limit = 0 ) {
 		$pdo = Core::$_connection_manager->getConnection("mvc");
 		if( $limit > 0 ) {
-			$stmt = $pdo->prepare("SELECT * FROM actor_roles LIMIT :index, :max");
-			$stmt->bindParam("index", $index, PDO::PARAM_INT);
-			$stmt->bindParam("max", $limit, PDO::PARAM_INT);
+			$pdo->prepare("SELECT * FROM actor_roles LIMIT :index, :max");
+			$pdo->bindParam("index", $index, PDO::PARAM_INT);
+			$pdo->bindParam("max", $limit, PDO::PARAM_INT);
 		} else {
-			$stmt = $pdo->prepare("SELECT * FROM actor_roles");
+			$pdo->prepare("SELECT * FROM actor_roles");
 		}
-		$stmt->execute();
-		return $stmt->fetchAll(PDO::FETCH_CLASS, __CLASS__);
+		return $pdo->execute()->fetchAll(PDO::FETCH_CLASS, __CLASS__);
 	}
 
 	/**
@@ -109,10 +107,9 @@ class ActorRole extends entities\ActorRole {
 		$children = array();
 		try {
 			$pdo = Core::$_connection_manager->getConnection("mvc");
-			$stmt = $pdo->prepare("SELECT * FROM actor_roles WHERE child_of=:id");
-			$stmt->bindParam(":id", $this->id, PDO::PARAM_INT);
-			$stmt->execute();
-            $results = $stmt->fetchAll(PDO::FETCH_CLASS, __CLASS__);
+			$pdo->prepare("SELECT * FROM actor_roles WHERE child_of=:id");
+			$pdo->bindParam(":id", $this->id, PDO::PARAM_INT);
+			$results = $pdo->execute()->fetchAll(PDO::FETCH_CLASS, __CLASS__);
 			foreach( $results as $child ) {
 				$children[] = $child;
 			}

@@ -34,11 +34,10 @@ class ActorPermission extends AEntity {
 	public function __construct( int $id = 0 ) {
 		if( $id > 0 ) {
 			$pdo = Core::$_connection_manager->getConnection("mvc");
-			$stmt = $pdo->prepare("SELECT * FROM actor_permissions WHERE id=:id");
-			$stmt->bindParam(":id", $id, PDO::PARAM_INT);
-			$stmt->setFetchMode(PDO::FETCH_INTO, $this);
-			$stmt->execute();
-			$stmt->fetch();
+			$pdo->prepare("SELECT * FROM actor_permissions WHERE id=:id");
+			$pdo->bindParam(":id", $id, PDO::PARAM_INT);
+			$pdo->setFetchMode(PDO::FETCH_INTO, $this);
+			$pdo->execute()->fetch();
 		}
 	}
 
@@ -49,13 +48,13 @@ class ActorPermission extends AEntity {
 		try {
 			$pdo = Core::$_connection_manager->getConnection("mvc");
 			$sql = "INSERT INTO actor_permissions (actor_id, role_id, path, controller, method) VALUES (:actor_id, :role_id, :path, :controller, :method)";
-			$stmt = $pdo->prepare($sql);
-			$stmt->bindParam(':actor_id', $this->actor_id, PDO::PARAM_INT);
-			$stmt->bindParam(':role_id', $this->role_id, PDO::PARAM_INT);
-			$stmt->bindParam(':path', $this->path, PDO::PARAM_STR);
-			$stmt->bindParam(':controller', $this->controller, PDO::PARAM_STR);
-			$stmt->bindParam(':method', $this->method, PDO::PARAM_STR);
-			$stmt->execute();
+			$pdo->prepare($sql);
+			$pdo->bindParam(':actor_id', $this->actor_id, PDO::PARAM_INT);
+			$pdo->bindParam(':role_id', $this->role_id, PDO::PARAM_INT);
+			$pdo->bindParam(':path', $this->path, PDO::PARAM_STR);
+			$pdo->bindParam(':controller', $this->controller, PDO::PARAM_STR);
+			$pdo->bindParam(':method', $this->method, PDO::PARAM_STR);
+			$pdo->execute();
 		} catch( PDOException $e ) {
 			throw new RuntimeException($e->getMessage());
 		}
@@ -76,9 +75,9 @@ class ActorPermission extends AEntity {
 		$pdo = Core::$_connection_manager->getConnection("mvc");
 		if( $this->actor_id > 0 ) {
 			try {
-				$stmt = $pdo->prepare("DELETE FROM actor_permissions WHERE actor_id=:actor_id");
-				$stmt->bindParam(':actor_id', $this->actor_id, PDO::PARAM_INT);
-				$stmt->execute();
+				$pdo->prepare("DELETE FROM actor_permissions WHERE actor_id=:actor_id");
+				$pdo->bindParam(':actor_id', $this->actor_id, PDO::PARAM_INT);
+				$pdo->execute();
 				return true;
 			} catch( PDOException $e ) {
 				throw new RuntimeException($e->getMessage());
