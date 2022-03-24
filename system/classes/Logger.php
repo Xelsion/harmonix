@@ -54,7 +54,10 @@ class Logger extends File {
 					}
 				}
 				// Add the trace to the log string
-				$log .= sprintf("\t=> Trace:[%d] %s%s%s(%s)\n", $trace["line"], $trace["class"], $trace["type"], $trace["function"], implode(", ", $args));
+				$log .= sprintf("\t=>\tTrace:\n\t\t[FILE]: %s\n", $trace["file"]);
+				$log .= sprintf("\t\t[LIME]: %d\n", $trace["line"]);
+				$log .= sprintf("\t\t[METHOD]: %s%s%s\n", $trace["class"], $trace["type"], $trace["function"]);
+				$log .= sprintf("\t\t[ARGS]: %s\n", json_encode($trace["args"], JSON_THROW_ON_ERROR));
 			}
 		}
 

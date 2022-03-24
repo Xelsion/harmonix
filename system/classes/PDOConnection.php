@@ -78,7 +78,7 @@ class PDOConnection extends PDO {
 		try {
 			$this->stmt->execute();
 		} catch( PDOException $e ) {
-			$this->logger->log($e->getFile(), $e->getLine(), $e->getMessage()."\n".$this->stmt->queryString, $e->getTrace());
+			$this->logger->log($e->getFile(), $e->getLine(), $e->getMessage()."\n\t=> [SQL] ".$this->stmt->queryString, $e->getTrace());
 		}
 		return $this->stmt;
 	}
