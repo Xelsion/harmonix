@@ -33,7 +33,7 @@ class Session extends entities\Session {
 			try {
 				return $this->login($_POST["email"], $_POST["password"]);
 			} catch( Exception $e ) {
-				throw new RuntimeException($e->getMessage());
+				throw new RuntimeException($e->getMessage(), $e->getCode(), $e);
 			}
 		}
 

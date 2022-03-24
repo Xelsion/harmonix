@@ -108,7 +108,7 @@ class Process {
             }
 		} catch( Exception $e ) {
 			// Pass all exceptions to the index.php
-			throw new RuntimeException($e->getMessage());
+			throw new RuntimeException($e->getMessage(), $e->getCode(), $e);
 		}
 	}
 

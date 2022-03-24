@@ -15,6 +15,10 @@ try {
 	echo $process->getResult();
 	ob_end_flush();
 } catch( Exception $e ) {
-	echo "Error: Please check the Log Files for mor information";
-	$runtime_logger->log($e->getFile(), $e->getLine(), $e->getMessage(), $e->getTrace());
+	try {
+		echo "Error: Please check the Log Files for mor information";
+		$runtime_logger->log($e->getFile(), $e->getLine(), $e->getMessage(), $e->getTrace());
+	} catch( JsonException $e ) {
+		die($e->getMessage());
+	}
 }

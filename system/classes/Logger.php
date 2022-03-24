@@ -2,6 +2,7 @@
 
 namespace system\classes;
 
+use JsonException;
 use RuntimeException;
 use DateTime;
 
@@ -15,7 +16,7 @@ use DateTime;
 class Logger extends File {
 
 	// The log text format
-	private string $_log_line = "[%s]: [%s][%d]\n\t=> %s\n";
+	private string $_log_line = "[%s]: [%s][%d]\n\t=>\t%s\n";
 	private string $_log_type;
 
 	/**
@@ -37,6 +38,7 @@ class Logger extends File {
 	 * @param string $message
 	 * @param array $backtrace
 	 * @return bool
+	 * @throws JsonException
 	 */
 	public function log( string $file, int $line, string $message, array $backtrace = array() ): bool {
 		$ts = new DateTime();
@@ -54,10 +56,9 @@ class Logger extends File {
 					}
 				}
 				// Add the trace to the log string
-				$log .= sprintf("\t=>\tTrace:\n\t\t[FILE]: %s\n", $trace["file"]);
-				$log .= sprintf("\t\t[LIME]: %d\n", $trace["line"]);
+				$log .= sprintf("\t=>\tTrace: %s Line %d\n", $trace["file"], $trace["line"]);
 				$log .= sprintf("\t\t[METHOD]: %s%s%s\n", $trace["class"], $trace["type"], $trace["function"]);
-				$log .= sprintf("\t\t[ARGS]: %s\n", json_encode($trace["args"], JSON_THROW_ON_ERROR));
+				$log .= sprintf("\t\t[ARGS]: %s\n", json_encode($args, JSON_THROW_ON_ERROR));
 			}
 		}
 

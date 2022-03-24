@@ -5,6 +5,7 @@ namespace system\classes;
 use PDO;
 use PDOException;
 use PDOStatement;
+use RuntimeException;
 
 /**
  * The PDOConnection
@@ -78,7 +79,12 @@ class PDOConnection extends PDO {
 		try {
 			$this->stmt->execute();
 		} catch( PDOException $e ) {
-			$this->logger->log($e->getFile(), $e->getLine(), $e->getMessage()."\n\t=> [SQL] ".$this->stmt->queryString, $e->getTrace());
+			try {
+				$this->logger->log($e->getFile(), $e->getLine(), $e->getMessage()."\n\t=>\t[SQL] ".$this->stmt->queryString, $e->getTrace());
+			} catch( \JsonException $je ) {
+				throw new RuntimeException($je->getMessage(), (int)$je->getCode(), $je);
+			}
+			throw new RuntimeException($e->getMessage(), (int)$e->getCode(), $e);
 		}
 		return $this->stmt;
 	}

@@ -108,7 +108,7 @@ class Router {
 				$params = $this->getValidParameters($controller, $method, $request_parts);
 				return array( "controller" => $controller, "method" => $method, "params" => $params );
 			} catch( RuntimeException $e ) {
-				throw new RuntimeException($e->getMessage());
+				throw new RuntimeException($e->getMessage(), $e->getCode(), $e);
 			}
 		} else {
 			throw new RuntimeException("Router: There is no route for [".$request->getRequestUri()."]!");
@@ -221,7 +221,7 @@ class Router {
 			}
 			throw new RuntimeException("Router: Param count mismatch for method[".$controller."->".$method."]");
 		} catch( ReflectionException $e ) {
-			throw new RuntimeException($e->getMessage());
+			throw new RuntimeException($e->getMessage(), $e->getCode(), $e);
 		}
 	}
 
@@ -281,7 +281,6 @@ class Router {
 				$controller = new $class();
 				if( $controller instanceof AController ) {
                     $routes = $controller->getRoutes();
-
                     foreach( $routes as $url => $route ) {
                         $results[$domain][$route["controller"]][$route["method"]] = $url;
                     }
