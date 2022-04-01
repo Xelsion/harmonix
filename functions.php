@@ -21,8 +21,16 @@ function Path2Namespace( string $path ): string {
 	return $path;
 }
 
-function escaped_html( string $string ): string {
-	return htmlentities($string, ENT_QUOTES);
+function escaped_html( ?string $string ): ?string {
+    if( is_null($string) ) {
+        return null;
+    }
+    if( mb_detect_encoding($string) === "UTF-8") {
+        $string = utf8_decode($string);
+    }
+    $string = utf8_encode($string);
+    $string = htmlentities($string, ENT_HTML5, "UTF-8");
+    return $string;
 }
 
 function redirect( string $url ) {
