@@ -16,10 +16,9 @@ use system\classes\Template;
  */
 class HomeController extends AController {
 
-	/**
-	 * @param Router $router
-	 * @see \system\interfaces\IController
-	 */
+    /**
+     * @inheritDoc
+     */
 	public function init( Router $router ): void {
 		// Add routes to router
         $routes = $this->getRoutes();
@@ -32,8 +31,7 @@ class HomeController extends AController {
 	}
 
     /**
-     * @return array[]
-     * @see \system\interfaces\IController
+     * @inheritDoc
      */
     public function getRoutes(): array {
         return array(
@@ -41,10 +39,9 @@ class HomeController extends AController {
         );
     }
 
-	/**
-	 * @return AResponse
-	 * @see \system\interfaces\IController
-	 */
+    /**
+     * @inheritDoc
+     */
 	public function index(): AResponse {
 		$response = new ResponseHTML();
 		$template = new Template(PATH_VIEWS."template.html");

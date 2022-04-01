@@ -9,7 +9,7 @@ use system\classes\Template;
 use system\classes\responses\ResponseHTML;
 use models\Actor;
 use models\ActorRole;
-use models\ActorPermission;
+use models\AccessPermission;
 
 /**
  * @see \system\abstracts\AController
@@ -19,10 +19,9 @@ use models\ActorPermission;
  */
 class ActorController extends AController {
 
-	/**
-	 * @param Router $router
-	 * @see \system\interfaces\IController
-	 */
+    /**
+     * @inheritDoc
+     */
 	public function init( Router $router ): void {
 		// Add routes to router
         $routes = $this->getRoutes();
@@ -36,8 +35,7 @@ class ActorController extends AController {
 	}
 
     /**
-     * @return array[]
-     * @see \system\interfaces\IController
+     * @inheritDoc
      */
     public function getRoutes(): array {
         return array(
@@ -48,10 +46,9 @@ class ActorController extends AController {
         );
     }
 
-	/**
-	 * @return AResponse
-	 * @see \system\interfaces\IController
-	 */
+    /**
+     * @inheritDoc
+     */
 	public function index(): AResponse {
 		$response = new ResponseHTML();
 		$template = new Template(PATH_VIEWS."template.html");
@@ -85,12 +82,12 @@ class ActorController extends AController {
 		}
 
 		$role_options = ActorRole::findAll();
-		$actor_permissions = array();
+		$access_permissions = array();
 		$response = new ResponseHTML();
 		$template = new Template(PATH_VIEWS."template.html");
 		$template->set("navigation", $this::$_menu);
 		$template->set("role_options", $role_options);
-		$template->set("actor_permissions", $actor_permissions);
+		$template->set("access_permissions", $access_permissions);
 		$template->set("view", new Template(PATH_VIEWS."actor/create.html"));
 		$response->setOutput($template->parse());
 		return $response;
@@ -119,7 +116,7 @@ class ActorController extends AController {
 		$template = new Template(PATH_VIEWS."template.html");
 		$template->set("actor", $actor);
 		$template->set("navigation", $this::$_menu);
-		$template->set("view", new Template(PATH_VIEWS."actor/edit.html"));
+		$template->set("view", new Template(PATH_VIEWS."actor/types_edit.html"));
 		$response->setOutput($template->parse());
 		return $response;
 	}
@@ -141,7 +138,7 @@ class ActorController extends AController {
 		$template = new Template(PATH_VIEWS."template.html");
 
 		$role_options = ActorRole::findAll();
-		$actor_permissions = ActorPermission::find(array(
+		$access_permissions = AccessPermission::find(array(
 			array(
 				"actor_id",
 				"=",
@@ -152,12 +149,17 @@ class ActorController extends AController {
 		$template->set("navigation", $this::$_menu);
 		$template->set("actor", $actor);
 		$template->set("role_options", $role_options);
-		$template->set("actor_permissions", $actor_permissions);
+		$template->set("access_permissions", $access_permissions);
 		$template->set("view", new Template(PATH_VIEWS."actor/roles.html"));
 		$response->setOutput($template->parse());
 		return $response;
 	}
 
+    /**
+     * Checks if all required values are set
+     *
+     * @return bool
+     */
 	private function postIsValid(): bool {
 		$is_valid = true;
 		if( !isset($_POST["email"]) || $_POST["email"] === "" ) {
@@ -178,37 +180,41 @@ class ActorController extends AController {
 		return $is_valid;
 	}
 
+    /**
+     * Save the permissions for the given actor
+     *
+     * @param Actor $actor
+     * @return void
+     */
 	private function savePermissions( Actor $actor ): void {
 		if( $actor->id === 0 ) {
 			return;
 		}
 		$roles = array();
-		foreach( $_POST['role'] as $path => $entry_path ) {
-			if( (int)$entry_path["role"] > 0 ) {
-				$roles[$path][null][null] = $entry_path["role"];
+		foreach( $_POST['role'] as $domain => $entry_domain ) {
+			if( (int)$entry_domain["role"] > 0 ) {
+				$roles[$domain][null][null] = $entry_domain["role"];
 			}
-			foreach( $entry_path["controller"] as $controller => $entry_controller ) {
+			foreach( $entry_domain["controller"] as $controller => $entry_controller ) {
 				$controller = str_replace("-", "\\", $controller);
 				if( (int)$entry_controller["role"] > 0 ) {
-					$roles[$path][$controller][null] = $entry_controller["role"];
+					$roles[$domain][$controller][null] = $entry_controller["role"];
 				}
 				foreach( $entry_controller["method"] as $method => $role ) {
 					if( (int)$role > 0 ) {
-						$roles[$path][$controller][$method] = $role;
+						$roles[$domain][$controller][$method] = $role;
 					}
 				}
 			}
 		}
-		$actor_permission = new ActorPermission();
-		$actor_permission->actor_id = $actor->id;
-		$actor_permission->delete();
-		foreach( $roles as $path => $controllers ) {
+        $actor->deletePermissions();
+		foreach( $roles as $domain => $controllers ) {
 			foreach( $controllers as $controller => $methods ) {
 				foreach( $methods as $method => $role ) {
-					$actor_permission = new ActorPermission();
+					$actor_permission = new AccessPermission();
 					$actor_permission->actor_id = $actor->id;
 					$actor_permission->role_id = $role;
-					$actor_permission->path = $path;
+					$actor_permission->domain = $domain;
 					$actor_permission->controller = ( $controller !== '' ) ? $controller : null;
 					$actor_permission->method = ( $method !== '' ) ? $method : null;
 					$actor_permission->create();

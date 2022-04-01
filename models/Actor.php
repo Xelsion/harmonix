@@ -4,7 +4,10 @@ namespace models;
 
 use PDO;
 
+use PDOException;
+use RuntimeException;
 use system\Core;
+use system\helper\SqlHelper;
 
 /**
  * The Actor
@@ -27,58 +30,43 @@ class Actor extends entities\Actor {
 		parent::__construct($id);
 	}
 
-	/**
-	 * Returns all actors that mach the given conditions,
-	 * The condition array is build like this:
-	 * <p>
-	 * array {
-	 *    array { col, condition, value },
-	 *    ...
-	 * }
-	 * </p>
-	 * All conditions are AND related
-	 *
-	 * @param array $conditions
-	 * @return array|false|null
-	 */
-	public static function find( array $conditions ): ?array {
-		if( empty($conditions) ) {
-			return static::findAll();
-		}
-
-		$columns = array();
-		foreach( $conditions as $i => $condition ) {
-			$columns[] = $condition[0].$condition[1].":".$i;
-		}
-
-		$pdo = Core::$_connection_manager->getConnection("mvc");
-		$sql = "SELECT * FROM actors WHERE ".implode(" AND ", $columns);
-		$pdo->prepare($sql);
-		foreach( $conditions as $i => $condition ) {
-			$pdo->bindParam(":".$i, $condition[2], static::getParamType($condition[2]));
-		}
+    /**
+     * Returns all actors that mach the given conditions,
+     * The condition array is build like this:
+     * <p>
+     * array {
+     *    array { col, condition, value },
+     *    ...
+     * }
+     * </p>
+     * All conditions are AND related
+     *
+     * @param array $conditions
+     * @param string|null $order
+     * @param string|null $direction
+     * @param int $limit
+     * @param int $page
+     * @return array|false|null
+     */
+	public static function find( array $conditions, ?string $order = "", ?string $direction = "asc", int $limit = 0, int $page = 1 ): ?array {
+		$pdo = SqlHelper::findIn("mvc", "actors", $conditions, $order, $direction, $limit, $page);
 		return $pdo->execute()->fetchAll(PDO::FETCH_CLASS, __CLASS__);
 	}
 
-	/**
-	 * Returns all actors
-	 * If limit is greater than 0 the query will return
-	 * that many results starting at index.
-	 * Returns false if an error occurs
-	 *
-	 * @param int $index
-	 * @param int $limit
-	 * @return array|false
-	 */
-	public static function findAll( int $index = 0, int $limit = 0 ): ?array {
-		$pdo = Core::$_connection_manager->getConnection("mvc");
-		if( $limit > 0 ) {
-			$pdo->prepare("SELECT * FROM actors LIMIT :index, :max");
-			$pdo->bindParam("index", $index, PDO::PARAM_INT);
-			$pdo->bindParam("max", $limit, PDO::PARAM_INT);
-		} else {
-			$pdo->prepare("SELECT * FROM actors");
-		}
+    /**
+     * Returns all actors
+     * If limit is greater than 0 the query will return
+     * that many results starting at index.
+     * Returns false if an error occurs
+     *
+     * @param string|null $order
+     * @param string|null $direction
+     * @param int $limit
+     * @param int $page
+     * @return array|false
+     */
+	public static function findAll( ?string $order = "", ?string $direction = "asc", int $limit = 0, int $page = 1 ): ?array {
+		$pdo = SqlHelper::findAllIn("mvc", "actors", $order, $direction, $limit, $page);
 		return $pdo->execute()->fetchAll(PDO::FETCH_CLASS, __CLASS__);
 	}
 
@@ -123,11 +111,26 @@ class Actor extends entities\Actor {
 		return new ActorRole();
 	}
 
+    public function deletePermissions() {
+        $pdo = Core::$_connection_manager->getConnection("mvc");
+        if( $this->id > 0 ) {
+            try {
+                $pdo->prepare("DELETE FROM access_permissions WHERE actor_id=:actor_id");
+                $pdo->bindParam(':actor_id', $this->id, PDO::PARAM_INT);
+                $pdo->execute();
+                return true;
+            } catch( PDOException $e ) {
+                throw new RuntimeException($e->getMessage());
+            }
+        }
+    }
+
+
 	/**
 	 * Collects all permission for this user
 	 */
 	private function initPermission(): void {
-		$permissions = ActorPermission::find(array(
+		$permissions = AccessPermission::find(array(
 			array(
 				"actor_id",
 				"=",
@@ -136,7 +139,7 @@ class Actor extends entities\Actor {
 		));
 
 		foreach( $permissions as $permission ) {
-			$this->_permissions[$permission->path][$permission->controller][$permission->method] = $permission->getRole();
+			$this->_permissions[$permission->domain][$permission->controller][$permission->method] = $permission->getRole();
 		}
 	}
 

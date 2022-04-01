@@ -1,0 +1,31 @@
+<?php
+global $lang;
+$this->set("title", "Zugriffstypen");
+$type_list = $this->get("type_list");
+?>
+<div class="container-fluid">
+	<h1>Zugriffstypen</h1>
+	<table class="table table-dark table-striped">
+		<tr>
+			<th>ID</th>
+			<th class="col-md-2">Name</th>
+			<th>incl. gleiche Obergruppe</th>
+			<th>incl. direkter Untergruppen</th>
+			<th>incl. aller Untergruppen</th>
+			<th class="col-md-2">Optionen</th>
+		</tr>
+		<?php foreach( $type_list as $type ): ?>
+			<tr>
+				<td><?= escaped_html($type->id) ?></td>
+				<td><?= escaped_html($type->name) ?></td>
+				<td><?= escaped_html($type->include_siblings) ?></td>
+				<td><?= escaped_html($type->include_children) ?></td>
+				<td><?= escaped_html($type->include_descendants) ?></td>
+				<td class="text-nowrap">
+					<a href="/restrictions/types/<?= $type->id ?>" class="button button-default"><?= escaped_html($lang["edit"]) ?></a>
+					<a href="/restrictions/types/delete/<?= $type->id ?>" class="button button-negativ"><?= escaped_html($lang["delete"]) ?></a>
+				</td>
+			</tr>
+		<?php endforeach; ?>
+	</table>
+</div>

@@ -7,6 +7,7 @@ use PDOException;
 use RuntimeException;
 
 use system\Core;
+use system\helper\SqlHelper;
 
 /**
  * The Actor Role
@@ -31,60 +32,45 @@ class ActorRole extends entities\ActorRole {
 		parent::__construct($id);
 	}
 
-	/**
-	 * Returns all actor roles that mach the given conditions,
-	 * The condition array is build like this:
-	 * <p>
-	 * array {
-	 *    array { col, condition, value },
-	 *    ...
-	 * }
-	 * </p>
-	 * All conditions are AND related
-	 *
-	 * @param array $conditions
-	 * @return array|false|null
-	 */
-	public static function find( array $conditions ) {
-		if( empty($conditions) ) {
-			return static::findAll();
-		}
+    /**
+     * Returns all actor roles that mach the given conditions,
+     * The condition array is build like this:
+     * <p>
+     * array {
+     *    array { col, condition, value },
+     *    ...
+     * }
+     * </p>
+     * All conditions are AND related
+     *
+     * @param array $conditions
+     * @param string|null $order
+     * @param string|null $direction
+     * @param int $limit
+     * @param int $page
+     * @return array|false|null
+     */
+    public static function find( array $conditions, ?string $order = "", ?string $direction = "asc", int $limit = 0, int $page = 1 ) : ?array {
+        $pdo = SqlHelper::findIn("mvc", "actor_roles", $conditions, $order, $direction, $limit, $page);
+        return $pdo->execute()->fetchAll(PDO::FETCH_CLASS, __CLASS__);
+    }
 
-		$columns = array();
-		foreach( $conditions as $i => $condition ) {
-			$columns[] = $condition[0].$condition[1].":".$i;
-		}
-
-		$pdo = Core::$_connection_manager->getConnection("mvc");
-		$sql = "SELECT * FROM actor_roles WHERE ".implode(" AND ", $columns);
-		$pdo->prepare($sql);
-		foreach( $conditions as $i => $condition ) {
-			$pdo->bindParam(":".$i, $condition[2], static::getParamType($condition[2]));
-		}
-		return $pdo->execute()->fetchAll(PDO::FETCH_CLASS, __CLASS__);
-	}
-
-	/**
-	 * Returns all actor roles
-	 * If limit is greater than 0 the query will return
-	 * that many results starting at index.
-	 * Returns false if an error occurs
-	 *
-	 * @param int $index
-	 * @param int $limit
-	 * @return array|false
-	 */
-	public static function findAll( int $index = 0, int $limit = 0 ) {
-		$pdo = Core::$_connection_manager->getConnection("mvc");
-		if( $limit > 0 ) {
-			$pdo->prepare("SELECT * FROM actor_roles LIMIT :index, :max");
-			$pdo->bindParam("index", $index, PDO::PARAM_INT);
-			$pdo->bindParam("max", $limit, PDO::PARAM_INT);
-		} else {
-			$pdo->prepare("SELECT * FROM actor_roles");
-		}
-		return $pdo->execute()->fetchAll(PDO::FETCH_CLASS, __CLASS__);
-	}
+    /**
+     * Returns all actor roles
+     * If limit is greater than 0 the query will return
+     * that many results starting at index.
+     * Returns false if an error occurs
+     *
+     * @param string|null $order
+     * @param string|null $direction
+     * @param int $limit
+     * @param int $page
+     * @return array|false
+     */
+    public static function findAll( ?string $order = "", ?string $direction = "asc", int $limit = 0, int $page = 1 ): ?array {
+        $pdo = SqlHelper::findAllIn("mvc", "actor_roles", $order, $direction, $limit, $page);
+        return $pdo->execute()->fetchAll(PDO::FETCH_CLASS, __CLASS__);
+    }
 
 	/**
 	 * Returns the parent of this role or null if it has no parent.

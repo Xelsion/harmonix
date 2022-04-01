@@ -1,0 +1,35 @@
+<?php
+global $lang;
+$this->set("title", "Zugriffstype erstellen");
+?>
+<div class="container-fluid">
+	<h1>Zugriffstype erstellen</h1>
+	<form action="/restrictions/types/create" method="POST" class="needs-validation" autocomplete="off" novalidate>
+		<div class="form-group row">
+			<label for="name">Name</label>
+			<input type="text" name="name" value="" id="name" required />
+			<div class="invalid-feedback"><?= escaped_html($lang["required"]["name"]) ?></div>
+		</div>
+		<div class="form-group row">
+			<label for="include_siblings">Incl. gleicher Obergruppe</label>
+			<input type="checkbox" name="include_siblings" value="1" id="include_siblings" />
+		</div>
+		<div class="form-group row">
+			<label for="include_children">Incl. direkter Untergruppen</label>
+			<input type="checkbox" name="include_children" value="1" id="include_children" />
+		</div>
+		<div class="form-group row">
+			<label for="include_descendants">Incl. aller Untergruppen</label>
+			<input type="checkbox" name="include_descendants" value="1" id="include_descendants" />
+		</div>
+		<div class="form-group row clearfix">
+			<div class="col-auto">
+				<a href="/restrictions/types" class="button button-default float-start"><?= escaped_html($lang["cancel"]) ?></a>
+			</div>
+			<div class="col"></div>
+			<div class="col-auto">
+				<button type="submit" name="create" class="button button-positiv float-end"><?= escaped_html($lang["create"]) ?></button>
+			</div>
+		</div>
+	</form>
+</div>

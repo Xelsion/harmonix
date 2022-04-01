@@ -17,10 +17,9 @@ use models\ActorRole;
  */
 class ActorRolesController extends AController {
 
-	/**
-	 * @param Router $router
-	 * @see \system\interfaces\IController
-	 */
+    /**
+     * @inheritDoc
+     */
 	public function init( Router $router ): void {
         // Add routes to router
         $routes = $this->getRoutes();
@@ -34,8 +33,7 @@ class ActorRolesController extends AController {
 	}
 
     /**
-     * @return array[]
-     * @see \system\interfaces\IController
+     * @inheritDoc
      */
     public function getRoutes(): array {
         return array(
@@ -45,10 +43,9 @@ class ActorRolesController extends AController {
         );
     }
 
-	/**
-	 * @see \system\interfaces\IController
-	 * @return AResponse
-	 */
+    /**
+     * @inheritDoc
+     */
 	public function index(): AResponse {
 		$response = new ResponseHTML();
 		$template = new Template(PATH_VIEWS."template.html");
@@ -123,7 +120,7 @@ class ActorRolesController extends AController {
 		$template->set("role", $role);
 		$template->set("option_list", $results);
 		$template->set("navigation", $this::$_menu);
-		$template->set("view", new Template(PATH_VIEWS."actor_roles/edit.html"));
+		$template->set("view", new Template(PATH_VIEWS."actor_roles/types_edit.html"));
 		$response->setOutput($template->parse());
 		return $response;
 	}
