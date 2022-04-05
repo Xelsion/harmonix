@@ -23,12 +23,18 @@ class Session extends entities\Session {
 	private bool $_cookie_secure = false;
 	private string $_error;
 
+    /**
+     * Starts the session
+     *
+     * @return Actor
+     */
 	public function start(): Actor {
 		$configuration = Core::$_configuration->getSection("cookie");
 		$this->_cookie_domain = $configuration["domain"];
 		$this->_cookie_lifetime = $configuration["lifetime"];
 		$this->_cookie_secure = $configuration["secure"];
 
+        // do we have a login attempt?
 		if( isset($_POST["login"], $_POST["email"], $_POST["password"]) ) {
 			try {
 				return $this->login($_POST["email"], $_POST["password"]);
@@ -37,11 +43,26 @@ class Session extends entities\Session {
 			}
 		}
 
+        // do we have a logout attempt?
 		if( isset($_POST["logout"]) ) {
 			$this->logout();
 		}
 
+        // do we have an active session?
 		if( $this->actor_id > 0 ) {
+            $date_time = new DateTime();
+            $date_time->modify("+".$this->_cookie_lifetime." hour");
+            $this->ip = $_SERVER["REMOTE_ADDR"];
+            $this->expired = $date_time->format("Y-m-d H:i:s");
+            $this->update();
+
+            $cookie_options = array(
+                'expires' => $date_time->getTimestamp(),
+                'path'    => $this->_cookie_path,
+                'domain'  => $this->_cookie_domain,
+                'secure'  => $this->_cookie_secure
+            );
+            setcookie("session", $this->id, $cookie_options);
 			return new Actor($this->actor_id);
 		}
 
@@ -73,13 +94,14 @@ class Session extends entities\Session {
 			} else if( !password_verify($password, $actor->password) ) {
 				$actor->login_fails++;
 				$actor->update();
-				$this->_error = "EMail/Password is incorrect!";
+				$this->_error = "E-Mail/Password is incorrect!";
 			} else {
 				$session_id = MD5(time());
 				$date_time = new DateTime();
 				$date_time->modify("+".$this->_cookie_lifetime." hour");
 				$this->id = $session_id;
 				$this->actor_id = $actor->id;
+                $this->ip = $_SERVER["REMOTE_ADDR"];
 				$this->expired = $date_time->format("Y-m-d H:i:s");
 				$this->create();
 
@@ -93,7 +115,7 @@ class Session extends entities\Session {
 				return $actor;
 			}
 		} else {
-            $this->_error = "EMail/Password is incorrect!";
+            $this->_error = "E-Mail/Password is incorrect!";
         }
 		return new Actor();
 	}
@@ -118,4 +140,5 @@ class Session extends entities\Session {
 	public function getError(): string {
 		return $this->_error;
 	}
+
 }

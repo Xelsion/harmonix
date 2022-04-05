@@ -5,6 +5,7 @@ namespace system;
 use Exception;
 use RuntimeException;
 use system\classes\Auth;
+use system\classes\GarbadgeCollector;
 use system\classes\tree\RoleTree;
 use system\abstracts\AController;
 use system\abstracts\AResponse;
@@ -87,6 +88,9 @@ class Process {
 
 			// Try to get the responsible route for this requested uri
 			$route = Core::$_router->getRoute(Core::$_request);
+
+            $gc = new GarbadgeCollector();
+            $gc->clean();
 
 			// Get the controller
 			$controller = $route["controller"];
