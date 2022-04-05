@@ -105,6 +105,26 @@ class ActorRole extends entities\ActorRole {
 		return $children;
 	}
 
+    /**
+     * Checks if this role is the parent of the given role
+     *
+     * @param ActorRole $role
+     * @return bool
+     */
+    public function isParentOf( ActorRole $role ): bool {
+        return $this->id === $role->child_of;
+    }
+
+    /**
+     * Checks if this role is a sibling of the given role
+     *
+     * @param ActorRole $role
+     * @return bool
+     */
+    public function isSiblingOf( ActorRole $role ): bool {
+        return $this->child_of === $role->child_of;
+    }
+
 	/**
 	 * Checks if this role is a child of the given role
 	 *
@@ -113,16 +133,6 @@ class ActorRole extends entities\ActorRole {
 	 */
 	public function isChildOf( ActorRole $role ): bool {
 		return $this->child_of === $role->id;
-	}
-
-	/**
-	 * Checks if this role is the parent of the given role
-	 *
-	 * @param ActorRole $role
-	 * @return bool
-	 */
-	public function isParentOf( ActorRole $role ): bool {
-		return $this->id === $role->child_of;
 	}
 
 	/**

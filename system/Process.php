@@ -4,6 +4,7 @@ namespace system;
 
 use Exception;
 use RuntimeException;
+use system\classes\Auth;
 use system\classes\tree\RoleTree;
 use system\abstracts\AController;
 use system\abstracts\AResponse;
@@ -99,9 +100,18 @@ class Process {
 				// Set the actor role for the current request
 				Core::$_actor_role = Core::$_actor->getRole(get_class($controller), $method);
 
-				// Get the Response obj from the controller
-				$this->_response = $controller->$method(...$params);
-				$this->_response->setHeaders();
+                // Set the Authentication class
+                Core::$_auth = new Auth();
+
+                // Has the current actor access to this request?
+                if( Core::$_auth->hasAccess() ) {
+				    // Get the Response obj from the controller
+				    $this->_response = $controller->$method(...$params);
+                    $this->_response->setHeaders();
+                } else {
+                    redirect("/error/403");
+                }
+
 			} else {
 			    // No valid controller found
 			    throw new RuntimeException("Controller for request ".Core::$_request->getRequestUri()." cant be found!");

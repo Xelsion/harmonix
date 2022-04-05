@@ -2,6 +2,7 @@
 
 namespace system;
 
+use system\classes\Auth;
 use system\classes\Configuration;
 use system\classes\Logger;
 use system\classes\Request;
@@ -47,4 +48,7 @@ class Core {
 
 	// The router
 	public static Router $_router;
+
+    // The authentication class
+    public static Auth $_auth;
 }

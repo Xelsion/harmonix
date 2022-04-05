@@ -45,7 +45,11 @@ class PDOConnection extends PDO {
 	 * @return bool
 	 */
 	public function bindParam( string $key, $value, int $type = PDO::PARAM_STR ): bool {
-		return $this->stmt->bindValue($key, $value, $type);
+        if( $type !== PDO::PARAM_STR) {
+		    return $this->stmt->bindValue($key, $value, $type);
+        } else {
+            return $this->stmt->bindValue($key, $value);
+        }
 	}
 
 	/**

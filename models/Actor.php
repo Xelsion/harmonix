@@ -111,6 +111,9 @@ class Actor extends entities\Actor {
 		return new ActorRole();
 	}
 
+    /**
+     * @return bool|void
+     */
     public function deletePermissions() {
         $pdo = Core::$_connection_manager->getConnection("mvc");
         if( $this->id > 0 ) {
@@ -141,10 +144,6 @@ class Actor extends entities\Actor {
 		foreach( $permissions as $permission ) {
 			$this->_permissions[$permission->domain][$permission->controller][$permission->method] = $permission->getRole();
 		}
-	}
-
-	public function toTableRow() {
-		return "<div></div>";
 	}
 
 }

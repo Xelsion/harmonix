@@ -2,6 +2,8 @@
 
 namespace system\classes\tree;
 
+use system\Core;
+
 /**
  * The Menu class extends TreeWalker
  * Represents a tree structured Menu
@@ -56,14 +58,17 @@ class Menu extends TreeWalker {
 		if( !empty($children) ) {
 			$html .= '<ul>';
 			foreach( $children as $child ) {
-				$has_children = $this->hasChildren($child->_id);
-				$class = ( $has_children ) ? "has-children" : "";
-				$html .= '<li class="'.$class.'">';
-				$html .= $child->getLink();
-				if( $has_children ) {
-					$this->buildHtmlTree($child->_id, $html);
-				}
-				$html .= '</li>';
+                $route = Core::$_router->getRouteFor($child->_target);
+                if( Core::$_auth->hasAccessTo($route["controller"], $route["method"]) ) {
+                    $has_children = $this->hasChildren($child->_id);
+                    $class = ( $has_children ) ? "has-children" : "";
+                    $html .= '<li class="'.$class.'">';
+                    $html .= $child->getLink();
+                    if( $has_children ) {
+                        $this->buildHtmlTree($child->_id, $html);
+                    }
+                    $html .= '</li>';
+                }
 			}
 			$html .= '</ul>';
 		}

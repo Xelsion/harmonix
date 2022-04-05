@@ -98,22 +98,45 @@ class Router {
 	 */
 	public function getRoute( Request $request ): ?array {
 		$request_parts = $request->getRequestParts();
-
-		$route = $this->getValidRoute($request_parts);
-		if( $this->hasRoute($route) ) {
-			$call = $this->_routes[$route];
-			$controller = new $call["controller"]();
-			$method = $call["method"];
-			try {
-				$params = $this->getValidParameters($controller, $method, $request_parts);
-				return array( "controller" => $controller, "method" => $method, "params" => $params );
-			} catch( RuntimeException $e ) {
-				throw new RuntimeException($e->getMessage(), $e->getCode(), $e);
-			}
-		} else {
-			throw new RuntimeException("Router: There is no route for [".$request->getRequestUri()."]!");
-		}
+        return $this->getRouteArray($request_parts);
 	}
+
+    /**
+     * The getRoute method will check the given $url
+     * for a valid Controller and the requested method
+     * the returned array will be like:
+     * ["controller" => {Controller instance}, "method" => {Methode name}, "params" => {Array of formatted args}]
+     *
+     * @param string $url
+     * @return array|null
+     */
+    public function getRouteFor( string $url ): ?array {
+        $request_parts = preg_split("/\//", $url, -1, PREG_SPLIT_NO_EMPTY);
+        return $this->getRouteArray($request_parts);
+    }
+
+    /**
+     * Parses the request parts to get the controller and the wanted method
+     *
+     * @param array $request_parts
+     * @return array
+     */
+    private function getRouteArray( array &$request_parts ): array {
+        $route = $this->getValidRoute($request_parts);
+        if( $this->hasRoute($route) ) {
+            $call = $this->_routes[$route];
+            $controller = new $call["controller"]();
+            $method = $call["method"];
+            try {
+                $params = $this->getValidParameters($controller, $method, $request_parts);
+                return array( "controller" => $controller, "method" => $method, "params" => $params );
+            } catch( RuntimeException $e ) {
+                throw new RuntimeException($e->getMessage(), $e->getCode(), $e);
+            }
+        } else {
+            throw new RuntimeException("Router: There is no route for [".implode("/", $request_parts)."]!");
+        }
+    }
 
 	/**
 	 * Parses the $request array and returns the route to the
@@ -146,6 +169,7 @@ class Router {
 			if( count($result) === 1 ) {
 				$route = array_pop($result);
 			}
+
 			// Last part wasn't a route parameter sp put it back into our request parts
 			array_unshift($request_parts, $part);
 			break;

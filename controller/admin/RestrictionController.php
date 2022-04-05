@@ -2,10 +2,8 @@
 
 namespace controller\admin;
 
-use models\AccessPermission;
 use models\AccessRestrictionType;
 use models\AccessRestriction;
-use models\Actor;
 use models\ActorRole;
 use system\abstracts\AResponse;
 use system\classes\responses\ResponseHTML;
@@ -168,8 +166,8 @@ class RestrictionController extends AController {
                 foreach( $methods as $method => $entry ) {
                     $restriction = new AccessRestriction();
                     $restriction->domain = $domain;
-                    $restriction->controller = $controller;
-                    $restriction->method = $method;
+                    $restriction->controller = ( $controller !== "") ? $controller : null;
+                    $restriction->method = ( $method !== "") ? $method : null;
                     $restriction->role_id = $entry[0];
                     $restriction->restriction_type = $entry[0];
                     $restriction->create();
