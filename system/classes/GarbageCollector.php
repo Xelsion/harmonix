@@ -5,13 +5,13 @@ namespace system\classes;
 use DateTime;
 use system\Core;
 
-class GarbadgeCollector {
+class GarbageCollector {
 
     public function __construct() {
 
     }
 
-    public function clean() {
+    public function clean() : void {
         $this->clearSessions();
     }
 
