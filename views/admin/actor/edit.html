@@ -23,15 +23,25 @@ $actor = $this->get("actor");
 		</div>
 		<div class="form-group row">
 			<label for="first_name">Vorname</label>
-			<input type="text" name="first_name" value="<?= escaped_html($actor->first_name) ?>" id="first_name"
-			       required />
+			<input type="text" name="first_name" value="<?= escaped_html($actor->first_name) ?>" id="first_name" required />
 			<div class="invalid-feedback"><?= escaped_html($lang["required"]["first_name"]) ?></div>
 		</div>
 		<div class="form-group row">
 			<label for="last_name">Nachname</label>
-			<input type="text" name="last_name" value="<?= escaped_html($actor->last_name) ?>" id="last_name"
-			       required />
+			<input type="text" name="last_name" value="<?= escaped_html($actor->last_name) ?>" id="last_name" required />
 			<div class="invalid-feedback"><?= escaped_html($lang["required"]["last_name"]) ?></div>
+		</div>
+		<div class="form-group row">
+			<label for="login_disabled">Login disabled</label>
+			<select name="login_disabled" id="login_disabled" required>
+				<option value="0"<?= ( !$actor->login_disabled ) ? ' selected="selected"' : ''?>>false</option>
+				<option value="1"<?= ( $actor->login_disabled ) ? ' selected="selected"' : ''?>>true</option>
+			</select>
+			<div class="invalid-feedback"><?= escaped_html($lang["required"]["last_name"]) ?></div>
+		</div>
+		<div class="form-group row">
+			<label for="login_fails">Login fails</label>
+			<input type="number" name="login_fails" value="<?= escaped_html($actor->login_fails) ?>" id="login_fails" required />
 		</div>
 		<div class="form-group row clearfix">
 			<div class="col-auto">

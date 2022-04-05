@@ -120,7 +120,7 @@ class ActorRolesController extends AController {
 		$template->set("role", $role);
 		$template->set("option_list", $results);
 		$template->set("navigation", $this::$_menu);
-		$template->set("view", new Template(PATH_VIEWS."actor_roles/types_edit.html"));
+		$template->set("view", new Template(PATH_VIEWS."actor_roles/edit.html"));
 		$response->setOutput($template->parse());
 		return $response;
 	}

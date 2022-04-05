@@ -66,7 +66,6 @@ class ActorController extends AController {
 		if( !$this::$_actor_role->canCreateAll() ) {
 			redirect("/error/403");
 		}
-
 		if( isset($_POST['create']) ) {
 			$is_valid = $this->postIsValid();
 			if( $is_valid ) {
@@ -97,7 +96,6 @@ class ActorController extends AController {
 		if( !$this::$_actor_role->canUpdateAll() ) {
 			redirect("/error/403");
 		}
-
 		if( isset($_POST['cancel']) ) {
 			redirect("/actors");
 		}
@@ -108,15 +106,16 @@ class ActorController extends AController {
 				$actor->password = $_POST["password"];
 				$actor->first_name = $_POST["first_name"];
 				$actor->last_name = $_POST["last_name"];
+                $actor->login_fails = (int) $_POST["login_fails"];
+                $actor->login_disabled = (int) $_POST["login_disabled"];
 				$actor->update();
-				redirect("/actors");
 			}
 		}
 		$response = new ResponseHTML();
 		$template = new Template(PATH_VIEWS."template.html");
 		$template->set("actor", $actor);
 		$template->set("navigation", $this::$_menu);
-		$template->set("view", new Template(PATH_VIEWS."actor/types_edit.html"));
+		$template->set("view", new Template(PATH_VIEWS."actor/edit.html"));
 		$response->setOutput($template->parse());
 		return $response;
 	}

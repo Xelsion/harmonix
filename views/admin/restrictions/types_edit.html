@@ -11,17 +11,17 @@ $type = $this->get("type");
 			<input type="text" name="name" value="<?= escaped_html($type->name) ?>" id="email" required />
 			<div class="invalid-feedback"><?= escaped_html($lang["required"]["name"]) ?></div>
 		</div>
-		<div class="form-group row">
-			<label for="first_name">Incl. gleicher Obergruppe</label>
-			<input type="checkbox" name="include_siblings" value="1" id="include_siblings"<?= ($type->include_siblings === 1 ) ? ' checked': ''?> />
+		<div class="clearfix">
+			<input type="checkbox" name="include_siblings" value="1" id="include_siblings" class="form-check-input float-start"<?= ($type->include_siblings === 1 ) ? ' checked': ''?> />
+			<label for="first_name" class="form-check-label float-start">Incl. gleicher Obergruppe</label>
 		</div>
-		<div class="form-group row">
-			<label for="first_name">Incl. direkter Untergruppen</label>
-			<input type="checkbox" name="include_children" value="1" id="include_children"<?= ($type->include_children === 1 ) ? ' checked': ''?> />
+		<div class="clearfix">
+			<input type="checkbox" name="include_children" value="1" id="include_children" class="form-check-input float-start"<?= ($type->include_children === 1 ) ? ' checked': ''?> />
+			<label for="first_name" class="form-check-label float-start">Incl. direkter Untergruppen</label>
 		</div>
-		<div class="form-group row">
-			<label for="first_name">Incl. aller Untergruppen</label>
-			<input type="checkbox" name="include_descendants" value="1" id="include_descendants"<?= ($type->include_descendants === 1 ) ? ' checked': ''?> />
+		<div class="clearfix">
+			<input type="checkbox" name="include_descendants" value="1" id="include_descendants" class="form-check-input float-start"<?= ($type->include_descendants === 1 ) ? ' checked': ''?> />
+			<label for="first_name" class="form-check-label float-start">Incl. aller Untergruppen</label>
 		</div>
 		<div class="form-group row clearfix">
 			<div class="col-auto">

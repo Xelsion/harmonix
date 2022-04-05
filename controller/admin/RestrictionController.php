@@ -160,6 +160,7 @@ class RestrictionController extends AController {
                 }
             }
         }
+
         AccessRestriction::deleteAll();
         foreach($restrictions as $domain => $controllers) {
             foreach( $controllers as $controller => $methods ) {
@@ -169,7 +170,7 @@ class RestrictionController extends AController {
                     $restriction->controller = ( $controller !== "") ? $controller : null;
                     $restriction->method = ( $method !== "") ? $method : null;
                     $restriction->role_id = $entry[0];
-                    $restriction->restriction_type = $entry[0];
+                    $restriction->restriction_type = $entry[1];
                     $restriction->create();
                 }
             }
