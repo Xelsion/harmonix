@@ -38,6 +38,7 @@ class Auth {
      *
      * @param $controller
      * @param string $method
+     * @param string|mixed $domain
      * @return bool
      */
     public function hasAccessTo( $controller, string $method, string $domain = SUB_DOMAIN) : bool {
@@ -92,6 +93,7 @@ class Auth {
      *
      * @param string|null $controller
      * @param string|null $method
+     * @param string|mixed $domain
      * @return array
      */
     private function getRestriction(?string $controller, ?string $method, string $domain = SUB_DOMAIN ) : array {
@@ -101,7 +103,7 @@ class Auth {
         $pdo_results = $this->getRestrictionRole( $controller, $method, $domain );
         if( $pdo_results->rowCount() === 1 ) {
             $row = $pdo_results->fetch();
-            $result["role"] =  new ActorRole($row["role_id"]);
+            $result["role"] = new ActorRole($row["role_id"]);
             $result["type"] = new AccessRestrictionType($row["restriction_type"]);
             $role_is_set = true;
         }
@@ -110,7 +112,7 @@ class Auth {
             $pdo_results = $this->getRestrictionRole( $controller, null, $domain );
             if( $pdo_results->rowCount() === 1 ) {
                 $row = $pdo_results->fetch();
-                $result["role"] =  new ActorRole($row["role_id"]);
+                $result["role"] = new ActorRole($row["role_id"]);
                 $result["type"] = new AccessRestrictionType($row["restriction_type"]);
                 $role_is_set = true;
             }
@@ -120,14 +122,14 @@ class Auth {
             $pdo_results = $this->getRestrictionRole( null, null, $domain );
             if( $pdo_results->rowCount() === 1 ) {
                 $row = $pdo_results->fetch();
-                $result["role"] =  new ActorRole($row["role_id"]);
+                $result["role"] = new ActorRole($row["role_id"]);
                 $result["type"] = new AccessRestrictionType($row["restriction_type"]);
                 $role_is_set = true;
             }
         }
 
         if( !$role_is_set ) {
-            $result["role"] =  new ActorRole(4);
+            $result["role"] = new ActorRole(4);
             $result["type"] = new AccessRestrictionType(4);
         }
 
@@ -139,6 +141,7 @@ class Auth {
      *
      * @param string|null $controller
      * @param string|null $method
+     * @param string|mixed $domain
      * @return PDOStatement
      */
     private function getRestrictionRole( ?string $controller, ?string $method, string $domain = SUB_DOMAIN ): PDOStatement {
