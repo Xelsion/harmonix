@@ -8,7 +8,7 @@ use PDO;
 use system\interfaces\IEntity;
 
 /**
- * The Abstract version of a Entity
+ * The Abstract version of an Entity
  *
  * @author Markus Schröder <xelsion@gmail.com>
  * @version 1.0.0;

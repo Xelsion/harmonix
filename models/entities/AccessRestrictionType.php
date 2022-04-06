@@ -6,7 +6,7 @@ use PDO;
 use PDOException;
 use RuntimeException;
 use system\Core;
-use \system\abstracts\AEntity;
+use system\abstracts\AEntity;
 
 class AccessRestrictionType extends AEntity {
 
@@ -37,7 +37,7 @@ class AccessRestrictionType extends AEntity {
         $pdo = Core::$_connection_manager->getConnection("mvc");
         $sql = "INSERT INTO access_restriction_types (name, include_siblings, include_children, include_descendants) VALUES (:name, :include_siblings, :include_children, :include_descendants)";
         $pdo->prepare($sql);
-        $pdo->bindParam(':name', $this->name, PDO::PARAM_STR);
+        $pdo->bindParam(':name', $this->name);
         $pdo->bindParam(':include_siblings', $this->include_siblings, PDO::PARAM_INT);
         $pdo->bindParam(':include_children', $this->include_children, PDO::PARAM_INT);
         $pdo->bindParam(':include_descendants', $this->include_descendants, PDO::PARAM_INT);
@@ -54,7 +54,7 @@ class AccessRestrictionType extends AEntity {
             $sql = "UPDATE access_restriction_types SET name=:name, include_siblings=:include_siblings, include_children=:include_children, include_descendants=:include_descendants WHERE id=:id";
             $pdo->prepare($sql);
             $pdo->bindParam(':id', $this->id, PDO::PARAM_INT);
-            $pdo->bindParam(':name', $this->name, PDO::PARAM_STR);
+            $pdo->bindParam(':name', $this->name);
             $pdo->bindParam(':include_siblings', $this->include_siblings, PDO::PARAM_INT);
             $pdo->bindParam(':include_children', $this->include_children, PDO::PARAM_INT);
             $pdo->bindParam(':include_descendants', $this->include_descendants, PDO::PARAM_INT);

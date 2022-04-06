@@ -8,7 +8,6 @@ use PDOException;
 use RuntimeException;
 
 use system\abstracts\AEntity;
-use system\System;
 
 /**
  * The Session entity
@@ -44,7 +43,6 @@ class Session extends AEntity {
 	}
 
 	/**
-	 * @return string
 	 * @see \system\interfaces\IEntity
 	 */
 	public function create(): void {
@@ -52,10 +50,10 @@ class Session extends AEntity {
 			$pdo = Core::$_connection_manager->getConnection("mvc");
 			$sql = "INSERT INTO sessions (id, actor_id, ip, expired) VALUES (:id, :actor_id, :ip, :expired)";
 			$pdo->prepare($sql);
-			$pdo->bindParam(':id', $this->id, PDO::PARAM_STR);
+			$pdo->bindParam(':id', $this->id);
 			$pdo->bindParam(':actor_id', $this->actor_id, PDO::PARAM_INT);
-            $pdo->bindParam(':ip', $this->ip, PDO::PARAM_STR);
-			$pdo->bindParam(':expired', $this->expired, PDO::PARAM_STR);
+            $pdo->bindParam(':ip', $this->ip);
+			$pdo->bindParam(':expired', $this->expired);
 			$pdo->execute();
 		} catch( PDOException $e ) {
 			throw new RuntimeException($e->getMessage());
@@ -70,10 +68,10 @@ class Session extends AEntity {
 			$pdo = Core::$_connection_manager->getConnection("mvc");
 			$sql = "UPDATE sessions SET actor_id=:actor_id, ip=:ip, expired=:expired WHERE id=:id";
 			$pdo->prepare($sql);
-			$pdo->bindParam(':id', $this->id, PDO::PARAM_STR);
+			$pdo->bindParam(':id', $this->id);
 			$pdo->bindParam(':actor_id', $this->actor_id, PDO::PARAM_INT);
-            $pdo->bindParam(':ip', $this->ip, PDO::PARAM_STR);
-			$pdo->bindParam(':expired', $this->expired, PDO::PARAM_STR);
+            $pdo->bindParam(':ip', $this->ip);
+			$pdo->bindParam(':expired', $this->expired);
 			$pdo->execute();
 		} catch( PDOException $e ) {
 			throw new RuntimeException($e->getMessage());

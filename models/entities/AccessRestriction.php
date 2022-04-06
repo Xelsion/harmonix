@@ -3,7 +3,7 @@
 namespace models\entities;
 
 use PDO;
-use \system\abstracts\AEntity;
+use system\abstracts\AEntity;
 use system\Core;
 
 class AccessRestriction extends AEntity {
@@ -18,13 +18,7 @@ class AccessRestriction extends AEntity {
     public ?string $deleted = null;
 
     public function __construct( int $id = 0 ) {
-        if( $id > 0 ) {
-            $pdo = Core::$_connection_manager->getConnection("mvc");
-            $pdo->prepare("SELECT * FROM access_restrictions WHERE id=:id");
-            $pdo->bindParam(":id", $id, PDO::PARAM_INT);
-            $pdo->setFetchMode(PDO::FETCH_INTO, $this);
-            $pdo->execute()->fetch();
-        }
+
     }
 
     /**

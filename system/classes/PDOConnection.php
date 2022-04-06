@@ -2,6 +2,7 @@
 
 namespace system\classes;
 
+use JsonException;
 use PDO;
 use PDOException;
 use PDOStatement;
@@ -47,15 +48,14 @@ class PDOConnection extends PDO {
 	public function bindParam( string $key, $value, int $type = PDO::PARAM_STR ): bool {
         if( $type !== PDO::PARAM_STR) {
 		    return $this->stmt->bindValue($key, $value, $type);
-        } else {
-            return $this->stmt->bindValue($key, $value);
         }
-	}
+
+        return $this->stmt->bindValue($key, $value);
+    }
 
 	/**
 	 * @param int $mode
 	 * @param $class
-	 * @param array $params
 	 */
 	public function setFetchMode( int $mode, $class ): void {
 		$this->stmt->setFetchMode($mode, $class);
@@ -85,7 +85,7 @@ class PDOConnection extends PDO {
 		} catch( PDOException $e ) {
 			try {
 				$this->logger->log($e->getFile(), $e->getLine(), $e->getMessage()."\n\t=>\t[SQL] ".$this->stmt->queryString, $e->getTrace());
-			} catch( \JsonException $je ) {
+			} catch( JsonException $je ) {
 				throw new RuntimeException($je->getMessage(), (int)$je->getCode(), $je);
 			}
 			throw new RuntimeException($e->getMessage(), (int)$e->getCode(), $e);

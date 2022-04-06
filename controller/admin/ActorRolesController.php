@@ -2,6 +2,7 @@
 
 namespace controller\admin;
 
+use Exception;
 use system\abstracts\AResponse;
 use system\abstracts\AController;
 use system\classes\Cache;
@@ -46,7 +47,7 @@ class ActorRolesController extends AController {
 
     /**
      * @inheritDoc
-     * @throws \Exception
+     * @throws Exception
      */
 	public function index(): AResponse {
 		$response = new ResponseHTML();
@@ -68,7 +69,10 @@ class ActorRolesController extends AController {
 		return $response;
 	}
 
-	public function create(): AResponse {
+    /**
+     * @throws Exception
+     */
+    public function create(): AResponse {
 		if( isset($_POST['create']) ) {
 			$is_valid = $this->postIsValid();
 			if( $is_valid ) {
@@ -105,7 +109,7 @@ class ActorRolesController extends AController {
 	}
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     public function update( ActorRole $role ): AResponse {
 		if( isset($_POST['cancel']) ) {

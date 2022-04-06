@@ -54,7 +54,7 @@ $view_content = ( $view instanceof Template ) ? $view->parse() : "";
 								</form>
 							</li>
 						<?php else: ?>
-							<?php if( Core::$_auth->hasAccessTo("controller\admin\HomeController", "index", "admin") ) { ?>
+							<?php if( Core::$_auth->hasAccessTo(controller\admin\HomeController::class, "index", "admin") ) { ?>
 								<li>
 									<a href="https://admin.harmonix.de">Admin-Bereich</a>
 								</li>

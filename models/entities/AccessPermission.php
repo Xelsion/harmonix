@@ -48,9 +48,9 @@ class AccessPermission extends AEntity {
 			$pdo->prepare($sql);
 			$pdo->bindParam(':actor_id', $this->actor_id, PDO::PARAM_INT);
 			$pdo->bindParam(':role_id', $this->role_id, PDO::PARAM_INT);
-			$pdo->bindParam(':domain', $this->domain, PDO::PARAM_STR);
-			$pdo->bindParam(':controller', $this->controller, PDO::PARAM_STR);
-			$pdo->bindParam(':method', $this->method, PDO::PARAM_STR);
+			$pdo->bindParam(':domain', $this->domain);
+			$pdo->bindParam(':controller', $this->controller);
+			$pdo->bindParam(':method', $this->method);
 			$pdo->execute();
 		} catch( PDOException $e ) {
 			throw new RuntimeException($e->getMessage());

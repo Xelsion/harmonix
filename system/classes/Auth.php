@@ -26,7 +26,7 @@ class Auth {
     }
 
     /**
-     * Returns if the currend actor has access to the current request
+     * Returns if the current actor has access to the current request
      * @return bool
      */
     public function hasAccess() : bool {
@@ -34,7 +34,7 @@ class Auth {
     }
 
     /**
-     * Returns if the current actor has access to the given controller an method
+     * Returns if the current actor has access to the given controller a method
      *
      * @param $controller
      * @param string $method

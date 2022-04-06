@@ -80,7 +80,7 @@ class ActorRole extends AEntityTreeNode {
 				$pdo->prepare($sql);
 				$pdo->bindParam(':id', $this->id, PDO::PARAM_INT);
 				$pdo->bindParam(':child_of', $this->child_of, PDO::PARAM_INT);
-				$pdo->bindParam(':name', $this->name, PDO::PARAM_STR);
+				$pdo->bindParam(':name', $this->name);
 				$pdo->bindParam(':rights_all', $this->rights_all, PDO::PARAM_INT);
 				$pdo->bindParam(':rights_group', $this->rights_group, PDO::PARAM_INT);
 				$pdo->bindParam(':rights_own', $this->rights_own, PDO::PARAM_INT);

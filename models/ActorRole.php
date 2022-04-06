@@ -3,6 +3,7 @@
 namespace models;
 
 use DateTime;
+use Exception;
 use PDO;
 use PDOException;
 use RuntimeException;
@@ -75,7 +76,7 @@ class ActorRole extends entities\ActorRole {
 
     /**
      * @return int
-     * @throws \Exception
+     * @throws Exception
      */
     public static function getLastModification() : int {
         $created = 0;

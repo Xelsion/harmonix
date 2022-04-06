@@ -25,7 +25,7 @@ class Session extends entities\Session {
 
     /**
      * @return int
-     * @throws \Exception
+     * @throws Exception
      */
     public static function getLastModification() : int {
         $created = 0;
@@ -99,7 +99,7 @@ class Session extends entities\Session {
 	public function login( string $email, string $password ): Actor {
 		$pdo = Core::$_connection_manager->getConnection("mvc");
 		$pdo->prepare("SELECT * FROM actors WHERE email=:email AND deleted IS NULL");
-		$pdo->bindParam(":email", $email, PDO::PARAM_STR);
+		$pdo->bindParam(":email", $email);
 		$stmt = $pdo->execute();
 		if( $stmt->rowCount() === 1 ) {
 			$actor = $stmt->fetchObject(Actor::class);

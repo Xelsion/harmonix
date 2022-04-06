@@ -2,8 +2,8 @@
 
 namespace system\abstracts;
 
-use \system\classes\tree\TreeNode;
-use \system\interfaces\IEntity;
+use system\classes\tree\TreeNode;
+use system\interfaces\IEntity;
 use PDO;
 
 abstract class AEntityTreeNode extends TreeNode implements IEntity {

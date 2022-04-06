@@ -29,8 +29,7 @@ function escaped_html( ?string $string ): ?string {
         $string = utf8_decode($string);
     }
     $string = utf8_encode($string);
-    $string = htmlentities($string, ENT_HTML5, "UTF-8");
-    return $string;
+    return htmlentities($string, ENT_HTML5, "UTF-8");
 }
 
 function redirect( string $url ) {

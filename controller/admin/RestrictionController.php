@@ -2,6 +2,7 @@
 
 namespace controller\admin;
 
+use Exception;
 use models\AccessRestrictionType;
 use models\AccessRestriction;
 use models\ActorRole;
@@ -46,7 +47,7 @@ class RestrictionController extends AController {
 
     /**
      * @inheritDoc
-     * @throws \Exception
+     * @throws Exception
      */
     public function index(): AResponse {
         if( isset($_POST['update']) ) {

@@ -3,6 +3,7 @@
 namespace models;
 
 use DateTime;
+use Exception;
 use PDO;
 use system\Core;
 use system\helper\SqlHelper;
@@ -60,7 +61,7 @@ class AccessRestriction extends entities\AccessRestriction {
 
     /**
      * @return int
-     * @throws \Exception
+     * @throws Exception
      */
     public static function getLastModification() : int {
         $created = 0;

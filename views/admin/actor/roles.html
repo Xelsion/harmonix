@@ -1,7 +1,10 @@
 <?php
 global $lang;
+
+use system\classes\Template;
+
 $actor = $this->get("actor");
-$snippet = new \system\classes\Template(PATH_VIEWS."snippets/access_permission.html");
+$snippet = new Template(PATH_VIEWS."snippets/access_permission.html");
 ?>
 <div class="container-fluid">
 	<h1>Benutzer Rollen</h1>
