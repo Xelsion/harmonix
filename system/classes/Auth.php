@@ -36,13 +36,16 @@ class Auth {
     /**
      * Returns if the current actor has access to the given controller an method
      *
-     * @param AController $controller
+     * @param $controller
      * @param string $method
      * @return bool
      */
-    public function hasAccessTo( AController $controller, string $method) : bool {
-        $actor_role = Core::$_actor->getRole(get_class($controller), $method);
-        $restriction = $this->getRestriction(get_class($controller), $method);
+    public function hasAccessTo( $controller, string $method, string $domain = SUB_DOMAIN) : bool {
+        if( $controller instanceof AController ) {
+            $controller = get_class($controller);
+        }
+        $actor_role = Core::$_actor->getRole($controller, $method, $domain);
+        $restriction = $this->getRestriction($controller, $method, $domain);
         $restriction_role = $restriction["role"];
         $restriction_type = $restriction["type"];
         return $this->getAccessibility($actor_role, $restriction_role, $restriction_type);
@@ -91,11 +94,11 @@ class Auth {
      * @param string|null $method
      * @return array
      */
-    private function getRestriction(?string $controller, ?string $method) : array {
+    private function getRestriction(?string $controller, ?string $method, string $domain = SUB_DOMAIN ) : array {
         $role_is_set = false;
         $result = array();
 
-        $pdo_results = $this->getRestrictionRole( $controller, $method );
+        $pdo_results = $this->getRestrictionRole( $controller, $method, $domain );
         if( $pdo_results->rowCount() === 1 ) {
             $row = $pdo_results->fetch();
             $result["role"] =  new ActorRole($row["role_id"]);
@@ -104,7 +107,7 @@ class Auth {
         }
 
         if( !$role_is_set ) {
-            $pdo_results = $this->getRestrictionRole( $controller, null );
+            $pdo_results = $this->getRestrictionRole( $controller, null, $domain );
             if( $pdo_results->rowCount() === 1 ) {
                 $row = $pdo_results->fetch();
                 $result["role"] =  new ActorRole($row["role_id"]);
@@ -114,7 +117,7 @@ class Auth {
         }
 
         if( !$role_is_set ) {
-            $pdo_results = $this->getRestrictionRole( null, null );
+            $pdo_results = $this->getRestrictionRole( null, null, $domain );
             if( $pdo_results->rowCount() === 1 ) {
                 $row = $pdo_results->fetch();
                 $result["role"] =  new ActorRole($row["role_id"]);
@@ -138,7 +141,7 @@ class Auth {
      * @param string|null $method
      * @return PDOStatement
      */
-    private function getRestrictionRole( ?string $controller, ?string $method ): PDOStatement {
+    private function getRestrictionRole( ?string $controller, ?string $method, string $domain = SUB_DOMAIN ): PDOStatement {
         $pdo = Core::$_connection_manager->getConnection("mvc");
         $sql = "SELECT role_id, restriction_type FROM access_restrictions WHERE domain=:domain";
         if( $controller === null ) {
@@ -152,7 +155,7 @@ class Auth {
             $sql .= " AND method=:method";
         }
         $pdo->prepare($sql);
-        $pdo->bindParam("domain", SUB_DOMAIN);
+        $pdo->bindParam("domain", $domain);
         if( $controller !== null ) {
             $pdo->bindParam("controller", $controller);
         }

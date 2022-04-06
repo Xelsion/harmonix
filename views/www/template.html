@@ -34,38 +34,37 @@ $view_content = ( $view instanceof Template ) ? $view->parse() : "";
 			</div>
 			<div id="actor-menu-dropdown" style="">
 				<menu>
-					<ul
-					">
-					<?php if( $actor->id === 0 ): ?>
-						<li>
-							<form action="<?= $_SERVER["REQUEST_URI"] ?>" method="POST">
-								<div class="form-row">
-									<label>
-										<input type="email" name="email" value="" placeholder="E-Mail" />
-									</label>
-								</div>
-								<div class="form-row">
-									<label>
-										<input type="password" name="password" value="" placeholder="Password" autocomplete="new-password" />
-									</label>
-								</div>
-								<div class="form-row">
-									<button type="submit" name="login">Login</button>
-								</div>
-							</form>
-						</li>
-					<?php else: ?>
-						<?php if( $actor_role->canReadAll() ) { ?>
+					<ul>
+						<?php if( $actor->id === 0 ): ?>
 							<li>
-								<a href="https://admin.harmonix.de">Admin-Bereich</a>
+								<form action="<?= $_SERVER["REQUEST_URI"] ?>" method="POST">
+									<div class="form-row">
+										<label>
+											<input type="email" name="email" value="" placeholder="E-Mail" />
+										</label>
+									</div>
+									<div class="form-row">
+										<label>
+											<input type="password" name="password" value="" placeholder="Password" autocomplete="new-password" />
+										</label>
+									</div>
+									<div class="form-row">
+										<button type="submit" name="login">Login</button>
+									</div>
+								</form>
 							</li>
-						<?php } ?>
-						<li>
-							<form action="<?= $_SERVER["REQUEST_URI"] ?>" method="POST">
-								<button type="submit" name="logout" class="link">Logout</button>
-							</form>
-						</li>
-					<?php endif; ?>
+						<?php else: ?>
+							<?php if( Core::$_auth->hasAccessTo("controller\admin\HomeController", "index", "admin") ) { ?>
+								<li>
+									<a href="https://admin.harmonix.de">Admin-Bereich</a>
+								</li>
+							<?php } ?>
+							<li>
+								<form action="<?= $_SERVER["REQUEST_URI"] ?>" method="POST">
+									<button type="submit" name="logout" class="link">Logout</button>
+								</form>
+							</li>
+						<?php endif; ?>
 					</ul>
 				</menu>
 			</div>

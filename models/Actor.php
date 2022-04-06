@@ -103,22 +103,22 @@ class Actor extends entities\Actor {
 	 * @param string $method
 	 * @return ActorRole
 	 */
-	public function getRole( string $controller, string $method ): ActorRole {
+	public function getRole( string $controller, string $method, $domain = SUB_DOMAIN ): ActorRole {
 		if( $this->id > 0 ) {
 			if( empty($this->_permissions) ) {
 				$this->initPermission();
 			}
 
-			if( isset($this->_permissions[SUB_DOMAIN][$controller][$method]) ) {
-				return $this->_permissions[SUB_DOMAIN][$controller][$method];
+			if( isset($this->_permissions[$domain][$controller][$method]) ) {
+				return $this->_permissions[$domain][$controller][$method];
 			}
 
-			if( isset($this->_permissions[SUB_DOMAIN][$controller][null]) ) {
-				return $this->_permissions[SUB_DOMAIN][$controller][null];
+			if( isset($this->_permissions[$domain][$controller][null]) ) {
+				return $this->_permissions[$domain][$controller][null];
 			}
 
-			if( isset($this->_permissions[SUB_DOMAIN][null][null]) ) {
-				return $this->_permissions[SUB_DOMAIN][null][null];
+			if( isset($this->_permissions[$domain][null][null]) ) {
+				return $this->_permissions[$domain][null][null];
 			}
 		}
 		$result = ActorRole::find(array(
