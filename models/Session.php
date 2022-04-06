@@ -24,6 +24,25 @@ class Session extends entities\Session {
 	private string $_error;
 
     /**
+     * @return int
+     * @throws \Exception
+     */
+    public static function getLastModification() : int {
+        $created = 0;
+        $updated = 0;
+        $pdo = Core::$_connection_manager->getConnection("mvc");
+        $pdo->prepare("SELECT max(created) as created, max(updated) as updated FROM sessions LIMIT 1");
+        $row = $pdo->execute()->fetch();
+        if( $row ) {
+            $created = new DateTime($row["created"]);
+            $created = $created->getTimestamp();
+            $updated = new DateTime($row["updated"]);
+            $updated = $updated->getTimestamp();
+        }
+        return ( $created >= $updated ) ? $created : $updated;
+    }
+
+    /**
      * Starts the session
      *
      * @return Actor

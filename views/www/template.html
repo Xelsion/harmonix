@@ -9,10 +9,7 @@ $actor_role = Core::$_actor_role;
 $menu = Core::$_menu;
 
 $view = $this->get("view");
-$view_content = "";
-if( $view instanceof Template ) {
-	$view_content = $view->parse();
-}
+$view_content = ( $view instanceof Template ) ? $view->parse() : "";
 ?>
 <!DOCTYPE html>
 <html lang="en">

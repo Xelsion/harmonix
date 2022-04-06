@@ -45,7 +45,7 @@ class SqlHelper {
 
 
 
-    public static function findAllIn( string $db, string $table,?string $order = "", ?string $direction = "asc", int $limit = 0, int $page = 1) {
+    public static function findAllIn( string $db, string $table, ?string $order = "", ?string $direction = "asc", int $limit = 0, int $page = 1) {
         $pdo = Core::$_connection_manager->getConnection("mvc");
         if( $pdo ) {
             $sql = "SELECT * FROM " . $table;

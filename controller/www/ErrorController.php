@@ -62,8 +62,9 @@ class ErrorController extends AController {
         }
 		$response->status_code = $error_code;
 		$template = new Template(PATH_VIEWS."template.html");
+        $view = new Template(PATH_VIEWS."error/".$error_code.".html");
 		$template->set("navigation", $this::$_menu);
-		$template->set("view", new Template(PATH_VIEWS."error/".$error_code.".html"));
+		$template->set("view", $view->parse());
 		$response->setOutput($template->parse());
 		return $response;
 	}

@@ -2,8 +2,10 @@
 
 namespace controller\admin;
 
+use Exception;
 use system\abstracts\AController;
 use system\abstracts\AResponse;
+use system\classes\Cache;
 use system\classes\Router;
 use system\classes\Template;
 use system\classes\responses\ResponseHTML;
@@ -48,12 +50,20 @@ class ActorController extends AController {
 
     /**
      * @inheritDoc
+     * @throws Exception
      */
 	public function index(): AResponse {
 		$response = new ResponseHTML();
 		$template = new Template(PATH_VIEWS."template.html");
 
-		$results = Actor::findAll();
+        $cache = new Cache("all_actors");
+        $last_modify = Actor::getLastModification();
+        if( $cache->isUpToDate($last_modify) ) {
+            $results = unserialize($cache->loadFromCache(), array(false));
+        } else {
+            $results = Actor::findAll();
+            $cache->saveToCache(serialize($results));
+        }
 
 		$template->set("navigation", $this::$_menu);
 		$template->set("result_list", $results);
@@ -62,7 +72,10 @@ class ActorController extends AController {
 		return $response;
 	}
 
-	public function create(): AResponse {
+    /**
+     * @throws Exception
+     */
+    public function create(): AResponse {
 		if( !$this::$_actor_role->canCreateAll() ) {
 			redirect("/error/403");
 		}
@@ -80,7 +93,15 @@ class ActorController extends AController {
 			}
 		}
 
-		$role_options = ActorRole::findAll();
+        $cache = new Cache("all_actor_roles");
+        $last_modify = ActorRole::getLastModification();
+        if( $cache->isUpToDate($last_modify) ) {
+            $role_options = unserialize($cache->loadFromCache(), array(false));
+        } else {
+            $role_options = ActorRole::findAll();
+            $cache->saveToCache(serialize($role_options));
+        }
+
 		$access_permissions = array();
 		$response = new ResponseHTML();
 		$template = new Template(PATH_VIEWS."template.html");
@@ -109,6 +130,7 @@ class ActorController extends AController {
                 $actor->login_fails = (int) $_POST["login_fails"];
                 $actor->login_disabled = (int) $_POST["login_disabled"];
 				$actor->update();
+                redirect("/actors");
 			}
 		}
 		$response = new ResponseHTML();
@@ -120,7 +142,10 @@ class ActorController extends AController {
 		return $response;
 	}
 
-	public function roles( Actor $actor ): AResponse {
+    /**
+     * @throws Exception
+     */
+    public function roles( Actor $actor ): AResponse {
 		if( !$this::$_actor_role->canUpdateGroup() ) {
 			redirect("/error/403");
 		}
@@ -136,14 +161,29 @@ class ActorController extends AController {
 		$response = new ResponseHTML();
 		$template = new Template(PATH_VIEWS."template.html");
 
-		$role_options = ActorRole::findAll();
-		$access_permissions = AccessPermission::find(array(
-			array(
-				"actor_id",
-				"=",
-				$actor->id
-			)
-		));
+        $cache = new Cache("all_actor_roles");
+        $last_modify = ActorRole::getLastModification();
+        if( $cache->isUpToDate($last_modify) ) {
+            $role_options = unserialize($cache->loadFromCache(), array(false));
+        } else {
+            $role_options = ActorRole::findAll();
+            $cache->saveToCache(serialize($role_options));
+        }
+
+        $cache = new Cache("actor_permissions_".$actor->id);
+        $last_modify = AccessPermission::getLastModification();
+        if( $cache->isUpToDate($last_modify) ) {
+            $access_permissions = unserialize($cache->loadFromCache(), array(false));
+        } else {
+            $access_permissions = AccessPermission::find(array(
+                array(
+                    "actor_id",
+                    "=",
+                    $actor->id
+                )
+            ));
+            $cache->saveToCache(serialize($access_permissions));
+        }
 
 		$template->set("navigation", $this::$_menu);
 		$template->set("actor", $actor);

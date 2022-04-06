@@ -24,6 +24,9 @@ class Session extends AEntity {
 	public int $actor_id = 0;
     public string $ip = "";
 	public string $expired = "";
+    public string $created = "";
+    public ?string $updated = null;
+    public ?string $deleted = null;
 
 	/**
 	 * The constructor loads the database content into this object.

@@ -6,6 +6,7 @@ use models\AccessRestrictionType;
 use models\AccessRestriction;
 use models\ActorRole;
 use system\abstracts\AResponse;
+use system\classes\Cache;
 use system\classes\responses\ResponseHTML;
 use system\classes\Router;
 use system\abstracts\AController;
@@ -45,6 +46,7 @@ class RestrictionController extends AController {
 
     /**
      * @inheritDoc
+     * @throws \Exception
      */
     public function index(): AResponse {
         if( isset($_POST['update']) ) {
@@ -57,21 +59,47 @@ class RestrictionController extends AController {
         $routes = array();
         Core::$_router->getAllRoutes(PATH_CONTROLLER_ROOT, $routes);
 
-        $results = AccessRestriction::findAll();
+        $cache = new Cache("all_access_restrictions");
+        $last_modify = AccessRestriction::getLastModification();
+        if( $cache->isUpToDate($last_modify) ) {
+            $access_restrictions = unserialize($cache->loadFromCache(), array(false));
+        } else {
+            $access_restrictions = AccessRestriction::findAll();
+            $cache->saveToCache(serialize($access_restrictions));
+        }
+
         $current_restrictions = array();
-        foreach( $results as $restriction ) {
+        foreach( $access_restrictions as $restriction ) {
             $current_restrictions[$restriction->domain][$restriction->controller][$restriction->method] = array(
                 "role" => $restriction->role_id,
                 "type" => $restriction->restriction_type
             );
         }
 
+        $cache = new Cache("all_actor_roles");
+        $last_modify = ActorRole::getLastModification();
+        if( $cache->isUpToDate($last_modify) ) {
+            $actor_roles = unserialize($cache->loadFromCache(), array(false));
+        } else {
+            $actor_roles = ActorRole::findAll();
+            $cache->saveToCache(serialize($actor_roles));
+        }
+
+        $cache = new Cache("all_restriction_types");
+        $last_modify = AccessRestrictionType::getLastModification();
+        if( $cache->isUpToDate($last_modify) ) {
+            $restriction_types = unserialize($cache->loadFromCache(), array(false));
+        } else {
+            $restriction_types = AccessRestrictionType::findAll();
+            $cache->saveToCache(serialize($restriction_types));
+        }
+
         $template->set("navigation", $this::$_menu);
         $template->set("view", new Template(PATH_VIEWS."restrictions/index.html"));
         $template->set("routes", $routes);
         $template->set("current_restrictions", $current_restrictions);
-        $template->set("role_options", ActorRole::findAll());
-        $template->set("type_options", AccessRestrictionType::findAll());
+        $template->set("role_options", $actor_roles);
+        $template->set("type_options", $restriction_types);
 
         $response->setOutput($template->parse());
         return $response;

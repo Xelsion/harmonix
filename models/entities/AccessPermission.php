@@ -2,6 +2,7 @@
 
 namespace models\entities;
 
+use DateTime;
 use PDO;
 use PDOException;
 use RuntimeException;
@@ -24,6 +25,9 @@ class AccessPermission extends AEntity {
 	public string $domain = "";
 	public ?string $controller = null;
 	public ?string $method = null;
+    public string $created = "";
+    public ?string $updated = null;
+    public ?string $deleted = null;
 
 	/**
 	 * The constructor loads the database content into this object.

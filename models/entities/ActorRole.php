@@ -27,6 +27,9 @@ class ActorRole extends AEntityTreeNode {
 	public int $rights_own = 0b0000;
 	public bool $is_default = false;
 	public bool $is_protected = false;
+    public string $created = "";
+    public ?string $updated = null;
+    public ?string $deleted = null;
 
 	/**
 	 * The constructor loads the database content into this object.

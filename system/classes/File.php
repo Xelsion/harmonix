@@ -2,6 +2,8 @@
 
 namespace system\classes;
 
+use RuntimeException;
+
 /**
  * The File class
  *
@@ -76,6 +78,12 @@ class File {
 	 * @return bool
 	 */
 	public function append( string $content ): bool {
+        $path_parts = pathinfo($this->_file_path);
+        // Create all necessary folders
+        if( !file_exists($path_parts["dirname"]) && !mkdir($path_parts["dirname"], 0777, true) && !is_dir($path_parts["dirname"]) ) {
+            throw new RuntimeException(sprintf('Directory "%s" was not created', $path_parts["dirname"]));
+        }
+
 		return file_put_contents($this->_file_path, $content, FILE_APPEND);
 	}
 
@@ -86,6 +94,12 @@ class File {
 	 * @return bool
 	 */
 	public function save(): bool {
+        $path_parts = pathinfo($this->_file_path);
+        // Create all necessary folders
+        if( !file_exists($path_parts["dirname"]) && !mkdir($path_parts["dirname"], 0777, true) && !is_dir($path_parts["dirname"]) ) {
+            throw new RuntimeException(sprintf('Directory "%s" was not created', $path_parts["dirname"]));
+        }
+
 		return file_put_contents($this->_file_path, $this->_content);
 	}
 

@@ -4,6 +4,7 @@ namespace controller\admin;
 
 use system\abstracts\AResponse;
 use system\abstracts\AController;
+use system\classes\Cache;
 use system\classes\responses\ResponseHTML;
 use system\classes\Router;
 use system\classes\Template;
@@ -45,12 +46,20 @@ class ActorRolesController extends AController {
 
     /**
      * @inheritDoc
+     * @throws \Exception
      */
 	public function index(): AResponse {
 		$response = new ResponseHTML();
 		$template = new Template(PATH_VIEWS."template.html");
 
-		$results = ActorRole::findAll();
+        $cache = new Cache("all_actor_roles");
+        $last_modify = ActorRole::getLastModification();
+        if( $cache->isUpToDate($last_modify) ) {
+            $results = unserialize($cache->loadFromCache(), array(false));
+        } else {
+            $results = ActorRole::findAll();
+            $cache->saveToCache(serialize($results));
+        }
 
 		$template->set("navigation", $this::$_menu);
 		$template->set("result_list", $results);
@@ -76,7 +85,15 @@ class ActorRolesController extends AController {
 				redirect("/actor-roles");
 			}
 		}
-		$results = ActorRole::findAll();
+
+        $cache = new Cache("all_actor_roles");
+        $last_modify = ActorRole::getLastModification();
+        if( $cache->isUpToDate($last_modify) ) {
+            $results = unserialize($cache->loadFromCache(), array(false));
+        } else {
+            $results = ActorRole::findAll();
+            $cache->saveToCache(serialize($results));
+        }
 
 		$response = new ResponseHTML();
 		$template = new Template(PATH_VIEWS."template.html");
@@ -87,7 +104,10 @@ class ActorRolesController extends AController {
 		return $response;
 	}
 
-	public function update( ActorRole $role ): AResponse {
+    /**
+     * @throws \Exception
+     */
+    public function update( ActorRole $role ): AResponse {
 		if( isset($_POST['cancel']) ) {
 			redirect("/actor-roles");
 		}
@@ -95,7 +115,6 @@ class ActorRolesController extends AController {
 
 			$is_valid = $this->postIsValid();
 			if( $is_valid ) {
-
 				$all = ( isset($_POST["all"]) ) ? $this->getPermissions($_POST["all"]) : 0b000;
 				$group = ( isset($_POST["group"]) ) ? $this->getPermissions($_POST["group"]) : 0b000;
 				$own = ( isset($_POST["own"]) ) ? $this->getPermissions($_POST["own"]) : 0b000;
@@ -108,13 +127,22 @@ class ActorRolesController extends AController {
 				redirect("/actor-roles");
 			}
 		}
-		$results = ActorRole::find(array(
-			array(
-				"id",
-				"!=",
-				$role->id
-			)
-		));
+
+        $cache = new Cache("actor_roles_".$role->id);
+        $last_modify = ActorRole::getLastModification();
+        if( $cache->isUpToDate($last_modify) ) {
+            $results = unserialize($cache->loadFromCache(), array(false));
+        } else {
+            $results = ActorRole::find(array(
+                array(
+                    "id",
+                    "!=",
+                    $role->id
+                )
+            ));
+            $cache->saveToCache(serialize($results));
+        }
+
 		$response = new ResponseHTML();
 		$template = new Template(PATH_VIEWS."template.html");
 		$template->set("role", $role);

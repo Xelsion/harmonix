@@ -15,6 +15,9 @@ class AccessRestrictionType extends AEntity {
     public int $include_siblings = 0;
     public int $include_children = 0;
     public int $include_descendants = 0;
+    public string $created = "";
+    public ?string $updated = null;
+    public ?string $deleted = null;
 
     public function __construct( int $id = 0 ) {
         if( $id > 0 ) {

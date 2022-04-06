@@ -13,6 +13,9 @@ class AccessRestriction extends AEntity {
     public ?string $method = null;
     public int $restriction_type = 0;
     public int $role_id = 0;
+    public string $created = "";
+    public ?string $updated = null;
+    public ?string $deleted = null;
 
     public function __construct( int $id = 0 ) {
         if( $id > 0 ) {

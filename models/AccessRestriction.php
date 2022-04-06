@@ -2,6 +2,7 @@
 
 namespace models;
 
+use DateTime;
 use PDO;
 use system\Core;
 use system\helper\SqlHelper;
@@ -56,6 +57,26 @@ class AccessRestriction extends entities\AccessRestriction {
         $pdo = SqlHelper::findAllIn("mvc", "access_restrictions", $order, $direction, $limit, $page);
         return $pdo->execute()->fetchAll(PDO::FETCH_CLASS, __CLASS__);
     }
+
+    /**
+     * @return int
+     * @throws \Exception
+     */
+    public static function getLastModification() : int {
+        $created = 0;
+        $updated = 0;
+        $pdo = Core::$_connection_manager->getConnection("mvc");
+        $pdo->prepare("SELECT max(created) as created, max(updated) as updated FROM access_restrictions LIMIT 1");
+        $row = $pdo->execute()->fetch();
+        if( $row ) {
+            $created = new DateTime($row["created"]);
+            $created = $created->getTimestamp();
+            $updated = new DateTime($row["updated"]);
+            $updated = $updated->getTimestamp();
+        }
+        return ( $created >= $updated ) ? $created : $updated;
+    }
+
 
     public static function deleteAll() {
         $pdo = Core::$_connection_manager->getConnection("mvc");
