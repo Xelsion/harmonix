@@ -18,9 +18,19 @@ $view_content = ( $view instanceof Template) ? $view->parse() : "";
 	<link rel="stylesheet" href="<?= PATH_CSS ?>navigation.css" />
 	<link rel="stylesheet" href="<?= PATH_CSS ?>forms.css" />
 	<link rel="stylesheet" href="<?= PATH_CSS ?>tables.css" />
+	<?php foreach( $this->getHeaderCss() as $css_file ) { ?>
+		<link rel="stylesheet" href="<?= $css_file ?>" />
+	<?php } ?>
 	<script src="<?= PATH_SRC ?>bootstrap-5.0.2/js/bootstrap.bundle.min.js"></script>
 	<script src="<?= PATH_SRC ?>jquery/jquery-3.6.0.min.js"></script>
 	<script src="<?= PATH_JS ?>main.js"></script>
+	<?php foreach( $this->getHeaderScripts() as $script_file => $async ) { ?>
+		<?php if ( $async ) { ?>
+			<script async src="<?= $script_file ?>"></script>
+		<?php } else { ?>
+			<script src="<?= $script_file ?>"></script>
+		<?php } ?>
+	<?php } ?>
 </head>
 <body>
 <header>
@@ -32,36 +42,34 @@ $view_content = ( $view instanceof Template) ? $view->parse() : "";
 			</div>
 			<div id="actor-menu-dropdown" style="">
 				<menu>
-					<ul>
-						<?php if( $actor->id === 0 ): ?>
-							<li>
-								<form action="<?= $_SERVER["REQUEST_URI"] ?>" method="POST">
-									<div class="form-row">
-										<label>
-											<input type="email" name="email" value="" placeholder="E-Mail" />
-										</label>
-									</div>
-									<div class="form-row">
-										<label>
-											<input type="password" name="password" value="" placeholder="Password" autocomplete="new-password" />
-										</label>
-									</div>
-									<div class="form-row">
-										<button type="submit" name="login">Login</button>
-									</div>
-								</form>
-							</li>
-						<?php else: ?>
-							<li>
-								<a href="https://www.harmonix.de">www-Bereich</a>
-							</li>
-							<li>
-								<form action="<?= $_SERVER["REQUEST_URI"] ?>" method="POST">
-									<button type="submit" name="logout" class="link">Logout</button>
-								</form>
-							</li>
-						<?php endif; ?>
-					</ul>
+					<?php if( $actor->id === 0 ): ?>
+						<li>
+							<form action="<?= $_SERVER["REQUEST_URI"] ?>" method="POST">
+								<div class="form-row">
+									<label>
+										<input type="email" name="email" value="" placeholder="E-Mail" />
+									</label>
+								</div>
+								<div class="form-row">
+									<label>
+										<input type="password" name="password" value="" placeholder="Password" autocomplete="new-password" />
+									</label>
+								</div>
+								<div class="form-row">
+									<button type="submit" name="login">Login</button>
+								</div>
+							</form>
+						</li>
+					<?php else: ?>
+						<li>
+							<a href="https://www.harmonix.de">www-Bereich</a>
+						</li>
+						<li>
+							<form action="<?= $_SERVER["REQUEST_URI"] ?>" method="POST">
+								<button type="submit" name="logout" class="link">Logout</button>
+							</form>
+						</li>
+					<?php endif; ?>
 				</menu>
 			</div>
 		</div>
@@ -71,4 +79,11 @@ $view_content = ( $view instanceof Template) ? $view->parse() : "";
 <main><?= $view_content ?></main>
 <footer></footer>
 </body>
+<?php foreach( $this->getFooterScripts() as $script_file => $async ) { ?>
+	<?php if ( $async ) { ?>
+		<script async src="<?= $script_file ?>"></script>
+	<?php } else { ?>
+		<script src="<?= $script_file ?>"></script>
+	<?php } ?>
+<?php } ?>
 </html>
