@@ -1,4 +1,6 @@
 <?php
+
+use system\abstracts\ALoggableException;
 use system\classes\Logger;
 use system\Process;
 
@@ -17,7 +19,11 @@ try {
 } catch( Exception $e ) {
 	try {
 		echo "Error: Please check the Log Files for mor information";
-		$runtime_logger->log($e->getFile(), $e->getLine(), $e->getMessage(), $e->getTrace());
+        if( $e instanceof ALoggableException ) {
+            $e->log();
+        } else {
+		    $runtime_logger->log($e->getFile(), $e->getLine(), $e->getMessage(), $e->getTrace());
+        }
 	} catch( JsonException $e ) {
 		die($e->getMessage());
 	}

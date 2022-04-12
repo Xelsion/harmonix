@@ -7,6 +7,7 @@ use system\abstracts\AResponse;
 use system\classes\responses\ResponseHTML;
 use system\classes\Router;
 use system\classes\Template;
+use system\exceptions\SystemException;
 
 /**
  * @see \system\abstracts\AController
@@ -41,6 +42,8 @@ class ErrorController extends AController {
 
     /**
      * @inheritDoc
+     *
+     * @throws SystemException
      */
 	public function index(): AResponse {
 		$response = new ResponseHTML();
@@ -54,6 +57,8 @@ class ErrorController extends AController {
     /**
      * @param int $error_code
      * @return AResponse
+     *
+     * @throws SystemException
      */
 	public function error( int $error_code ): AResponse {
 		$response = new ResponseHTML();

@@ -2,13 +2,13 @@
 
 namespace models\entities;
 
-use DateTime;
 use PDO;
 use PDOException;
 use RuntimeException;
 
-use system\abstracts\AEntity;
+use system\abstracts\ACacheableEntity;
 use system\Core;
+use system\helper\SqlHelper;
 
 /**
  * The AccessPermission entity
@@ -17,7 +17,7 @@ use system\Core;
  * @author Markus Schröder <xelsion@gmail.com>
  * @version 1.0.0;
  */
-class AccessPermission extends AEntity {
+class AccessPermission extends ACacheableEntity {
 
 	// The columns
 	public int $actor_id = 0;
@@ -25,9 +25,6 @@ class AccessPermission extends AEntity {
 	public string $domain = "";
 	public ?string $controller = null;
 	public ?string $method = null;
-    public string $created = "";
-    public ?string $updated = null;
-    public ?string $deleted = null;
 
 	/**
 	 * The constructor loads the database content into this object.
@@ -38,9 +35,9 @@ class AccessPermission extends AEntity {
 
 	}
 
-	/**
-	 * @see \system\interfaces\IEntity
-	 */
+    /**
+     * @inheritDoc
+     */
 	public function create(): void {
 		try {
 			$pdo = Core::$_connection_manager->getConnection("mvc");
@@ -57,17 +54,23 @@ class AccessPermission extends AEntity {
 		}
 	}
 
-	/**
-	 * @see \system\interfaces\IEntity
-	 */
+    /**
+     * @inheritDoc
+     */
 	public function update(): void {
 	}
 
-	/**
-	 * @see \system\interfaces\IEntity
-	 * @return bool
-	 */
+    /**
+     * @inheritDoc
+     */
 	public function delete(): bool {
 		return false;
 	}
+
+    /**
+     * @inheritDoc
+     */
+    public static function getLastModification(): int {
+        return SqlHelper::getLastModificationDate("access_permissions");
+    }
 }

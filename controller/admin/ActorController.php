@@ -3,6 +3,8 @@
 namespace controller\admin;
 
 use Exception;
+use JsonException;
+use system\abstracts\ACacheableEntity;
 use system\abstracts\AController;
 use system\abstracts\AResponse;
 use system\classes\Cache;
@@ -12,6 +14,8 @@ use system\classes\responses\ResponseHTML;
 use models\Actor;
 use models\ActorRole;
 use models\AccessPermission;
+use system\exceptions\SystemException;
+use system\helper\SqlHelper;
 
 /**
  * @see \system\abstracts\AController
@@ -50,20 +54,28 @@ class ActorController extends AController {
 
     /**
      * @inheritDoc
+     *
      * @throws Exception
+     * @throws JsonException
+     * @throws SystemException
      */
 	public function index(): AResponse {
 		$response = new ResponseHTML();
 		$template = new Template(PATH_VIEWS."template.html");
 
-        $cache = new Cache("all_actors");
-        $last_modify = Actor::getLastModification();
-        if( $cache->isUpToDate($last_modify) ) {
-            $results = unserialize($cache->loadFromCache(), array(false));
-        } else {
-            $results = Actor::findAll();
-            $cache->saveToCache(serialize($results));
+
+        if( Actor::isCacheable() ) {
+            $results = SqlHelper::findAllInCached("mvc", "actors");
         }
+//        $cache = new Cache("all_actors");
+//        $last_modify = Actor::getLastModification();
+//        if( $cache->isUpToDate($last_modify) ) {
+//            $results = unserialize($cache->loadFromCache(), array(false));
+//        } else {
+//
+//            $cache->saveToCache(serialize($results));
+//        }
+
 
 		$template->set("navigation", $this::$_menu);
 		$template->set("result_list", $results);
@@ -113,7 +125,11 @@ class ActorController extends AController {
 		return $response;
 	}
 
-	public function update( Actor $actor ): AResponse {
+
+    /**
+     * @throws SystemException
+     */
+    public function update( Actor $actor ): AResponse {
 		if( !$this::$_actor_role->canUpdateAll() ) {
 			redirect("/error/403");
 		}
@@ -133,6 +149,7 @@ class ActorController extends AController {
                 redirect("/actors");
 			}
 		}
+
 		$response = new ResponseHTML();
 		$template = new Template(PATH_VIEWS."template.html");
 		$template->set("actor", $actor);
@@ -143,6 +160,7 @@ class ActorController extends AController {
 	}
 
     /**
+     * @throws SystemException
      * @throws Exception
      */
     public function roles( Actor $actor ): AResponse {
@@ -224,6 +242,9 @@ class ActorController extends AController {
      *
      * @param Actor $actor
      * @return void
+     *
+     * @throws JsonException
+     * @throws SystemException
      */
 	private function savePermissions( Actor $actor ): void {
 		if( $actor->id === 0 ) {

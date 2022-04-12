@@ -2,6 +2,7 @@
 
 namespace system\classes\tree;
 
+use Exception;
 use models\ActorRole;
 
 class RoleTree extends TreeWalker {
@@ -12,12 +13,15 @@ class RoleTree extends TreeWalker {
      * The class constructor
      *
      * Collect all actor roles and add then to the tree
+     *
+     * @throws Exception
      */
 	private function __construct() {
 		parent::__construct();
 		$actor_roles = ActorRole::findAll();
 		foreach( $actor_roles as $role ) {
-			$this->addNode($role);
+            $node = new RoleNode($role);
+			$this->addNode($node);
 		}
 	}
 

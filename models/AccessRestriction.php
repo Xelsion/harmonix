@@ -4,8 +4,10 @@ namespace models;
 
 use DateTime;
 use Exception;
+use JsonException;
 use PDO;
 use system\Core;
+use system\exceptions\SystemException;
 use system\helper\SqlHelper;
 
 class AccessRestriction extends entities\AccessRestriction {
@@ -36,6 +38,9 @@ class AccessRestriction extends entities\AccessRestriction {
      * @param int $limit
      * @param int $page
      * @return array|false|null
+     *
+     * @throws JsonException
+     * @throws SystemException
      */
     public static function find( array $conditions, ?string $order = "", ?string $direction = "asc", int $limit = 0, int $page = 1 ) : ?array {
         $pdo = SqlHelper::findIn("mvc", "access_restrictions", $conditions, $order, $direction, $limit, $page);
@@ -53,6 +58,9 @@ class AccessRestriction extends entities\AccessRestriction {
      * @param int $limit
      * @param int $page
      * @return array|false
+     *
+     * @throws JsonException
+     * @throws SystemException
      */
     public static function findAll( ?string $order = "", ?string $direction = "asc", int $limit = 0, int $page = 1 ): ?array {
         $pdo = SqlHelper::findAllIn("mvc", "access_restrictions", $order, $direction, $limit, $page);
@@ -60,26 +68,12 @@ class AccessRestriction extends entities\AccessRestriction {
     }
 
     /**
-     * @return int
-     * @throws Exception
+     * @return void
+     *
+     * @throws JsonException
+     * @throws SystemException
      */
-    public static function getLastModification() : int {
-        $created = 0;
-        $updated = 0;
-        $pdo = Core::$_connection_manager->getConnection("mvc");
-        $pdo->prepare("SELECT max(created) as created, max(updated) as updated FROM access_restrictions LIMIT 1");
-        $row = $pdo->execute()->fetch();
-        if( $row ) {
-            $created = new DateTime($row["created"]);
-            $created = $created->getTimestamp();
-            $updated = new DateTime($row["updated"]);
-            $updated = $updated->getTimestamp();
-        }
-        return ( $created >= $updated ) ? $created : $updated;
-    }
-
-
-    public static function deleteAll() {
+    public static function deleteAll() : void {
         $pdo = Core::$_connection_manager->getConnection("mvc");
         $sql = "DELETE FROM access_restrictions";
         $pdo->prepare($sql);

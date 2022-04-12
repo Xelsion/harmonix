@@ -2,22 +2,21 @@
 
 namespace models\entities;
 
+use JsonException;
 use PDO;
 use PDOException;
 use RuntimeException;
+use system\abstracts\ACacheableEntity;
 use system\Core;
-use system\abstracts\AEntity;
+use system\helper\SqlHelper;
 
-class AccessRestrictionType extends AEntity {
+class AccessRestrictionType extends ACacheableEntity {
 
     public int $id = 0;
     public string $name = "";
     public int $include_siblings = 0;
     public int $include_children = 0;
     public int $include_descendants = 0;
-    public string $created = "";
-    public ?string $updated = null;
-    public ?string $deleted = null;
 
     public function __construct( int $id = 0 ) {
         if( $id > 0 ) {
@@ -30,8 +29,7 @@ class AccessRestrictionType extends AEntity {
     }
 
     /**
-     *
-     * @see \system\interfaces\IEntity
+     * @inheritDoc
      */
     public function create(): void {
         $pdo = Core::$_connection_manager->getConnection("mvc");
@@ -46,7 +44,7 @@ class AccessRestrictionType extends AEntity {
     }
 
     /**
-     * @see \system\interfaces\IEntity
+     * @inheritDoc
      */
     public function update(): void {
         try {
@@ -65,8 +63,7 @@ class AccessRestrictionType extends AEntity {
     }
 
     /**
-     * @see \system\interfaces\IEntity
-     * @return bool
+     * @inheritDoc
      */
     public function delete(): bool {
         if( $this->id > 0 ) {
@@ -77,5 +74,12 @@ class AccessRestrictionType extends AEntity {
             return true;
         }
         return false;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public static function getLastModification(): int {
+        return SqlHelper::getLastModificationDate("access_restriction_types");
     }
 }

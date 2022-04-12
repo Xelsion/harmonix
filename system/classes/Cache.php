@@ -20,7 +20,7 @@ class Cache extends File {
     /**
      * The constructor
      *
-     * @param string $cache_file
+     * @param string $file_name
      */
     public function __construct( string $file_name ) {
         $cache_file = PATH_CACHE.md5($file_name).".cache";

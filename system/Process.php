@@ -2,21 +2,22 @@
 
 namespace system;
 
-use Exception;
-use RuntimeException;
-use system\classes\Auth;
-use system\classes\GarbageCollector;
-use system\classes\tree\RoleTree;
+use JsonException;
+use ReflectionException;
+use system\exceptions\SystemException;
+
 use system\abstracts\AController;
 use system\abstracts\AResponse;
 use system\manager\ConnectionManager;
+use system\classes\Auth;
+use system\classes\GarbageCollector;
+use system\classes\tree\RoleTree;
+use system\classes\tree\Menu;
 use system\classes\Configuration;
 use system\classes\Logger;
 use system\classes\Request;
 use system\classes\Router;
-use system\classes\tree\Menu;
 use models\Session;
-
 
 /**
  * The System Class Type singleton
@@ -59,72 +60,68 @@ class Process {
 		return static::$_instance;
 	}
 
-	/**
-	 * Gets the required controller for the current request
-	 * and performs the requested method.
-	 * Sets the system\abstracts\AResponse this method will return.
-	 *
-	 * @throws RuntimeException - if no valid controller and its method was found
-	 */
+    /**
+     * Gets the required controller for the current request
+     * and performs the requested method.
+     * Sets the system\abstracts\AResponse this method will return.
+     *
+     * @throws SystemException|ReflectionException|JsonException - if no valid controller and its method was found
+     */
 	public function start(): void {
-		try {
-            // Initiate session cookie settings
-            $cookie = Core::$_configuration->getSection("cookie");
-            ini_set('session.cookie_domain', $cookie["domain"]);
-            session_start();
 
-            // Initiate database connections
-            $connections = Core::$_configuration->getSection("connections");
-            foreach( $connections as $name => $conn ) {
-                Core::$_connection_manager->addConnection($name, $conn["dns"], $conn["user"], $conn["password"]);
+        // Initiate session cookie settings
+        $cookie = Core::$_configuration->getSection("cookie");
+        ini_set('session.cookie_domain', $cookie["domain"]);
+        session_start();
+
+        // Initiate database connections
+        $connections = Core::$_configuration->getSection("connections");
+        foreach( $connections as $name => $conn ) {
+            Core::$_connection_manager->addConnection($name, $conn["dns"], $conn["user"], $conn["password"]);
+        }
+
+        // clear the garbage
+        $gc = new GarbageCollector();
+        $gc->clean();
+
+        // initiate actor roles tree
+        Core::$_role_tree = RoleTree::getInstance();
+
+        // initiate the session
+        $session = new Session();
+        Core::$_actor = $session->start();
+
+        // Try to get the responsible route for this requested uri
+        $route = Core::$_router->getRoute(Core::$_request);
+
+        // Get the controller
+        $controller = $route["controller"];
+
+        // Is it a compatible controller?
+        if( $controller instanceof AController ) {
+            // Get the method and its parameters
+            $method = $route["method"];
+            $params = $route["params"];
+
+            // Set the actor role for the current request
+            Core::$_actor_role = Core::$_actor->getRole(get_class($controller), $method);
+
+            // Set the Authentication class
+            Core::$_auth = new Auth();
+
+            // Has the current actor access to this request?
+            if( Core::$_auth->hasAccess() ) {
+                // Get the Response obj from the controller
+                $this->_response = $controller->$method(...$params);
+                $this->_response->setHeaders();
+            } else {
+                redirect("/error/403");
             }
 
-            // clear the garbage
-            $gc = new GarbageCollector();
-            $gc->clean();
-
-            // initiate actor roles tree
-            Core::$_role_tree = RoleTree::getInstance();
-
-            // initiate the session
-            $session = new Session();
-            Core::$_actor = $session->start();
-
-			// Try to get the responsible route for this requested uri
-			$route = Core::$_router->getRoute(Core::$_request);
-
-			// Get the controller
-			$controller = $route["controller"];
-
-			// Is it a compatible controller?
-			if( $controller instanceof AController ) {
-				// Get the method and its parameters
-				$method = $route["method"];
-				$params = $route["params"];
-
-				// Set the actor role for the current request
-				Core::$_actor_role = Core::$_actor->getRole(get_class($controller), $method);
-
-                // Set the Authentication class
-                Core::$_auth = new Auth();
-
-                // Has the current actor access to this request?
-                if( Core::$_auth->hasAccess() ) {
-				    // Get the Response obj from the controller
-				    $this->_response = $controller->$method(...$params);
-                    $this->_response->setHeaders();
-                } else {
-                    redirect("/error/403");
-                }
-
-			} else {
-			    // No valid controller found
-			    throw new RuntimeException("Controller for request ".Core::$_request->getRequestUri()." cant be found!");
-            }
-		} catch( Exception $e ) {
-			// Pass all exceptions to the index.php
-			throw new RuntimeException($e->getMessage(), $e->getCode(), $e);
-		}
+        } else {
+            // No valid controller found
+            throw new SystemException(__FILE__, __LINE__, "Controller for request ".Core::$_request->getRequestUri()." cant be found!");
+        }
 	}
 
 	/**

@@ -2,7 +2,7 @@
 
 namespace system\classes;
 
-use RuntimeException;
+use system\exceptions\SystemException;
 
 /**
  * The File class
@@ -70,34 +70,36 @@ class File {
 		return false;
 	}
 
-	/**
-	 * Adds the given $content to the end of the files content.
-	 * Return true if successful and false if not
-	 *
-	 * @param string $content
-	 * @return bool
-	 */
+    /**
+     * Adds the given $content to the end of the files content.
+     * Return true if successful and false if not
+     *
+     * @param string $content
+     * @return bool
+     * @throws SystemException
+     */
 	public function append( string $content ): bool {
         $path_parts = pathinfo($this->_file_path);
         // Create all necessary folders
         if( !file_exists($path_parts["dirname"]) && !mkdir($path_parts["dirname"], 0777, true) && !is_dir($path_parts["dirname"]) ) {
-            throw new RuntimeException(sprintf('Directory "%s" was not created', $path_parts["dirname"]));
+            throw new SystemException(__FILE__, __LINE__, sprintf('Directory "%s" was not created', $path_parts["dirname"]));
         }
 
 		return file_put_contents($this->_file_path, $content, FILE_APPEND);
 	}
 
-	/**
-	 * writes the current content to the current file.
-	 * Return true if successful and false if not
-	 *
-	 * @return bool
-	 */
+    /**
+     * writes the current content to the current file.
+     * Return true if successful and false if not
+     *
+     * @return bool
+     * @throws SystemException
+     */
 	public function save(): bool {
         $path_parts = pathinfo($this->_file_path);
         // Create all necessary folders
         if( !file_exists($path_parts["dirname"]) && !mkdir($path_parts["dirname"], 0777, true) && !is_dir($path_parts["dirname"]) ) {
-            throw new RuntimeException(sprintf('Directory "%s" was not created', $path_parts["dirname"]));
+            throw new SystemException(__FILE__, __LINE__, sprintf('Directory "%s" was not created', $path_parts["dirname"]));
         }
 
 		return file_put_contents($this->_file_path, $this->_content);

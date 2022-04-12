@@ -2,7 +2,7 @@
 
 namespace system\classes;
 
-use RuntimeException;
+use system\exceptions\SystemException;
 
 /**
  * The Template class
@@ -20,11 +20,12 @@ class Template extends TemplateData {
 	 * Throws an exception if the file was not found
 	 *
 	 * @param string $file_path
-	 * @throws RuntimeException
+     *
+	 * @throws SystemException
 	 */
 	public function __construct( string $file_path ) {
 		if( !file_exists($file_path) ) {
-			throw new RuntimeException("Template: file[".$file_path."] not found!");
+			throw new SystemException( __FILE__, __LINE__, "Template: file[".$file_path."] not found!");
 		}
 		$this->_file_path = $file_path;
 	}

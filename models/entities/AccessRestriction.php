@@ -3,10 +3,11 @@
 namespace models\entities;
 
 use PDO;
-use system\abstracts\AEntity;
+use system\abstracts\ACacheableEntity;
 use system\Core;
+use system\helper\SqlHelper;
 
-class AccessRestriction extends AEntity {
+class AccessRestriction extends ACacheableEntity {
 
     public string $domain = "";
     public ?string $controller = null;
@@ -47,5 +48,12 @@ class AccessRestriction extends AEntity {
      */
     public function delete(): bool {
         return false;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public static function getLastModification(): int {
+        return SqlHelper::getLastModificationDate("access_restrictions");
     }
 }

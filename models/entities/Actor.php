@@ -2,11 +2,14 @@
 
 namespace models\entities;
 
+use Exception;
+use JsonException;
+use system\abstracts\ACacheableEntity;
 use system\Core;
 use PDO;
-use PDOException;
-use RuntimeException;
-use system\abstracts\AEntity;
+
+use system\exceptions\SystemException;
+use system\helper\SqlHelper;
 use system\helper\StringHelper;
 
 /**
@@ -16,7 +19,7 @@ use system\helper\StringHelper;
  * @author Markus Schröder <xelsion@gmail.com>
  * @version 1.0.0;
  */
-class Actor extends AEntity {
+class Actor extends ACacheableEntity {
 
 	// the columns
 	public int $id = 0;
@@ -26,16 +29,15 @@ class Actor extends AEntity {
 	public string $last_name = "";
 	public int $login_fails = 0;
 	public bool $login_disabled = false;
-	public string $created;
-	public ?string $updated;
-	public ?string $deleted;
 
-	/**
-	 * The constructor loads the database content into this object.
-	 * If id is 0 the entity will be empty
-	 *
-	 * @param int $id
-	 */
+    /**
+     * The constructor loads the database content into this object.
+     * If id is 0 the entity will be empty
+     *
+     * @param int $id
+     * @throws JsonException
+     * @throws SystemException
+     */
 	public function __construct( int $id = 0 ) {
 		if( $id > 0 ) {
 			$pdo = Core::$_connection_manager->getConnection("mvc");
@@ -46,10 +48,9 @@ class Actor extends AEntity {
 		}
 	}
 
-	/**
-	 *
-	 * @see \system\interfaces\IEntity
-	 */
+    /**
+     * @inheritDoc
+     */
 	public function create(): void {
 		$pdo = Core::$_connection_manager->getConnection("mvc");
 		$sql = "INSERT INTO actors (email, password, first_name, last_name, login_fails, login_disabled) VALUES (:email, :password, :first_name, :last_name, :login_fails, :login_disabled)";
@@ -65,9 +66,9 @@ class Actor extends AEntity {
 		$this->id = $pdo->lastInsertId();
 	}
 
-	/**
-	 * @see \system\interfaces\IEntity
-	 */
+    /**
+     * @inheritDoc
+     */
 	public function update(): void {
 		try {
 			$pdo = Core::$_connection_manager->getConnection("mvc");
@@ -90,15 +91,14 @@ class Actor extends AEntity {
 				$pdo->bindParam(':login_disabled', $this->login_disabled, PDO::PARAM_INT);
 				$pdo->execute();
 			}
-		} catch( PDOException $e ) {
-			throw new RuntimeException($e->getMessage());
+		} catch( Exception $e ) {
+			throw new SystemException( __FILE__, __LINE__, $e->getMessage());
 		}
-	}
+    }
 
-	/**
-	 * @see \system\interfaces\IEntity
-	 * @return bool
-	 */
+    /**
+     * @inheritDoc
+     */
 	public function delete(): bool {
 		if( $this->id > 0 ) {
 			$pdo = Core::$_connection_manager->getConnection("mvc");
@@ -109,4 +109,11 @@ class Actor extends AEntity {
 		}
 		return false;
 	}
+
+    /**
+     * @inheritDoc
+     */
+    public static function getLastModification(): int {
+        return SqlHelper::getLastModificationDate("actors");
+    }
 }

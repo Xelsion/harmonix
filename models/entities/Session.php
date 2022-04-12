@@ -2,12 +2,12 @@
 
 namespace models\entities;
 
+use system\abstracts\ACacheableEntity;
 use system\Core;
 use PDO;
 use PDOException;
 use RuntimeException;
-
-use system\abstracts\AEntity;
+use system\helper\SqlHelper;
 
 /**
  * The Session entity
@@ -16,16 +16,13 @@ use system\abstracts\AEntity;
  * @author Markus Schröder <xelsion@gmail.com>
  * @version 1.0.0;
  */
-class Session extends AEntity {
+class Session extends ACacheableEntity {
 
 	// The columns
 	public string $id = "";
 	public int $actor_id = 0;
     public string $ip = "";
 	public string $expired = "";
-    public string $created = "";
-    public ?string $updated = null;
-    public ?string $deleted = null;
 
 	/**
 	 * The constructor loads the database content into this object.
@@ -42,9 +39,9 @@ class Session extends AEntity {
 		}
 	}
 
-	/**
-	 * @see \system\interfaces\IEntity
-	 */
+    /**
+     * @inheritDoc
+     */
 	public function create(): void {
 		try {
 			$pdo = Core::$_connection_manager->getConnection("mvc");
@@ -60,9 +57,9 @@ class Session extends AEntity {
 		}
 	}
 
-	/**
-	 * @see \system\interfaces\IEntity
-	 */
+    /**
+     * @inheritDoc
+     */
 	public function update(): void {
 		try {
 			$pdo = Core::$_connection_manager->getConnection("mvc");
@@ -78,10 +75,9 @@ class Session extends AEntity {
 		}
 	}
 
-	/**
-	 * @see \system\interfaces\IEntity
-	 * @return bool
-	 */
+    /**
+     * @inheritDoc
+     */
 	public function delete(): bool {
 		if( $this->id !== "" ) {
 			try {
@@ -96,4 +92,11 @@ class Session extends AEntity {
 		}
 		return false;
 	}
+
+    /**
+     * @inheritDoc
+     */
+    public static function getLastModification(): int {
+        return SqlHelper::getLastModificationDate("access_permissions");
+    }
 }

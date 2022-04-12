@@ -2,11 +2,10 @@
 
 namespace models;
 
-use PDO;
-use DateTime;
-use Exception;
-use RuntimeException;
+use JsonException;
+use system\exceptions\SystemException;
 
+use DateTime;
 use system\Core;
 
 /**
@@ -24,28 +23,12 @@ class Session extends entities\Session {
 	private string $_error;
 
     /**
-     * @return int
-     * @throws Exception
-     */
-    public static function getLastModification() : int {
-        $created = 0;
-        $updated = 0;
-        $pdo = Core::$_connection_manager->getConnection("mvc");
-        $pdo->prepare("SELECT max(created) as created, max(updated) as updated FROM sessions LIMIT 1");
-        $row = $pdo->execute()->fetch();
-        if( $row ) {
-            $created = new DateTime($row["created"]);
-            $created = $created->getTimestamp();
-            $updated = new DateTime($row["updated"]);
-            $updated = $updated->getTimestamp();
-        }
-        return ( $created >= $updated ) ? $created : $updated;
-    }
-
-    /**
      * Starts the session
      *
      * @return Actor
+     *
+     * @throws JsonException
+     * @throws SystemException
      */
 	public function start(): Actor {
 		$configuration = Core::$_configuration->getSection("cookie");
@@ -55,11 +38,7 @@ class Session extends entities\Session {
 
         // do we have a login attempt?
 		if( isset($_POST["login"], $_POST["email"], $_POST["password"]) ) {
-			try {
-				return $this->login($_POST["email"], $_POST["password"]);
-			} catch( Exception $e ) {
-				throw new RuntimeException($e->getMessage(), $e->getCode(), $e);
-			}
+			return $this->login($_POST["email"], $_POST["password"]);
 		}
 
         // do we have a logout attempt?
@@ -88,14 +67,16 @@ class Session extends entities\Session {
 		return new Actor();
 	}
 
-	/**
-	 * Try to log in with the given email and password
-	 *
-	 * @param string $email
-	 * @param string $password
-	 * @return Actor
-	 * @throws Exception
-	 */
+    /**
+     * Try to log in with the given email and password
+     *
+     * @param string $email
+     * @param string $password
+     * @return Actor
+     *
+     * @throws JsonException
+     * @throws SystemException
+     */
 	public function login( string $email, string $password ): Actor {
 		$pdo = Core::$_connection_manager->getConnection("mvc");
 		$pdo->prepare("SELECT * FROM actors WHERE email=:email AND deleted IS NULL");
@@ -141,6 +122,9 @@ class Session extends entities\Session {
 
 	/**
 	 * Log out the current actor
+     *
+     * @throws JsonException
+     * @throws SystemException
 	 */
 	public function logout(): void {
 		if( isset($_COOKIE["session"]) && $_COOKIE["session"] === $this->id ) {

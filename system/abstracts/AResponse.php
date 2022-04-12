@@ -10,7 +10,7 @@ use system\interfaces\IResponse;
  * @author Markus Schröder <xelsion@gmail.com>
  * @version 1.0.0;
  */
-abstract class AResponse implements IResponse {
+abstract class AResponse {
 
 	// The output content
 	private string $_output;
@@ -32,5 +32,10 @@ abstract class AResponse implements IResponse {
 	public function getOutput(): string {
 		return $this->_output;
 	}
+
+    /**
+     * sets the headers for the response
+     */
+    abstract public function setHeaders(): void;
 
 }

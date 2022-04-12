@@ -7,6 +7,7 @@ use system\abstracts\AController;
 use system\classes\responses\ResponseHTML;
 use system\classes\Router;
 use system\classes\Template;
+use system\exceptions\SystemException;
 
 /**
  * @see \system\abstracts\AController
@@ -18,6 +19,8 @@ class HomeController extends AController {
 
     /**
      * @inheritDoc
+     *
+     * @throws SystemException
      */
 	public function init( Router $router ): void {
 		// Add routes to router

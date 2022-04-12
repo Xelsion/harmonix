@@ -2,12 +2,16 @@
 
 namespace models\entities;
 
+use JsonException;
 use PDO;
 use PDOException;
 use RuntimeException;
 
+use system\abstracts\ACacheableEntity;
 use system\Core;
-use system\abstracts\AEntityTreeNode;
+use system\abstracts\AEntity;
+use system\exceptions\SystemException;
+use system\helper\SqlHelper;
 
 /**
  * The ActorRole entity
@@ -16,7 +20,7 @@ use system\abstracts\AEntityTreeNode;
  * @author Markus Schröder <xelsion@gmail.com>
  * @version 1.0.0;
  */
-class ActorRole extends AEntityTreeNode {
+class ActorRole extends ACacheableEntity {
 
 	// The columns
 	public int $id = 0;
@@ -27,16 +31,16 @@ class ActorRole extends AEntityTreeNode {
 	public int $rights_own = 0b0000;
 	public bool $is_default = false;
 	public bool $is_protected = false;
-    public string $created = "";
-    public ?string $updated = null;
-    public ?string $deleted = null;
 
-	/**
-	 * The constructor loads the database content into this object.
-	 * If id is 0 the entity will be empty
-	 *
-	 * @param int $id
-	 */
+    /**
+     * The constructor loads the database content into this object.
+     * If id is 0 the entity will be empty
+     *
+     * @param int $id
+     *
+     * @throws JsonException
+     * @throws SystemException
+     */
 	public function __construct( int $id = 0 ) {
 		if( $id > 0 ) {
 			$pdo = Core::$_connection_manager->getConnection("mvc");
@@ -45,13 +49,11 @@ class ActorRole extends AEntityTreeNode {
 			$pdo->setFetchMode(PDO::FETCH_INTO, $this);
 			$pdo->execute()->fetch();
 		}
-		parent::__construct($this->id, $this->child_of, $this->name);
 	}
 
-	/**
-	 * @return string
-	 * @see \system\interfaces\IEntity
-	 */
+    /**
+     * @inheritDoc
+     */
 	public function create(): void {
 		try {
 			$pdo = Core::$_connection_manager->getConnection("mvc");
@@ -69,9 +71,9 @@ class ActorRole extends AEntityTreeNode {
 		}
 	}
 
-	/**
-	 * @see \system\interfaces\IEntity
-	 */
+    /**
+     * @inheritDoc
+     */
 	public function update(): void {
 		if( $this->id > 0 ) {
 			try {
@@ -91,10 +93,9 @@ class ActorRole extends AEntityTreeNode {
 		}
 	}
 
-	/**
-	 * @return bool
-	 * @see \system\interfaces\IEntity
-	 */
+    /**
+     * @inheritDoc
+     */
 	public function delete(): bool {
 		if( $this->id > 0 ) {
 			try {
@@ -109,4 +110,11 @@ class ActorRole extends AEntityTreeNode {
 		}
 		return false;
 	}
+
+    /**
+     * @inheritDoc
+     */
+    public static function getLastModification(): int {
+        return SqlHelper::getLastModificationDate("actor_roles");
+    }
 }

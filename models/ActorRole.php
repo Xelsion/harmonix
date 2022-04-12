@@ -4,11 +4,11 @@ namespace models;
 
 use DateTime;
 use Exception;
+use JsonException;
 use PDO;
-use PDOException;
-use RuntimeException;
 
 use system\Core;
+use system\exceptions\SystemException;
 use system\helper\SqlHelper;
 
 /**
@@ -24,12 +24,15 @@ class ActorRole extends entities\ActorRole {
 	public static int $CAN_UPDATE = 0b0010;
 	public static int $CAN_DELETE = 0b0001;
 
-	/**
-	 * The class constructor
-	 * If id is 0 it will return an empty actor
-	 *
-	 * @param int $id
-	 */
+    /**
+     * The class constructor
+     * If id is 0 it will return an empty actor
+     *
+     * @param int $id
+     *
+     * @throws JsonException
+     * @throws SystemException
+     */
 	public function __construct( int $id = 0 ) {
 		parent::__construct($id);
 	}
@@ -51,6 +54,9 @@ class ActorRole extends entities\ActorRole {
      * @param int $limit
      * @param int $page
      * @return array|false|null
+     *
+     * @throws JsonException
+     * @throws SystemException
      */
     public static function find( array $conditions, ?string $order = "", ?string $direction = "asc", int $limit = 0, int $page = 1 ) : ?array {
         $pdo = SqlHelper::findIn("mvc", "actor_roles", $conditions, $order, $direction, $limit, $page);
@@ -68,6 +74,9 @@ class ActorRole extends entities\ActorRole {
      * @param int $limit
      * @param int $page
      * @return array|false
+     *
+     * @throws JsonException
+     * @throws SystemException
      */
     public static function findAll( ?string $order = "", ?string $direction = "asc", int $limit = 0, int $page = 1 ): ?array {
         $pdo = SqlHelper::findAllIn("mvc", "actor_roles", $order, $direction, $limit, $page);
@@ -75,29 +84,13 @@ class ActorRole extends entities\ActorRole {
     }
 
     /**
-     * @return int
-     * @throws Exception
+     * Returns the parent of this role or null if it has no parent.
+     *
+     * @return ActorRole|null
+     *
+     * @throws JsonException
+     * @throws SystemException
      */
-    public static function getLastModification() : int {
-        $created = 0;
-        $updated = 0;
-        $pdo = Core::$_connection_manager->getConnection("mvc");
-        $pdo->prepare("SELECT max(created) as created, max(updated) as updated FROM actor_roles LIMIT 1");
-        $row = $pdo->execute()->fetch();
-        if( $row ) {
-            $created = new DateTime($row["created"]);
-            $created = $created->getTimestamp();
-            $updated = new DateTime($row["updated"]);
-            $updated = $updated->getTimestamp();
-        }
-        return ( $created >= $updated ) ? $created : $updated;
-    }
-
-	/**
-	 * Returns the parent of this role or null if it has no parent.
-	 *
-	 * @return ActorRole|null
-	 */
 	public function getParent(): ?ActorRole {
 		if( $this->child_of !== null ) {
 			return new ActorRole($this->child_of);
@@ -105,24 +98,23 @@ class ActorRole extends entities\ActorRole {
 		return null;
 	}
 
-	/**
-	 * Returns all children of this role in an array
-	 *
-	 * @return array
-	 */
+    /**
+     * Returns all children of this role in an array
+     *
+     * @return array
+     *
+     * @throws JsonException
+     * @throws SystemException
+     */
 	public function getChildren(): array {
 		$children = array();
-		try {
-			$pdo = Core::$_connection_manager->getConnection("mvc");
-			$pdo->prepare("SELECT * FROM actor_roles WHERE child_of=:id");
-			$pdo->bindParam(":id", $this->id, PDO::PARAM_INT);
-			$results = $pdo->execute()->fetchAll(PDO::FETCH_CLASS, __CLASS__);
-			foreach( $results as $child ) {
-				$children[] = $child;
-			}
-		} catch( PDOException $e ) {
-			throw new RuntimeException($e->getMessage());
-		}
+        $pdo = Core::$_connection_manager->getConnection("mvc");
+        $pdo->prepare("SELECT * FROM actor_roles WHERE child_of=:id");
+        $pdo->bindParam(":id", $this->id, PDO::PARAM_INT);
+        $results = $pdo->execute()->fetchAll(PDO::FETCH_CLASS, __CLASS__);
+        foreach( $results as $child ) {
+            $children[] = $child;
+        }
 		return $children;
 	}
 
@@ -156,12 +148,15 @@ class ActorRole extends entities\ActorRole {
 		return $this->child_of === $role->id;
 	}
 
-	/**
-	 * Checks if this role is an ancestor of the given role
-	 *
-	 * @param ActorRole $role
-	 * @return bool
-	 */
+    /**
+     * Checks if this role is an ancestor of the given role
+     *
+     * @param ActorRole $role
+     * @return bool
+     *
+     * @throws JsonException
+     * @throws SystemException
+     */
 	public function isAncestorOf( ActorRole $role ): bool {
 		$current_role = $role;
 		while( $current_role->child_of !== null ) {
@@ -173,12 +168,15 @@ class ActorRole extends entities\ActorRole {
 		return false;
 	}
 
-	/**
-	 * Checks if this role is a descendant of the given role
-	 *
-	 * @param ActorRole $role
-	 * @return bool
-	 */
+    /**
+     * Checks if this role is a descendant of the given role
+     *
+     * @param ActorRole $role
+     * @return bool
+     *
+     * @throws JsonException
+     * @throws SystemException
+     */
 	public function isDescendantOf( ActorRole $role ): bool {
 		$current_role = $this;
 		while( $current_role->child_of !== null ) {

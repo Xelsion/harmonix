@@ -8,6 +8,7 @@ use Exception;
 use RuntimeException;
 use ReflectionException;
 use ReflectionMethod;
+use system\exceptions\SystemException;
 
 /**
  * The Router Type singleton
@@ -53,14 +54,16 @@ class Router {
 		return $this->_routes;
 	}
 
-	/**
-	 * Sets a route for a specific call.
-	 * The call looks like "ControllerName->methodName"
-	 *
-	 * @param string $route
-	 * @param string $class
-	 * @param string|null $method
-	 */
+    /**
+     * Sets a route for a specific call.
+     * The call looks like "ControllerName->methodName"
+     *
+     * @param string $route
+     * @param string $class
+     * @param string|null $method
+     *
+     * @throws SystemException
+     */
 	public function addRoute( string $route, string $class, ?string $method = null ): void {
 		if( !isset($this->_routes[$route]) ) {
 			if( is_null($method) ) {
@@ -68,7 +71,7 @@ class Router {
 			}
 			$this->_routes[$route] = array( "controller" => $class, 'method' => $method );
 		} else {
-			throw new RuntimeException("Router: The route [".$route."] was already taken");
+			throw new SystemException(__FILE__, __LINE__,"Router: The route [".$route."] is already taken");
 		}
 	}
 
@@ -86,16 +89,18 @@ class Router {
 		return count($matches) > 0;
 	}
 
-	/**
-	 * The getRoute method will check the given $request
-	 * for a valid Controller and the requested method
-	 * the returned array will be like:
-	 * ["controller" => {Controller instance}, "method" => {Methode name}, "params" => {Array of formatted args}]
-	 *
-	 * @param Request $request
-	 * @return array|null
-	 * @throws RuntimeException
-	 */
+    /**
+     * The getRoute method will check the given $request
+     * for a valid Controller and the requested method
+     * the returned array will be like:
+     * ["controller" => {Controller instance}, "method" => {Methode name}, "params" => {Array of formatted args}]
+     *
+     * @param Request $request
+     * @return array|null
+     *
+     * @throws ReflectionException
+     * @throws SystemException
+     */
 	public function getRoute( Request $request ): ?array {
 		$request_parts = $request->getRequestParts();
         return $this->getRouteArray($request_parts);
@@ -109,6 +114,9 @@ class Router {
      *
      * @param string $url
      * @return array|null
+     *
+     * @throws ReflectionException
+     * @throws SystemException
      */
     public function getRouteFor( string $url ): ?array {
         $request_parts = preg_split("/\//", $url, -1, PREG_SPLIT_NO_EMPTY);
@@ -120,6 +128,8 @@ class Router {
      *
      * @param array $request_parts
      * @return array
+     *
+     * @throws SystemException|ReflectionException
      */
     private function getRouteArray( array &$request_parts ): array {
         $route = $this->getValidRoute($request_parts);
@@ -127,15 +137,12 @@ class Router {
             $call = $this->_routes[$route];
             $controller = new $call["controller"]();
             $method = $call["method"];
-            try {
-                $params = $this->getValidParameters($controller, $method, $request_parts);
-                return array( "controller" => $controller, "method" => $method, "params" => $params );
-            } catch( RuntimeException $e ) {
-                throw new RuntimeException($e->getMessage(), $e->getCode(), $e);
-            }
-        } else {
-            throw new RuntimeException("Router: There is no route for [".implode("/", $request_parts)."]!");
+
+            $params = $this->getValidParameters($controller, $method, $request_parts);
+            return array( "controller" => $controller, "method" => $method, "params" => $params );
         }
+
+        throw new SystemException( __FILE__, __LINE__,"Router: There is no route for [".implode("/", $request_parts)."]!");
     }
 
 	/**
@@ -177,76 +184,74 @@ class Router {
 		return $route;
 	}
 
-	/**
-	 * Checks if the needed parameters of the controller method
-	 * matches the given parameters in the request.
-	 * Also checks the type of the parameters and tries to convert
-	 * the request parameter into the required method parameter type
-	 * Returns an array with formatted values
-	 *
-	 * @param AController $controller
-	 * @param string $method
-	 * @param array $params
-	 * @return array|null
-	 *
-	 * @throws RuntimeException
-	 */
+    /**
+     * Checks if the needed parameters of the controller method
+     * matches the given parameters in the request.
+     * Also checks the type of the parameters and tries to convert
+     * the request parameter into the required method parameter type
+     * Returns an array with formatted values
+     *
+     * @param AController $controller
+     * @param string $method
+     * @param array $params
+     * @return array|null
+     *
+     * @throws SystemException
+     * @throws ReflectionException
+     */
 	private function getValidParameters( AController $controller, string $method, array $params ): ?array {
 		$num_params = count($params);
 		$result = array();
-		try {
-			$reflection = new ReflectionMethod($controller, $method);
-			$args = $reflection->getParameters();
-			$max_args = count($args);
-			$min_args = 0;
-			// Go through all parameters of the requested method
-			for( $i = 0; $i < $max_args; $i++ ) {
-				$arg_name = $args[$i]->getName();
-				$arg_type = (string)$args[$i]->getType();
-				$arg_optional = $args[$i]->isOptional();
-				// If the parameter is not optional increase the number of required parameters
-				if( !$arg_optional ) {
-					$min_args++;
-				}
-				if( isset($params[$i]) ) {
-					// Check if the parameters match the expected type and converts it
-					switch( $arg_type ) {
-						case "bool":
-							$valid_boolean = array( "0", "1", "true", "false" );
-							if( in_array(strtolower($params[$i]), $valid_boolean, true) ) {
-								$result[$arg_name] = (bool)$params[$i];
-							} else {
-								throw new RuntimeException("Router: Param type mismatch for method[".$controller."->".$method."]");
-							}
-							break;
-						case "int":
-							if( preg_match("/^\d+$/", $params[$i]) ) {
-								$result[$arg_name] = (int)$params[$i];
-							} else {
-								throw new RuntimeException("Router: Param type mismatch for method[".$controller."->".$method."]");
-							}
-							break;
-						case "string":
-							$result[$arg_name] = $params[$i];
-							break;
-						default:
-							try {
-								$result[$arg_name] = new $arg_type($params[$i]);
-							} catch( Exception $e ) {
-								throw new RuntimeException("Router: Param type mismatch for method[".$controller."->".$method."]");
-							}
-					}
-				}
-			}
-			// Check if we have a valid number of parameters.
-			// If so return them
-			if( $num_params >= $min_args && $num_params <= $max_args ) {
-				return $result;
-			}
-			throw new RuntimeException("Router: Param count mismatch for method[".$controller."->".$method."]");
-		} catch( ReflectionException $e ) {
-			throw new RuntimeException($e->getMessage(), $e->getCode(), $e);
-		}
+
+        $reflection = new ReflectionMethod($controller, $method);
+        $args = $reflection->getParameters();
+        $max_args = count($args);
+        $min_args = 0;
+        // Go through all parameters of the requested method
+        for( $i = 0; $i < $max_args; $i++ ) {
+            $arg_name = $args[$i]->getName();
+            $arg_type = (string)$args[$i]->getType();
+            $arg_optional = $args[$i]->isOptional();
+            // If the parameter is not optional increase the number of required parameters
+            if( !$arg_optional ) {
+                $min_args++;
+            }
+            if( isset($params[$i]) ) {
+                // Check if the parameters match the expected type and converts it
+                switch( $arg_type ) {
+                    case "bool":
+                        $valid_boolean = array( "0", "1", "true", "false" );
+                        if( in_array(strtolower($params[$i]), $valid_boolean, true) ) {
+                            $result[$arg_name] = (bool)$params[$i];
+                        } else {
+                            throw new SystemException( __FILE__,__LINE__,"Router: Param type mismatch for method[".$controller."->".$method."]");
+                        }
+                        break;
+                    case "int":
+                        if( preg_match("/^\d+$/", $params[$i]) ) {
+                            $result[$arg_name] = (int)$params[$i];
+                        } else {
+                            throw new SystemException( __FILE__,__LINE__,"Router: Param type mismatch for method[".$controller."->".$method."]");
+                        }
+                        break;
+                    case "string":
+                        $result[$arg_name] = $params[$i];
+                        break;
+                    default:
+                        try {
+                            $result[$arg_name] = new $arg_type($params[$i]);
+                        } catch( Exception $e ) {
+                            throw new SystemException( __FILE__,__LINE__,"Router: Param type mismatch for method[".$controller."->".$method."]");
+                        }
+                }
+            }
+        }
+        // Check if we have a valid number of parameters.
+        // If so return them
+        if( $num_params >= $min_args && $num_params <= $max_args ) {
+            return $result;
+        }
+        throw new SystemException( __FILE__,__LINE__,"Router: Param count mismatch for method[".$controller."->".$method."]");
 	}
 
 	/**
@@ -270,7 +275,6 @@ class Router {
 					// It's a valid Controller so initialize its routes
 					$controller->init($this);
 				}
-
 			} else if( $file !== "." && $file !== ".." && is_dir($directory.DIRECTORY_SEPARATOR.$file) ) {
 				// Let's go through this subdirectory
 				$this->initController($directory.$file.DIRECTORY_SEPARATOR);

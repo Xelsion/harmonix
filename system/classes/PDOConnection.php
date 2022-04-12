@@ -7,6 +7,7 @@ use PDO;
 use PDOException;
 use PDOStatement;
 use RuntimeException;
+use system\exceptions\SystemException;
 
 /**
  * The PDOConnection
@@ -76,19 +77,18 @@ class PDOConnection extends PDO {
 		return $this->query($query);
 	}
 
-	/**
-	 * @return PDOStatement
-	 */
+    /**
+     * @return PDOStatement
+     *
+     * @throws JsonException
+     * @throws SystemException
+     */
 	public function execute(): PDOStatement {
 		try {
 			$this->stmt->execute();
 		} catch( PDOException $e ) {
-			try {
-				$this->logger->log($e->getFile(), $e->getLine(), $e->getMessage()."\n\t=>\t[SQL] ".$this->stmt->queryString, $e->getTrace());
-			} catch( JsonException $je ) {
-				throw new RuntimeException($je->getMessage(), (int)$je->getCode(), $je);
-			}
-			throw new RuntimeException($e->getMessage(), (int)$e->getCode(), $e);
+			$this->logger->log($e->getFile(), $e->getLine(), $e->getMessage()."\n\t=>\t[SQL] ".$this->stmt->queryString, $e->getTrace());
+			throw new SystemException(__FILE__, __LINE__, $e->getMessage());
 		}
 		return $this->stmt;
 	}

@@ -2,14 +2,13 @@
 
 namespace models;
 
-use DateTime;
-use Exception;
+use JsonException;
 use PDO;
 
-use PDOException;
-use RuntimeException;
 use system\Core;
+use system\exceptions\SystemException;
 use system\helper\SqlHelper;
+
 
 /**
  * The Actor
@@ -22,12 +21,15 @@ class Actor extends entities\Actor {
 	// a collection of all permission this user has
 	public array $_permissions = array();
 
-	/**
-	 * The class constructor
-	 * If id is 0 it will return an empty actor
-	 *
-	 * @param int $id
-	 */
+    /**
+     * The class constructor
+     * If id is 0 it will return an empty actor
+     *
+     * @param int $id
+     *
+     * @throws JsonException
+     * @throws SystemException
+     */
 	public function __construct( int $id = 0 ) {
 		parent::__construct($id);
 	}
@@ -49,6 +51,9 @@ class Actor extends entities\Actor {
      * @param int $limit
      * @param int $page
      * @return array|false|null
+     *
+     * @throws JsonException
+     * @throws SystemException
      */
 	public static function find( array $conditions, ?string $order = "", ?string $direction = "asc", int $limit = 0, int $page = 1 ): ?array {
 		$pdo = SqlHelper::findIn("mvc", "actors", $conditions, $order, $direction, $limit, $page);
@@ -66,6 +71,9 @@ class Actor extends entities\Actor {
      * @param int $limit
      * @param int $page
      * @return array|false
+     *
+     * @throws JsonException
+     * @throws SystemException
      */
 	public static function findAll( ?string $order = "", ?string $direction = "asc", int $limit = 0, int $page = 1 ): ?array {
 		$pdo = SqlHelper::findAllIn("mvc", "actors", $order, $direction, $limit, $page);
@@ -73,96 +81,82 @@ class Actor extends entities\Actor {
 	}
 
     /**
-     * @return int
-     * @throws Exception
+     * Returns the actor role for the given controller method
+     * If non is set for a specific method it will look for a
+     * controller role and if non is set too, it will look for
+     * the domain role
+     *
+     * @param string $controller
+     * @param string $method
+     * @param mixed|string $domain
+     * @return ActorRole
+     *
+     * @throws JsonException
+     * @throws SystemException
      */
-    public static function getLastModification() : int {
-        $created = 0;
-        $updated = 0;
-        $pdo = Core::$_connection_manager->getConnection("mvc");
-        $pdo->prepare("SELECT max(created) as created, max(updated) as updated FROM actors LIMIT 1");
-        $row = $pdo->execute()->fetch();
-        if( $row ) {
-            $created = new DateTime($row["created"]);
-            $created = $created->getTimestamp();
-            if( $row["updated"] !== NULL ) {
-                $updated = new DateTime($row["updated"]);
-                $updated = $updated->getTimestamp();
-            }
-
-        }
-        return ( $created >= $updated ) ? $created : $updated;
-    }
-
-	/**
-	 * Returns the actor role for the given controller method
-	 * If non is set for a specific method it will look for a
-	 * controller role and if non is set too, it will look for
-	 * the domain role
-	 *
-	 * @param string $controller
-	 * @param string $method
-	 * @return ActorRole
-	 */
 	public function getRole( string $controller, string $method, $domain = SUB_DOMAIN ): ActorRole {
-		if( $this->id > 0 ) {
+        // do we have a loaded actor object?
+        if( $this->id > 0 ) {
+            // no permission restriction is set?
 			if( empty($this->_permissions) ) {
 				$this->initPermission();
 			}
 
+            // check if there is a permission set for this method if so return the actor role
 			if( isset($this->_permissions[$domain][$controller][$method]) ) {
 				return $this->_permissions[$domain][$controller][$method];
 			}
 
+            // check if there is a permission set for this controller if so return the actor role
 			if( isset($this->_permissions[$domain][$controller][null]) ) {
 				return $this->_permissions[$domain][$controller][null];
 			}
 
+            // check if there is a permission set for this domain if so return the actor role
 			if( isset($this->_permissions[$domain][null][null]) ) {
 				return $this->_permissions[$domain][null][null];
 			}
 		}
+
+        // actor object is not loaded, so we return the default actor role
 		$result = ActorRole::find(array(
-			array(
-				"is_default",
-				"=",
-				1
-			)
+			array( "is_default", "=", 1 )
 		));
         if( count($result) === 1 ) {
             return $result[0];
         }
+
+        // if no default actor role could be found return an empty actor role
 		return new ActorRole();
 	}
 
     /**
-     * @return bool|void
+     * @return bool
+     *
+     * @throws SystemException
+     * @throws JsonException
      */
-    public function deletePermissions() {
+    public function deletePermissions() : bool {
         $pdo = Core::$_connection_manager->getConnection("mvc");
         if( $this->id > 0 ) {
-            try {
-                $pdo->prepare("DELETE FROM access_permissions WHERE actor_id=:actor_id");
-                $pdo->bindParam(':actor_id', $this->id, PDO::PARAM_INT);
-                $pdo->execute();
-                return true;
-            } catch( PDOException $e ) {
-                throw new RuntimeException($e->getMessage());
-            }
+            $pdo->prepare("DELETE FROM access_permissions WHERE actor_id=:actor_id");
+            $pdo->bindParam(':actor_id', $this->id, PDO::PARAM_INT);
+            $pdo->execute();
+            return true;
         }
+        return false;
     }
 
 
 	/**
 	 * Collects all permission for this user
+     *
+     * @throws SystemException
+     * @throws JsonException
 	 */
 	private function initPermission(): void {
 		$permissions = AccessPermission::find(array(
-			array(
-				"actor_id",
-				"=",
-				$this->id
-			)
+			array( "actor_id", "=", $this->id )
 		));
 
 		foreach( $permissions as $permission ) {
