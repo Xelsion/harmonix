@@ -85,7 +85,7 @@ class SqlHelper {
                 $params["limit"] = $limit;
                 $params["offset"] = $offset;
             }
-
+            print_debug($sql);
             $pdo->prepare($sql);
             foreach( $params as $key => $value ) {
                 $pdo->bindParam(":" . $key, $value, static::getParamType($value));
@@ -108,14 +108,18 @@ class SqlHelper {
      * @throws JsonException
      * @throws SystemException
      */
-    public static function findInCached( string $db, string $table, array $conditions, ?string $order = "", ?string $direction = "asc", int $limit = 0, int $page = 1 ) {
-        $cache_name = self::getCacheName($db, $table, $order, $direction, $limit, $page, $conditions);
+    public static function findInCached( string $db, string $table, array $conditions, ?string $class = "", ?string $order = "", ?string $direction = "asc", int $limit = 0, int $page = 1 ) {
+        $cache_name = self::getCacheName($db, $table, $order, $direction, $limit, $page, $conditions, $class);
         $last_modify = self::getLastModificationDate($table);
         $cache = new Cache($cache_name);
         if( $cache->isUpToDate($last_modify) ) {
             $results = unserialize($cache->loadFromCache(), array(false));
         } else {
-            $results = self::findAllIn($db, $table, $order, $direction, $limit, $page);
+            if( !is_null($class) && $class !== "" ) {
+                $results = self::findAllIn($db, $table, $order, $direction, $limit, $page)->execute()->fetchAll( PDO::FETCH_CLASS, $class);
+            } else {
+                $results = self::findAllIn($db, $table, $order, $direction, $limit, $page)->execute()->fetchAll();
+            }
             $cache->saveToCache(serialize($results));
         }
         return $results;
@@ -133,15 +137,19 @@ class SqlHelper {
      * @throws JsonException
      * @throws SystemException
      */
-    public static function findAllInCached( string $db, string $table, ?string $order = "", ?string $direction = "asc", int $limit = 0, int $page = 1) {
-        $cache_name = self::getCacheName($db, $table, $order, $direction, $limit, $page);
+    public static function findAllInCached( string $db, string $table, ?string $class = "", ?string $order = "", ?string $direction = "asc", int $limit = 0, int $page = 1) {
+        $cache_name = self::getCacheName($db, $table, $order, $direction, $limit, $page, $class);
         $last_modify = self::getLastModificationDate($table);
         $cache = new Cache($cache_name);
         if( $cache->isUpToDate($last_modify) ) {
             print_debug("load from cache");
             $results = unserialize($cache->loadFromCache(), array(false));
         } else {
-            $results = self::findAllIn($db, $table, $order, $direction, $limit, $page)->execute()->fetchAll();
+            if( !is_null($class) && $class !== '' ) {
+                $results = self::findAllIn($db, $table, $order, $direction, $limit, $page)->execute()->fetchAll(PDO::FETCH_CLASS, $class);
+            } else {
+                $results = self::findAllIn($db, $table, $order, $direction, $limit, $page)->execute()->fetchAll();
+            }
             print_debug("write to cache");
             $cache->saveToCache(serialize($results));
         }
@@ -205,23 +213,22 @@ class SqlHelper {
         return PDO::PARAM_STR;
     }
 
+
     /**
-     * @param string $db
-     * @param string $table
-     * @param string $order
-     * @param string $direction
-     * @param int $limit
-     * @param int $page
-     * @param array $conditions
+     * @param ...$params
      * @return string
      *
      * @throws JsonException
      */
-    private static function getCacheName(string $db, string $table, string $order = "", string $direction = "asc", int $limit = 0, int $page = 1, array $conditions = [] ) : string {
-        $cache_name = $db."_".$table."_".$order."_".$direction."_".$limit."_".$page;
-        if( !empty($conditions) ) {
-            $cache_name .= "_".md5(json_encode($conditions, JSON_THROW_ON_ERROR));
+    private static function getCacheName( ...$params ) : string {
+        $name_parts = array();
+        foreach( $params as $param ) {
+            if( is_array($param) ) {
+                $name_parts[] = md5(json_encode($param, JSON_THROW_ON_ERROR));
+            } else {
+                $name_parts[] = $param;
+            }
         }
-        return $cache_name;
+        return implode("_", $name_parts);
     }
 }

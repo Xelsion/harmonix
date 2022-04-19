@@ -4,6 +4,7 @@ namespace controller\admin;
 
 use Exception;
 use JsonException;
+use PDO;
 use system\abstracts\ACacheableEntity;
 use system\abstracts\AController;
 use system\abstracts\AResponse;
@@ -60,12 +61,14 @@ class ActorController extends AController {
      * @throws SystemException
      */
 	public function index(): AResponse {
-		$response = new ResponseHTML();
-		$template = new Template(PATH_VIEWS."template.html");
+        $response = new ResponseHTML();
+        $template = new Template(PATH_VIEWS . "template.html");
 
 
         if( Actor::isCacheable() ) {
-            $results = SqlHelper::findAllInCached("mvc", "actors");
+            $results = SqlHelper::findAllInCached("mvc", "actors",Actor::class);
+        } else {
+            $results = SqlHelper::findAllIn("mvc", "actors")->execute()->fetchAll(PDO::FETCH_CLASS, Actor::class);
         }
 //        $cache = new Cache("all_actors");
 //        $last_modify = Actor::getLastModification();
