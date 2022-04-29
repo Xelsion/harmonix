@@ -3,6 +3,7 @@
 namespace system\classes;
 
 use DateTime;
+use system\exceptions\SystemException;
 use system\helper\StringHelper;
 
 /**
@@ -55,6 +56,7 @@ class Cache extends File {
      *
      * @param string $content
      * @return void
+     * @throws SystemException
      */
 	public function saveToCache( string $content ) : void {
 		$this->setContent(StringHelper::encrypt($content));

@@ -4,11 +4,11 @@ namespace controller\admin;
 
 use Exception;
 use JsonException;
-use PDO;
-use system\abstracts\ACacheableEntity;
+
 use system\abstracts\AController;
 use system\abstracts\AResponse;
 use system\classes\Cache;
+use system\classes\QueryBuilder;
 use system\classes\Router;
 use system\classes\Template;
 use system\classes\responses\ResponseHTML;
@@ -16,7 +16,6 @@ use models\Actor;
 use models\ActorRole;
 use models\AccessPermission;
 use system\exceptions\SystemException;
-use system\helper\SqlHelper;
 
 /**
  * @see \system\abstracts\AController
@@ -64,24 +63,8 @@ class ActorController extends AController {
         $response = new ResponseHTML();
         $template = new Template(PATH_VIEWS . "template.html");
 
-
-        if( Actor::isCacheable() ) {
-            $results = SqlHelper::findAllInCached("mvc", "actors",Actor::class);
-        } else {
-            $results = SqlHelper::findAllIn("mvc", "actors")->execute()->fetchAll(PDO::FETCH_CLASS, Actor::class);
-        }
-//        $cache = new Cache("all_actors");
-//        $last_modify = Actor::getLastModification();
-//        if( $cache->isUpToDate($last_modify) ) {
-//            $results = unserialize($cache->loadFromCache(), array(false));
-//        } else {
-//
-//            $cache->saveToCache(serialize($results));
-//        }
-
-
 		$template->set("navigation", $this::$_menu);
-		$template->set("result_list", $results);
+		$template->set("result_list", Actor::find());
 		$template->set("view", new Template(PATH_VIEWS."actor/index.html"));
 		$response->setOutput($template->parse());
 		return $response;
@@ -108,21 +91,11 @@ class ActorController extends AController {
 			}
 		}
 
-        $cache = new Cache("all_actor_roles");
-        $last_modify = ActorRole::getLastModification();
-        if( $cache->isUpToDate($last_modify) ) {
-            $role_options = unserialize($cache->loadFromCache(), array(false));
-        } else {
-            $role_options = ActorRole::findAll();
-            $cache->saveToCache(serialize($role_options));
-        }
-
-		$access_permissions = array();
 		$response = new ResponseHTML();
 		$template = new Template(PATH_VIEWS."template.html");
 		$template->set("navigation", $this::$_menu);
-		$template->set("role_options", $role_options);
-		$template->set("access_permissions", $access_permissions);
+		$template->set("role_options", ActorRole::find());
+		$template->set("access_permissions", array());
 		$template->set("view", new Template(PATH_VIEWS."actor/create.html"));
 		$response->setOutput($template->parse());
 		return $response;
@@ -182,34 +155,10 @@ class ActorController extends AController {
 		$response = new ResponseHTML();
 		$template = new Template(PATH_VIEWS."template.html");
 
-        $cache = new Cache("all_actor_roles");
-        $last_modify = ActorRole::getLastModification();
-        if( $cache->isUpToDate($last_modify) ) {
-            $role_options = unserialize($cache->loadFromCache(), array(false));
-        } else {
-            $role_options = ActorRole::findAll();
-            $cache->saveToCache(serialize($role_options));
-        }
-
-        $cache = new Cache("actor_permissions_".$actor->id);
-        $last_modify = AccessPermission::getLastModification();
-        if( $cache->isUpToDate($last_modify) ) {
-            $access_permissions = unserialize($cache->loadFromCache(), array(false));
-        } else {
-            $access_permissions = AccessPermission::find(array(
-                array(
-                    "actor_id",
-                    "=",
-                    $actor->id
-                )
-            ));
-            $cache->saveToCache(serialize($access_permissions));
-        }
-
 		$template->set("navigation", $this::$_menu);
 		$template->set("actor", $actor);
-		$template->set("role_options", $role_options);
-		$template->set("access_permissions", $access_permissions);
+		$template->set("role_options", ActorRole::find());
+		$template->set("access_permissions", AccessPermission::find(array(["actor_id","=", $actor->id])));
 		$template->set("view", new Template(PATH_VIEWS."actor/roles.html"));
 		$response->setOutput($template->parse());
 		return $response;

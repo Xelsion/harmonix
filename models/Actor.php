@@ -5,6 +5,8 @@ namespace models;
 use JsonException;
 use PDO;
 
+use system\classes\Cache;
+use system\classes\QueryBuilder;
 use system\Core;
 use system\exceptions\SystemException;
 use system\helper\SqlHelper;
@@ -55,29 +57,34 @@ class Actor extends entities\Actor {
      * @throws JsonException
      * @throws SystemException
      */
-	public static function find( array $conditions, ?string $order = "", ?string $direction = "asc", int $limit = 0, int $page = 1 ): ?array {
-		$pdo = SqlHelper::findIn("mvc", "actors", $conditions, $order, $direction, $limit, $page);
-		return $pdo->execute()->fetchAll(PDO::FETCH_CLASS, __CLASS__);
-	}
+	public static function find( array $conditions = array(), ?string $order = "", ?string $direction = "asc", int $limit = 0, int $page = 1 ): array {
+        $queryBuilder = new QueryBuilder("mvc");
+        $queryBuilder->setTable("actors");
+        if( !empty($conditions) ) {
+            $queryBuilder->setConditions( $conditions );
+        }
+        if( !is_null($order) && $order !== "" ) {
+            $queryBuilder->setOrder($order, $direction);
+        }
+        if( $limit > 0 ) {
+            $queryBuilder->setLimit($limit, $page);
+        }
+        $queryBuilder->setFetchClass(__CLASS__);
 
-    /**
-     * Returns all actors
-     * If limit is greater than 0 the query will return
-     * that many results starting at index.
-     * Returns false if an error occurs
-     *
-     * @param string|null $order
-     * @param string|null $direction
-     * @param int $limit
-     * @param int $page
-     * @return array|false
-     *
-     * @throws JsonException
-     * @throws SystemException
-     */
-	public static function findAll( ?string $order = "", ?string $direction = "asc", int $limit = 0, int $page = 1 ): ?array {
-		$pdo = SqlHelper::findAllIn("mvc", "actors", $order, $direction, $limit, $page);
-		return $pdo->execute()->fetchAll(PDO::FETCH_CLASS, __CLASS__);
+        if( self::isCacheable() ) {
+            $cache = new Cache(md5($queryBuilder->getCacheName()));
+            $last_modify = $queryBuilder->getLastModificationDate();
+            if( $cache->isUpToDate($last_modify) ) {
+                $results = unserialize($cache->loadFromCache(), array(false));
+            } else {
+                $results = $queryBuilder->getResults();
+                $cache->saveToCache(serialize($results));
+            }
+        } else {
+            $results = $queryBuilder->getResults();
+        }
+
+        return $results;
 	}
 
     /**
@@ -155,10 +162,7 @@ class Actor extends entities\Actor {
      * @throws JsonException
 	 */
 	private function initPermission(): void {
-		$permissions = AccessPermission::find(array(
-			array( "actor_id", "=", $this->id )
-		));
-
+		$permissions = AccessPermission::find(array(["actor_id", "=", $this->id] ));
 		foreach( $permissions as $permission ) {
 			$this->_permissions[$permission->domain][$permission->controller][$permission->method] = $permission->getRole();
 		}

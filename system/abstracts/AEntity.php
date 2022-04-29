@@ -12,7 +12,7 @@ use system\exceptions\SystemException;
  * @author Markus Schröder <xelsion@gmail.com>
  * @version 1.0.0;
  */
-abstract class AEntity {
+abstract class AEntity extends DBObject {
 
     /**
      * Creates an entry in the database with the current object

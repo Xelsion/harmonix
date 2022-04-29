@@ -2,11 +2,14 @@
 
 namespace system\classes;
 
+use JsonException;
 use models\AccessRestrictionType;
 use models\ActorRole;
 use PDOStatement;
+use ReflectionException;
 use system\abstracts\AController;
 use system\Core;
+use system\exceptions\SystemException;
 
 class Auth {
 
@@ -16,6 +19,10 @@ class Auth {
 
     /**
      * The class constructor
+     *
+     * @throws JsonException
+     * @throws SystemException
+     * @throws ReflectionException
      */
     public function __construct() {
         $this->_actor_role = Core::$_actor_role;
@@ -28,6 +35,9 @@ class Auth {
     /**
      * Returns if the current actor has access to the current request
      * @return bool
+     *
+     * @throws JsonException
+     * @throws SystemException
      */
     public function hasAccess() : bool {
         return $this->getAccessibility($this->_actor_role, $this->_restriction_role, $this->_restriction_type);
@@ -40,6 +50,9 @@ class Auth {
      * @param string $method
      * @param string|mixed $domain
      * @return bool
+     *
+     * @throws JsonException
+     * @throws SystemException
      */
     public function hasAccessTo( $controller, string $method, string $domain = SUB_DOMAIN) : bool {
         if( $controller instanceof AController ) {
@@ -60,6 +73,9 @@ class Auth {
      * @param ActorRole $restriction_role
      * @param AccessRestrictionType $restriction_type
      * @return bool
+     *
+     * @throws JsonException
+     * @throws SystemException
      */
     private function getAccessibility( ActorRole $actor_role, ActorRole $restriction_role, AccessRestrictionType $restriction_type ) : bool {
         if( $restriction_role->id === 4 ) {
@@ -95,6 +111,9 @@ class Auth {
      * @param string|null $method
      * @param string|mixed $domain
      * @return array
+     *
+     * @throws JsonException
+     * @throws SystemException
      */
     private function getRestriction(?string $controller, ?string $method, string $domain = SUB_DOMAIN ) : array {
         $role_is_set = false;
@@ -143,6 +162,9 @@ class Auth {
      * @param string|null $method
      * @param string|mixed $domain
      * @return PDOStatement
+     *
+     * @throws JsonException
+     * @throws SystemException
      */
     private function getRestrictionRole( ?string $controller, ?string $method, string $domain = SUB_DOMAIN ): PDOStatement {
         $pdo = Core::$_connection_manager->getConnection("mvc");

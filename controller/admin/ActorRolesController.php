@@ -53,17 +53,8 @@ class ActorRolesController extends AController {
 		$response = new ResponseHTML();
 		$template = new Template(PATH_VIEWS."template.html");
 
-        $cache = new Cache("all_actor_roles");
-        $last_modify = ActorRole::getLastModification();
-        if( $cache->isUpToDate($last_modify) ) {
-            $results = unserialize($cache->loadFromCache(), array(false));
-        } else {
-            $results = ActorRole::findAll();
-            $cache->saveToCache(serialize($results));
-        }
-
 		$template->set("navigation", $this::$_menu);
-		$template->set("result_list", $results);
+		$template->set("result_list", ActorRole::find());
 		$template->set("view", new Template(PATH_VIEWS."actor_roles/index.html"));
 		$response->setOutput($template->parse());
 		return $response;
@@ -90,19 +81,10 @@ class ActorRolesController extends AController {
 			}
 		}
 
-        $cache = new Cache("all_actor_roles");
-        $last_modify = ActorRole::getLastModification();
-        if( $cache->isUpToDate($last_modify) ) {
-            $results = unserialize($cache->loadFromCache(), array(false));
-        } else {
-            $results = ActorRole::findAll();
-            $cache->saveToCache(serialize($results));
-        }
-
 		$response = new ResponseHTML();
 		$template = new Template(PATH_VIEWS."template.html");
 		$template->set("navigation", $this::$_menu);
-		$template->set("option_list", $results);
+		$template->set("option_list", ActorRole::find());
 		$template->set("view", new Template(PATH_VIEWS."actor_roles/create.html"));
 		$response->setOutput($template->parse());
 		return $response;
@@ -132,25 +114,10 @@ class ActorRolesController extends AController {
 			}
 		}
 
-        $cache = new Cache("actor_roles_".$role->id);
-        $last_modify = ActorRole::getLastModification();
-        if( $cache->isUpToDate($last_modify) ) {
-            $results = unserialize($cache->loadFromCache(), array(false));
-        } else {
-            $results = ActorRole::find(array(
-                array(
-                    "id",
-                    "!=",
-                    $role->id
-                )
-            ));
-            $cache->saveToCache(serialize($results));
-        }
-
 		$response = new ResponseHTML();
 		$template = new Template(PATH_VIEWS."template.html");
 		$template->set("role", $role);
-		$template->set("option_list", $results);
+		$template->set("option_list", ActorRole::find(array(["id", "!=", $role->id])));
 		$template->set("navigation", $this::$_menu);
 		$template->set("view", new Template(PATH_VIEWS."actor_roles/edit.html"));
 		$response->setOutput($template->parse());

@@ -3,6 +3,7 @@
 namespace controller\admin;
 
 use Exception;
+use JsonException;
 use models\AccessRestrictionType;
 use models\AccessRestriction;
 use models\ActorRole;
@@ -13,6 +14,7 @@ use system\classes\Router;
 use system\abstracts\AController;
 use system\classes\Template;
 use system\Core;
+use system\exceptions\SystemException;
 
 class RestrictionController extends AController {
 
@@ -60,15 +62,7 @@ class RestrictionController extends AController {
         $routes = array();
         Core::$_router->getAllRoutes(PATH_CONTROLLER_ROOT, $routes);
 
-        $cache = new Cache("all_access_restrictions");
-        $last_modify = AccessRestriction::getLastModification();
-        if( $cache->isUpToDate($last_modify) ) {
-            $access_restrictions = unserialize($cache->loadFromCache(), array(false));
-        } else {
-            $access_restrictions = AccessRestriction::findAll();
-            $cache->saveToCache(serialize($access_restrictions));
-        }
-
+        $access_restrictions = AccessRestriction::find();
         $current_restrictions = array();
         foreach( $access_restrictions as $restriction ) {
             $current_restrictions[$restriction->domain][$restriction->controller][$restriction->method] = array(
@@ -77,45 +71,36 @@ class RestrictionController extends AController {
             );
         }
 
-        $cache = new Cache("all_actor_roles");
-        $last_modify = ActorRole::getLastModification();
-        if( $cache->isUpToDate($last_modify) ) {
-            $actor_roles = unserialize($cache->loadFromCache(), array(false));
-        } else {
-            $actor_roles = ActorRole::findAll();
-            $cache->saveToCache(serialize($actor_roles));
-        }
-
-        $cache = new Cache("all_restriction_types");
-        $last_modify = AccessRestrictionType::getLastModification();
-        if( $cache->isUpToDate($last_modify) ) {
-            $restriction_types = unserialize($cache->loadFromCache(), array(false));
-        } else {
-            $restriction_types = AccessRestrictionType::findAll();
-            $cache->saveToCache(serialize($restriction_types));
-        }
-
         $template->set("navigation", $this::$_menu);
         $template->set("view", new Template(PATH_VIEWS."restrictions/index.html"));
         $template->set("routes", $routes);
         $template->set("current_restrictions", $current_restrictions);
-        $template->set("role_options", $actor_roles);
-        $template->set("type_options", $restriction_types);
+        $template->set("role_options", ActorRole::find());
+        $template->set("type_options", AccessRestrictionType::find());
 
         $response->setOutput($template->parse());
         return $response;
     }
 
+    /**
+     * @return AResponse
+     * @throws SystemException|JsonException
+     */
     public function types(): AResponse {
         $response = new ResponseHTML();
         $template = new Template(PATH_VIEWS."template.html");
         $template->set("navigation", $this::$_menu);
         $template->set("view", new Template(PATH_VIEWS."restrictions/types.html"));
-        $template->set("type_list", AccessRestrictionType::findAll());
+        $template->set("type_list", AccessRestrictionType::find());
         $response->setOutput($template->parse());
         return $response;
     }
 
+    /**
+     * @return AResponse
+     * @throws JsonException
+     * @throws SystemException
+     */
     public function typesCreate(): AResponse {
         if( isset($_POST['cancel']) ) {
             redirect("/restrictions/types");
@@ -140,7 +125,11 @@ class RestrictionController extends AController {
         return $response;
     }
 
-
+    /**
+     * @param AccessRestrictionType $type
+     * @return AResponse
+     * @throws SystemException
+     */
     public function typesUpdate( AccessRestrictionType $type ): AResponse {
         if( isset($_POST['cancel']) ) {
             redirect("/restrictions/types");
@@ -169,6 +158,8 @@ class RestrictionController extends AController {
      * Save the restrictions
      *
      * @return void
+     * @throws JsonException
+     * @throws SystemException
      */
     private function saveRestrictions(): void {
 

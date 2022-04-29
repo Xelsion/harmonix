@@ -18,7 +18,7 @@ class RoleTree extends TreeWalker {
      */
 	private function __construct() {
 		parent::__construct();
-		$actor_roles = ActorRole::findAll();
+		$actor_roles = ActorRole::find();
 		foreach( $actor_roles as $role ) {
             $node = new RoleNode($role);
 			$this->addNode($node);
