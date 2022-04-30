@@ -5,9 +5,11 @@ namespace system\helper;
 use DateTime;
 use Exception;
 use JsonException;
+use models\Actor;
 use PDO;
 use system\classes\Cache;
 use system\classes\PDOConnection;
+use system\classes\QueryBuilder;
 use system\Core;
 use system\exceptions\SystemException;
 

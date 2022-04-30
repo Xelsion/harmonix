@@ -12,16 +12,16 @@ use system\exceptions\SystemException;
  * @author Markus Schröder <xelsion@gmail.com>
  * @version 1.0.0;
  */
-abstract class AEntity extends DBObject {
+abstract class AEntity {
 
-    /**
-     * Creates an entry in the database with the current object
-     * and tries to return the id of the new entry
-     *
-     * @throws JsonException
-     * @throws SystemException
-     */
-    abstract public function create(): void;
+	/**
+	 * Creates an entry in the database with the current object
+	 * and tries to return the id of the new entry
+	 *
+	 * @throws JsonException
+	 * @throws SystemException
+	 */
+	abstract public function create(): void;
 
     /**
      * Updates an entry in the database with the current object

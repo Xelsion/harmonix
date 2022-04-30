@@ -4,11 +4,10 @@ namespace controller\admin;
 
 use Exception;
 use JsonException;
-
+use system\abstracts\ACacheableEntity;
 use system\abstracts\AController;
 use system\abstracts\AResponse;
 use system\classes\Cache;
-use system\classes\QueryBuilder;
 use system\classes\Router;
 use system\classes\Template;
 use system\classes\responses\ResponseHTML;
@@ -16,6 +15,7 @@ use models\Actor;
 use models\ActorRole;
 use models\AccessPermission;
 use system\exceptions\SystemException;
+use system\helper\SqlHelper;
 
 /**
  * @see \system\abstracts\AController
@@ -60,8 +60,8 @@ class ActorController extends AController {
      * @throws SystemException
      */
 	public function index(): AResponse {
-        $response = new ResponseHTML();
-        $template = new Template(PATH_VIEWS . "template.html");
+		$response = new ResponseHTML();
+		$template = new Template(PATH_VIEWS."template.html");
 
 		$template->set("navigation", $this::$_menu);
 		$template->set("result_list", Actor::find());
@@ -91,12 +91,13 @@ class ActorController extends AController {
 			}
 		}
 
-		$response = new ResponseHTML();
+	    $access_permissions = array();
+	    $response = new ResponseHTML();
 		$template = new Template(PATH_VIEWS."template.html");
 		$template->set("navigation", $this::$_menu);
-		$template->set("role_options", ActorRole::find());
-		$template->set("access_permissions", array());
-		$template->set("view", new Template(PATH_VIEWS."actor/create.html"));
+	    $template->set("role_options", ActorRole::find());
+	    $template->set("access_permissions", $access_permissions);
+	    $template->set("view", new Template(PATH_VIEWS."actor/create.html"));
 		$response->setOutput($template->parse());
 		return $response;
 	}
@@ -157,9 +158,15 @@ class ActorController extends AController {
 
 		$template->set("navigation", $this::$_menu);
 		$template->set("actor", $actor);
-		$template->set("role_options", ActorRole::find());
-		$template->set("access_permissions", AccessPermission::find(array(["actor_id","=", $actor->id])));
-		$template->set("view", new Template(PATH_VIEWS."actor/roles.html"));
+	    $template->set("role_options", ActorRole::find());
+	    $template->set("access_permissions", AccessPermission::find(array(
+		    [
+			    "actor_id",
+			    "=",
+			    $actor->id
+		    ]
+	    )));
+	    $template->set("view", new Template(PATH_VIEWS."actor/roles.html"));
 		$response->setOutput($template->parse());
 		return $response;
 	}
