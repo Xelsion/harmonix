@@ -7,7 +7,6 @@ use system\Core;
 use PDO;
 use PDOException;
 use RuntimeException;
-use system\helper\SqlHelper;
 
 /**
  * The Session entity
@@ -93,10 +92,4 @@ class Session extends ACacheableEntity {
 		return false;
 	}
 
-    /**
-     * @inheritDoc
-     */
-    public static function getLastModification(): int {
-        return SqlHelper::getLastModificationDate("access_permissions");
-    }
 }

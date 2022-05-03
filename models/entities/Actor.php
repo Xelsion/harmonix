@@ -2,14 +2,13 @@
 
 namespace models\entities;
 
-use Exception;
 use JsonException;
+use PDOException;
 use system\abstracts\ACacheableEntity;
 use system\Core;
 use PDO;
 
 use system\exceptions\SystemException;
-use system\helper\SqlHelper;
 use system\helper\StringHelper;
 
 /**
@@ -35,6 +34,7 @@ class Actor extends ACacheableEntity {
      * If id is 0 the entity will be empty
      *
      * @param int $id
+     *
      * @throws JsonException
      * @throws SystemException
      */
@@ -52,48 +52,54 @@ class Actor extends ACacheableEntity {
      * @inheritDoc
      */
 	public function create(): void {
-		$pdo = Core::$_connection_manager->getConnection("mvc");
-		$sql = "INSERT INTO actors (email, password, first_name, last_name, login_fails, login_disabled) VALUES (:email, :password, :first_name, :last_name, :login_fails, :login_disabled)";
-		$this->password = StringHelper::getBCrypt($this->password);
-		$stmt = $pdo->prepare($sql);
-		$stmt->bindParam(':email', $this->email);
-		$stmt->bindParam(':password', $encrypted_pass);
-		$stmt->bindParam(':first_name', $this->first_name);
-		$stmt->bindParam(':last_name', $this->last_name);
-		$stmt->bindParam(':login_fails', $this->login_fails, PDO::PARAM_INT);
-		$stmt->bindParam(':login_disabled', $this->login_disabled, PDO::PARAM_INT);
-		$stmt->execute();
-		$this->id = $pdo->lastInsertId();
+        try {
+            $pdo = Core::$_connection_manager->getConnection("mvc");
+            $sql = "INSERT INTO actors (email, password, first_name, last_name, login_fails, login_disabled) VALUES (:email, :password, :first_name, :last_name, :login_fails, :login_disabled)";
+            $this->password = StringHelper::getBCrypt($this->password);
+            $stmt = $pdo->prepare($sql);
+            $stmt->bindParam(':email', $this->email);
+            $stmt->bindParam(':password', $encrypted_pass);
+            $stmt->bindParam(':first_name', $this->first_name);
+            $stmt->bindParam(':last_name', $this->last_name);
+            $stmt->bindParam(':login_fails', $this->login_fails, PDO::PARAM_INT);
+            $stmt->bindParam(':login_disabled', $this->login_disabled, PDO::PARAM_INT);
+            $stmt->execute();
+            $this->id = $pdo->lastInsertId();
+        } catch( PDOException $e ) {
+            throw new SystemException(__FILE__, __LINE__, $e->getMessage());
+        }
 	}
 
     /**
      * @inheritDoc
+     *
+     * @throws SystemException
      */
 	public function update(): void {
-		try {
-			$pdo = Core::$_connection_manager->getConnection("mvc");
-			$pdo->prepare("SELECT password FROM actors WHERE id=:id");
-			$pdo->bindParam(":id", $this->id, PDO::PARAM_INT);
-			if( $row = $pdo->execute()->fetch() ) {
-				if( $this->password !== '' && $row["password"] !== $this->password ) {
-					$this->password = StringHelper::getBCrypt($this->password);
-				} else {
-					$this->password = $row["password"];
-				}
-				$sql = "UPDATE actors SET email=:email, password=:password, first_name=:first_name, last_name=:last_name, login_fails=:login_fails, login_disabled=:login_disabled WHERE id=:id";
-				$pdo->prepare($sql);
-				$pdo->bindParam(':id', $this->id, PDO::PARAM_INT);
-				$pdo->bindParam(':email', $this->email);
-				$pdo->bindParam(':password', $this->password);
-				$pdo->bindParam(':first_name', $this->first_name);
-				$pdo->bindParam(':last_name', $this->last_name);
-				$pdo->bindParam(':login_fails', $this->login_fails, PDO::PARAM_INT);
-				$pdo->bindParam(':login_disabled', $this->login_disabled, PDO::PARAM_INT);
-				$pdo->execute();
-			}
-		} catch( Exception $e ) {
-			throw new SystemException( __FILE__, __LINE__, $e->getMessage());
-		}
+        $pdo = Core::$_connection_manager->getConnection("mvc");
+        $pdo->prepare("SELECT password FROM actors WHERE id=:id");
+        $pdo->bindParam(":id", $this->id, PDO::PARAM_INT);
+        try {
+            if( $row = $pdo->execute()->fetch() ) {
+                if( $this->password !== '' && $row["password"] !== $this->password ) {
+                    $this->password = StringHelper::getBCrypt($this->password);
+                } else {
+                    $this->password = $row["password"];
+                }
+                $sql = "UPDATE actors SET email=:email, password=:password, first_name=:first_name, last_name=:last_name, login_fails=:login_fails, login_disabled=:login_disabled WHERE id=:id";
+                $pdo->prepare($sql);
+                $pdo->bindParam(':id', $this->id, PDO::PARAM_INT);
+                $pdo->bindParam(':email', $this->email);
+                $pdo->bindParam(':password', $this->password);
+                $pdo->bindParam(':first_name', $this->first_name);
+                $pdo->bindParam(':last_name', $this->last_name);
+                $pdo->bindParam(':login_fails', $this->login_fails, PDO::PARAM_INT);
+                $pdo->bindParam(':login_disabled', $this->login_disabled, PDO::PARAM_INT);
+                $pdo->execute();
+            }
+        } catch( JsonException|SystemException $e ) {
+            throw new SystemException(__FILE__, __LINE__, $e->getMessage());
+        }
     }
 
     /**
@@ -110,10 +116,4 @@ class Actor extends ACacheableEntity {
 		return false;
 	}
 
-    /**
-     * @inheritDoc
-     */
-    public static function getLastModification(): int {
-        return SqlHelper::getLastModificationDate("actors");
-    }
 }

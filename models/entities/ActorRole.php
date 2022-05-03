@@ -9,9 +9,7 @@ use RuntimeException;
 
 use system\abstracts\ACacheableEntity;
 use system\Core;
-use system\abstracts\AEntity;
 use system\exceptions\SystemException;
-use system\helper\SqlHelper;
 
 /**
  * The ActorRole entity
@@ -67,12 +65,15 @@ class ActorRole extends ACacheableEntity {
 			$pdo->execute();
 			$this->id = $pdo->lastInsertId();
 		} catch( PDOException $e ) {
-			throw new RuntimeException($e->getMessage());
+			throw new SystemException(__FILE__, __LINE__, $e->getMessage());
 		}
 	}
 
     /**
      * @inheritDoc
+     *
+     * @throws JsonException
+     * @throws SystemException
      */
 	public function update(): void {
 		if( $this->id > 0 ) {
@@ -88,7 +89,7 @@ class ActorRole extends ACacheableEntity {
 				$pdo->bindParam(':rights_own', $this->rights_own, PDO::PARAM_INT);
 				$pdo->execute();
 			} catch( PDOException $e ) {
-				throw new RuntimeException($e->getMessage());
+                throw new SystemException(__FILE__, __LINE__, $e->getMessage());
 			}
 		}
 	}
@@ -105,16 +106,10 @@ class ActorRole extends ACacheableEntity {
 				$pdo->execute();
 				return true;
 			} catch( PDOException $e ) {
-				throw new RuntimeException($e->getMessage());
+                throw new SystemException(__FILE__, __LINE__, $e->getMessage());
 			}
 		}
 		return false;
 	}
 
-    /**
-     * @inheritDoc
-     */
-    public static function getLastModification(): int {
-        return SqlHelper::getLastModificationDate("actor_roles");
-    }
 }

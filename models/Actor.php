@@ -9,8 +9,6 @@ use system\classes\Cache;
 use system\classes\QueryBuilder;
 use system\Core;
 use system\exceptions\SystemException;
-use system\helper\SqlHelper;
-
 
 /**
  * The Actor
@@ -34,6 +32,9 @@ class Actor extends entities\Actor {
      */
 	public function __construct( int $id = 0 ) {
 		parent::__construct($id);
+        if( $id > 0 ) {
+            $this->initPermission();
+        }
 	}
 
     /**

@@ -8,7 +8,6 @@ use RuntimeException;
 
 use system\abstracts\ACacheableEntity;
 use system\Core;
-use system\helper\SqlHelper;
 
 /**
  * The AccessPermission entity
@@ -67,10 +66,4 @@ class AccessPermission extends ACacheableEntity {
 		return false;
 	}
 
-    /**
-     * @inheritDoc
-     */
-    public static function getLastModification(): int {
-        return SqlHelper::getLastModificationDate("access_permissions");
-    }
 }

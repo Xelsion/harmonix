@@ -2,6 +2,7 @@
 
 use system\abstracts\ALoggableException;
 use system\classes\Logger;
+use system\exceptions\SystemException;
 use system\Process;
 
 define("SUB_DOMAIN", explode(".", $_SERVER["HTTP_HOST"])[0]);
@@ -24,7 +25,7 @@ try {
         } else {
 		    $runtime_logger->log($e->getFile(), $e->getLine(), $e->getMessage(), $e->getTrace());
         }
-	} catch( JsonException $e ) {
+	} catch( JsonException|SystemException $e ) {
 		die($e->getMessage());
 	}
 }

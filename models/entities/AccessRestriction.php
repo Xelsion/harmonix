@@ -5,7 +5,6 @@ namespace models\entities;
 use PDO;
 use system\abstracts\ACacheableEntity;
 use system\Core;
-use system\helper\SqlHelper;
 
 class AccessRestriction extends ACacheableEntity {
 
@@ -41,6 +40,7 @@ class AccessRestriction extends ACacheableEntity {
      * @inheritDoc
      */
     public function update(): void {
+
     }
 
     /**
@@ -50,10 +50,4 @@ class AccessRestriction extends ACacheableEntity {
         return false;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public static function getLastModification(): int {
-        return SqlHelper::getLastModificationDate("access_restrictions");
-    }
 }
