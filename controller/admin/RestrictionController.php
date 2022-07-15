@@ -8,7 +8,7 @@ use models\AccessRestrictionType;
 use models\AccessRestriction;
 use models\ActorRole;
 use system\abstracts\AResponse;
-use system\classes\Cache;
+use system\classes\CacheFile;
 use system\classes\responses\ResponseHTML;
 use system\classes\Router;
 use system\abstracts\AController;

@@ -51,4 +51,5 @@ class Core {
 
     // The authentication class
     public static Auth $_auth;
+
 }

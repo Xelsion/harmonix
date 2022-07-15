@@ -1,0 +1,21 @@
+<?php
+$actor_list = $this->get("actor_list");
+?>
+<div class="container-fluid">
+	<table class="table table-hover table-dark">
+		<thead>
+			<tr class="table-row">
+				<th class="table-col">Name</th>
+				<th class="table-col">Vorname</th>
+			</tr>
+		</thead>
+		<tbody>
+		    <?php foreach( $actor_list as $actor) { ?>
+		        <tr class="table-row" onclick="window.location.href='/actors/<?= $actor->id?>';">
+			        <td class="table-col"><?= escaped_html($actor->last_name) ?></td>
+		            <td class="table-col"><?= escaped_html($actor->first_name) ?></td>
+		        </tr>
+		    <?php } ?>
+		</tbody>
+	</table>
+</div>

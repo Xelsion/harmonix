@@ -3,7 +3,7 @@
 namespace models;
 
 use JsonException;
-use system\classes\Cache;
+use system\classes\CacheFile;
 use system\classes\QueryBuilder;
 use system\Core;
 use system\exceptions\SystemException;
@@ -55,7 +55,7 @@ class AccessRestriction extends entities\AccessRestriction {
         $queryBuilder->setFetchClass(__CLASS__);
 
         if( self::isCacheable() ) {
-            $cache = new Cache(md5($queryBuilder->getCacheName()));
+            $cache = new CacheFile(md5($queryBuilder->getCacheName()));
             $last_modify = $queryBuilder->getLastModificationDate();
             if( $cache->isUpToDate($last_modify) ) {
                 $results = unserialize($cache->loadFromCache(), array(false));
@@ -78,7 +78,7 @@ class AccessRestriction extends entities\AccessRestriction {
      */
     public static function deleteAll() : void {
         $pdo = Core::$_connection_manager->getConnection("mvc");
-        $sql = "DELETE FROM access_restrictions";
+        $sql = "TRUNCATE access_restrictions";
         $pdo->prepare($sql);
         $pdo->execute();
     }

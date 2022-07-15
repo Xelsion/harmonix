@@ -20,7 +20,7 @@ use system\classes\Router;
 use models\Session;
 
 /**
- * The System Class Type singleton
+ * The Process class of type singleton
  * This class handles the main procedure from getting a request
  * to return the response output
  *

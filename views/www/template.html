@@ -35,53 +35,54 @@ $view_content = ( $view instanceof Template ) ? $view->parse() : "";
 	<?php } ?>
 </head>
 <body>
-<header>
-	<nav id="navigation">
-		<?= $menu->getAsHtml() ?>
-		<div id="actor-menu">
-			<div class="has-children">
-				<span onclick="$('#actor-menu-dropdown').toggle();" class="menu-item"><?= ( $actor->id > 0 ) ? $actor->first_name." ".$actor->last_name : "Profile" ?></span>
-			</div>
-			<div id="actor-menu-dropdown" style="">
-				<menu>
-					<?php if( $actor->id === 0 ): ?>
-						<li>
-							<form action="<?= $_SERVER["REQUEST_URI"] ?>" method="POST">
-								<div class="form-row">
-									<label>
-										<input type="email" name="email" value="" placeholder="E-Mail" />
-									</label>
-								</div>
-								<div class="form-row">
-									<label>
-										<input type="password" name="password" value="" placeholder="Password" autocomplete="new-password" />
-									</label>
-								</div>
-								<div class="form-row">
-									<button type="submit" name="login">Login</button>
-								</div>
-							</form>
-						</li>
-					<?php else: ?>
-						<?php if( Core::$_auth->hasAccessTo(controller\admin\HomeController::class, "index", "admin") ) { ?>
+	<header>
+		<nav id="navigation">
+			<?= $menu->getAsHtml() ?>
+			<div id="actor-menu">
+				<div class="has-children">
+					<span onclick="$('#actor-menu-dropdown').toggle();" class="menu-item"><?= ( $actor->id > 0 ) ? $actor->first_name." ".$actor->last_name : "Profile" ?></span>
+				</div>
+				<div id="actor-menu-dropdown" style="">
+					<menu>
+						<?php if( $actor->id === 0 ): ?>
 							<li>
-								<a href="https://admin.harmonix.de">Admin-Bereich</a>
+								<form action="<?= $_SERVER["REQUEST_URI"] ?>" method="POST">
+									<div class="form-row">
+										<label>
+											<input type="email" name="email" value="" placeholder="E-Mail" />
+										</label>
+									</div>
+									<div class="form-row">
+										<label>
+											<input type="password" name="password" value="" placeholder="Password" autocomplete="new-password" />
+										</label>
+									</div>
+									<div><a href="" class="font-monospace">Passwort vergessen?</a></div>
+									<div class="form-row">
+										<button type="submit" name="login">Login</button>
+									</div>
+								</form>
 							</li>
-						<?php } ?>
-						<li>
-							<form action="<?= $_SERVER["REQUEST_URI"] ?>" method="POST">
-								<button type="submit" name="logout" class="link">Logout</button>
-							</form>
-						</li>
-					<?php endif; ?>
-				</menu>
+						<?php else: ?>
+							<?php if( Core::$_auth->hasAccessTo(controller\admin\HomeController::class, "index", "admin") ) { ?>
+								<li>
+									<a href="https://admin.harmonix.de">Admin-Bereich</a>
+								</li>
+							<?php } ?>
+							<li>
+								<form action="<?= $_SERVER["REQUEST_URI"] ?>" method="POST">
+									<button type="submit" name="logout" class="link">Logout</button>
+								</form>
+							</li>
+						<?php endif; ?>
+					</menu>
+				</div>
 			</div>
-		</div>
-		<div class="cleaner"></div>
-	</nav>
-</header>
-<main><?= $view_content ?></main>
-<footer></footer>
+			<div class="cleaner"></div>
+		</nav>
+	</header>
+	<main><?= $view_content ?></main>
+	<footer></footer>
 </body>
 <?php foreach( $this->getFooterScripts() as $script_file => $async ) { ?>
 	<?php if ( $async ) { ?>

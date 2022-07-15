@@ -2,12 +2,12 @@
 
 namespace models\entities;
 
+use Exception;
 use PDO;
-use PDOException;
-use RuntimeException;
 
 use system\abstracts\ACacheableEntity;
 use system\Core;
+use system\exceptions\SystemException;
 
 /**
  * The AccessPermission entity
@@ -48,8 +48,8 @@ class AccessPermission extends ACacheableEntity {
 			$pdo->bindParam(':controller', $this->controller);
 			$pdo->bindParam(':method', $this->method);
 			$pdo->execute();
-		} catch( PDOException $e ) {
-			throw new RuntimeException($e->getMessage());
+		} catch( Exception $e ) {
+			throw new SystemException(__FILE__, __LINE__, $e->getMessage());
 		}
 	}
 

@@ -22,13 +22,13 @@ class ErrorController extends AController {
     /**
      * @inheritDoc
      */
-	public function init( Router $router ): void {
+    public function init( Router $router ): void {
         // Add routes to router
         $routes = $this->getRoutes();
         foreach( $routes as $url => $route ) {
             $router->addRoute($url, $route["controller"], $route["method"] );
         }
-	}
+    }
 
     /**
      * @inheritDoc
@@ -42,35 +42,26 @@ class ErrorController extends AController {
 
     /**
      * @inheritDoc
-     *
-     * @throws SystemException
      */
-	public function index(): AResponse {
-		$response = new ResponseHTML();
-		$template = new Template(PATH_VIEWS."template.html");
-		$template->set("navigation", $this::$_menu);
-		$template->set("view", new Template(PATH_VIEWS."home/index.html"));
-		$response->setOutput($template->parse());
-		return $response;
-	}
+    public function index(): AResponse {
+        $response = new ResponseHTML();
+        $template = new Template(PATH_VIEWS."template.html");
+        $template->set("navigation", $this::$_menu);
+        $template->set("view", new Template(PATH_VIEWS."home/index.html"));
+        $response->setOutput($template->parse());
+        return $response;
+    }
 
     /**
-     * @param int $error_code
-     * @return AResponse
-     *
      * @throws SystemException
      */
-	public function error( int $error_code ): AResponse {
-		$response = new ResponseHTML();
-        if( !in_array($error_code, $this->_error_codes, true )) {
-            $error_code = 404;
-        }
-		$response->status_code = $error_code;
-		$template = new Template(PATH_VIEWS."template.html");
-        $view = new Template(PATH_VIEWS."error/".$error_code.".html");
-		$template->set("navigation", $this::$_menu);
-		$template->set("view", $view->parse());
-		$response->setOutput($template->parse());
-		return $response;
-	}
+    public function error( int $error_code ): AResponse {
+        $response = new ResponseHTML();
+        $response->status_code = $error_code;
+        $template = new Template(PATH_VIEWS."template.html");
+        $template->set("navigation", $this::$_menu);
+        $template->set("view", new Template(PATH_VIEWS."error/".$error_code.".html"));
+        $response->setOutput($template->parse());
+        return $response;
+    }
 }

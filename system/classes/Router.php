@@ -24,11 +24,13 @@ class Router {
 	// the collection of the collected controllers
 	private array $_routes = array();
 
-	/**
-	 * The class constructor
-	 * will be called once by the static method getInstance()
-	 * calls the method initController()
-	 */
+    /**
+     * The class constructor
+     * will be called once by the static method getInstance()
+     * calls the method initController()
+     *
+     * @throws SystemException
+     */
 	private function __construct() {
 		$this->initController(PATH_CONTROLLER);
 	}
@@ -217,6 +219,7 @@ class Router {
                 $min_args++;
             }
             if( isset($params[$i]) ) {
+
                 // Check if the parameters match the expected type and converts it
                 switch( $arg_type ) {
                     case "bool":
@@ -246,6 +249,8 @@ class Router {
                 }
             }
         }
+
+
         // Check if we have a valid number of parameters.
         // If so return them
         if( $num_params >= $min_args && $num_params <= $max_args ) {
@@ -254,12 +259,14 @@ class Router {
         throw new SystemException( __FILE__,__LINE__,"Router: Param count mismatch for method[".$controller."->".$method."]");
 	}
 
-	/**
-	 * Walks through the given $directory and collects all
-	 * Classes that are an instance of system\abstracts\AController
-	 *
-	 * @param string $directory
-	 */
+    /**
+     * Walks through the given $directory and collects all
+     * Classes that are an instance of system\abstracts\AController
+     *
+     * @param string $directory
+     *
+     * @throws SystemException
+     */
 	private function initController( string $directory ): void {
 		$files = scandir($directory);
 		// Go through all files/directories in this directory

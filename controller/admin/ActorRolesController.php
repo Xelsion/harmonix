@@ -5,11 +5,12 @@ namespace controller\admin;
 use Exception;
 use system\abstracts\AResponse;
 use system\abstracts\AController;
-use system\classes\Cache;
+use system\classes\CacheFile;
 use system\classes\responses\ResponseHTML;
 use system\classes\Router;
 use system\classes\Template;
 use models\ActorRole;
+use system\exceptions\SystemException;
 
 /**
  * @see \system\abstracts\AController
@@ -41,7 +42,8 @@ class ActorRolesController extends AController {
         return array(
             "/actor-roles" => array("controller" => __CLASS__, "method" => "index"),
             "/actor-roles/{role}" => array("controller" => __CLASS__, "method" => "update"),
-            "/actor-roles/create" => array("controller" => __CLASS__, "method" => "create")
+            "/actor-roles/create" => array("controller" => __CLASS__, "method" => "create"),
+            "/actor-roles/delete/{role}" => array("controller" => __CLASS__, "method" => "delete"),
         );
     }
 
@@ -123,6 +125,31 @@ class ActorRolesController extends AController {
 		$response->setOutput($template->parse());
 		return $response;
 	}
+
+    /**
+     * @throws SystemException
+     */
+    public function delete( ActorRole $role ) : AResponse {
+        if( isset($_POST['cancel']) ) {
+            redirect("/actor-roles");
+        }
+        if( isset($_POST['delete']) ) {
+            try {
+                $role->delete();
+                redirect("/actor-roles");
+            } catch( Exception $e ) {
+                throw new SystemException(__FILE__, __LINE__, $e->getMessage());
+            }
+        }
+        $response = new ResponseHTML();
+        $template = new Template(PATH_VIEWS."template.html");
+        $template->set("role", $role);
+        $template->set("navigation", $this::$_menu);
+        $template->set("view", new Template(PATH_VIEWS . "actor_roles/delete.html"));
+        $response->setOutput($template->parse());
+        return $response;
+
+    }
 
 	private function getPermissions( array $settings ): int {
 		$permissions = 0b0000;

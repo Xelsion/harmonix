@@ -20,6 +20,7 @@ class Session extends entities\Session {
 	private string $_cookie_domain = "";
 	private int $_cookie_lifetime = 2;
 	private bool $_cookie_secure = false;
+	private string $_cookie_same_site = "lax";
 	private string $_error;
 
     /**
@@ -35,6 +36,7 @@ class Session extends entities\Session {
 		$this->_cookie_domain = $configuration["domain"];
 		$this->_cookie_lifetime = $configuration["lifetime"];
 		$this->_cookie_secure = $configuration["secure"];
+		$this->_cookie_same_site = $configuration["same_site"];
 
         // do we have a login attempt?
 		if( isset($_POST["login"], $_POST["email"], $_POST["password"]) ) {
@@ -58,7 +60,8 @@ class Session extends entities\Session {
                 'expires' => $date_time->getTimestamp(),
                 'path'    => $this->_cookie_path,
                 'domain'  => $this->_cookie_domain,
-                'secure'  => $this->_cookie_secure
+                'secure'  => $this->_cookie_secure,
+	            'samesite' => $this->_cookie_same_site
             );
             setcookie("session", $this->id, $cookie_options);
 			return new Actor($this->actor_id);
@@ -109,7 +112,8 @@ class Session extends entities\Session {
 					'expires' => $date_time->getTimestamp(),
 					'path'    => $this->_cookie_path,
 					'domain'  => $this->_cookie_domain,
-					'secure'  => $this->_cookie_secure
+					'secure'  => $this->_cookie_secure,
+					'samesite' => $this->_cookie_same_site
 				);
 				setcookie("session", $session_id, $cookie_options);
 				return $actor;
@@ -134,7 +138,8 @@ class Session extends entities\Session {
 				'expires' => time() - 3600,
 				'path'    => $this->_cookie_path,
 				'domain'  => $this->_cookie_domain,
-				'secure'  => $this->_cookie_secure
+				'secure'  => $this->_cookie_secure,
+				'samesite' => $this->_cookie_same_site
 			);
 			setcookie("session", "", $cookie_options);
 		}

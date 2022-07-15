@@ -5,7 +5,7 @@ namespace models;
 use JsonException;
 use PDO;
 
-use system\classes\Cache;
+use system\classes\CacheFile;
 use system\classes\QueryBuilder;
 use system\Core;
 use system\exceptions\SystemException;
@@ -72,7 +72,7 @@ class ActorRole extends entities\ActorRole {
         $queryBuilder->setFetchClass(__CLASS__);
 
         if( self::isCacheable() ) {
-            $cache = new Cache(md5($queryBuilder->getCacheName()));
+            $cache = new CacheFile(md5($queryBuilder->getCacheName()));
             $last_modify = $queryBuilder->getLastModificationDate();
             if( $cache->isUpToDate($last_modify) ) {
                 $results = unserialize($cache->loadFromCache(), array(false));

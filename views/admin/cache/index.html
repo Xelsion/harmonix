@@ -1,0 +1,16 @@
+<?php
+$cache_list = $this->get("cache_list");
+?>
+<h1>Cache</h1>
+<div class="content-block">
+    <?php
+    $i = 0;
+    foreach( $cache_list as $file => $results ) {
+        $i++;
+        ?>
+        <div class="">
+            <div onclick="$('#<?= $i ?>').toggle();" style="padding: 10px; background-color: #495057;"><?= $file ?></div>
+            <div id="<?= $i ?>" style="display: none; background-color: #444444; padding: 10px; margin-bottom: 10px;"><pre><?php print_r($results) ?></pre></div>
+        </div>
+    <?php } ?>
+</div>

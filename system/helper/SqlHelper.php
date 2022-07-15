@@ -7,7 +7,7 @@ use Exception;
 use JsonException;
 use models\Actor;
 use PDO;
-use system\classes\Cache;
+use system\classes\CacheFile;
 use system\classes\PDOConnection;
 use system\classes\QueryBuilder;
 use system\Core;

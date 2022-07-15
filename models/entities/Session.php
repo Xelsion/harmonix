@@ -2,11 +2,14 @@
 
 namespace models\entities;
 
+use Exception;
+use JsonException;
 use system\abstracts\ACacheableEntity;
 use system\Core;
 use PDO;
 use PDOException;
 use RuntimeException;
+use system\exceptions\SystemException;
 
 /**
  * The Session entity
@@ -23,19 +26,25 @@ class Session extends ACacheableEntity {
     public string $ip = "";
 	public string $expired = "";
 
-	/**
-	 * The constructor loads the database content into this object.
-	 * If a session was set it will load it else it will return an
-	 * empty entity
-	 */
+    /**
+     * The constructor loads the database content into this object.
+     * If a session was set it will load it else it will return an
+     * empty entity
+     *
+     * @throws SystemException
+     */
 	public function __construct() {
 		if( isset($_COOKIE["session"]) ) {
-			$pdo = Core::$_connection_manager->getConnection("mvc");
-			$pdo->prepare("SELECT * FROM sessions WHERE id=:id");
-			$pdo->bindParam(":id", $_COOKIE["session"]);
-			$pdo->setFetchMode(PDO::FETCH_INTO, $this);
-			$pdo->execute()->fetch();
-		}
+            try {
+                $pdo = Core::$_connection_manager->getConnection("mvc");
+                $pdo->prepare("SELECT * FROM sessions WHERE id=:id");
+                $pdo->bindParam(":id", $_COOKIE["session"]);
+                $pdo->setFetchMode(PDO::FETCH_INTO, $this);
+                $pdo->execute()->fetch();
+            } catch( Exception $e ) {
+                throw new SystemException(__FILE__, __LINE__, $e->getMessage());
+            }
+        }
 	}
 
     /**
@@ -51,13 +60,15 @@ class Session extends ACacheableEntity {
             $pdo->bindParam(':ip', $this->ip);
 			$pdo->bindParam(':expired', $this->expired);
 			$pdo->execute();
-		} catch( PDOException $e ) {
-			throw new RuntimeException($e->getMessage());
+		} catch( Exception $e ) {
+			throw new SystemException(__FILE__, __LINE__, $e->getMessage());
 		}
 	}
 
     /**
      * @inheritDoc
+     *
+     * @throws SystemException
      */
 	public function update(): void {
 		try {
@@ -69,8 +80,8 @@ class Session extends ACacheableEntity {
             $pdo->bindParam(':ip', $this->ip);
 			$pdo->bindParam(':expired', $this->expired);
 			$pdo->execute();
-		} catch( PDOException $e ) {
-			throw new RuntimeException($e->getMessage());
+		} catch( Exception $e ) {
+            throw new SystemException(__FILE__, __LINE__, $e->getMessage());
 		}
 	}
 
@@ -85,8 +96,8 @@ class Session extends ACacheableEntity {
 				$pdo->bindParam(":id", $this->id, PDO::PARAM_INT);
 				$pdo->execute();
 				return true;
-			} catch( PDOException $e ) {
-				throw new RuntimeException($e->getMessage());
+			} catch( Exception $e ) {
+                throw new SystemException(__FILE__, __LINE__, $e->getMessage());
 			}
 		}
 		return false;

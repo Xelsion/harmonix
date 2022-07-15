@@ -13,9 +13,8 @@ use system\helper\SqlHelper;
 /**
  * The QueryBuilder
  *
- * A class that can handle single table queries and can use a cache system
- * for cacheable entries to store them into a file, so we can reduce the database
- * communications.
+ * A class that can handle single table queries and supports functions for the
+ * CacheFile system.
  *
  * @see \system\abstracts\ACacheableEntity
  *
@@ -25,6 +24,7 @@ class QueryBuilder {
     private string $_sql = "";
 
     protected ?PDOConnection $_conn = null;
+    protected string $_db = "";
     protected string $_table = "";
     protected string $_class = "";
     protected array $_conditions = array();
@@ -37,6 +37,7 @@ class QueryBuilder {
      * @param string $db
      */
     public function __construct( string $db ) {
+        $this->_db = $db;
         $this->_conn = Core::$_connection_manager->getConnection($db);
     }
 
@@ -184,28 +185,18 @@ class QueryBuilder {
      * @throws Exception
      */
     public function getLastModificationDate() : int {
-        $created = 0;
-        $updated = 0;
-        $deleted = 0;
         $modified = 0;
         if( $this->_table !== "" ) {
-            $this->_conn->prepare("SELECT max(created) as created, max(updated) as updated, max(deleted) as deleted FROM " . $this->_table . " LIMIT 1");
+            $this->_conn->prepare("SELECT update_time FROM information_schema.tables WHERE table_schema=:db AND table_name=:table");
+            $this->_conn->bindParam("db", $this->_db);
+            $this->_conn->bindParam("table", $this->_table);
             $row = $this->_conn->execute()->fetch();
             if( $row ) {
-                $created = new DateTime($row["created"]);
-                $created = $created->getTimestamp();
-                if( $row["updated"] !== null ) {
-                    $updated = new DateTime($row["updated"]);
-                    $updated = $updated->getTimestamp();
-                }
-                if( $row["deleted"] !== null ) {
-                    $deleted = new DateTime($row["deleted"]);
-                    $deleted = $deleted->getTimestamp();
-                }
-                $modified = ( $updated >= $deleted ) ? $updated : $deleted;
+                $last_update = new DateTime($row["update_time"]);
+                $modified = $last_update->getTimestamp();
             }
         }
-        return ( $created >= $modified ) ? $created : $modified;
+        return $modified;
     }
 
     /**

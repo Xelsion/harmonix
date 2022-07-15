@@ -105,6 +105,17 @@ class File {
 		return file_put_contents($this->_file_path, $this->_content);
 	}
 
+    /**
+     * Deletes the current file from the disc
+     *
+     * @return void
+     */
+    public function delete() : void {
+        if( file_exists($this->_file_path) ) {
+            unlink($this->_file_path);
+        }
+    }
+
 	/**
 	 * Tries to save the current content to the given file path.
 	 * Return true if successful and false if not

@@ -2,10 +2,9 @@
 
 namespace models\entities;
 
+use Exception;
 use JsonException;
 use PDO;
-use PDOException;
-use RuntimeException;
 
 use system\abstracts\ACacheableEntity;
 use system\Core;
@@ -64,7 +63,7 @@ class ActorRole extends ACacheableEntity {
 			$pdo->bindParam(':rights_own', $this->rights_own, PDO::PARAM_INT);
 			$pdo->execute();
 			$this->id = $pdo->lastInsertId();
-		} catch( PDOException $e ) {
+		} catch( Exception $e ) {
 			throw new SystemException(__FILE__, __LINE__, $e->getMessage());
 		}
 	}
@@ -72,7 +71,6 @@ class ActorRole extends ACacheableEntity {
     /**
      * @inheritDoc
      *
-     * @throws JsonException
      * @throws SystemException
      */
 	public function update(): void {
@@ -88,7 +86,7 @@ class ActorRole extends ACacheableEntity {
 				$pdo->bindParam(':rights_group', $this->rights_group, PDO::PARAM_INT);
 				$pdo->bindParam(':rights_own', $this->rights_own, PDO::PARAM_INT);
 				$pdo->execute();
-			} catch( PDOException $e ) {
+			} catch( Exception $e ) {
                 throw new SystemException(__FILE__, __LINE__, $e->getMessage());
 			}
 		}
@@ -98,14 +96,14 @@ class ActorRole extends ACacheableEntity {
      * @inheritDoc
      */
 	public function delete(): bool {
-		if( $this->id > 0 ) {
+		if( $this->id > 0 && !$this->is_protected ) {
 			try {
 				$pdo = Core::$_connection_manager->getConnection("mvc");
 				$pdo->prepare("DELETE FROM actor_roles WHERE id=:id");
 				$pdo->bindParam(':id', $this->id, PDO::PARAM_INT);
 				$pdo->execute();
 				return true;
-			} catch( PDOException $e ) {
+			} catch( Exception $e ) {
                 throw new SystemException(__FILE__, __LINE__, $e->getMessage());
 			}
 		}

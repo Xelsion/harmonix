@@ -60,7 +60,6 @@ abstract class AController extends Core {
      */
     abstract public function index(): AResponse;
 
-
 	public function __toString(): string {
 		return __CLASS__;
 	}

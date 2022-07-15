@@ -2,10 +2,8 @@
 
 namespace models\entities;
 
-use JsonException;
+use Exception;
 use PDO;
-use PDOException;
-use RuntimeException;
 use system\abstracts\ACacheableEntity;
 use system\Core;
 use system\exceptions\SystemException;
@@ -31,7 +29,7 @@ class AccessRestrictionType extends ACacheableEntity {
                 $pdo->bindParam(":id", $id, PDO::PARAM_INT);
                 $pdo->setFetchMode(PDO::FETCH_INTO, $this);
                 $pdo->execute()->fetch();
-            } catch( JsonException|SystemException $e ) {
+            } catch( Exception $e ) {
                 throw new SystemException(__FILE__, __LINE__, $e->getMessage());
             }
         }
@@ -51,7 +49,7 @@ class AccessRestrictionType extends ACacheableEntity {
             $pdo->bindParam(':include_descendants', $this->include_descendants, PDO::PARAM_INT);
             $pdo->execute();
             $this->id = $pdo->lastInsertId();
-        } catch( PDOException $e ) {
+        } catch( Exception $e ) {
             throw new SystemException(__FILE__, __LINE__, $e->getMessage());
         }
     }
@@ -72,7 +70,7 @@ class AccessRestrictionType extends ACacheableEntity {
             $pdo->bindParam(':include_children', $this->include_children, PDO::PARAM_INT);
             $pdo->bindParam(':include_descendants', $this->include_descendants, PDO::PARAM_INT);
             $pdo->execute();
-        } catch( JsonException|SystemException $e ) {
+        } catch( Exception $e ) {
             throw new SystemException(__FILE__, __LINE__, $e->getMessage());
         }
     }

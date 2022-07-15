@@ -7,6 +7,7 @@ use system\abstracts\AResponse;
 use system\classes\responses\ResponseHTML;
 use system\classes\Router;
 use system\classes\Template;
+use system\exceptions\SystemException;
 
 /**
  * @see \system\abstracts\AController
@@ -49,7 +50,10 @@ class ErrorController extends AController {
 		return $response;
 	}
 
-	public function error( int $error_code ): AResponse {
+    /**
+     * @throws SystemException
+     */
+    public function error( int $error_code ): AResponse {
 		$response = new ResponseHTML();
 		$response->status_code = $error_code;
 		$template = new Template(PATH_VIEWS."template.html");

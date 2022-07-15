@@ -2,12 +2,11 @@
 
 namespace models\entities;
 
-use JsonException;
-use PDOException;
+use PDO;
+use Exception;
+
 use system\abstracts\ACacheableEntity;
 use system\Core;
-use PDO;
-
 use system\exceptions\SystemException;
 use system\helper\StringHelper;
 
@@ -35,17 +34,20 @@ class Actor extends ACacheableEntity {
      *
      * @param int $id
      *
-     * @throws JsonException
      * @throws SystemException
      */
 	public function __construct( int $id = 0 ) {
 		if( $id > 0 ) {
-			$pdo = Core::$_connection_manager->getConnection("mvc");
-			$pdo->prepare("SELECT * FROM actors WHERE id=:id");
-			$pdo->bindParam(":id", $id, PDO::PARAM_INT);
-			$pdo->setFetchMode(PDO::FETCH_INTO, $this);
-			$pdo->execute()->fetch();
-		}
+            try {
+                $pdo = Core::$_connection_manager->getConnection("mvc");
+                $pdo->prepare("SELECT * FROM actors WHERE id=:id");
+                $pdo->bindParam(":id", $id, PDO::PARAM_INT);
+                $pdo->setFetchMode(PDO::FETCH_INTO, $this);
+                $pdo->execute()->fetch();
+            } catch( Exception $e ) {
+                throw new SystemException(__FILE__, __LINE__, $e->getMessage());
+            }
+        }
 	}
 
     /**
@@ -56,16 +58,16 @@ class Actor extends ACacheableEntity {
             $pdo = Core::$_connection_manager->getConnection("mvc");
             $sql = "INSERT INTO actors (email, password, first_name, last_name, login_fails, login_disabled) VALUES (:email, :password, :first_name, :last_name, :login_fails, :login_disabled)";
             $this->password = StringHelper::getBCrypt($this->password);
-            $stmt = $pdo->prepare($sql);
-            $stmt->bindParam(':email', $this->email);
-            $stmt->bindParam(':password', $encrypted_pass);
-            $stmt->bindParam(':first_name', $this->first_name);
-            $stmt->bindParam(':last_name', $this->last_name);
-            $stmt->bindParam(':login_fails', $this->login_fails, PDO::PARAM_INT);
-            $stmt->bindParam(':login_disabled', $this->login_disabled, PDO::PARAM_INT);
-            $stmt->execute();
+            $pdo->prepare($sql);
+            $pdo->bindParam(':email', $this->email);
+            $pdo->bindParam(':password', $this->password);
+            $pdo->bindParam(':first_name', $this->first_name);
+            $pdo->bindParam(':last_name', $this->last_name);
+            $pdo->bindParam(':login_fails', $this->login_fails, PDO::PARAM_INT);
+            $pdo->bindParam(':login_disabled', $this->login_disabled, PDO::PARAM_INT);
+            $pdo->execute();
             $this->id = $pdo->lastInsertId();
-        } catch( PDOException $e ) {
+        } catch( Exception $e ) {
             throw new SystemException(__FILE__, __LINE__, $e->getMessage());
         }
 	}
@@ -97,7 +99,7 @@ class Actor extends ACacheableEntity {
                 $pdo->bindParam(':login_disabled', $this->login_disabled, PDO::PARAM_INT);
                 $pdo->execute();
             }
-        } catch( JsonException|SystemException $e ) {
+        } catch( Exception $e ) {
             throw new SystemException(__FILE__, __LINE__, $e->getMessage());
         }
     }

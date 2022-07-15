@@ -2,14 +2,12 @@
 
 namespace controller\www;
 
-use Cassandra\Date;
-use DateTime;
 use system\abstracts\AResponse;
 use system\abstracts\AController;
-use system\classes\Cache;
 use system\classes\responses\ResponseHTML;
 use system\classes\Router;
 use system\classes\Template;
+use system\exceptions\SystemException;
 
 /**
  * @author Markus Schröder <xelsion@gmail.com>
@@ -19,7 +17,7 @@ class HomeController extends AController {
 
     /**
      * @param Router $router
-     * @see \system\interfaces\IController
+     * @throws SystemException
      */
 	public function init( Router $router ): void {
         // Add routes to router
@@ -34,7 +32,6 @@ class HomeController extends AController {
 
     /**
      * @return array[]
-     * @see \system\interfaces\IController
      */
     public function getRoutes(): array {
         return array(
@@ -44,7 +41,7 @@ class HomeController extends AController {
 
     /**
      * @return AResponse
-     * @see \system\interfaces\IController
+     * @throws SystemException
      */
 	public function index(): AResponse {
 		$response = new ResponseHTML();

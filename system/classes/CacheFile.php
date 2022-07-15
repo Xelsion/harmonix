@@ -7,13 +7,13 @@ use system\exceptions\SystemException;
 use system\helper\StringHelper;
 
 /**
- * The Cache
- * Cache dato into a file
+ * The CacheFile
+ * CacheFile dato into a file
  *
  * @author Markus Schröder <xelsion@gmail.com>
  * @version 1.0.0;
  */
-class Cache extends File {
+class CacheFile extends File {
 
     // the age of the cache file
     private DateTime $cache_age;
@@ -34,6 +34,22 @@ class Cache extends File {
         }
     }
 
+	/**
+	 * Loads the cache file with the given name
+	 *
+	 * @param string $cache_file
+	 * @return void
+	 */
+	public function load(string $cache_file ) : void {
+		parent::__construct($cache_file);
+		$this->cache_age = new DateTime();
+		if( file_exists($this->_file_path) ) {
+			$this->cache_age->setTimestamp(filemtime($cache_file));
+		} else {
+			$this->cache_age->setTimestamp(0);
+		}
+	}
+
     /**
      * Checks if the current cache file is not older than
      * the given timestamp.
@@ -47,7 +63,11 @@ class Cache extends File {
         }
         $data_age = new DateTime();
         $data_age->setTimestamp($timestamp);
-        return $this->cache_age >= $data_age;
+        if( $this->cache_age < $data_age ) {
+            $this->delete();
+            return false;
+        }
+        return true;
     }
 
     /**

@@ -89,7 +89,7 @@
 }
 
 #navigation li > ul {
-    background-color: #222;
+    background-color: rgba(40, 40, 40, 0.9);
     border: 1px solid #444;
 }
 
