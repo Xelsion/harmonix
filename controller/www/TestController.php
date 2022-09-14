@@ -27,6 +27,7 @@ class TestController extends AController {
         $this::$_menu->insertMenuItem(200, null, "Tests", "/tests");
         $this::$_menu->insertMenuItem(210, 200, "Actors", "/actors");
         $this::$_menu->insertMenuItem(220, 200, "Charts", "/tests/charts");
+	    $this::$_menu->insertMenuItem(230, 200, "TinyMCE", "/tests/tinymce");
     }
 
     /**
@@ -37,7 +38,8 @@ class TestController extends AController {
             "/tests" => array("controller" => __CLASS__, "method" => "index"),
             "/actors" => array("controller" => __CLASS__, "method" => "actors"),
             "/actors/{id}" => array("controller" => __CLASS__, "method" => "actorsDetail"),
-            "/tests/charts" => array("controller" => __CLASS__, "method" => "charts")
+            "/tests/charts" => array("controller" => __CLASS__, "method" => "charts"),
+	        "/tests/tinymce" => array("controller" => __CLASS__, "method" => "tinymce")
         );
     }
 
@@ -92,5 +94,20 @@ class TestController extends AController {
         $response->setOutput($template->parse());
         return $response;
     }
+
+	/**
+	 * @return ResponseHTML
+	 * @throws SystemException
+	 */
+	public function tinymce() : AResponse {
+		if( !empty($_POST) && isset($_POST["content"]) ) {
+			print_debug($_POST["content"]);
+		}
+		$response = new ResponseHTML();
+		$template = new Template(PATH_VIEWS . "template.html");
+		$template->set("view", new Template(PATH_VIEWS . "tests/tinymce.html"));
+		$response->setOutput($template->parse());
+		return $response;
+	}
 
 }

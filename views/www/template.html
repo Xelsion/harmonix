@@ -26,6 +26,7 @@ $view_content = ( $view instanceof Template ) ? $view->parse() : "";
 	<?php } ?>
 	<script src="<?= PATH_SRC ?>bootstrap-5.0.2/js/bootstrap.bundle.min.js"></script>
 	<script src="<?= PATH_SRC ?>jquery/jquery-3.6.0.min.js"></script>
+    <script src="<?= PATH_SRC ?>tinymce.v6/tinymce.min.js"></script>
 	<?php foreach( $this->getHeaderScripts() as $script_file => $async ) { ?>
 		<?php if ( $async ) { ?>
 			<script async src="<?= $script_file ?>"></script>
