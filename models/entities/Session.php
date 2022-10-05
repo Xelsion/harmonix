@@ -7,8 +7,6 @@ use JsonException;
 use system\abstracts\ACacheableEntity;
 use system\Core;
 use PDO;
-use PDOException;
-use RuntimeException;
 use system\exceptions\SystemException;
 
 /**
@@ -42,7 +40,7 @@ class Session extends ACacheableEntity {
                 $pdo->setFetchMode(PDO::FETCH_INTO, $this);
                 $pdo->execute()->fetch();
             } catch( Exception $e ) {
-                throw new SystemException(__FILE__, __LINE__, $e->getMessage());
+                throw new SystemException(__FILE__, __LINE__, $e->getMessage(), $e->getCode(), $e->getPrevious());
             }
         }
 	}
@@ -61,7 +59,7 @@ class Session extends ACacheableEntity {
 			$pdo->bindParam(':expired', $this->expired);
 			$pdo->execute();
 		} catch( Exception $e ) {
-			throw new SystemException(__FILE__, __LINE__, $e->getMessage());
+			throw new SystemException(__FILE__, __LINE__, $e->getMessage(), $e->getCode(), $e->getPrevious());
 		}
 	}
 
@@ -81,7 +79,7 @@ class Session extends ACacheableEntity {
 			$pdo->bindParam(':expired', $this->expired);
 			$pdo->execute();
 		} catch( Exception $e ) {
-            throw new SystemException(__FILE__, __LINE__, $e->getMessage());
+            throw new SystemException(__FILE__, __LINE__, $e->getMessage(), $e->getCode(), $e->getPrevious());
 		}
 	}
 
@@ -97,7 +95,7 @@ class Session extends ACacheableEntity {
 				$pdo->execute();
 				return true;
 			} catch( Exception $e ) {
-                throw new SystemException(__FILE__, __LINE__, $e->getMessage());
+                throw new SystemException(__FILE__, __LINE__, $e->getMessage(), $e->getCode(), $e->getPrevious());
 			}
 		}
 		return false;

@@ -68,7 +68,7 @@ class Actor extends ACacheableEntity {
             $pdo->execute();
             $this->id = $pdo->lastInsertId();
         } catch( Exception $e ) {
-            throw new SystemException(__FILE__, __LINE__, $e->getMessage());
+            throw new SystemException(__FILE__, __LINE__, $e->getMessage(), $e->getCode(), $e->getPrevious());
         }
 	}
 
@@ -100,7 +100,7 @@ class Actor extends ACacheableEntity {
                 $pdo->execute();
             }
         } catch( Exception $e ) {
-            throw new SystemException(__FILE__, __LINE__, $e->getMessage());
+            throw new SystemException(__FILE__, __LINE__, $e->getMessage(), $e->getCode(), $e->getPrevious());
         }
     }
 

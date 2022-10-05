@@ -11,7 +11,7 @@ $actor_list = $this->get("actor_list");
 		</thead>
 		<tbody>
 		    <?php foreach( $actor_list as $actor) { ?>
-		        <tr class="table-row" onclick="window.location.href='/actors/<?= $actor->id?>';">
+		        <tr class="table-row" onclick="window.location.href='/tests/actors/<?= $actor->id?>';">
 			        <td class="table-col"><?= escaped_html($actor->last_name) ?></td>
 		            <td class="table-col"><?= escaped_html($actor->first_name) ?></td>
 		        </tr>

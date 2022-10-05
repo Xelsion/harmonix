@@ -30,7 +30,7 @@ class AccessRestrictionType extends ACacheableEntity {
                 $pdo->setFetchMode(PDO::FETCH_INTO, $this);
                 $pdo->execute()->fetch();
             } catch( Exception $e ) {
-                throw new SystemException(__FILE__, __LINE__, $e->getMessage());
+                throw new SystemException(__FILE__, __LINE__, $e->getMessage(), $e->getCode(), $e->getPrevious());
             }
         }
     }
@@ -50,7 +50,7 @@ class AccessRestrictionType extends ACacheableEntity {
             $pdo->execute();
             $this->id = $pdo->lastInsertId();
         } catch( Exception $e ) {
-            throw new SystemException(__FILE__, __LINE__, $e->getMessage());
+            throw new SystemException(__FILE__, __LINE__, $e->getMessage(), $e->getCode(), $e->getPrevious());
         }
     }
 
@@ -71,7 +71,7 @@ class AccessRestrictionType extends ACacheableEntity {
             $pdo->bindParam(':include_descendants', $this->include_descendants, PDO::PARAM_INT);
             $pdo->execute();
         } catch( Exception $e ) {
-            throw new SystemException(__FILE__, __LINE__, $e->getMessage());
+            throw new SystemException(__FILE__, __LINE__, $e->getMessage(), $e->getCode(), $e->getPrevious());
         }
     }
 

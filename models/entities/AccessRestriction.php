@@ -38,7 +38,7 @@ class AccessRestriction extends ACacheableEntity {
             $pdo->bindParam(':role_id', $this->role_id, PDO::PARAM_INT);
             $pdo->execute();
         } catch( Exception $e ) {
-            throw new SystemException(__FILE__, __LINE__, $e->getMessage());
+            throw new SystemException(__FILE__, __LINE__, $e->getMessage(), $e->getCode(), $e->getPrevious());
         }
     }
 

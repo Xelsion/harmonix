@@ -1,4 +1,6 @@
 <?php
+use system\Core;
+
 $role = $this->get("role");
 ?>
 
@@ -7,7 +9,7 @@ $role = $this->get("role");
 		<div>Die Rolle <?= escaped_html($role->name) ?> ist gesch&uuml;tzt und kann nicht gel&ouml;scht werden!!!</div>
 		<div class="form-group row">
 			<div class="col-auto">
-				<button type="submit" name="cancel" class="button button-default"><?= escaped_html($lang["cancel"]) ?></button>
+				<button type="submit" name="cancel" class="button button-default"><?= Core::$_lang->getValue("translations", "cancel") ?></button>
 			</div>
 			<div class="col"></div>
 			<div class="col-auto"> </div>
@@ -16,11 +18,11 @@ $role = $this->get("role");
 		<div>Soll die Rolle <?= escaped_html($role->name) ?> wirklich gel&ouml&ouml;scht werden?</div>
 		<div class="form-group row">
 			<div class="col-auto">
-				<button type="submit" name="cancel" class="button button-default"><?= escaped_html($lang["cancel"]) ?></button>
+				<button type="submit" name="cancel" class="button button-default"><?= Core::$_lang->getValue("translations", "cancel") ?></button>
 			</div>
 			<div class="col"></div>
 			<div class="col-auto">
-				<button type="submit" name="delete" class="button button-negativ"><?= escaped_html($lang["delete"]) ?></button>
+				<button type="submit" name="delete" class="button button-negativ"><?= Core::$_lang->getValue("translations", "delete") ?></button>
 			</div>
 		</div>
 	<?php }?>

@@ -1,5 +1,6 @@
 <?php
-global $lang;
+use system\Core;
+
 $this->set("title", "Zugriffstypen");
 $type_list = $this->get("type_list");
 ?>
@@ -22,8 +23,8 @@ $type_list = $this->get("type_list");
 				<td><?= escaped_html($type->include_children) ?></td>
 				<td><?= escaped_html($type->include_descendants) ?></td>
 				<td class="text-nowrap">
-					<a href="/restrictions/types/<?= $type->id ?>" class="button button-default"><?= escaped_html($lang["edit"]) ?></a>
-					<a href="/restrictions/types/delete/<?= $type->id ?>" class="button button-negativ"><?= escaped_html($lang["delete"]) ?></a>
+					<a href="/restrictions/types/<?= $type->id ?>" class="button button-default"><?= Core::$_lang->getValue("translations", "edit") ?></a>
+					<a href="/restrictions/types/delete/<?= $type->id ?>" class="button button-negativ"><?= Core::$_lang->getValue("translations", "delete") ?></a>
 				</td>
 			</tr>
 		<?php endforeach; ?>

@@ -138,6 +138,45 @@ class Actor extends entities\Actor {
 		return new ActorRole();
 	}
 
+    public function getCurrentRole( string $controller, string $method, $domain = SUB_DOMAIN ): ActorRole {
+
+
+        // do we have a loaded actor object?
+        if( $this->id > 0 ) {
+            // no permission restriction is set?
+            if( empty($this->_permissions) ) {
+                $this->initPermission();
+            }
+
+            // check if there is a permission set for this method if so return the actor role
+            if( isset($this->_permissions[$domain][$controller][$method]) ) {
+                return $this->_permissions[$domain][$controller][$method];
+            }
+
+            // check if there is a permission set for this controller if so return the actor role
+            if( isset($this->_permissions[$domain][$controller][null]) ) {
+                return $this->_permissions[$domain][$controller][null];
+            }
+
+            // check if there is a permission set for this domain if so return the actor role
+            if( isset($this->_permissions[$domain][null][null]) ) {
+                return $this->_permissions[$domain][null][null];
+            }
+        }
+
+        // actor object is not loaded, so we return the default actor role
+        $result = ActorRole::find(array(
+            array( "is_default", "=", 1 )
+        ));
+        if( count($result) === 1 ) {
+            return $result[0];
+        }
+
+        // if no default actor role could be found return an empty actor role
+        return new ActorRole();
+    }
+
+
     /**
      * @return bool
      *

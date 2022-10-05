@@ -4,6 +4,7 @@ namespace system;
 
 use system\classes\Auth;
 use system\classes\Configuration;
+use system\classes\Language;
 use system\classes\Logger;
 use system\classes\Request;
 use system\classes\Router;
@@ -51,5 +52,8 @@ class Core {
 
     // The authentication class
     public static Auth $_auth;
+
+    // The current language settings
+    public static Language $_lang;
 
 }

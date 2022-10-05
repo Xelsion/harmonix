@@ -25,7 +25,7 @@ class TestController extends AController {
 
         // Add MenuItems to the Menu
         $this::$_menu->insertMenuItem(200, null, "Tests", "/tests");
-        $this::$_menu->insertMenuItem(210, 200, "Actors", "/actors");
+        $this::$_menu->insertMenuItem(210, 200, "Actors", "/tests/actors");
         $this::$_menu->insertMenuItem(220, 200, "Charts", "/tests/charts");
 	    $this::$_menu->insertMenuItem(230, 200, "TinyMCE", "/tests/tinymce");
     }
@@ -36,8 +36,8 @@ class TestController extends AController {
     public function getRoutes(): array {
         return array(
             "/tests" => array("controller" => __CLASS__, "method" => "index"),
-            "/actors" => array("controller" => __CLASS__, "method" => "actors"),
-            "/actors/{id}" => array("controller" => __CLASS__, "method" => "actorsDetail"),
+            "/tests/actors" => array("controller" => __CLASS__, "method" => "actors"),
+            "/tests/actors/{id}" => array("controller" => __CLASS__, "method" => "actorsDetail"),
             "/tests/charts" => array("controller" => __CLASS__, "method" => "charts"),
 	        "/tests/tinymce" => array("controller" => __CLASS__, "method" => "tinymce")
         );

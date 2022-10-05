@@ -1,5 +1,6 @@
 <?php
-global $lang;
+use system\Core;
+
 $this->set("title", "Benutzer");
 
 $actor_list = $this->get("result_list");
@@ -21,9 +22,9 @@ $actor_list = $this->get("result_list");
 				<td><?= escaped_html($actor->first_name) ?></td>
 				<td><?= escaped_html($actor->last_name) ?></td>
 				<td class="text-nowrap">
-					<a href="/actors/roles/<?= $actor->id ?>" class="button button-default"><?= escaped_html($lang["roles"]) ?></a>
-					<a href="/actors/<?= $actor->id ?>" class="button button-default"><?= escaped_html($lang["edit"]) ?></a>
-					<a href="/actors/<?= $actor->id ?>" class="button button-negativ"><?= escaped_html($lang["delete"]) ?></a>
+					<a href="/actors/roles/<?= $actor->id ?>" class="button button-default"><?= Core::$_lang->getValue("translations", "roles") ?></a>
+					<a href="/actors/<?= $actor->id ?>" class="button button-default"><?= Core::$_lang->getValue("translations", "edit") ?></a>
+					<a href="/actors/<?= $actor->id ?>" class="button button-negativ"><?= Core::$_lang->getValue("translations", "delete") ?></a>
 				</td>
 			</tr>
 		<?php endforeach; ?>

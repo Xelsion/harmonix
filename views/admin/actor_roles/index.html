@@ -1,5 +1,6 @@
 <?php
-global $lang;
+use system\Core;
+
 $this->set("title", "Rollen");
 
 $role_list = $this->get("result_list");
@@ -28,8 +29,8 @@ $role_list = $this->get("result_list");
 				<td><?= escaped_html(implode(", ", $rights["group"])) ?></td>
 				<td><?= escaped_html(implode(", ", $rights["own"])) ?></td>
 				<td class="text-nowrap">
-					<a href="/actor-roles/<?= $role->id ?>" class="button button-default"><?= escaped_html($lang['edit']) ?></a>
-					<a href="/actor-roles/delete/<?= $role->id ?>" class="button button-negativ"><?= escaped_html($lang['delete']) ?></a>
+					<a href="/actor-roles/<?= $role->id ?>" class="button button-default"><?= Core::$_lang->getValue("translations", "edit") ?></a>
+					<a href="/actor-roles/delete/<?= $role->id ?>" class="button button-negativ"><?= Core::$_lang->getValue("translations", "delete") ?></a>
 				</td>
 			</tr>
 		<?php endforeach; ?>

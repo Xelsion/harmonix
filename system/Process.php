@@ -4,6 +4,7 @@ namespace system;
 
 use JsonException;
 use ReflectionException;
+use system\classes\Language;
 use system\exceptions\SystemException;
 
 use system\abstracts\AController;
@@ -46,6 +47,7 @@ class Process {
 		Core::$_request = Request::getInstance();
 		Core::$_menu = new Menu();
 		Core::$_router = Router::getInstance();
+        Core::$_lang = Language::getInstance("de");
 	}
 
 	/**

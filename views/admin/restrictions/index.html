@@ -1,5 +1,5 @@
 <?php
-global $lang;
+use system\Core;
 
 $this->set("title", "Zugriffsrechte");
 $routes = $this->get("routes");
@@ -149,7 +149,7 @@ $type_options = $this->get("type_options");
 		<?php } ?>
 		<div class="row clearfix">
 			<div class="col-md">
-				<button type="submit" name="update" class="button button-positiv float-end"><?= escaped_html($lang["save"]) ?></button>
+				<button type="submit" name="update" class="button button-positiv float-end"><?= Core::$_lang->getValue("translations", "save") ?></button>
 			</div>
 		</div>
 	</form>

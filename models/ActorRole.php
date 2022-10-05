@@ -5,9 +5,9 @@ namespace models;
 use JsonException;
 use PDO;
 
+use system\Core;
 use system\classes\CacheFile;
 use system\classes\QueryBuilder;
-use system\Core;
 use system\exceptions\SystemException;
 
 /**
@@ -342,40 +342,40 @@ class ActorRole extends entities\ActorRole {
 			"own"   => array(),
 		);
 		if( $this->canCreateAll() ) {
-			$rights["all"][] = $lang['rights_char']["create"];
+			$rights["all"][] = Core::$_lang->getValue("right-chars", "create");
 		}
 		if( $this->canReadAll() ) {
-			$rights["all"][] = $lang['rights_char']["read"];
+			$rights["all"][] = Core::$_lang->getValue("right-chars", "read");
 		}
 		if( $this->canUpdateAll() ) {
-			$rights["all"][] = $lang['rights_char']["update"];
+			$rights["all"][] = Core::$_lang->getValue("right-chars", "update");
 		}
 		if( $this->canDeleteAll() ) {
-			$rights["all"][] = $lang['rights_char']["delete"];
+			$rights["all"][] = Core::$_lang->getValue("right-chars", "delete");
 		}
 		if( $this->canCreateGroup() ) {
-			$rights["group"][] = $lang['rights_char']["create"];
+			$rights["group"][] = Core::$_lang->getValue("right-chars", "create");
 		}
 		if( $this->canReadGroup() ) {
-			$rights["group"][] = $lang['rights_char']["read"];
+			$rights["group"][] = Core::$_lang->getValue("right-chars", "read");
 		}
 		if( $this->canUpdateGroup() ) {
-			$rights["group"][] = $lang['rights_char']["update"];
+			$rights["group"][] = Core::$_lang->getValue("right-chars", "update");
 		}
 		if( $this->canDeleteGroup() ) {
-			$rights["group"][] = $lang['rights_char']["delete"];
+			$rights["group"][] = Core::$_lang->getValue("right-chars", "delete");
 		}
 		if( $this->canCreateOwn() ) {
-			$rights["own"][] = $lang['rights_char']["create"];
+			$rights["own"][] = Core::$_lang->getValue("right-chars", "create");
 		}
 		if( $this->canReadOwn() ) {
-			$rights["own"][] = $lang['rights_char']["read"];
+			$rights["own"][] = Core::$_lang->getValue("right-chars", "read");
 		}
 		if( $this->canUpdateOwn() ) {
-			$rights["own"][] = $lang['rights_char']["update"];
+			$rights["own"][] = Core::$_lang->getValue("right-chars", "update");
 		}
 		if( $this->canDeleteOwn() ) {
-			$rights["own"][] = $lang['rights_char']["delete"];
+			$rights["own"][] = Core::$_lang->getValue("right-chars", "delete");
 		}
 		return $rights;
 	}

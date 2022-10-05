@@ -1,6 +1,4 @@
 <?php
-global $lang;
-
 use system\Core;
 use models\ActorRole;
 
@@ -17,7 +15,7 @@ $role_option = $this->get("option_list");
 			<label for="name">Name</label>
 			<input type="text" name="name" value="<?= escaped_html($role->name) ?>"
 			       id="name"<?= ( $protected ) ? ' disabled' : '' ?> required />
-			<div class="invalid-feedback"><?= escaped_html($lang["required"]["name"]) ?></div>
+			<div class="invalid-feedback"><?= Core::$_lang->getValue("error-messages", "name") ?></div>
 		</div>
 		<div class="form-group">
 			<label for="child_of">Unterrolle von</label>
@@ -38,19 +36,19 @@ $role_option = $this->get("option_list");
 				<td class="table-col align-top">
 					<div class="clearfix">
 						<input type="checkbox" name="all[read]" value="x" id="all_read" class="form-check-input float-start"<?= ( $protected ) ? ' disabled' : '' ?><?= ( $role->rights_all & ActorRole::$CAN_READ ) ? ' checked' : '' ?> />
-						<label for="all_read" class="form-check-label float-end"><?= escaped_html($lang["read"]) ?></label>
+						<label for="all_read" class="form-check-label float-end"><?= Core::$_lang->getValue("translations", "read") ?></label>
 					</div>
 					<div class="clearfix">
 						<input type="checkbox" name="all[create]" value="x" id="all_create" class="form-check-input float-start"<?= ( $protected ) ? ' disabled' : '' ?><?= ( $role->rights_all & ActorRole::$CAN_CREATE ) ? ' checked' : '' ?> />
-						<label for="all_create" class="form-check-label float-end"><?= escaped_html($lang["create"]) ?></label>
+						<label for="all_create" class="form-check-label float-end"><?= Core::$_lang->getValue("translations", "create") ?></label>
 					</div>
 					<div class="clearfix">
 						<input type="checkbox" name="all[update]" value="x" id="all_update" class="form-check-input float-start"<?= ( $protected ) ? ' disabled' : '' ?><?= ( $role->rights_all & ActorRole::$CAN_UPDATE ) ? ' checked' : '' ?> />
-						<label for="all_update" class="form-check-label float-end"><?= escaped_html($lang["update"]) ?></label>
+						<label for="all_update" class="form-check-label float-end"><?= Core::$_lang->getValue("translations", "update") ?></label>
 					</div>
 					<div class="clearfix">
 						<input type="checkbox" name="all[delete]" value="x" id="all_delete" class="form-check-input float-start"<?= ( $protected ) ? ' disabled' : '' ?><?= ( $role->rights_all & ActorRole::$CAN_DELETE ) ? ' checked' : '' ?> />
-						<label for="all_delete" class="form-check-label float-end"><?= escaped_html($lang["delete"]) ?></label>
+						<label for="all_delete" class="form-check-label float-end"><?= Core::$_lang->getValue("translations", "delete") ?></label>
 					</div>
 				</td>
 			</tr>
@@ -62,19 +60,19 @@ $role_option = $this->get("option_list");
 				<td class="table-col align-top">
 					<div class="clearfix">
 						<input type="checkbox" name="group[read]" value="x" id="group_read" class="form-check-input float-start"<?= ( $protected ) ? ' disabled' : '' ?><?= ( $role->rights_group & ActorRole::$CAN_READ ) ? ' checked' : '' ?> />
-						<label for="group_read" class="form-check-label float-end"><?= escaped_html($lang["read"]) ?></label>
+						<label for="group_read" class="form-check-label float-end"><?= Core::$_lang->getValue("translations", "read") ?></label>
 					</div>
 					<div class="clearfix">
 						<input type="checkbox" name="group[create]" value="x" id="group_create" class="form-check-input float-start"<?= ( $protected ) ? ' disabled' : '' ?><?= ( $role->rights_group & ActorRole::$CAN_CREATE ) ? ' checked' : '' ?> />
-						<label for="group_create" class="form-check-label float-end"><?= escaped_html($lang["create"]) ?></label>
+						<label for="group_create" class="form-check-label float-end"><?= Core::$_lang->getValue("translations", "create") ?></label>
 					</div>
 					<div class="clearfix">
 						<input type="checkbox" name="group[update]" value="x" id="group_update" class="form-check-input float-start"<?= ( $protected ) ? ' disabled' : '' ?><?= ( $role->rights_group & ActorRole::$CAN_UPDATE ) ? ' checked' : '' ?> />
-						<label for="group_update" class="form-check-label float-end"><?= escaped_html($lang["update"]) ?></label>
+						<label for="group_update" class="form-check-label float-end"><?= Core::$_lang->getValue("translations", "update") ?></label>
 					</div>
 					<div class="clearfix">
 						<input type="checkbox" name="group[delete]" value="x" id="group_delete" class="form-check-input float-start"<?= ( $protected ) ? ' disabled' : '' ?><?= ( $role->rights_group & ActorRole::$CAN_DELETE ) ? ' checked' : '' ?> />
-						<label for="group_delete" class="form-check-label float-end"><?= escaped_html($lang["delete"]) ?></label>
+						<label for="group_delete" class="form-check-label float-end"><?= Core::$_lang->getValue("translations", "delete") ?></label>
 					</div>
 				</td>
 			</tr>
@@ -85,30 +83,30 @@ $role_option = $this->get("option_list");
 				<td class="table-col align-top">
 					<div class="clearfix">
 						<input type="checkbox" name="own[read]" value="x" id="own_read" class="form-check-input float-start"<?= ( $protected ) ? ' disabled' : '' ?><?= ( $role->rights_own & ActorRole::$CAN_READ ) ? ' checked' : '' ?> />
-						<label for="own_read" class="form-check-label float-end"><?= escaped_html($lang["read"]) ?></label>
+						<label for="own_read" class="form-check-label float-end"><?= Core::$_lang->getValue("translations", "read") ?></label>
 					</div>
 					<div class="clearfix">
 						<input type="checkbox" name="own[create]" value="x" id="own_create" class="form-check-input float-start"<?= ( $protected ) ? ' disabled' : '' ?><?= ( $role->rights_own & ActorRole::$CAN_CREATE ) ? ' checked' : '' ?> />
-						<label for="own_create" class="form-check-label float-end"><?= escaped_html($lang["create"]) ?></label>
+						<label for="own_create" class="form-check-label float-end"><?= Core::$_lang->getValue("translations", "create") ?></label>
 					</div>
 					<div class="clearfix">
 						<input type="checkbox" name="own[update]" value="x" id="own_update" class="form-check-input float-start"<?= ( $protected ) ? ' disabled' : '' ?><?= ( $role->rights_own & ActorRole::$CAN_UPDATE ) ? ' checked' : '' ?> />
-						<label for="own_update" class="form-check-label float-end"><?= escaped_html($lang["update"]) ?></label>
+						<label for="own_update" class="form-check-label float-end"><?= Core::$_lang->getValue("translations", "update") ?></label>
 					</div>
 					<div class="clearfix">
 						<input type="checkbox" name="own[delete]" value="x" id="own_delete" class="form-check-input float-start"<?= ( $protected ) ? ' disabled' : '' ?><?= ( $role->rights_own & ActorRole::$CAN_DELETE ) ? ' checked' : '' ?> />
-						<label for="own_delete" class="form-check-label float-end"><?= escaped_html($lang["delete"]) ?></label>
+						<label for="own_delete" class="form-check-label float-end"><?= Core::$_lang->getValue("translations", "delete") ?></label>
 					</div>
 				</td>
 			</tr>
 		</table>
 		<div class="form-group row">
 			<div class="col-auto">
-				<button type="submit" name="cancel" class="button button-default"><?= escaped_html($lang["cancel"]) ?></button>
+				<button type="submit" name="cancel" class="button button-default"><?= Core::$_lang->getValue("translations", "cancel") ?></button>
 			</div>
 			<div class="col"></div>
 			<div class="col-auto">
-				<button type="submit" name="update" class="button button-positiv"<?= ( $protected ) ? ' disabled' : '' ?>><?= escaped_html($lang["save"]) ?></button>
+				<button type="submit" name="update" class="button button-positiv"<?= ( $protected ) ? ' disabled' : '' ?>><?= Core::$_lang->getValue("translations", "save") ?></button>
 			</div>
 		</div>
 	</form>

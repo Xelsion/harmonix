@@ -75,7 +75,7 @@ class ConnectionManager {
 				$this->_active_connections[$name] = $conn;
 				return $conn;
 			} catch( PDOException $e ) {
-				throw new RuntimeException($e->getMessage());
+				throw new RuntimeException($e->getMessage(), $e->getCode(), $e->getTrace());
 			}
 		} else {
 			throw new RuntimeException("ConnectionManager: [".$name."] connection not found");

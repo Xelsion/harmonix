@@ -64,7 +64,7 @@ class ActorRole extends ACacheableEntity {
 			$pdo->execute();
 			$this->id = $pdo->lastInsertId();
 		} catch( Exception $e ) {
-			throw new SystemException(__FILE__, __LINE__, $e->getMessage());
+			throw new SystemException(__FILE__, __LINE__, $e->getMessage(), $e->getCode(), $e->getPrevious());
 		}
 	}
 
@@ -87,7 +87,7 @@ class ActorRole extends ACacheableEntity {
 				$pdo->bindParam(':rights_own', $this->rights_own, PDO::PARAM_INT);
 				$pdo->execute();
 			} catch( Exception $e ) {
-                throw new SystemException(__FILE__, __LINE__, $e->getMessage());
+                throw new SystemException(__FILE__, __LINE__, $e->getMessage(), $e->getCode(), $e->getPrevious());
 			}
 		}
 	}
@@ -104,7 +104,7 @@ class ActorRole extends ACacheableEntity {
 				$pdo->execute();
 				return true;
 			} catch( Exception $e ) {
-                throw new SystemException(__FILE__, __LINE__, $e->getMessage());
+                throw new SystemException(__FILE__, __LINE__, $e->getMessage(), $e->getCode(), $e->getPrevious());
 			}
 		}
 		return false;

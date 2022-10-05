@@ -49,7 +49,7 @@ class AccessPermission extends ACacheableEntity {
 			$pdo->bindParam(':method', $this->method);
 			$pdo->execute();
 		} catch( Exception $e ) {
-			throw new SystemException(__FILE__, __LINE__, $e->getMessage());
+			throw new SystemException(__FILE__, __LINE__, $e->getMessage(), $e->getCode(), $e->getPrevious());
 		}
 	}
 

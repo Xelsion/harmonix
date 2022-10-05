@@ -1,4 +1,5 @@
 <?php
+use system\Core;
 global $lang;
 $this->set("title", "Rolle erstellen");
 
@@ -10,7 +11,7 @@ $role_option = $this->get("option_list");
 		<div class="form-group">
 			<label for="name">Name</label>
 			<input type="text" name="name" value="" id="name" required />
-			<div class="invalid-feedback"><?= escaped_html($lang["required"]["name"]) ?></div>
+			<div class="invalid-feedback"><?= Core::$_lang->getValue("error-messages", "name") ?></div>
 		</div>
 		<div class="form-group">
 			<label for="child_of">Unterrolle von</label>
@@ -29,19 +30,19 @@ $role_option = $this->get("option_list");
 				<td class="table-col align-top">
 					<div class="clearfix">
 						<input type="checkbox" name="all[read]" value="x" id="all_read" class="form-check-input float-start" />
-						<label for="all_read" class="form-check-label float-end"><?= escaped_html($lang["read"]) ?></label>
+						<label for="all_read" class="form-check-label float-end"><?= Core::$_lang->getValue("translations", "read") ?></label>
 					</div>
 					<div class="clearfix">
 						<input type="checkbox" name="all[create]" value="x" id="all_create" class="form-check-input float-start" />
-						<label for="all_create" class="form-check-label float-end"><?= escaped_html($lang["create"]) ?></label>
+						<label for="all_create" class="form-check-label float-end"><?= Core::$_lang->getValue("translations", "create") ?></label>
 					</div>
 					<div class="clearfix">
 						<input type="checkbox" name="all[update]" value="x" id="all_update" class="form-check-input float-start" />
-						<label for="all_update" class="form-check-label float-end"><?= escaped_html($lang["update"]) ?></label>
+						<label for="all_update" class="form-check-label float-end"><?= Core::$_lang->getValue("translations", "update") ?></label>
 					</div>
 					<div class="clearfix">
 						<input type="checkbox" name="all[delete]" value="x" id="all_delete" class="form-check-input float-start" />
-						<label for="all_delete" class="form-check-label float-end"><?= escaped_html($lang["delete"]) ?></label>
+						<label for="all_delete" class="form-check-label float-end"><?= Core::$_lang->getValue("translations", "delete") ?></label>
 					</div>
 				</td>
 			</tr>
@@ -53,19 +54,19 @@ $role_option = $this->get("option_list");
 				<td class="table-col align-top">
 					<div class="clearfix">
 						<input type="checkbox" name="group[read]" value="x" id="group_read" class="form-check-input float-start" />
-						<label for="group_read" class="form-check-label float-end"><?= escaped_html($lang["read"]) ?></label>
+						<label for="group_read" class="form-check-label float-end"><?= Core::$_lang->getValue("translations", "read") ?></label>
 					</div>
 					<div class="clearfix">
 						<input type="checkbox" name="group[create]" value="x" id="group_create" class="form-check-input float-start" />
-						<label for="group_create" class="form-check-label float-end"><?= escaped_html($lang["create"]) ?></label>
+						<label for="group_create" class="form-check-label float-end"><?= Core::$_lang->getValue("translations", "create") ?></label>
 					</div>
 					<div class="clearfix">
 						<input type="checkbox" name="group[update]" value="x" id="group_update" class="form-check-input float-start" />
-						<label for="group_update" class="form-check-label float-end"><?= escaped_html($lang["update"]) ?></label>
+						<label for="group_update" class="form-check-label float-end"><?= Core::$_lang->getValue("translations", "update") ?></label>
 					</div>
 					<div class="clearfix">
 						<input type="checkbox" name="group[delete]" value="x" id="group_delete" class="form-check-input float-start" />
-						<label for="group_delete" class="form-check-label float-end"><?= escaped_html($lang["delete"]) ?></label>
+						<label for="group_delete" class="form-check-label float-end"><?= Core::$_lang->getValue("translations", "delete") ?></label>
 					</div>
 				</td>
 			</tr>
@@ -76,19 +77,19 @@ $role_option = $this->get("option_list");
 				<td class="table-col align-top">
 					<div class="clearfix">
 						<input type="checkbox" name="own[read]" value="x" id="own_read" class="form-check-input float-start" />
-						<label for="own_read" class="form-check-label float-end"><?= escaped_html($lang["read"]) ?></label>
+						<label for="own_read" class="form-check-label float-end"><?= Core::$_lang->getValue("translations", "read") ?></label>
 					</div>
 					<div class="clearfix">
 						<input type="checkbox" name="own[create]" value="x" id="own_create" class="form-check-input float-start" />
-						<label for="own_create" class="form-check-label float-end"><?= escaped_html($lang["create"]) ?></label>
+						<label for="own_create" class="form-check-label float-end"><?= Core::$_lang->getValue("translations", "create") ?></label>
 					</div>
 					<div class="clearfix">
 						<input type="checkbox" name="own[update]" value="x" id="own_update" class="form-check-input float-start" />
-						<label for="own_update" class="form-check-label float-end"><?= escaped_html($lang["update"]) ?></label>
+						<label for="own_update" class="form-check-label float-end"><?= Core::$_lang->getValue("translations", "update") ?></label>
 					</div>
 					<div class="clearfix">
 						<input type="checkbox" name="own[delete]" value="x" id="own_delete" class="form-check-input float-start" />
-						<label for="own_delete" class="form-check-label float-end"><?= escaped_html($lang["delete"]) ?></label>
+						<label for="own_delete" class="form-check-label float-end"><?= Core::$_lang->getValue("translations", "delete") ?></label>
 					</div>
 				</td>
 			</tr>
@@ -96,7 +97,7 @@ $role_option = $this->get("option_list");
 		<div class="form-group row">
 			<div class="col"></div>
 			<div class="col-auto">
-				<button type="submit" name="create" class="button button-positiv float-end"><?= escaped_html($lang["create"]) ?></button>
+				<button type="submit" name="create" class="button button-positiv float-end"><?= Core::$_lang->getValue("translations", "create") ?></button>
 			</div>
 		</div>
 	</form>
