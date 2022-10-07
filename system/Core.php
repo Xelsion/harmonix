@@ -8,6 +8,8 @@ use system\classes\Language;
 use system\classes\Logger;
 use system\classes\Request;
 use system\classes\Router;
+use system\classes\Storage;
+use system\classes\TimeAnalyser;
 use system\classes\tree\Menu;
 use system\classes\tree\RoleTree;
 use system\manager\ConnectionManager;
@@ -22,6 +24,12 @@ use models\ActorRole;
  * @version 1.0.0;
  */
 class Core {
+
+    // global storage
+    public static Storage $_storage;
+
+    // time analysing tool
+    public static TimeAnalyser $_analyser;
 
 	// The application configuration
 	public static Configuration $_configuration;

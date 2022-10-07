@@ -4,10 +4,8 @@ namespace controller\admin;
 
 use Exception;
 use JsonException;
-use system\abstracts\ACacheableEntity;
 use system\abstracts\AController;
 use system\abstracts\AResponse;
-use system\classes\CacheFile;
 use system\classes\Router;
 use system\classes\Template;
 use system\classes\responses\ResponseHTML;
@@ -15,7 +13,6 @@ use models\Actor;
 use models\ActorRole;
 use models\AccessPermission;
 use system\exceptions\SystemException;
-use system\helper\SqlHelper;
 
 /**
  * @see \system\abstracts\AController
@@ -85,7 +82,6 @@ class ActorController extends AController {
 				$actor->password = $_POST["password"];
 				$actor->first_name = $_POST["first_name"];
 				$actor->last_name = $_POST["last_name"];
-                print_debug($actor);
 				$actor->create();
 				$this->savePermissions($actor);
 				redirect("/actors");

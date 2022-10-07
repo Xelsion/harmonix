@@ -4,8 +4,11 @@ namespace models;
 
 use JsonException;
 use system\classes\CacheFile;
+use system\classes\PDOCache;
 use system\classes\QueryBuilder;
+use system\Core;
 use system\exceptions\SystemException;
+use system\helper\SqlHelper;
 
 /**
  * The Actor Permissions
@@ -53,34 +56,45 @@ class AccessPermission extends entities\AccessPermission {
 	 * @throws SystemException
 	 */
 	public static function find( array $conditions = array(), ?string $order = "", ?string $direction = "asc", int $limit = 0, int $page = 1 ): array {
-		$queryBuilder = new QueryBuilder( "mvc" );
-		$queryBuilder->setTable( "access_permissions" );
-		if( !empty( $conditions ) ) {
-			$queryBuilder->setConditions( $conditions );
-		}
-		if( !is_null( $order ) && $order !== "" ) {
-			$queryBuilder->setOrder( $order, $direction );
-		}
-		if( $limit > 0 ) {
-			$queryBuilder->setLimit( $limit, $page );
-		}
-		$queryBuilder->setFetchClass( __CLASS__ );
+        $results = array();
+        $db = Core::$_connection_manager->getConnection("mvc");
+        if( !is_null($db) ) {
+            $params = array();
 
-		if( self::isCacheable() ) {
-			$cache = new CacheFile( $queryBuilder->getCacheName() );
-			$last_modify = $queryBuilder->getLastModificationDate();
-			if( $cache->isUpToDate( $last_modify ) ) {
-				$results = unserialize( $cache->loadFromCache(), array( false ) );
-			}
-			else {
-				$results = $queryBuilder->getResults();
-				$cache->saveToCache( serialize( $results ) );
-			}
-		}
-		else {
-			$results = $queryBuilder->getResults();
-		}
-		return $results;
+            $query = "SELECT * FROM access_permissions";
+            if( !empty($conditions) ) {
+                $columns = array();
+
+                foreach( $conditions as $i => $condition ) {
+                    $columns[] = $condition[0] . $condition[1] . ":" . $i;
+                    $params[$i] = $condition[2];
+                }
+                $query .= " WHERE " . implode(" AND ", $columns);
+            }
+
+            if( $order !== "" ) {
+                $query .= " ORDER BY " . $order . " " . $direction;
+            }
+
+            if( $limit > 0 ) {
+                $offset = $limit * ($page - 1);
+                $query .= " LIMIT :limit OFFSET :offset";
+                $params["limit"] = $limit;
+                $params["offset"] = $offset;
+            }
+
+            $db->prepare($query);
+            foreach( $params as $key => $value ) {
+                $db->bindParam(":" . $key, $value, SqlHelper::getParamType($value));
+            }
+
+            $pdo_cache = new PDOCache($db);
+            $pdo_cache->checkTable("mvc", "access_permissions");
+            $results = $pdo_cache->getResults(__CLASS__);
+
+        }
+
+        return $results;
 	}
 
 	/**

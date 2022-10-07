@@ -5,10 +5,10 @@ namespace models;
 use JsonException;
 use PDO;
 
-use system\classes\CacheFile;
-use system\classes\QueryBuilder;
+use system\classes\PDOCache;
 use system\Core;
 use system\exceptions\SystemException;
+use system\helper\SqlHelper;
 
 /**
  * The Actor
@@ -59,30 +59,42 @@ class Actor extends entities\Actor {
      * @throws SystemException
      */
 	public static function find( array $conditions = array(), ?string $order = "", ?string $direction = "asc", int $limit = 0, int $page = 1 ): array {
-        $queryBuilder = new QueryBuilder("mvc");
-        $queryBuilder->setTable("actors");
-        if( !empty($conditions) ) {
-            $queryBuilder->setConditions( $conditions );
-        }
-        if( !is_null($order) && $order !== "" ) {
-            $queryBuilder->setOrder($order, $direction);
-        }
-        if( $limit > 0 ) {
-            $queryBuilder->setLimit($limit, $page);
-        }
-        $queryBuilder->setFetchClass(__CLASS__);
+        $results = array();
+        $db = Core::$_connection_manager->getConnection("mvc");
+        if( !is_null($db) ) {
+            $params = array();
 
-        if( self::isCacheable() ) {
-            $cache = new CacheFile(md5($queryBuilder->getCacheName()));
-            $last_modify = $queryBuilder->getLastModificationDate();
-            if( $cache->isUpToDate($last_modify) ) {
-                $results = unserialize($cache->loadFromCache(), array(false));
-            } else {
-                $results = $queryBuilder->getResults();
-                $cache->saveToCache(serialize($results));
+            $query = "SELECT * FROM actors";
+            if( !empty($conditions) ) {
+                $columns = array();
+
+                foreach( $conditions as $i => $condition ) {
+                    $columns[] = $condition[0] . $condition[1] . ":" . $i;
+                    $params[$i] = $condition[2];
+                }
+                $query .= " WHERE " . implode(" AND ", $columns);
             }
-        } else {
-            $results = $queryBuilder->getResults();
+
+            if( $order !== "" ) {
+                $query .= " ORDER BY " . $order . " " . $direction;
+            }
+
+            if( $limit > 0 ) {
+                $offset = $limit * ($page - 1);
+                $query .= " LIMIT :limit OFFSET :offset";
+                $params["limit"] = $limit;
+                $params["offset"] = $offset;
+            }
+
+            $db->prepare($query);
+            foreach( $params as $key => $value ) {
+                $db->bindParam(":" . $key, $value, SqlHelper::getParamType($value));
+            }
+
+            $pdo_cache = new PDOCache($db);
+            $pdo_cache->checkTable("mvc", "actors");
+            $results = $pdo_cache->getResults(__CLASS__);
+
         }
 
         return $results;
@@ -137,45 +149,6 @@ class Actor extends entities\Actor {
         // if no default actor role could be found return an empty actor role
 		return new ActorRole();
 	}
-
-    public function getCurrentRole( string $controller, string $method, $domain = SUB_DOMAIN ): ActorRole {
-
-
-        // do we have a loaded actor object?
-        if( $this->id > 0 ) {
-            // no permission restriction is set?
-            if( empty($this->_permissions) ) {
-                $this->initPermission();
-            }
-
-            // check if there is a permission set for this method if so return the actor role
-            if( isset($this->_permissions[$domain][$controller][$method]) ) {
-                return $this->_permissions[$domain][$controller][$method];
-            }
-
-            // check if there is a permission set for this controller if so return the actor role
-            if( isset($this->_permissions[$domain][$controller][null]) ) {
-                return $this->_permissions[$domain][$controller][null];
-            }
-
-            // check if there is a permission set for this domain if so return the actor role
-            if( isset($this->_permissions[$domain][null][null]) ) {
-                return $this->_permissions[$domain][null][null];
-            }
-        }
-
-        // actor object is not loaded, so we return the default actor role
-        $result = ActorRole::find(array(
-            array( "is_default", "=", 1 )
-        ));
-        if( count($result) === 1 ) {
-            return $result[0];
-        }
-
-        // if no default actor role could be found return an empty actor role
-        return new ActorRole();
-    }
-
 
     /**
      * @return bool

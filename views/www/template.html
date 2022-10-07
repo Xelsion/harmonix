@@ -82,7 +82,13 @@ $view_content = ( $view instanceof Template ) ? $view->parse() : "";
 		</nav>
 	</header>
 	<main><?= $view_content ?></main>
-	<footer></footer>
+	<footer>
+		<?php if( Core::$_storage::get("debug_mode") ) {
+			$debug = new Template(PATH_VIEWS_ROOT."snippets/debug.html");
+			$debug_content = $debug->parse();
+			echo $debug_content;
+		} ?>
+	</footer>
 </body>
 <?php foreach( $this->getFooterScripts() as $script_file => $async ) { ?>
 	<?php if ( $async ) { ?>

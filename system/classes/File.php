@@ -27,6 +27,24 @@ class File {
 		$this->_file_path = $file_path;
 	}
 
+    /**
+     * Returns the whole file path
+     *
+     * @return string
+     */
+    public function getFilePath(): string {
+        return $this->_file_path;
+    }
+
+    /**
+     * returns just the file name
+     *
+     * @return string
+     */
+    public function getFileName(): string {
+        return basename($this->_file_path);
+    }
+
 	/**
 	 * Checks if the current file exists
 	 * @return bool

@@ -3,6 +3,7 @@
 namespace system\classes;
 
 use DateTime;
+use system\Core;
 use system\exceptions\SystemException;
 use system\helper\StringHelper;
 
@@ -17,6 +18,7 @@ class CacheFile extends File {
 
     // the age of the cache file
     private DateTime $cache_age;
+    private bool $_encrypt;
 
     /**
      * The constructor
@@ -24,8 +26,11 @@ class CacheFile extends File {
      * @param string $file_name
      */
     public function __construct( string $file_name ) {
-        $cache_file = PATH_CACHE.md5($file_name).".cache";
-        parent::__construct( $cache_file );
+        $cache_setting = Core::$_configuration->getSection("cache");
+        $this->_encrypt = $cache_setting["encryption"];
+
+        $cache_file = PATH_CACHE . md5($file_name.$this->_encrypt) . ".cache";
+        parent::__construct($cache_file);
         $this->cache_age = new DateTime();
         if( file_exists($this->_file_path) ) {
             $this->cache_age->setTimestamp(filemtime($cache_file));
@@ -34,21 +39,21 @@ class CacheFile extends File {
         }
     }
 
-	/**
-	 * Loads the cache file with the given name
-	 *
-	 * @param string $cache_file
-	 * @return void
-	 */
-	public function load(string $cache_file ) : void {
-		parent::__construct($cache_file);
-		$this->cache_age = new DateTime();
-		if( file_exists($this->_file_path) ) {
-			$this->cache_age->setTimestamp(filemtime($cache_file));
-		} else {
-			$this->cache_age->setTimestamp(0);
-		}
-	}
+    /**
+     * Loads the cache file with the given name
+     *
+     * @param string $cache_file
+     * @return void
+     */
+    public function load( string $cache_file ): void {
+        parent::__construct($cache_file);
+        $this->cache_age = new DateTime();
+        if( file_exists($this->_file_path) ) {
+            $this->cache_age->setTimestamp(filemtime($cache_file));
+        } else {
+            $this->cache_age->setTimestamp(0);
+        }
+    }
 
     /**
      * Checks if the current cache file is not older than
@@ -57,7 +62,7 @@ class CacheFile extends File {
      * @param int $timestamp
      * @return bool
      */
-    public function isUpToDate( int $timestamp ) : bool {
+    public function isUpToDate( int $timestamp ): bool {
         if( !file_exists($this->_file_path) ) {
             return false;
         }
@@ -75,13 +80,19 @@ class CacheFile extends File {
      * encrypted string.
      *
      * @param string $content
+     *
      * @return void
+     *
      * @throws SystemException
      */
-	public function saveToCache( string $content ) : void {
-		$this->setContent(StringHelper::encrypt($content));
+    public function saveToCache( string $content ): void {
+        if( $this->_encrypt ) {
+            $this->setContent(StringHelper::encrypt($content));
+        } else {
+            $this->setContent($content);
+        }
         $this->save();
-	}
+    }
 
     /**
      * Loads the content of the cache file and returns its decrypted
@@ -89,8 +100,11 @@ class CacheFile extends File {
      *
      * @return string
      */
-	public function loadFromCache() : string {
-        return StringHelper::decrypt($this->getContent());
-	}
+    public function loadFromCache(): string {
+        if( $this->_encrypt ) {
+            return StringHelper::decrypt($this->getContent());
+        }
+        return $this->getContent();
+    }
 
 }

@@ -2,11 +2,10 @@
 
 namespace system\classes;
 
-use JsonException;
 use PDO;
 use PDOException;
 use PDOStatement;
-use RuntimeException;
+use JsonException;
 use system\exceptions\SystemException;
 
 /**
@@ -17,8 +16,11 @@ use system\exceptions\SystemException;
  */
 class PDOConnection extends PDO {
 
-	private ?Logger $logger = null;
+	private ?Logger $logger;
 	private PDOStatement $stmt;
+
+    private string $used_query = "";
+    private array $used_params = array();
 
 	/**
 	 * @param $dns
@@ -37,7 +39,10 @@ class PDOConnection extends PDO {
 	 * @param array $options
 	 */
 	public function prepare( $query, array $options = [] ) {
+        $this->used_query = "";
+        $this->used_params = array();
 		$this->stmt = parent::prepare($query, $options);
+        $this->used_query = $query;
 	}
 
 	/**
@@ -47,11 +52,40 @@ class PDOConnection extends PDO {
 	 * @return bool
 	 */
 	public function bindParam( string $key, $value, int $type = PDO::PARAM_STR ): bool {
+        $this->used_params[$key] = $value;
         if( $type !== PDO::PARAM_STR) {
 		    return $this->stmt->bindValue($key, $value, $type);
         }
 
         return $this->stmt->bindValue($key, $value);
+    }
+
+
+    /**
+     * Returns the query that is sent to the database
+     *
+     * @return string
+     */
+    public function getFinalizedQuery() : string {
+        $keys = array();
+        $values = array_values($this->used_params);
+
+        # build a regular expression for each parameter
+        foreach( $this->used_params as $key => $value ) {
+            if( is_string($key) ) {
+                $keys[] = '/'.$key.'/';
+            } else {
+                $keys[] = '/[?]/';
+            }
+        }
+
+        array_walk($values, static function( &$v, $k ) {
+            if( !is_numeric($v) && $v !== "NULL" ) {
+                $v = "\'" . $v . "\'";
+            }
+        });
+
+        return preg_replace($keys, $values, $this->used_query, 1);
     }
 
 	/**

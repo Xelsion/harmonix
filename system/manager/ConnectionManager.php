@@ -50,18 +50,20 @@ class ConnectionManager {
 		);
 	}
 
-	/**
-	 * Returns a connections
-	 * First checks if the connection is already active, if so returns it
-	 * else it activates the connection, stores it to the active connections
-	 * and returns it.
-	 *
-	 * @param string $name
-	 * @return mixed|PDO
-	 */
-	public function getConnection( string $name ) {
+    /**
+     * Returns a connections
+     * First checks if the connection is already active, if so returns it
+     * else it activates the connection, stores it to the active connections
+     * and returns it.
+     *
+     * @param string $name
+     * @param bool $singelton - default is true
+     *
+     * @return mixed|PDO
+     */
+	public function getConnection( string $name, bool $singelton = true ) {
 		// is the connection already active?
-		if( isset($this->_active_connections[$name]) ) {
+		if( isset($this->_active_connections[$name]) && $singelton ) {
 			return $this->_active_connections[$name];
 		}
 
@@ -72,7 +74,9 @@ class ConnectionManager {
 				// try to establish the connection
 				$conn = new PDOConnection($conn_array["dns"], $conn_array["user"], $conn_array["pass"], $this->options);
 				// add it to the active connections
-				$this->_active_connections[$name] = $conn;
+                if( $singelton ) {
+				    $this->_active_connections[$name] = $conn;
+                }
 				return $conn;
 			} catch( PDOException $e ) {
 				throw new RuntimeException($e->getMessage(), $e->getCode(), $e->getTrace());
