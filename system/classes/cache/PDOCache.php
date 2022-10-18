@@ -1,12 +1,15 @@
 <?php
 
-namespace system\classes;
+namespace system\classes\cache;
 
 use DateTime;
+use PDO;
+use system\classes\CacheFile;
+use system\classes\PDOConnection;
+use system\Core;
+
 use Exception;
 use JsonException;
-use PDO;
-use system\Core;
 use system\exceptions\SystemException;
 
 /**

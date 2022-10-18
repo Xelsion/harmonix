@@ -5,7 +5,7 @@ namespace models;
 use JsonException;
 use PDO;
 
-use system\classes\PDOCache;
+use system\classes\cache\PDOCache;
 use system\Core;
 use system\exceptions\SystemException;
 use system\helper\SqlHelper;
@@ -53,15 +53,16 @@ class Actor extends entities\Actor {
      * @param string|null $direction
      * @param int $limit
      * @param int $page
-     * @return array|false|null
+     *
+     * @return array
      *
      * @throws JsonException
      * @throws SystemException
      */
 	public static function find( array $conditions = array(), ?string $order = "", ?string $direction = "asc", int $limit = 0, int $page = 1 ): array {
         $results = array();
-        $db = Core::$_connection_manager->getConnection("mvc");
-        if( !is_null($db) ) {
+        $pdo = Core::$_connection_manager->getConnection("mvc");
+        if( !is_null($pdo) ) {
             $params = array();
 
             $query = "SELECT * FROM actors";
@@ -86,15 +87,12 @@ class Actor extends entities\Actor {
                 $params["offset"] = $offset;
             }
 
-            $db->prepare($query);
+            $pdo->prepare($query);
             foreach( $params as $key => $value ) {
-                $db->bindParam(":" . $key, $value, SqlHelper::getParamType($value));
+                $pdo->bindParam(":" . $key, $value, SqlHelper::getParamType($value));
             }
-
-            $pdo_cache = new PDOCache($db);
-            $pdo_cache->checkTable("mvc", "actors");
-            $results = $pdo_cache->getResults(__CLASS__);
-
+            $pdo->setFetchMode(PDO::FETCH_CLASS, __CLASS__);
+            $results = $pdo->execute()->fetchAll();
         }
 
         return $results;

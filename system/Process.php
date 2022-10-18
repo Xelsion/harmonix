@@ -3,8 +3,13 @@
 namespace system;
 
 use Exception;
+use JetBrains\PhpStorm\Pure;
 use JsonException;
 use ReflectionException;
+use system\abstracts\ADBConnection;
+use system\classes\connections\MsSqlConnection;
+use system\classes\connections\MySqlConnection;
+use system\classes\connections\PostgresConnection;
 use system\classes\Language;
 use system\classes\Storage;
 use system\classes\TimeAnalyser;
@@ -78,7 +83,7 @@ class Process {
         // Initiate general settings
         $settings = Core::$_configuration->getSection("development");
         Core::$_storage::set("environment", $settings["environment"]);
-        Core::$_storage::set("debug_mode", $settings["debug"]);
+        Core::$_storage::set("debug_mode", (bool)$settings["debug"]);
 
         Core::$_analyser = new TimeAnalyser();
 
@@ -89,8 +94,22 @@ class Process {
 
         // Initiate database connections
         $connections = Core::$_configuration->getSection("connections");
-        foreach( $connections as $name => $conn ) {
-            Core::$_connection_manager->addConnection($name, $conn["dns"], $conn["user"], $conn["password"]);
+        foreach( $connections as $conn ) {
+            $connection = match ( $conn["type"] ) {
+                "postgres" => new PostgresConnection(),
+                "mssql" => new MsSqlConnection(),
+                "mysql" => new MySqlConnection(),
+                default => null
+            };
+
+            if( $connection instanceof ADBConnection ) {
+                $connection->_host = $conn["host"];
+                $connection->_port = (int) $conn["port"];
+                $connection->_dbname = $conn["dbname"];
+                $connection->_user = $conn["user"];
+                $connection->_pass = $conn["password"];
+                Core::$_connection_manager->addConnection($connection);
+            }
         }
 
         // clear the garbage
@@ -126,9 +145,21 @@ class Process {
 
             // Has the current actor access to this request?
             if( Core::$_auth->hasAccess() ) {
+                if( Core::$_storage::get("debug_mode") ) {
+                    Core::$_analyser->addTimer("template-parsing", $controller."->".$method);
+                    Core::$_analyser->startTimer("template-parsing");
+                }
+
                 // Get the Response obj from the controller
                 $this->_response = $controller->$method(...$params);
                 $this->_response->setHeaders();
+
+                if( Core::$_storage::get("debug_mode") ) {
+                    Core::$_analyser->stopTimer("template-parsing");
+                    $elapsed_time = Core::$_analyser->getTimerElapsedTime("template-parsing");
+                    $label = Core::$_analyser->getTimerLabel("template-parsing");
+                    echo $label . " => elapsed time: " . round($elapsed_time * 1000, 4) . "ms";
+                }
             } else {
                 redirect("/error/403");
             }
@@ -144,7 +175,7 @@ class Process {
 	 *
 	 * @return string
 	 */
-	public function getResult(): string {
+    public function getResult(): string {
 		return $this->_response->getOutput();
 	}
 
@@ -152,18 +183,18 @@ class Process {
     public function generateTestData():void {
         for( $i=0; $i<10000; $i++) {
             try {
-            $email = StringHelper::getRandomString();
-            $first_name = StringHelper::getRandomString();
-            $last_name = StringHelper::getRandomString();
-            $password = StringHelper::getRandomString();
+                $email = StringHelper::getRandomString();
+                $first_name = StringHelper::getRandomString();
+                $last_name = StringHelper::getRandomString();
+                $password = StringHelper::getRandomString();
 
-            $db = Core::$_connection_manager->getConnection("mvc");
-            $db->prepare("INSERT INTO actors (email, first_name, last_name, password) VALUES (:email, :first_name, :last_name, :password)");
-            $db->bindParam('email', $email);
-            $db->bindParam('first_name', $first_name);
-            $db->bindParam('last_name', $last_name);
-            $db->bindParam('password', $password);
-            $db->execute();
+                $pdo = Core::$_connection_manager->getConnection("mvc");
+                $pdo->prepare("INSERT INTO actors (email, first_name, last_name, password) VALUES (:email, :first_name, :last_name, :password)");
+                $pdo->bindParam('email', $email);
+                $pdo->bindParam('first_name', $first_name);
+                $pdo->bindParam('last_name', $last_name);
+                $pdo->bindParam('password', $password);
+                $pdo->execute();
             } catch( Exception $e) {
                 die($e->getMessage());
             }

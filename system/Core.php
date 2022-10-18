@@ -1,5 +1,4 @@
 <?php
-
 namespace system;
 
 use system\classes\Auth;

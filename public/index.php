@@ -5,6 +5,8 @@
  * @author Markus Schröder <xelsion@gmail.com>
  * @version 1.0.0;
  */
+declare(strict_types = 1);
+
 use system\abstracts\ALoggableException;
 use system\classes\Logger;
 use system\Process;

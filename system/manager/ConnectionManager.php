@@ -2,10 +2,14 @@
 
 namespace system\manager;
 
-use PDO;
+use JsonException;
 use PDOException;
 use RuntimeException;
+
+use system\abstracts\ADBConnection;
 use system\classes\PDOConnection;
+use system\exceptions\SystemException;
+
 
 /**
  * This class will handle all database connections
@@ -21,11 +25,6 @@ class ConnectionManager {
 	// the active connections
 	private array $_active_connections = array();
 	// the pdo options for all connections
-	private array $options = array(
-		PDO::ATTR_PERSISTENT         => true,
-		PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-		PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION
-	);
 
 	/**
 	 * the class constructor
@@ -34,20 +33,13 @@ class ConnectionManager {
 
 	}
 
-	/**
-	 * Adds a connection the available connections
-	 *
-	 * @param string $name
-	 * @param string $dns
-	 * @param string $user
-	 * @param string $pass
-	 */
-	public function addConnection( string $name, string $dns, string $user, string $pass ): void {
-		$this->_connections[$name] = array(
-			"dns"  => $dns,
-			"user" => $user,
-			"pass" => $pass
-		);
+    /**
+     * Adds a connection the available connections
+     *
+     * @param ADBConnection $conn
+     */
+	public function addConnection( ADBConnection $conn ): void {
+        $this->_connections[$conn->_dbname] = $conn;
 	}
 
     /**
@@ -56,33 +48,33 @@ class ConnectionManager {
      * else it activates the connection, stores it to the active connections
      * and returns it.
      *
-     * @param string $name
+     * @param string $dbname
      * @param bool $singelton - default is true
      *
-     * @return mixed|PDO
+     * @return mixed|PDOConnection
      */
-	public function getConnection( string $name, bool $singelton = true ) {
+	public function getConnection( string $dbname, bool $singelton = true ): mixed {
 		// is the connection already active?
-		if( isset($this->_active_connections[$name]) && $singelton ) {
-			return $this->_active_connections[$name];
+		if( isset($this->_active_connections[$dbname]) && $singelton ) {
+			return $this->_active_connections[$dbname];
 		}
 
 		// check if it's an available connection
-		if( isset($this->_connections[$name]) ) {
-			$conn_array = $this->_connections[$name];
+		if( isset($this->_connections[$dbname]) ) {
+			$conn = $this->_connections[$dbname];
 			try {
 				// try to establish the connection
-				$conn = new PDOConnection($conn_array["dns"], $conn_array["user"], $conn_array["pass"], $this->options);
+				$pdo_conn = new PDOConnection($conn);
 				// add it to the active connections
                 if( $singelton ) {
-				    $this->_active_connections[$name] = $conn;
+				    $this->_active_connections[$dbname] = $pdo_conn;
                 }
-				return $conn;
-			} catch( PDOException $e ) {
+				return $pdo_conn;
+			} catch( PDOException|SystemException|JsonException $e ) {
 				throw new RuntimeException($e->getMessage(), $e->getCode(), $e->getTrace());
 			}
-		} else {
-			throw new RuntimeException("ConnectionManager: [".$name."] connection not found");
+        } else {
+			throw new RuntimeException("ConnectionManager: [".$dbname."] connection not found");
 		}
 	}
 

@@ -2,10 +2,9 @@
 
 namespace models;
 
+use PDO;
 use JsonException;
-use system\classes\CacheFile;
-use system\classes\PDOCache;
-use system\classes\QueryBuilder;
+
 use system\Core;
 use system\exceptions\SystemException;
 use system\helper\SqlHelper;
@@ -37,15 +36,15 @@ class AccessRestriction extends entities\AccessRestriction {
      * @param string|null $direction
      * @param int $limit
      * @param int $page
-     * @return array|false|null
+     * @return array|null
      *
      * @throws JsonException
      * @throws SystemException
      */
     public static function find( array $conditions = array(), ?string $order = "", ?string $direction = "asc", int $limit = 0, int $page = 1 ) : ?array {
         $results = array();
-        $db = Core::$_connection_manager->getConnection("mvc");
-        if( !is_null($db) ) {
+        $pdo = Core::$_connection_manager->getConnection("mvc");
+        if( !is_null($pdo) ) {
             $params = array();
 
             $query = "SELECT * FROM access_restrictions";
@@ -70,17 +69,13 @@ class AccessRestriction extends entities\AccessRestriction {
                 $params["offset"] = $offset;
             }
 
-            $db->prepare($query);
+            $pdo->prepare($query);
             foreach( $params as $key => $value ) {
-                $db->bindParam(":" . $key, $value, SqlHelper::getParamType($value));
+                $pdo->bindParam(":" . $key, $value, SqlHelper::getParamType($value));
             }
 
-            $pdo_cache = new PDOCache($db);
-            $pdo_cache->checkTable("mvc", "access_restrictions");
-            $results = $pdo_cache->getResults(__CLASS__);
-
+            $results = $pdo->execute()->fetchObject(__CLASS__);
         }
-
         return $results;
     }
 

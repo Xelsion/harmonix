@@ -40,7 +40,10 @@ class HomeController extends AController {
     }
 
     /**
+     * @Route("/", methods: {"GET})
+     *
      * @return AResponse
+     *
      * @throws SystemException
      */
 	public function index(): AResponse {

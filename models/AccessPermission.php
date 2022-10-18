@@ -3,9 +3,7 @@
 namespace models;
 
 use JsonException;
-use system\classes\CacheFile;
-use system\classes\PDOCache;
-use system\classes\QueryBuilder;
+use PDO;
 use system\Core;
 use system\exceptions\SystemException;
 use system\helper\SqlHelper;
@@ -57,8 +55,8 @@ class AccessPermission extends entities\AccessPermission {
 	 */
 	public static function find( array $conditions = array(), ?string $order = "", ?string $direction = "asc", int $limit = 0, int $page = 1 ): array {
         $results = array();
-        $db = Core::$_connection_manager->getConnection("mvc");
-        if( !is_null($db) ) {
+        $pdo = Core::$_connection_manager->getConnection("mvc");
+        if( !is_null($pdo) ) {
             $params = array();
 
             $query = "SELECT * FROM access_permissions";
@@ -83,17 +81,13 @@ class AccessPermission extends entities\AccessPermission {
                 $params["offset"] = $offset;
             }
 
-            $db->prepare($query);
+            $pdo->prepare($query);
             foreach( $params as $key => $value ) {
-                $db->bindParam(":" . $key, $value, SqlHelper::getParamType($value));
+                $pdo->bindParam(":" . $key, $value, SqlHelper::getParamType($value));
             }
-
-            $pdo_cache = new PDOCache($db);
-            $pdo_cache->checkTable("mvc", "access_permissions");
-            $results = $pdo_cache->getResults(__CLASS__);
-
+            $pdo->setFetchMode(PDO::FETCH_CLASS, __CLASS__ );
+            $results = $pdo->execute()->fetchAll();
         }
-
         return $results;
 	}
 

@@ -145,6 +145,9 @@ class File {
 		return file_put_contents($file_path, $this->_content);
 	}
 
+    /**
+     * @return int
+     */
     public function getLastModified(): int {
         if( $this->exists() ) {
             $ctime = filectime($this->_file_path);

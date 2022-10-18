@@ -2,14 +2,16 @@
 
 namespace controller\www;
 
-use JsonException;
 use models\Actor;
 use system\abstracts\AController;
 use system\abstracts\AResponse;
 use system\classes\responses\ResponseHTML;
 use system\classes\Router;
 use system\classes\Template;
+
+use JsonException;
 use system\exceptions\SystemException;
+
 
 class TestController extends AController {
 
@@ -45,16 +47,20 @@ class TestController extends AController {
 
     /**
      * @inheritDoc
+     *
+     * @throws SystemException
      */
     public function index(): AResponse {
         $response = new ResponseHTML();
-        $template = new Template(PATH_VIEWS."template.html");
-        $template->set("view", new Template(PATH_VIEWS."tests/index.html"));
+        $template = new Template(PATH_VIEWS . "template.html");
+        $template->set("view", new Template(PATH_VIEWS . "tests/index.html"));
         $response->setOutput($template->parse());
         return $response;
     }
 
     /**
+     * @return AResponse
+     *
      * @throws SystemException
      */
     public function charts(): AResponse {
@@ -66,6 +72,7 @@ class TestController extends AController {
     }
 
     /**
+     *
      * @throws SystemException
      * @throws JsonException
      */
@@ -79,6 +86,7 @@ class TestController extends AController {
     }
 
     /**
+     *
      * @throws SystemException
      * @throws JsonException
      */
@@ -96,6 +104,7 @@ class TestController extends AController {
     }
 
 	/**
+     *
 	 * @return ResponseHTML
 	 * @throws SystemException
 	 */

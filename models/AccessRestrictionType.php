@@ -2,14 +2,11 @@
 
 namespace models;
 
+use PDO;
 use JsonException;
-use system\classes\CacheFile;
-use system\classes\PDOCache;
-use system\classes\QueryBuilder;
+
 use system\Core;
 use system\exceptions\SystemException;
-
-use PDO;
 use system\helper\SqlHelper;
 
 class AccessRestrictionType extends entities\AccessRestrictionType {
@@ -19,6 +16,8 @@ class AccessRestrictionType extends entities\AccessRestrictionType {
      * If id is 0 it will return an empty actor
      *
      * @param int $id
+     *
+     * @throws SystemException
      */
     public function __construct( int $id = 0 ) {
         parent::__construct($id);
@@ -40,15 +39,16 @@ class AccessRestrictionType extends entities\AccessRestrictionType {
      * @param string|null $direction
      * @param int $limit
      * @param int $page
-     * @return array|false|null
+     *
+     * @return array|null
      *
      * @throws JsonException
      * @throws SystemException
      */
     public static function find( array $conditions = array(), ?string $order = "", ?string $direction = "asc", int $limit = 0, int $page = 1 ) : ?array {
         $results = array();
-        $db = Core::$_connection_manager->getConnection("mvc");
-        if( !is_null($db) ) {
+        $pdo = Core::$_connection_manager->getConnection("mvc");
+        if( !is_null($pdo) ) {
             $params = array();
 
             $query = "SELECT * FROM access_restriction_types";
@@ -73,15 +73,12 @@ class AccessRestrictionType extends entities\AccessRestrictionType {
                 $params["offset"] = $offset;
             }
 
-            $db->prepare($query);
+            $pdo->prepare($query);
             foreach( $params as $key => $value ) {
-                $db->bindParam(":" . $key, $value, SqlHelper::getParamType($value));
+                $pdo->bindParam(":" . $key, $value, SqlHelper::getParamType($value));
             }
-
-            $pdo_cache = new PDOCache($db);
-            $pdo_cache->checkTable("mvc", "access_restriction_types");
-            $results = $pdo_cache->getResults(__CLASS__);
-
+            $pdo->setFetchMode( PDO::FETCH_CLASS, __CLASS__);
+            $results = $pdo->execute()->fetchAll();
         }
 
         return $results;
