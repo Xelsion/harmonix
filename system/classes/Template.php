@@ -30,6 +30,15 @@ class Template extends TemplateData {
 		$this->_file_path = $file_path;
 	}
 
+    /**
+     * Returns the filepath of the template
+     *
+     * @return string
+     */
+    public function getFilePath(): string {
+        return $this->_file_path;
+    }
+
 	/**
 	 * Includes the template file and returns its output
 	 *

@@ -9,6 +9,13 @@ use PDO;
 use system\Core;
 use system\exceptions\SystemException;
 
+/**
+ * The PDOCache class
+ * Can be used the store db results in a cache file
+ *
+ * @author Markus Schröder <xelsion@gmail.com>
+ * @version 1.0.0;
+ */
 class PDOCache {
 
     private PDOConnection $_pdo;

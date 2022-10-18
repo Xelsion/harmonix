@@ -2,6 +2,13 @@
 
 namespace system\classes;
 
+/**
+ * The TimeAnalyser class
+ * Can be used the store db results in a cache file
+ *
+ * @author Markus Schröder <xelsion@gmail.com>
+ * @version 1.0.0;
+ */
 class TimeAnalyser {
 
     private array $_timers = array();

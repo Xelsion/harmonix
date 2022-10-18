@@ -144,4 +144,15 @@ class File {
 	public function saveAs( string $file_path ): bool {
 		return file_put_contents($file_path, $this->_content);
 	}
+
+    public function getLastModified(): int {
+        if( $this->exists() ) {
+            $ctime = filectime($this->_file_path);
+            $mtime = filemtime($this->_file_path);
+            if( $mtime && $mtime > $ctime ) {
+                return $mtime;
+            }
+        }
+        return 0;
+    }
 }

@@ -6,7 +6,7 @@ use system\Core;
 $actor = Core::$_actor;
 $menu = Core::$_menu;
 $view = $this->get("view");
-$view_content = ( $view instanceof Template) ? $view->parse() : "";
+$view_content = ( $view instanceof Template) ? $view->parse() : $view;
 ?>
 <!DOCTYPE html>
 <html lang="en">

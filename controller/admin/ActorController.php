@@ -12,6 +12,8 @@ use system\classes\responses\ResponseHTML;
 use models\Actor;
 use models\ActorRole;
 use models\AccessPermission;
+use system\classes\TemplateCache;
+use system\Core;
 use system\exceptions\SystemException;
 
 /**
@@ -58,12 +60,36 @@ class ActorController extends AController {
      */
 	public function index(): AResponse {
 		$response = new ResponseHTML();
-		$template = new Template(PATH_VIEWS."template.html");
 
-		$template->set("navigation", $this::$_menu);
-		$template->set("result_list", Actor::find());
-		$template->set("view", new Template(PATH_VIEWS."actor/index.html"));
-		$response->setOutput($template->parse());
+
+        $view = new Template(PATH_VIEWS."actor/index.html");
+        $tpl_cache = new TemplateCache($view);
+        $tpl_cache->checkTable("mvc", "actors");
+
+        Core::$_analyser->addTimer("ActorController.index", $tpl_cache->_cache->getFileName());
+        Core::$_analyser->startTimer("ActorController.index");
+
+        if( $tpl_cache->isUpToDate() ) {
+            Core::$_storage::add("debug", "Read from cache");
+            $tpl_content = $tpl_cache->getContent();
+        } else {
+            Core::$_storage::add("debug", "Read from template");
+            $view->set("result_list", Actor::find());
+            $tpl_content = $view->parse();
+            $tpl_cache->saveContent($tpl_content);
+        }
+        Core::$_analyser->stopTimer("ActorController.index");
+
+        $template = new Template(PATH_VIEWS."template.html");
+        $template->set("navigation", $this::$_menu);
+		$template->set("view", $tpl_content);
+
+        $elapsed_time = Core::$_analyser->getTimerElapsedTime("ActorController.index");
+        $label = Core::$_analyser->getTimerLabel("ActorController.index");
+        Core::$_storage::add("debug", $label." => elapsed time: ".round($elapsed_time * 1000, 4)."ms");
+
+        $response->setOutput($template->parse());
+
 		return $response;
 	}
 

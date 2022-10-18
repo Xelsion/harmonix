@@ -2,8 +2,13 @@
 
 namespace system\classes;
 
-use system\Process;
-
+/**
+ * The Configuration type singleton
+ * Collect all the configurations and stores them in an array
+ *
+ * @author Markus Schröder <xelsion@gmail.com>
+ * @version 1.0.0;
+ */
 class Language {
 
     private static ?Language $_instance = null;
@@ -16,6 +21,8 @@ class Language {
 
     /**
      * The initializer for this class
+     *
+     * @param string $language_key
      *
      * @return Language
      */
@@ -30,6 +37,7 @@ class Language {
      * Returns a specific section of the configuration
      *
      * @param string $name
+     *
      * @return array
      */
     public function getSection( string $name ): array {

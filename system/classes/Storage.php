@@ -2,6 +2,13 @@
 
 namespace system\classes;
 
+/**
+ * The Storage class
+ * A storage for the whole project in key => value pairs
+ *
+ * @author Markus Schröder <xelsion@gmail.com>
+ * @version 1.0.0;
+ */
 class Storage {
 
     private static array $_storage = array();
