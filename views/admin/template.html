@@ -12,7 +12,7 @@ $view_content = ( $view instanceof Template) ? $view->parse() : $view;
 <head>
 	<meta charset="UTF-8">
 	<title><?= $this->get("title") ?? "Home" ?></title>
-	<link rel="stylesheet" href="<?= PATH_SRC ?>bootstrap-5.0.2/css/bootstrap.min.css" />
+	<link rel="stylesheet" href="<?= PATH_SRC ?>bootstrap-5.2.2/css/bootstrap.min.css" />
 	<link rel="stylesheet" href="<?= PATH_CSS ?>main.css" />
 	<link rel="stylesheet" href="<?= PATH_CSS ?>navigation.css" />
 	<link rel="stylesheet" href="<?= PATH_CSS ?>forms.css" />
@@ -83,17 +83,17 @@ $view_content = ( $view instanceof Template) ? $view->parse() : $view;
 		echo $debug_content;
 	} ?>
 </div>
-<footer class="container text-right">
+<footer>
 	<?php
 	Core::$_analyser->stopTimer("template-parsing");
 	$elapsed_time = Core::$_analyser->getTimerElapsedTime("template-parsing");
 	$label = Core::$_analyser->getTimerLabel("template-parsing");
 	?>
-	<div class="row" style="margin: 0;">
-		<div class="col-6"></div>
-		<div class="col">MVC-Framework by: <?= escaped_html(AUTHOR) ?></div>
-		<div class="col-1">Version: <?= escaped_html(MVC_VERSION) ?></div>
-		<div class="col">elapsed time: <?= round($elapsed_time, 4) ?>sec</div>
+	<div class="row text-end" style="margin: 0;">
+		<div class="col"></div>
+		<div class="col-3">MVC-Framework by: <?= escaped_html(AUTHOR) ?></div>
+		<div class="col-2">Version: <?= escaped_html(MVC_VERSION) ?></div>
+		<div class="col-2">elapsed time: <?= round($elapsed_time, 4) ?>sec</div>
 	</div>
 </footer>
 </body>

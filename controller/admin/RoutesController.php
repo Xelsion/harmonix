@@ -2,14 +2,12 @@
 
 namespace controller\admin;
 
-use models\Actor;
 use system\abstracts\AController;
 use system\abstracts\AResponse;
 use system\classes\responses\ResponseHTML;
 use system\classes\Router;
 use system\classes\Template;
 use system\Core;
-use system\exceptions\SystemException;
 
 class RoutesController Extends AController {
 

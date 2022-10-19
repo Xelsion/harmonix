@@ -3,7 +3,6 @@
 namespace system;
 
 use Exception;
-use JetBrains\PhpStorm\Pure;
 use JsonException;
 use ReflectionException;
 use system\abstracts\ADBConnection;
@@ -43,7 +42,7 @@ class Process {
 	// The instance of this class
 	private static ?Process $_instance = null;
 
-	// The router
+	// The response
 	private AResponse $_response;
 
 	/**
@@ -87,6 +86,11 @@ class Process {
         Core::$_storage::set("debug_mode", (bool)$settings["debug"]);
 
         Core::$_analyser = new TimeAnalyser();
+
+        if( Core::$_storage::get("debug_mode") ) {
+            Core::$_analyser->addTimer("template-parsing", "");
+            Core::$_analyser->startTimer("template-parsing");
+        }
 
         // Initiate session cookie settings
         $cookie = Core::$_configuration->getSection("cookie");
@@ -146,11 +150,6 @@ class Process {
 
             // Has the current actor access to this request?
             if( Core::$_auth->hasAccess() ) {
-                if( Core::$_storage::get("debug_mode") ) {
-                    Core::$_analyser->addTimer("template-parsing", $controller."->".$method);
-                    Core::$_analyser->startTimer("template-parsing");
-                }
-
                 Core::$_response_cache = ResponseCache::getInstance();
                 Core::$_response_cache->initCacheFor($controller."-".$method, ...$params);
 
@@ -163,13 +162,6 @@ class Process {
                 // Get the Response obj from the controller
                 $this->_response = $controller->$method(...$params);
                 $this->_response->setHeaders();
-
-                if( Core::$_storage::get("debug_mode") ) {
-                    Core::$_analyser->stopTimer("template-parsing");
-                    $elapsed_time = Core::$_analyser->getTimerElapsedTime("template-parsing");
-                    $label = Core::$_analyser->getTimerLabel("template-parsing");
-                    echo $label . " => elapsed time: " . round($elapsed_time, 4) . "sec";
-                }
             } else {
                 redirect("/error/403");
             }
