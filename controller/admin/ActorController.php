@@ -4,17 +4,19 @@ namespace controller\admin;
 
 use Exception;
 use JsonException;
+
+use system\Core;
 use system\abstracts\AController;
 use system\abstracts\AResponse;
 use system\classes\Router;
 use system\classes\Template;
 use system\classes\responses\ResponseHTML;
+use system\exceptions\SystemException;
+
 use models\Actor;
 use models\ActorRole;
 use models\AccessPermission;
-use system\classes\cache\TemplateCache;
-use system\Core;
-use system\exceptions\SystemException;
+
 
 /**
  * @see \system\abstracts\AController
@@ -61,23 +63,23 @@ class ActorController extends AController {
 	public function index(): AResponse {
         $response = new ResponseHTML();
 
-        $view = new Template(PATH_VIEWS."actor/index.html");
-        $tpl_cache = new TemplateCache($view);
-        $tpl_cache->checkTable("mvc", "actors");
-
-        if( $tpl_cache->isUpToDate() ) {
-            Core::$_storage::add("debug", "Read from cache");
-            $tpl_content = $tpl_cache->getContent();
+        $cache = Core::$_response_cache;
+        $cache->addFileCheck(__FILE__);
+        $cache->addFileCheck(PATH_VIEWS."actor/index.html");
+        if( $cache->isUpToDate() ) {
+            print_debug("from cache");
+            $view_content = $cache->getContent();
         } else {
-            Core::$_storage::add("debug", "Read from template");
+            print_debug("from template");
+            $view = new Template(PATH_VIEWS."actor/index.html");
             $view->set("result_list", Actor::find());
-            $tpl_content = $view->parse();
-            $tpl_cache->saveContent($tpl_content);
+            $view_content = $view->parse();
+            $cache->saveContent($view_content);
         }
 
         $template = new Template(PATH_VIEWS."template.html");
         $template->set("navigation", $this::$_menu);
-		$template->set("view", $tpl_content);
+		$template->set("view", $view_content);
 
         $response->setOutput($template->parse());
 		return $response;
@@ -104,20 +106,38 @@ class ActorController extends AController {
 			}
 		}
 
-	    $access_permissions = array();
-	    $response = new ResponseHTML();
-		$template = new Template(PATH_VIEWS."template.html");
-		$template->set("navigation", $this::$_menu);
-	    $template->set("role_options", ActorRole::find());
-	    $template->set("access_permissions", $access_permissions);
-	    $template->set("view", new Template(PATH_VIEWS."actor/create.html"));
-		$response->setOutput($template->parse());
+        $response = new ResponseHTML();
+
+        $cache = Core::$_response_cache;
+        $cache->addFileCheck(__FILE__);
+        $cache->addFileCheck(PATH_VIEWS."actor/create.html");
+        if( $cache->isUpToDate() ) {
+            print_debug("from cache");
+            $view_content = $cache->getContent();
+        } else {
+            print_debug("from template");
+            $access_permissions = array();
+
+            $view = new Template(PATH_VIEWS."actor/create.html");
+            $view->set("role_options", ActorRole::find());
+            $view->set("access_permissions", $access_permissions);
+
+            $view_content = $view->parse();
+            $cache->saveContent($view_content);
+        }
+
+        $template = new Template(PATH_VIEWS."template.html");
+        $template->set("navigation", $this::$_menu);
+        $template->set("view", $view_content);
+
+        $response->setOutput($template->parse());
 		return $response;
 	}
 
 
     /**
      * @throws SystemException
+     * @throws JsonException
      */
     public function update( Actor $actor ): AResponse {
 		if( !$this::$_actor_role->canUpdateAll() ) {
@@ -141,12 +161,20 @@ class ActorController extends AController {
 		}
 
 		$response = new ResponseHTML();
-		$template = new Template(PATH_VIEWS."template.html");
-		$template->set("actor", $actor);
-		$template->set("navigation", $this::$_menu);
-		$template->set("view", new Template(PATH_VIEWS."actor/edit.html"));
-		$response->setOutput($template->parse());
-		return $response;
+
+        $access_permissions = array();
+        $view = new Template(PATH_VIEWS."actor/edit.html");
+        $view->set("actor", $actor);
+        $view->set("role_options", ActorRole::find());
+        $view->set("access_permissions", $access_permissions);
+        $view_content = $view->parse();
+
+        $template = new Template(PATH_VIEWS."template.html");
+        $template->set("navigation", $this::$_menu);
+        $template->set("view", $view_content);
+
+        $response->setOutput($template->parse());
+        return $response;
 	}
 
     /**

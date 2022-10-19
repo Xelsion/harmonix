@@ -2,6 +2,7 @@
 namespace system;
 
 use system\classes\Auth;
+use system\classes\cache\ResponseCache;
 use system\classes\Configuration;
 use system\classes\Language;
 use system\classes\Logger;
@@ -41,6 +42,9 @@ class Core {
 
 	// The request obj
 	public static Request $_request;
+
+    // The response cache
+    public static ResponseCache $_response_cache;
 
 	// The Menu
 	public static Menu $_menu;

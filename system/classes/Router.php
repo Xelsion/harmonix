@@ -2,10 +2,9 @@
 
 namespace system\classes;
 
+use JetBrains\PhpStorm\ArrayShape;
 use system\abstracts\AController;
-use system\Core;
 use Exception;
-use RuntimeException;
 use ReflectionException;
 use ReflectionMethod;
 use system\exceptions\SystemException;
@@ -133,6 +132,7 @@ class Router {
      *
      * @throws SystemException|ReflectionException
      */
+    #[ArrayShape( [ "controller" => "mixed", "method" => "mixed", "params" => "array|null" ] )]
     private function getRouteArray( array &$request_parts ): array {
         $route = $this->getValidRoute($request_parts);
         if( $this->hasRoute($route) ) {

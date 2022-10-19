@@ -25,11 +25,11 @@ class CacheFile extends File {
      *
      * @param string $file_name
      */
-    public function __construct( string $file_name ) {
+    public function __construct( string $file_name, string $hash ) {
         $cache_setting = Core::$_configuration->getSection("cache");
         $this->_encrypt = $cache_setting["encryption"];
 
-        $cache_file = PATH_CACHE . md5($file_name.$this->_encrypt) . ".cache";
+        $cache_file = PATH_CACHE . Core::$_actor->id . DIRECTORY_SEPARATOR . $file_name."_".(int)$this->_encrypt."_".md5($hash) . ".cache";
         parent::__construct($cache_file);
         $this->cache_age = new DateTime();
         if( file_exists($this->_file_path) ) {

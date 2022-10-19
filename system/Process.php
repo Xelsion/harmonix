@@ -7,6 +7,7 @@ use JetBrains\PhpStorm\Pure;
 use JsonException;
 use ReflectionException;
 use system\abstracts\ADBConnection;
+use system\classes\cache\ResponseCache;
 use system\classes\connections\MsSqlConnection;
 use system\classes\connections\MySqlConnection;
 use system\classes\connections\PostgresConnection;
@@ -150,6 +151,15 @@ class Process {
                     Core::$_analyser->startTimer("template-parsing");
                 }
 
+                Core::$_response_cache = ResponseCache::getInstance();
+                Core::$_response_cache->initCacheFor($controller."-".$method, ...$params);
+
+                // Always check these tables
+                Core::$_response_cache->addDBCheck("mvc", "actors");
+                Core::$_response_cache->addDBCheck("mvc", "actor_roles");
+                Core::$_response_cache->addDBCheck("mvc", "access_permissions");
+                Core::$_response_cache->addDBCheck("mvc", "access_restrictions");
+
                 // Get the Response obj from the controller
                 $this->_response = $controller->$method(...$params);
                 $this->_response->setHeaders();
@@ -158,7 +168,7 @@ class Process {
                     Core::$_analyser->stopTimer("template-parsing");
                     $elapsed_time = Core::$_analyser->getTimerElapsedTime("template-parsing");
                     $label = Core::$_analyser->getTimerLabel("template-parsing");
-                    echo $label . " => elapsed time: " . round($elapsed_time * 1000, 4) . "ms";
+                    echo $label . " => elapsed time: " . round($elapsed_time, 4) . "sec";
                 }
             } else {
                 redirect("/error/403");

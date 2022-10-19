@@ -73,8 +73,8 @@ class AccessRestriction extends entities\AccessRestriction {
             foreach( $params as $key => $value ) {
                 $pdo->bindParam(":" . $key, $value, SqlHelper::getParamType($value));
             }
-
-            $results = $pdo->execute()->fetchObject(__CLASS__);
+            $pdo->setFetchMode(PDO::FETCH_CLASS, __CLASS__);
+            $results = $pdo->execute()->fetchAll();
         }
         return $results;
     }

@@ -2,29 +2,63 @@
 
 namespace system\classes\cache;
 
-use DateTime;
-use Exception;
-use JsonException;
+use system\classes\CacheFile;
+use system\classes\File;
 use system\Core;
 use system\exceptions\SystemException;
 
 class ResponseCache {
 
-    private static ResponseCache $_instance;
+    private static ?ResponseCache $_instance = null;
 
     private CacheFile $_cache;
-    private array $_db_checks;
-    private array $_file_checks;
+    private array $_db_checks = array();
+    private array $_file_checks = array();
 
-    private function __construct( string $cache_name, ...$param ) {
-        $this->_cache = new CacheFile( $cache_name . implode("-", $param) );
+    /**
+     */
+    private function __construct() {
+
     }
 
-    public static function getInstance( string $cache_name, ...$param ): ResponseCache {
+    /**
+     * @return ResponseCache
+     */
+    public static function getInstance(): ResponseCache {
         if( static::$_instance === null ) {
-            static::$_instance = new ResponseCache( $cache_name, ...$param );
+            static::$_instance = new ResponseCache();
         }
         return static::$_instance;
+    }
+
+    public function initCacheFor( string $cache_name, ...$param ): void {
+        $entries = array();
+        foreach( $param as $p ) {
+            if( is_object($p) ) {
+                $entries[] = serialize($p);
+            } else {
+                $entries[] = (string)$p;
+            }
+        }
+        $this->_cache = new CacheFile( $cache_name, implode("-", $entries) );
+    }
+
+    /**
+     * @return string
+     */
+    public function getContent(): string {
+        return $this->_cache->getContent();
+    }
+
+    /**
+     * @param string $content
+     *
+     * @return void
+     *
+     * @throws SystemException
+     */
+    public function saveContent( string $content ): void {
+        $this->_cache->saveToCache($content);
     }
 
     /**
@@ -49,7 +83,17 @@ class ResponseCache {
         if( in_array($file_name, $this->_file_checks, TRUE) ) {
             return;
         }
-        $this->_db_checks[] = $file_name;
+        $this->_file_checks[] = $file_name;
+    }
+
+    /**
+     * Returns if the cache file age is up-to-date
+     *
+     * @return bool
+     *
+     */
+    public function isUpToDate(): bool {
+        return ($this->doDBCheck() && $this->doFileChecks());
     }
 
     /**
@@ -57,30 +101,13 @@ class ResponseCache {
      *
      * @return bool
      *
-     * @throws SystemException
-     * @throws JsonException
-     * @throws Exception
      */
-    public function doDBCheck(): bool {
-        foreach( $this->_db_checks as $db => $tables ) {
-            $pdo = Core::$_connection_manager->getConnection($db, false);
-            $pdo->prepare("SELECT create_time, update_time FROM information_schema.tables WHERE table_schema=:db AND table_name IN (:table)");
-            $pdo->bindParam("db", $db);
-            $pdo->bindParam("table", implode("','", $tables));
-            $results = $pdo->execute()->fetch();
-            foreach( $results as $row ) {
-                $create_time = !is_null($row["create_time"]);
-                $update_time = ( !is_null($row["update_time"]) )
-                    ? $row["update_time"]
-                    : "1970-01-01 00:00:00";
-                $create_date = new DateTime($create_time);
-                $update_date = new DateTime($update_time);
-
-                $modification_time = ( $update_date > $create_date )
-                    ? $update_date->getTimestamp()
-                    : $create_date->getTimestamp();
-
-                if( !$this->_cache->isUpToDate($modification_time) ) {
+    private function doDBCheck(): bool {
+        foreach( $this->_db_checks as $dbname => $tables ) {
+            $pdo = Core::$_connection_manager->getConnection($dbname);
+            foreach( $tables as $table_name ) {
+                $table_time = $pdo->getModificationTimeOfTable($table_name);
+                if( !$this->_cache->isUpToDate($table_time) ) {
                     return false;
                 }
             }
@@ -91,7 +118,7 @@ class ResponseCache {
     /**
      * @return bool
      */
-    public function doFileChecks(): bool {
+    private function doFileChecks(): bool {
         $cache_time = $this->_cache->getLastModified();
         foreach( $this->_file_checks as $file_name ) {
             $file = new File($file_name);

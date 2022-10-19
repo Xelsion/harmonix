@@ -24,7 +24,7 @@ class CacheFileController extends AController {
 		}
 
 		// Add MenuItems to the Menu
-		$this::$_menu->insertMenuItem(500, null, "Cache Files", "/cache");
+		$this::$_menu->insertMenuItem(600, null, "Cache Files", "/cache");
 	}
 
 	/**
@@ -43,21 +43,40 @@ class CacheFileController extends AController {
 		$response = new ResponseHTML();
 		$template = new Template(PATH_VIEWS."template.html");
 
-		$cache_file_list = array();
-		$files = scandir(PATH_CACHE);
-		foreach( $files as $f ) {
-			$file_name = PATH_CACHE.$f;
-			if( is_file($file_name) ) {
-				$cache_file = new CacheFile("");
-				$cache_file->load($file_name);
-				$cache_file_list[$file_name] = unserialize($cache_file->loadFromCache(), array(false));
-			}
-		}
+        $file_list = array();
+        $this->getCacheFiles(PATH_CACHE, $file_list);
 
 		$template->set("navigation", $this::$_menu);
-		$template->set("cache_list", $cache_file_list);
+		$template->set("cache_list", $file_list);
 		$template->set("view", new Template(PATH_VIEWS."cache/index.html"));
 		$response->setOutput($template->parse());
 		return $response;
 	}
+
+    /**
+     * Reads the given path recursive and collects all files
+     * they will be stored in the given file_list array
+     *
+     * @param string $path
+     * @param array $file_list
+     *
+     * @return void
+     */
+    public function getCacheFiles( string $path, array &$file_list ): void {
+        $files = scandir($path);
+        foreach( $files as $f ) {
+            if( $f === "." || $f === ".." ) {
+                continue;
+            }
+            $file_name = $path.$f;
+            if( is_file($file_name) ) {
+                $cache_file = new CacheFile("", "");
+                $cache_file->load($file_name);
+                $file_list[$file_name] = $cache_file->loadFromCache();
+            } elseif(is_dir($file_name) ) {
+                $this->getCacheFiles($file_name.DIRECTORY_SEPARATOR, $file_list);
+            }
+        }
+    }
+
 }
