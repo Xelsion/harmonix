@@ -22,6 +22,11 @@ body {
     color: #ccc;
 }
 
+footer {
+    font-size: 0.8em;
+    padding: 10px;
+}
+
 h1 {
     font-size: 1.6em;
     padding: 10px 15px;

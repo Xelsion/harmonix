@@ -76,12 +76,25 @@ $view_content = ( $view instanceof Template) ? $view->parse() : $view;
 	</nav>
 </header>
 <main><?= $view_content ?></main>
-<footer>
+<div>
 	<?php if( Core::$_storage::get("debug_mode") ) {
 		$debug = new Template(PATH_VIEWS_ROOT."snippets/debug.html");
 		$debug_content = $debug->parse();
 		echo $debug_content;
 	} ?>
+</div>
+<footer class="container text-right">
+	<?php
+	Core::$_analyser->stopTimer("template-parsing");
+	$elapsed_time = Core::$_analyser->getTimerElapsedTime("template-parsing");
+	$label = Core::$_analyser->getTimerLabel("template-parsing");
+	?>
+	<div class="row" style="margin: 0;">
+		<div class="col-6"></div>
+		<div class="col">MVC-Framework by: <?= escaped_html(AUTHOR) ?></div>
+		<div class="col-1">Version: <?= escaped_html(MVC_VERSION) ?></div>
+		<div class="col">elapsed time: <?= round($elapsed_time, 4) ?>sec</div>
+	</div>
 </footer>
 </body>
 <?php foreach( $this->getFooterScripts() as $script_file => $async ) { ?>
