@@ -1,0 +1,15 @@
+.list-group {
+
+}
+
+.list-group-item.active {
+    background: linear-gradient(to bottom, #3b3b3b , #151515);
+    border-color: #666666;
+    text-transform: uppercase;
+}
+
+.list-group-item {
+    color: #ccc;
+    background-color: #222;
+    border-bottom-color: #666666;
+}

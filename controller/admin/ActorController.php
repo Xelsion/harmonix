@@ -16,6 +16,8 @@ use system\exceptions\SystemException;
 use models\Actor;
 use models\ActorRole;
 use models\AccessPermission;
+use system\helper\HtmlHelper;
+use system\helper\RequestHelper;
 
 
 /**
@@ -62,17 +64,22 @@ class ActorController extends AController {
      */
 	public function index(): AResponse {
         $response = new ResponseHTML();
+        $params = RequestHelper::getPaginationParams();
 
         $cache = Core::$_response_cache;
+        $cache->initCacheFor(__METHOD__, ...$params);
         $cache->addFileCheck(__FILE__);
         $cache->addFileCheck(PATH_VIEWS."actor/index.html");
         if( $cache->isUpToDate() ) {
-            print_debug("from cache");
             $view_content = $cache->getContent();
         } else {
-            print_debug("from template");
+            $pagination = "";
+            HTMLHelper::getPagination( $params['page'],  Actor::getNumActors(), $params['limit'], $pagination);
+
+
             $view = new Template(PATH_VIEWS."actor/index.html");
-            $view->set("result_list", Actor::find());
+            $view->set("result_list", Actor::find(array(), $params['order'], $params['direction'], $params['limit'], $params['page']));
+            $view->set("pagination", $pagination);
             $view_content = $view->parse();
             $cache->saveContent($view_content);
         }
@@ -109,18 +116,15 @@ class ActorController extends AController {
         $response = new ResponseHTML();
 
         $cache = Core::$_response_cache;
+        $cache->initCacheFor(__METHOD__);
         $cache->addFileCheck(__FILE__);
         $cache->addFileCheck(PATH_VIEWS."actor/create.html");
         if( $cache->isUpToDate() ) {
-            print_debug("from cache");
             $view_content = $cache->getContent();
         } else {
-            print_debug("from template");
-            $access_permissions = array();
-
             $view = new Template(PATH_VIEWS."actor/create.html");
             $view->set("role_options", ActorRole::find());
-            $view->set("access_permissions", $access_permissions);
+            $view->set("access_permissions", array());
 
             $view_content = $view->parse();
             $cache->saveContent($view_content);

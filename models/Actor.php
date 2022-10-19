@@ -5,7 +5,6 @@ namespace models;
 use JsonException;
 use PDO;
 
-use system\classes\cache\PDOCache;
 use system\Core;
 use system\exceptions\SystemException;
 use system\helper\SqlHelper;
@@ -97,6 +96,24 @@ class Actor extends entities\Actor {
 
         return $results;
 	}
+
+    /**
+     * Returns the number of total actors
+     *
+     * @return int
+     *
+     * @throws JsonException
+     * @throws SystemException
+     */
+    public static function getNumActors(): int {
+        $pdo = Core::$_connection_manager->getConnection("mvc");
+        $pdo->prepare("SELECT COUNT(DISTINCT id) as 'num_rows' FROM actors");
+        $row = $pdo->execute()->fetch();
+        if( $row ) {
+            return (int)$row["num_rows"];
+        }
+        return 0;
+    }
 
     /**
      * Returns the actor role for the given controller method

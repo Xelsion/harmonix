@@ -1,16 +1,31 @@
 @font-face {
     font-family: "Comfortaa";
-    src: url("./fonts/Comfortaa-Regular.ttf") format("truetype")
+    src: url("../../fonts/Comfortaa-Regular.ttf") format("truetype")
 }
 
 @font-face {
     font-family: "Comfortaa-Light";
-    src: url("./fonts/Comfortaa-Light.ttf") format("truetype")
+    src: url("../../fonts/Comfortaa-Light.ttf") format("truetype")
 }
 
 @font-face {
     font-family: "Comfortaa-Bold";
-    src: url("./fonts/Comfortaa-Bold.ttf") format("truetype")
+    src: url("../../fonts/Comfortaa-Bold.ttf") format("truetype")
+}
+
+@font-face {
+    font-family: "FiraCode";
+    src: url("../../fonts/FiraCode-Regular.ttf") format("truetype")
+}
+
+@font-face {
+    font-family: "FiraCode-Light";
+    src: url("../../fonts/FiraCode-Light.ttf") format("truetype")
+}
+
+@font-face {
+    font-family: "FiraCode-Bold";
+    src: url("../../fonts/FiraCode-Bold.ttf") format("truetype")
 }
 
 html {
@@ -20,11 +35,22 @@ html {
 body {
     background-color: #111;
     color: #ccc;
+    margin-bottom: 40px;
+}
+
+main {
+    padding: 20px 10px;
 }
 
 footer {
-    font-size: 0.8em;
+    position: fixed;
+    width: 100%;
+    bottom: 0px;
     padding: 10px;
+    font-family: FiraCode, sans-serif;
+    font-size: 0.7em;
+    color: #333333;
+    background: linear-gradient(to bottom, #d8d8d8, #5f5f5f);
 }
 
 h1 {

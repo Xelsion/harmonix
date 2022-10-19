@@ -17,6 +17,7 @@ $view_content = ( $view instanceof Template) ? $view->parse() : $view;
 	<link rel="stylesheet" href="<?= PATH_CSS ?>navigation.css" />
 	<link rel="stylesheet" href="<?= PATH_CSS ?>forms.css" />
 	<link rel="stylesheet" href="<?= PATH_CSS ?>tables.css" />
+	<link rel="stylesheet" href="<?= PATH_CSS ?>overrides.css" />
 	<?php foreach( $this->getHeaderCss() as $css_file ) { ?>
 		<link rel="stylesheet" href="<?= $css_file ?>" />
 	<?php } ?>
@@ -91,10 +92,10 @@ $view_content = ( $view instanceof Template) ? $view->parse() : $view;
 	?>
 	<div class="row text-end" style="margin: 0;">
 		<div class="col"></div>
-		<div class="col-3">MVC-Framework by: <?= escaped_html(AUTHOR) ?></div>
-		<div class="col-2">Version: <?= escaped_html(MVC_VERSION) ?></div>
-		<div class="col-2">elapsed time: <?= round($elapsed_time, 4) ?>sec</div>
+		<div class="col-3">Harmonix by: <?= escaped_html(AUTHOR) ?> version: <?= escaped_html(MVC_VERSION) ?></div>
+		<div class="col-2">build in: <?= round($elapsed_time, 4) ?>sec</div>
 	</div>
+	<div class="cleaner"></div>
 </footer>
 </body>
 <?php foreach( $this->getFooterScripts() as $script_file => $async ) { ?>

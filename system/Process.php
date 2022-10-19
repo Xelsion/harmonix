@@ -125,6 +125,7 @@ class Process {
         Core::$_role_tree = RoleTree::getInstance();
 
         //$this->generateTestData();
+        //$this->deleteTestData();
 
         // initiate the session
         $session = new Session();
@@ -151,9 +152,8 @@ class Process {
             // Has the current actor access to this request?
             if( Core::$_auth->hasAccess() ) {
                 Core::$_response_cache = ResponseCache::getInstance();
-                Core::$_response_cache->initCacheFor($controller."-".$method, ...$params);
 
-                // Always check these tables
+                // Always check on these tables
                 Core::$_response_cache->addDBCheck("mvc", "actors");
                 Core::$_response_cache->addDBCheck("mvc", "actor_roles");
                 Core::$_response_cache->addDBCheck("mvc", "access_permissions");
@@ -186,7 +186,7 @@ class Process {
         for( $i=0; $i<10000; $i++) {
             try {
                 $email = StringHelper::getRandomString();
-                $first_name = StringHelper::getRandomString();
+                $first_name = "TEST_". StringHelper::getRandomString();
                 $last_name = StringHelper::getRandomString();
                 $password = StringHelper::getRandomString();
 
@@ -197,10 +197,20 @@ class Process {
                 $pdo->bindParam('last_name', $last_name);
                 $pdo->bindParam('password', $password);
                 $pdo->execute();
-            } catch( Exception $e) {
+            } catch( Exception $e ) {
                 die($e->getMessage());
             }
         }
-
     }
+
+    private function deleteTestData(): void {
+        try {
+            $pdo = Core::$_connection_manager->getConnection("mvc");
+            $pdo->run("DELETE FROM actors WHERE first_name LIKE 'TEST_%'");
+            $pdo->run("ALTER TABLE actors AUTO_INCREMENT=4");
+        } catch( Exception $e ) {
+            die($e->getMessage());
+        }
+    }
+
 }

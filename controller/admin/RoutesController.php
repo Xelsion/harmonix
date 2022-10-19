@@ -46,10 +46,8 @@ class RoutesController Extends AController {
         $cache->addFileCheck(PATH_VIEWS."routes/index.html");
 
         if( $cache->isUpToDate() ) {
-            print_debug("from cache");
             $view_content = $cache->getContent();
         } else {
-            print_debug("from template");
             $view = new Template(PATH_VIEWS."routes/index.html");
             $view->set("routes_list", $all_routes);
             $view_content = $view->parse();

@@ -29,6 +29,8 @@ class CacheFile extends File {
         $cache_setting = Core::$_configuration->getSection("cache");
         $this->_encrypt = $cache_setting["encryption"];
 
+        $file_name = str_replace("::", "/", $file_name);
+
         $cache_file = PATH_CACHE . Core::$_actor->id . DIRECTORY_SEPARATOR . $file_name."_".(int)$this->_encrypt."_".md5($hash) . ".cache";
         parent::__construct($cache_file);
         $this->cache_age = new DateTime();

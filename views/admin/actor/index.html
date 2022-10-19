@@ -4,6 +4,7 @@ use system\Core;
 $this->set("title", "Benutzer");
 
 $actor_list = $this->get("result_list");
+$pagination = $this->get("pagination");
 ?>
 <div class="container-fluid">
 	<h1>Benutzer</h1>
@@ -29,4 +30,7 @@ $actor_list = $this->get("result_list");
 			</tr>
 		<?php endforeach; ?>
 	</table>
+	<form action="/actors" method="POST">
+		<?= $pagination ?>
+	</form>
 </div>
