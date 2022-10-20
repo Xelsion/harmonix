@@ -2,9 +2,9 @@
 
 namespace system\classes\cache;
 
+use system\Core;
 use system\classes\CacheFile;
 use system\classes\File;
-use system\Core;
 use system\exceptions\SystemException;
 
 class ResponseCache {

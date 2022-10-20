@@ -2,14 +2,16 @@
 
 namespace system\classes;
 
-use JsonException;
-use models\AccessRestrictionType;
-use models\ActorRole;
 use PDOStatement;
 use ReflectionException;
+use JsonException;
+
 use system\abstracts\AController;
 use system\Core;
 use system\exceptions\SystemException;
+
+use models\AccessRestrictionType;
+use models\ActorRole;
 
 class Auth {
 

@@ -2,8 +2,8 @@
 
 namespace system\abstracts;
 
-use system\classes\Router;
 use system\Core;
+use system\classes\Router;
 use system\exceptions\SystemException;
 
 /**

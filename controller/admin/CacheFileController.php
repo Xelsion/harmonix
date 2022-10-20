@@ -2,14 +2,12 @@
 
 namespace controller\admin;
 
-use models\Actor;
 use system\abstracts\AResponse;
 use system\abstracts\AController;
 use system\classes\CacheFile;
 use system\classes\responses\ResponseHTML;
 use system\classes\Router;
 use system\classes\Template;
-use system\exceptions\SystemException;
 
 class CacheFileController extends AController {
 
@@ -44,7 +42,7 @@ class CacheFileController extends AController {
 		$template = new Template(PATH_VIEWS."template.html");
 
         $file_list = array();
-        $this->getCacheFiles(PATH_CACHE, $file_list);
+        $this->getCacheFiles(PATH_CACHE_ROOT, $file_list);
 
 		$template->set("navigation", $this::$_menu);
 		$template->set("cache_list", $file_list);

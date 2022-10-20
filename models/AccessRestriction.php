@@ -6,8 +6,8 @@ use PDO;
 use JsonException;
 
 use system\Core;
-use system\exceptions\SystemException;
 use system\helper\SqlHelper;
+use system\exceptions\SystemException;
 
 class AccessRestriction extends entities\AccessRestriction {
 

@@ -2,11 +2,13 @@
 
 namespace system\classes;
 
-use JetBrains\PhpStorm\ArrayShape;
-use system\abstracts\AController;
 use Exception;
 use ReflectionException;
 use ReflectionMethod;
+
+use JetBrains\PhpStorm\ArrayShape;
+
+use system\abstracts\AController;
 use system\exceptions\SystemException;
 
 /**
@@ -70,7 +72,10 @@ class Router {
 			if( is_null($method) ) {
 				$method = "index";
 			}
-			$this->_routes[$route] = array( "controller" => $class, 'method' => $method );
+
+            $regex = str_replace("/" , "\/", $route);
+            $regex = preg_replace("/{.*}/", "(.+)", $regex);
+			$this->_routes[$regex] = array( "controller" => $class, 'method' => $method, 'regex' => $regex );
 		} else {
 			throw new SystemException(__FILE__, __LINE__,"Router: The route [".$route."] is already taken");
 		}
@@ -104,7 +109,8 @@ class Router {
      */
 	public function getRoute( Request $request ): ?array {
 		$request_parts = $request->getRequestParts();
-        return $this->getRouteArray($request_parts);
+        return $this->getRouteArray($request->getRequestUri());
+        //return $this->getRouteArray($request_parts);
 	}
 
     /**
@@ -120,8 +126,8 @@ class Router {
      * @throws SystemException
      */
     public function getRouteFor( string $url ): ?array {
-        $request_parts = preg_split("/\//", $url, -1, PREG_SPLIT_NO_EMPTY);
-        return $this->getRouteArray($request_parts);
+        //$request_parts = preg_split("/\//", $url, -1, PREG_SPLIT_NO_EMPTY);
+        return $this->getRouteArray($url);
     }
 
     /**
@@ -133,19 +139,42 @@ class Router {
      * @throws SystemException|ReflectionException
      */
     #[ArrayShape( [ "controller" => "mixed", "method" => "mixed", "params" => "array|null" ] )]
-    private function getRouteArray( array &$request_parts ): array {
-        $route = $this->getValidRoute($request_parts);
-        if( $this->hasRoute($route) ) {
-            $call = $this->_routes[$route];
-            $controller = new $call["controller"]();
-            $method = $call["method"];
-
-            $params = $this->getValidParameters($controller, $method, $request_parts);
-            return array( "controller" => $controller, "method" => $method, "params" => $params );
+    private function getRouteArray( string $request ): array {
+        // first check for static urls
+        if( array_key_exists( addcslashes($request, "/"), $this->_routes ) ) {
+            $entry = $this->_routes[addcslashes($request, "/")];
+            $controller = new $entry["controller"]();
+            $method = $entry["method"];
+            return array( "controller" => $controller, "method" => $method, "params" => array() );
         }
 
+        // then check for dynamic urls
+        foreach( $this->_routes as $regex => $entry ) {
+            $matches = array();
+            if( preg_match("/^".$regex."$/i", $request, $matches) ) {
+                array_shift($matches);
+                $controller = new $entry["controller"]();
+                $method = $entry["method"];
+                $params = $this->getValidParameters($controller, $method, $matches);
+
+                return array( "controller" => $controller, "method" => $method, "params" => $params );
+            }
+        }
         throw new SystemException( __FILE__, __LINE__,"Router: There is no route for [".implode("/", $request_parts)."]!");
     }
+    //    private function getRouteArray( array &$request_parts ): array {
+//        $route = $this->getValidRoute($request_parts);
+//        if( $this->hasRoute($route) ) {
+//            $call = $this->_routes[$route];
+//            $controller = new $call["controller"]();
+//            $method = $call["method"];
+//
+//            $params = $this->getValidParameters($controller, $method, $request_parts);
+//            return array( "controller" => $controller, "method" => $method, "params" => $params );
+//        }
+//
+//        throw new SystemException( __FILE__, __LINE__,"Router: There is no route for [".implode("/", $request_parts)."]!");
+//    }
 
 	/**
 	 * Parses the $request array and returns the route to the
@@ -219,7 +248,6 @@ class Router {
                 $min_args++;
             }
             if( isset($params[$i]) ) {
-
                 // Check if the parameters match the expected type and converts it
                 switch( $arg_type ) {
                     case "bool":

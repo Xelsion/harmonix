@@ -2,11 +2,12 @@
 
 namespace models;
 
-use JsonException;
 use PDO;
+use JsonException;
+
 use system\Core;
-use system\exceptions\SystemException;
 use system\helper\SqlHelper;
+use system\exceptions\SystemException;
 
 /**
  * The Actor Permissions

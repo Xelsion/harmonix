@@ -2,10 +2,11 @@
 
 namespace models\entities;
 
-use Exception;
 use PDO;
-use system\abstracts\ACacheableEntity;
+use Exception;
+
 use system\Core;
+use system\abstracts\ACacheableEntity;
 use system\exceptions\SystemException;
 
 class AccessRestrictionType extends ACacheableEntity {

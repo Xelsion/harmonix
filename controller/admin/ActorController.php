@@ -11,14 +11,13 @@ use system\abstracts\AResponse;
 use system\classes\Router;
 use system\classes\Template;
 use system\classes\responses\ResponseHTML;
+use system\helper\HtmlHelper;
+use system\helper\RequestHelper;
 use system\exceptions\SystemException;
 
 use models\Actor;
 use models\ActorRole;
 use models\AccessPermission;
-use system\helper\HtmlHelper;
-use system\helper\RequestHelper;
-
 
 /**
  * @see \system\abstracts\AController
@@ -49,6 +48,7 @@ class ActorController extends AController {
     public function getRoutes(): array {
         return array(
             "/actors" => array("controller" => __CLASS__, "method" => "index"),
+            "/actors-{page}" => array("controller" => __CLASS__, "method" => "indexPage"),
             "/actors/{actor}" => array("controller" => __CLASS__, "method" => "update"),
             "/actors/create" => array("controller" => __CLASS__, "method" => "create"),
             "/actors/roles/{actor}" => array("controller" => __CLASS__, "method" => "roles")
@@ -76,7 +76,6 @@ class ActorController extends AController {
             $pagination = "";
             HTMLHelper::getPagination( $params['page'],  Actor::getNumActors(), $params['limit'], $pagination);
 
-
             $view = new Template(PATH_VIEWS."actor/index.html");
             $view->set("result_list", Actor::find(array(), $params['order'], $params['direction'], $params['limit'], $params['page']));
             $view->set("pagination", $pagination);
@@ -91,6 +90,17 @@ class ActorController extends AController {
         $response->setOutput($template->parse());
 		return $response;
 	}
+
+    public function indexPage( int $page ) {
+        $response = new ResponseHTML();
+        echo $page;
+
+        $template = new Template(PATH_VIEWS."template.html");
+        $template->set("navigation", $this::$_menu);
+        $response->setOutput($template->parse());
+        $template->set("view", "");
+        return $response;
+    }
 
     /**
      * @throws Exception

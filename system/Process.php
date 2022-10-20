@@ -5,7 +5,10 @@ namespace system;
 use Exception;
 use JsonException;
 use ReflectionException;
+
 use system\abstracts\ADBConnection;
+use system\abstracts\AController;
+use system\abstracts\AResponse;
 use system\classes\cache\ResponseCache;
 use system\classes\connections\MsSqlConnection;
 use system\classes\connections\MySqlConnection;
@@ -13,12 +16,6 @@ use system\classes\connections\PostgresConnection;
 use system\classes\Language;
 use system\classes\Storage;
 use system\classes\TimeAnalyser;
-use system\exceptions\SystemException;
-
-use system\abstracts\AController;
-use system\abstracts\AResponse;
-use system\helper\StringHelper;
-use system\manager\ConnectionManager;
 use system\classes\Auth;
 use system\classes\GarbageCollector;
 use system\classes\tree\RoleTree;
@@ -27,6 +24,10 @@ use system\classes\Configuration;
 use system\classes\Logger;
 use system\classes\Request;
 use system\classes\Router;
+use system\manager\ConnectionManager;
+use system\helper\StringHelper;
+use system\exceptions\SystemException;
+
 use models\Session;
 
 /**
@@ -152,6 +153,14 @@ class Process {
             // Has the current actor access to this request?
             if( Core::$_auth->hasAccess() ) {
                 Core::$_response_cache = ResponseCache::getInstance();
+
+                // Always check on these files
+                Core::$_response_cache->addFileCheck(PATH_ROOT."lang-de.ini");
+                Core::$_response_cache->addFileCheck(PATH_ROOT."functions.php");
+                Core::$_response_cache->addFileCheck(PATH_ROOT."constants.php");
+                Core::$_response_cache->addFileCheck(PATH_SYSTEM."helper/HtmlHelper.php");
+                Core::$_response_cache->addFileCheck(PATH_SYSTEM."helper/RequestHelper.php");
+                Core::$_response_cache->addFileCheck(PATH_SYSTEM."helper/StringHelper.php");
 
                 // Always check on these tables
                 Core::$_response_cache->addDBCheck("mvc", "actors");

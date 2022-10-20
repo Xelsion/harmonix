@@ -3,13 +3,17 @@
 namespace system\classes;
 
 use DateTime;
+
 use system\Core;
-use system\exceptions\SystemException;
 use system\helper\StringHelper;
+use system\exceptions\SystemException;
 
 /**
  * The CacheFile
- * CacheFile dato into a file
+ * Stores any given content to file so u can load it on the same request
+ * without to process the necessary functions that produces the content.
+ * Mostly it is much faster to reuse the produced content from a file than
+ * to rebuild it every time.
  *
  * @author Markus Schröder <xelsion@gmail.com>
  * @version 1.0.0;
@@ -23,21 +27,35 @@ class CacheFile extends File {
     /**
      * The constructor
      *
+     * if the methode (__METHOD__) name was given as file_name the result will be like:
+     * {namespace}/{classname}/{method}/{actor_id}/{encrypted}_{hash}.cache
+     * else it would be like
+     * {file_path}/{filename}/{actor_id}/{encrypted}_{hash}.cache
+     *
      * @param string $file_name
+     * @param string $hash
      */
-    public function __construct( string $file_name, string $hash ) {
+    public function __construct( string $file_name = "", string $hash = "" ) {
         $cache_setting = Core::$_configuration->getSection("cache");
         $this->_encrypt = $cache_setting["encryption"];
 
-        $file_name = str_replace("::", "/", $file_name);
+        if( $file_name !== "" ) {
+            $file_name = str_replace("::", "/", $file_name);
+            $path_infos = pathinfo($file_name);
 
-        $cache_file = PATH_CACHE . Core::$_actor->id . DIRECTORY_SEPARATOR . $file_name."_".(int)$this->_encrypt."_".md5($hash) . ".cache";
-        parent::__construct($cache_file);
-        $this->cache_age = new DateTime();
-        if( file_exists($this->_file_path) ) {
-            $this->cache_age->setTimestamp(filemtime($cache_file));
-        } else {
-            $this->cache_age->setTimestamp(0);
+            // build the cache file name
+            $dir_part = PATH_CACHE_ROOT. $path_infos["dirname"] . DIRECTORY_SEPARATOR
+                . $path_infos["filename"] . DIRECTORY_SEPARATOR
+                . Core::$_actor->id . DIRECTORY_SEPARATOR;
+            $cache_file = $dir_part . (int)$this->_encrypt."_".md5($hash) . ".cache";
+
+            parent::__construct($cache_file);
+            $this->cache_age = new DateTime();
+            if( file_exists($this->_file_path) ) {
+                $this->cache_age->setTimestamp(filemtime($cache_file));
+            } else {
+                $this->cache_age->setTimestamp(0);
+            }
         }
     }
 
@@ -51,7 +69,10 @@ class CacheFile extends File {
         parent::__construct($cache_file);
         $this->cache_age = new DateTime();
         if( file_exists($this->_file_path) ) {
-            $this->cache_age->setTimestamp(filemtime($cache_file));
+            $creation_time = filectime($cache_file);
+            $modification_time = filemtime($cache_file);
+            $time = ( $modification_time > $creation_time ) ? $modification_time : $creation_time;
+            $this->cache_age->setTimestamp($time);
         } else {
             $this->cache_age->setTimestamp(0);
         }

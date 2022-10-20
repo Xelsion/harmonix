@@ -2,12 +2,12 @@
 
 namespace system\abstracts;
 
+use Throwable;
 use Exception;
 use JsonException;
-use system\exceptions\SystemException;
-use Throwable;
-use system\classes\Logger;
 
+use system\classes\Logger;
+use system\exceptions\SystemException;
 
 abstract class ALoggableException extends Exception {
 

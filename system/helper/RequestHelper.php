@@ -12,7 +12,7 @@ class RequestHelper {
         $params['direction'] = Core::$_request->get("direction") ?? "asc";
         $params['limit'] = ( Core::$_request->get("limit") !== null )
             ? (int) Core::$_request->get("limit")
-            : 20;
+            : 50;
         $params['page'] = ( Core::$_request->get("page") !== null )
             ? (int) Core::$_request->get("page")
             : 1;

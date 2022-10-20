@@ -4,17 +4,18 @@ namespace controller\admin;
 
 use Exception;
 use JsonException;
+
+use system\Core;
+use system\abstracts\AResponse;
+use system\abstracts\AController;
+use system\classes\responses\ResponseHTML;
+use system\classes\Router;
+use system\classes\Template;
+use system\exceptions\SystemException;
+
 use models\AccessRestrictionType;
 use models\AccessRestriction;
 use models\ActorRole;
-use system\abstracts\AResponse;
-use system\classes\CacheFile;
-use system\classes\responses\ResponseHTML;
-use system\classes\Router;
-use system\abstracts\AController;
-use system\classes\Template;
-use system\Core;
-use system\exceptions\SystemException;
 
 class RestrictionController extends AController {
 

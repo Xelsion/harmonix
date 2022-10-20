@@ -2,11 +2,11 @@
 
 namespace models\entities;
 
-use Exception;
-use JsonException;
-use system\abstracts\ACacheableEntity;
-use system\Core;
 use PDO;
+use Exception;
+
+use system\Core;
+use system\abstracts\ACacheableEntity;
 use system\exceptions\SystemException;
 
 /**

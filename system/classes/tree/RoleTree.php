@@ -3,6 +3,7 @@
 namespace system\classes\tree;
 
 use Exception;
+
 use models\ActorRole;
 
 class RoleTree extends TreeWalker {

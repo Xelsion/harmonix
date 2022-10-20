@@ -5,10 +5,10 @@ namespace models\entities;
 use PDO;
 use Exception;
 
-use system\abstracts\ACacheableEntity;
 use system\Core;
-use system\exceptions\SystemException;
+use system\abstracts\ACacheableEntity;
 use system\helper\StringHelper;
+use system\exceptions\SystemException;
 
 /**
  * The Actor entity

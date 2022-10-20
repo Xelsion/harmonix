@@ -2,16 +2,17 @@
 
 namespace controller\www;
 
-use models\Actor;
+use JsonException;
+
+
 use system\abstracts\AController;
 use system\abstracts\AResponse;
 use system\classes\responses\ResponseHTML;
 use system\classes\Router;
 use system\classes\Template;
-
-use JsonException;
 use system\exceptions\SystemException;
 
+use models\Actor;
 
 class TestController extends AController {
 

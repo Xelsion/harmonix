@@ -2,8 +2,6 @@
 
 namespace system\abstracts;
 
-use system\interfaces\IResponse;
-
 /**
  * The Abstract version of a Response
  *

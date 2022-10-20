@@ -2,12 +2,13 @@
 
 namespace system\classes;
 
-use DateTime;
-use Exception;
 use PDO;
+use Exception;
 use PDOException;
 use PDOStatement;
 use JsonException;
+use DateTime;
+
 use system\abstracts\ADBConnection;
 use system\exceptions\SystemException;
 
@@ -23,7 +24,7 @@ class PDOConnection extends PDO {
 	private PDOStatement $_stmt;
     private ADBConnection $_conn;
 
-    private array $_modification_times = array();
+    private array $_table_infos = array();
     private string $_used_query = "";
     private array $_used_params = array();
 
@@ -140,8 +141,21 @@ class PDOConnection extends PDO {
      * @return int
      */
     public function getModificationTimeOfTable( string $table_name ): int {
-        if( array_key_exists($table_name, $this->_modification_times) ) {
-            return $this->_modification_times[$table_name];
+        if( array_key_exists($table_name, $this->_table_infos) ) {
+            return $this->_table_infos[$table_name]["modified"];
+        }
+        return 0;
+    }
+
+    /**
+     * Returns the number or rows in that table
+     *
+     * @param string $table_name
+     * @return int
+     */
+    public function getNumRowsOfTable( string $table_name ): int {
+        if( array_key_exists($table_name, $this->_table_infos) ) {
+            return $this->_table_infos[$table_name]["num_rows"];
         }
         return 0;
     }
@@ -154,7 +168,7 @@ class PDOConnection extends PDO {
      * @throws Exception
      */
     private function setModificationTimes(): void {
-        $this->prepare("SELECT table_name, create_time, update_time FROM information_schema.tables WHERE table_schema=:db");
+        $this->prepare("SELECT table_name, table_rows, create_time, update_time FROM information_schema.tables WHERE table_schema=:db");
         $this->bindParam("db", $this->_conn->_dbname);
         $results = $this->execute()->fetchAll();
         foreach( $results as $row ) {
@@ -168,7 +182,10 @@ class PDOConnection extends PDO {
             $modification_time = ( $update_date > $create_date )
                 ? $update_date->getTimestamp()
                 : $create_date->getTimestamp();
-            $this->_modification_times[$row["table_name"]] = $modification_time;
+            $this->_table_infos[$row["table_name"]] = array(
+                "num_rows" => $row["table_rows"],
+                "modified" => $modification_time
+            );
         }
     }
 }

@@ -2,11 +2,11 @@
 
 namespace models;
 
-use JsonException;
-use system\exceptions\SystemException;
-
 use DateTime;
+use JsonException;
+
 use system\Core;
+use system\exceptions\SystemException;
 
 /**
  * The Session

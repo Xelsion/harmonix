@@ -2,8 +2,6 @@
 
 namespace system\classes;
 
-use system\Core;
-
 /**
  * This class can hold key => value pairs that
  * will be shared by all used templates

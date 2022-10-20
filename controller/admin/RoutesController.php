@@ -2,12 +2,12 @@
 
 namespace controller\admin;
 
+use system\Core;
 use system\abstracts\AController;
 use system\abstracts\AResponse;
 use system\classes\responses\ResponseHTML;
 use system\classes\Router;
 use system\classes\Template;
-use system\Core;
 
 class RoutesController Extends AController {
 
@@ -42,6 +42,7 @@ class RoutesController Extends AController {
         Core::$_router->getAllRoutes( PATH_CONTROLLER_ROOT, $all_routes);
 
         $cache = Core::$_response_cache;
+        $cache->initCacheFor(__METHOD__);
         $cache->addFileCheck(__FILE__);
         $cache->addFileCheck(PATH_VIEWS."routes/index.html");
 

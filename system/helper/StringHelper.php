@@ -3,7 +3,6 @@
 namespace system\helper;
 
 use Exception;
-use system\classes\Configuration;
 
 /**
  * Functions that helps with strings
