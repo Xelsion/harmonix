@@ -96,6 +96,18 @@ class StringHelper {
 		return $result;
 	}
 
+    public static function getHighlighted( string $hl_part, string $string ): string {
+        $matches = array();
+        preg_match("/".$hl_part."/i", $string, $matches);
+        if( empty($matches) ) {
+            return $string;
+        }
+        foreach( $matches as $match ) {
+            $string = preg_replace('/'.$match.'/', '<span class="hl">'.$match.'</span>', $string);
+        }
+        return $string;
+    }
+
 	/**
 	 * Returns a BCrypt string from the given string
 	 *

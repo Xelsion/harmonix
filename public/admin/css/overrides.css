@@ -1,5 +1,6 @@
-.list-group {
-
+.pagination {
+    width: fit-content;
+    margin: 0 auto;
 }
 
 .list-group-item.active {
@@ -12,4 +13,9 @@
     color: #ccc;
     background-color: #222;
     border-bottom-color: #666666;
+}
+
+.modal-content {
+    background-color: #222;
+    border: 1px solid #666;
 }

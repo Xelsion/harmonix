@@ -6,8 +6,6 @@ use Exception;
 use ReflectionException;
 use ReflectionMethod;
 
-use JetBrains\PhpStorm\ArrayShape;
-
 use system\abstracts\AController;
 use system\exceptions\SystemException;
 
@@ -72,9 +70,8 @@ class Router {
 			if( is_null($method) ) {
 				$method = "index";
 			}
-
             $regex = str_replace("/" , "\/", $route);
-            $regex = preg_replace("/{.*}/", "(.+)", $regex);
+            $regex = preg_replace("/{.*}/", "([\w|0-9]+)", $regex);
 			$this->_routes[$regex] = array( "controller" => $class, 'method' => $method, 'regex' => $regex );
 		} else {
 			throw new SystemException(__FILE__, __LINE__,"Router: The route [".$route."] is already taken");
@@ -108,9 +105,7 @@ class Router {
      * @throws SystemException
      */
 	public function getRoute( Request $request ): ?array {
-		$request_parts = $request->getRequestParts();
         return $this->getRouteArray($request->getRequestUri());
-        //return $this->getRouteArray($request_parts);
 	}
 
     /**
@@ -126,19 +121,18 @@ class Router {
      * @throws SystemException
      */
     public function getRouteFor( string $url ): ?array {
-        //$request_parts = preg_split("/\//", $url, -1, PREG_SPLIT_NO_EMPTY);
         return $this->getRouteArray($url);
     }
 
     /**
      * Parses the request parts to get the controller and the wanted method
      *
-     * @param array $request_parts
+     * @param string $request
      * @return array
      *
-     * @throws SystemException|ReflectionException
+     * @throws ReflectionException
+     * @throws SystemException
      */
-    #[ArrayShape( [ "controller" => "mixed", "method" => "mixed", "params" => "array|null" ] )]
     private function getRouteArray( string $request ): array {
         // first check for static urls
         if( array_key_exists( addcslashes($request, "/"), $this->_routes ) ) {
@@ -155,65 +149,12 @@ class Router {
                 array_shift($matches);
                 $controller = new $entry["controller"]();
                 $method = $entry["method"];
-                $params = $this->getValidParameters($controller, $method, $matches);
-
+                $params = $this->getFormattedParameters($controller, $method, $matches);
                 return array( "controller" => $controller, "method" => $method, "params" => $params );
             }
         }
-        throw new SystemException( __FILE__, __LINE__,"Router: There is no route for [".implode("/", $request_parts)."]!");
+        return array();
     }
-    //    private function getRouteArray( array &$request_parts ): array {
-//        $route = $this->getValidRoute($request_parts);
-//        if( $this->hasRoute($route) ) {
-//            $call = $this->_routes[$route];
-//            $controller = new $call["controller"]();
-//            $method = $call["method"];
-//
-//            $params = $this->getValidParameters($controller, $method, $request_parts);
-//            return array( "controller" => $controller, "method" => $method, "params" => $params );
-//        }
-//
-//        throw new SystemException( __FILE__, __LINE__,"Router: There is no route for [".implode("/", $request_parts)."]!");
-//    }
-
-	/**
-	 * Parses the $request array and returns the route to the
-	 * matching controller
-	 *
-	 * @param array $request_parts
-	 * @return string
-	 */
-	private function getValidRoute( array &$request_parts ): string {
-		$temp = "";
-		$route = "";
-
-		if( empty($request_parts) ) {
-			// The request is empty so return the default Controller route
-			return "/";
-		}
-
-		// Get the route for the controller
-		while( !empty($request_parts) ) {
-			$part = array_shift($request_parts);
-			$temp .= "/".$part;
-			if( $this->hasRoute($temp) ) {
-				// We find a route lets continue
-				$route = $temp;
-				continue;
-			}
-
-			// Last part didn't match, but it could be an argument
-			$result = preg_grep("/^".preg_quote($route, "/")."\/{.*}$/", array_keys($this->_routes));
-			if( count($result) === 1 ) {
-				$route = array_pop($result);
-			}
-
-			// Last part wasn't a route parameter sp put it back into our request parts
-			array_unshift($request_parts, $part);
-			break;
-		}
-		return $route;
-	}
 
     /**
      * Checks if the needed parameters of the controller method
@@ -230,7 +171,7 @@ class Router {
      * @throws SystemException
      * @throws ReflectionException
      */
-	private function getValidParameters( AController $controller, string $method, array $params ): ?array {
+	private function getFormattedParameters( AController $controller, string $method, array $params ): ?array {
 		$num_params = count($params);
 		$result = array();
 
@@ -270,6 +211,15 @@ class Router {
                         break;
                     default:
                         try {
+                            $class_reflection = new ReflectionMethod($arg_type, "__construct");
+                            $constructor_args = $class_reflection->getParameters();
+                            $constructor_arg_type = (string)$constructor_args[0]->getType();
+                            if( $constructor_arg_type === "int" && !is_numeric($params[$i]) ) {
+                                throw new SystemException( __FILE__,__LINE__,"Router: Param type mismatch for method[".$controller."->".$method."]");
+                            }
+                            if( $constructor_arg_type==="string" && !is_string($params[$i]) ) {
+                                throw new SystemException( __FILE__,__LINE__,"Router: Param type mismatch for method[".$controller."->".$method."]");
+                            }
                             $result[$arg_name] = new $arg_type($params[$i]);
                         } catch( Exception $e ) {
                             throw new SystemException( __FILE__,__LINE__,"Router: Param type mismatch for method[".$controller."->".$method."]");

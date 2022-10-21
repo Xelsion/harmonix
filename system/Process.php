@@ -44,7 +44,7 @@ class Process {
 	private static ?Process $_instance = null;
 
 	// The response
-	private AResponse $_response;
+	private ?AResponse $_response = null;
 
 	/**
 	 * The class constructor.
@@ -58,7 +58,7 @@ class Process {
 		Core::$_request = Request::getInstance();
 		Core::$_menu = new Menu();
 		Core::$_router = Router::getInstance();
-        Core::$_lang = Language::getInstance("de");
+        Core::$_lang = Language::getInstance();
 	}
 
 	/**
@@ -89,7 +89,7 @@ class Process {
         Core::$_analyser = new TimeAnalyser();
 
         if( Core::$_storage::get("debug_mode") ) {
-            Core::$_analyser->addTimer("template-parsing", "");
+            Core::$_analyser->addTimer("template-parsing");
             Core::$_analyser->startTimer("template-parsing");
         }
 
@@ -133,7 +133,17 @@ class Process {
         Core::$_actor = $session->start();
 
         // Try to get the responsible route for this requested uri
-        $route = Core::$_router->getRoute(Core::$_request);
+        try {
+            $route = Core::$_router->getRoute(Core::$_request);
+            if( empty($route) ) { // no route found
+                Core::$_request->setRequestUri("/error/404");
+                $route = Core::$_router->getRoute(Core::$_request);
+            }
+        } catch( Exception $e ) { // route was found but with mismatching arguments
+            Core::$_storage::set("message", $e->getMessage());
+            Core::$_request->setRequestUri("/error/400");
+            $route = Core::$_router->getRoute(Core::$_request);
+        }
 
         // Get the controller
         $controller = $route["controller"];
@@ -174,11 +184,11 @@ class Process {
             } else {
                 redirect("/error/403");
             }
-
         } else {
             // No valid controller found
             throw new SystemException(__FILE__, __LINE__, "Controller for request ".Core::$_request->getRequestUri()." cant be found!");
         }
+
 	}
 
 	/**
@@ -187,10 +197,16 @@ class Process {
 	 * @return string
 	 */
     public function getResult(): string {
-		return $this->_response->getOutput();
+        $output = $this->_response->getOutput();
+        Core::$_analyser->stopTimer("template-parsing");
+        $elapsed_time = Core::$_analyser->getTimerElapsedTime("template-parsing");
+        return str_replace("{{build_time}}", round($elapsed_time, 4), $output);
 	}
 
 
+    /**
+     * @return void
+     */
     public function generateTestData():void {
         for( $i=0; $i<10000; $i++) {
             try {

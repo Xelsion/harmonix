@@ -13,6 +13,8 @@ class Request {
 
 	// The instance of this class
 	private static ?Request $_request = null;
+    private string $_request_uri;
+
 	// GET, POST & FILES data from the request
 	private array $_form;
 
@@ -22,6 +24,7 @@ class Request {
 	 * calls the method initController()
 	 */
 	private function __construct() {
+        $this->_request_uri = $_SERVER["REQUEST_URI"];
 		foreach( $_GET as $key => $value ) {
 			$this->_form[$key] = $value;
 		}
@@ -45,13 +48,23 @@ class Request {
 		return static::$_request;
 	}
 
+    /**
+     * Returns the requested uri
+     *
+     * @param string $uri
+     * @return void
+     */
+    public function setRequestUri( string $uri ): void {
+        $this->_request_uri = $uri;
+    }
+
 	/**
 	 * Returns the requested uri
 	 *
 	 * @return string
 	 */
 	public function getRequestUri(): string {
-		return $_SERVER["REQUEST_URI"];
+		return $this->_request_uri;
 	}
 
 	/**

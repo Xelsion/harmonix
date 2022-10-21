@@ -36,6 +36,8 @@ body {
     background-color: #111;
     color: #ccc;
     margin-bottom: 40px;
+    font-family: Comfortaa, sans-serif;
+    font-size: 0.9em;
 }
 
 main {
@@ -44,13 +46,14 @@ main {
 
 footer {
     position: fixed;
+    z-index: 999;
     width: 100%;
     bottom: 0px;
     padding: 10px;
-    font-family: FiraCode, sans-serif;
-    font-size: 0.7em;
-    color: #333333;
-    background: linear-gradient(to bottom, #aaaaaa, #888888);
+    font-size: 0.8em;
+    border-top: 1px solid #555;
+    color: #1cb5f1;
+    background: linear-gradient(to bottom, #444, #111);
 }
 
 h1 {
@@ -146,4 +149,8 @@ a:hover {
     width: 0;
     height: 0;
     overflow: hidden;
+}
+
+.hl {
+    color: #1cb5f1;
 }

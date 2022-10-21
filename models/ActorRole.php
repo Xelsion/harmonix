@@ -142,6 +142,15 @@ class ActorRole extends entities\ActorRole {
     }
 
     /**
+     * @param ActorRole $role
+     *
+     * @return bool
+     */
+    public function isGuest( ActorRole $role ): bool {
+        return ( $role->id === 4 );
+    }
+
+    /**
      * Checks if this role is a sibling of the given role
      *
      * @param ActorRole $role
@@ -336,6 +345,56 @@ class ActorRole extends entities\ActorRole {
 		}
 		return ( $this->rights_own & self::$CAN_DELETE );
 	}
+
+    /**
+     * @param int $owner_id
+     *
+     * @return bool
+     *
+     * @throws JsonException
+     * @throws SystemException
+     */
+    public function canUpdate(int $owner_id): bool {
+        $class = debug_backtrace()[1]['class'];
+        $method = debug_backtrace()[1]['function'];
+        $owner = new Actor($owner_id);
+        $owner_role = $owner->getRole($class, $method, SUB_DOMAIN);
+        if( $this->canUpdateAll() ) {
+            return true;
+        }
+        if( (Core::$_actor_role->isAncestorOf($owner_role) || $this->isGuest($owner_role)) && $this->canUpdateGroup() ) {
+            return true;
+        }
+        if( Core::$_actor->id === $owner_id && $this->canUpdateOwn() ) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * @param int $owner_id
+     *
+     * @return bool
+     *
+     * @throws JsonException
+     * @throws SystemException
+     */
+    public function canDelete(int $owner_id): bool {
+        $class = debug_backtrace()[1]['class'];
+        $method = debug_backtrace()[1]['function'];
+        $owner = new Actor($owner_id);
+        $owner_role = $owner->getRole($class, $method, SUB_DOMAIN);
+        if( $this->canDeleteAll() ) {
+            return true;
+        }
+        if( (Core::$_actor_role->isAncestorOf($owner_role) || $this->isGuest($owner_role) ) && $this->canDeleteGroup() ) {
+            return true;
+        }
+        if( Core::$_actor->id === $owner_id && $this->canDeleteOwn() ) {
+            return true;
+        }
+        return false;
+    }
 
 	/**
 	 * Returns an array of all rights where the rights ar

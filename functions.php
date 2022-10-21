@@ -1,7 +1,7 @@
 <?php
 spl_autoload_register(static function( $class_name ) {
 	$class_name = Namespace2Path($class_name);
-	require_once PATH_ROOT.$class_name.".php";
+	require_once PATH_ROOT . $class_name . ".php";
 });
 
 function Namespace2Path( string $namespace ): string {
@@ -32,7 +32,7 @@ function escaped_html( ?string $string ): ?string {
     return htmlentities($string, ENT_HTML5, "UTF-8");
 }
 
-function redirect( string $url ) {
+function redirect( string $url ): void {
 	header("Location: https://".$_SERVER["HTTP_HOST"].$url);
 	die();
 }

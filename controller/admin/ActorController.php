@@ -2,9 +2,11 @@
 
 namespace controller\admin;
 
+use DateTime;
 use Exception;
 use JsonException;
 
+use PDO;
 use system\Core;
 use system\abstracts\AController;
 use system\abstracts\AResponse;
@@ -48,9 +50,10 @@ class ActorController extends AController {
     public function getRoutes(): array {
         return array(
             "/actors" => array("controller" => __CLASS__, "method" => "index"),
-            "/actors-{page}" => array("controller" => __CLASS__, "method" => "indexPage"),
+            "/actors/search" => array("controller" => __CLASS__, "method" => "search"),
             "/actors/{actor}" => array("controller" => __CLASS__, "method" => "update"),
             "/actors/create" => array("controller" => __CLASS__, "method" => "create"),
+            "/actors/delete/{actor}" => array("controller" => __CLASS__, "method" => "delete"),
             "/actors/roles/{actor}" => array("controller" => __CLASS__, "method" => "roles")
         );
     }
@@ -91,14 +94,46 @@ class ActorController extends AController {
 		return $response;
 	}
 
-    public function indexPage( int $page ) {
+    /**
+     *
+     * @return AResponse
+     *
+     * @throws JsonException
+     * @throws SystemException
+     */
+    public function search(): AResponse {
         $response = new ResponseHTML();
-        echo $page;
+        $search_string = Core::$_request->get("search_string");
+
+        $params = array($search_string);
+        $cache = Core::$_response_cache;
+        $cache->initCacheFor(__METHOD__, ...$params);
+        $cache->addFileCheck(__FILE__);
+        $cache->addFileCheck(PATH_VIEWS."actor/search.html");
+
+        if( $cache->isUpToDate() ) {
+            $view_content = $cache->getContent();
+        } else {
+            $results = array();
+            if( $search_string !== null ) {
+                $pdo = Core::$_connection_manager->getConnection("mvc");
+                $sql = "SELECT * FROM actors WHERE first_name LIKE :word OR last_name LIKE :word OR email LIKE :word";
+                $pdo->prepare($sql);
+                $pdo->bindParam("word", "%".$search_string."%");
+                $pdo->setFetchMode(PDO::FETCH_CLASS, Actor::class );
+                $results = $pdo->execute()->fetchAll();
+            }
+            $view = new Template(PATH_VIEWS."actor/search.html");
+            $view->set("search_string", $search_string);
+            $view->set("result_list", $results);
+            $view_content = $view->parse();
+            $cache->saveContent($view_content);
+        }
 
         $template = new Template(PATH_VIEWS."template.html");
         $template->set("navigation", $this::$_menu);
+        $template->set("view", $view_content);
         $response->setOutput($template->parse());
-        $template->set("view", "");
         return $response;
     }
 
@@ -154,7 +189,7 @@ class ActorController extends AController {
      * @throws JsonException
      */
     public function update( Actor $actor ): AResponse {
-		if( !$this::$_actor_role->canUpdateAll() ) {
+		if( !$this::$_actor_role->canUpdate($actor->id) ) {
 			redirect("/error/403");
 		}
 		if( isset($_POST['cancel']) ) {
@@ -192,11 +227,33 @@ class ActorController extends AController {
 	}
 
     /**
+     * @param Actor $actor
+     *
+     * @return AResponse
+     *
+     * @throws JsonException
+     * @throws SystemException
+     */
+    public function delete( Actor $actor ): AResponse {
+        if( !$this::$_actor_role->canDelete($actor->id) ) {
+            redirect("/error/403");
+        }
+        if( isset($_POST['cancel']) ) {
+            redirect("/actors");
+        }
+        $delete_date = new DateTime();
+        $actor->deleted = $delete_date->format('Y-m-d H:i:s');
+        $actor->update();
+        redirect("/actors");
+        return new ResponseHTML();
+    }
+
+    /**
      * @throws SystemException
      * @throws Exception
      */
     public function roles( Actor $actor ): AResponse {
-		if( !$this::$_actor_role->canUpdateGroup() ) {
+		if( !$this::$_actor_role->canUpdate($actor->id) ) {
 			redirect("/error/403");
 		}
 		if( isset($_POST['cancel']) ) {
@@ -215,11 +272,7 @@ class ActorController extends AController {
 		$template->set("actor", $actor);
 	    $template->set("role_options", ActorRole::find());
 	    $template->set("access_permissions", AccessPermission::find(array(
-		    [
-			    "actor_id",
-			    "=",
-			    $actor->id
-		    ]
+		    ["actor_id", "=", $actor->id]
 	    )));
 	    $template->set("view", new Template(PATH_VIEWS."actor/roles.html"));
 		$response->setOutput($template->parse());
@@ -232,23 +285,22 @@ class ActorController extends AController {
      * @return bool
      */
 	private function postIsValid(): bool {
-		$is_valid = true;
 		if( !isset($_POST["email"]) || $_POST["email"] === "" ) {
-			$is_valid = false;
+			return false;
 		}
 		if( !isset($_POST["password"]) || ( isset($_POST["create"]) && $_POST["password"] === '' ) ) {
-			$is_valid = false;
+            return false;
 		}
 		if( !array_key_exists("password", $_POST) || !array_key_exists("password_verify", $_POST) || $_POST["password"] !== $_POST["password_verify"] ) {
-			$is_valid = false;
+            return false;
 		}
 		if( !isset($_POST["first_name"]) || $_POST["first_name"] === "" ) {
-			$is_valid = false;
+            return false;
 		}
 		if( !isset($_POST["last_name"]) || $_POST["last_name"] === "" ) {
-			$is_valid = false;
+            return false;
 		}
-		return $is_valid;
+		return true;
 	}
 
     /**

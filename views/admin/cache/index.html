@@ -1,16 +1,22 @@
 <?php
-$cache_list = $this->get("cache_list");
+use system\Core;
+
+$cache_infos = $this->get("cache_infos");
 ?>
-<h1>Cache</h1>
-<div class="content-block">
-    <?php
-    $i = 0;
-    foreach( $cache_list as $file => $results ) {
-        $i++;
-        ?>
-        <div class="">
-            <div onclick="$('#<?= $i ?>').toggle();" style="padding: 10px; background-color: #495057;"><?= $file ?></div>
-            <div id="<?= $i ?>" style="display: none; background-color: #444444; padding: 10px; margin-bottom: 10px;"><pre><?php print_r($results) ?></pre></div>
-        </div>
-    <?php } ?>
+<div class="container-fluid">
+	<h1>Cache files</h1>
+	<table class="table table-dark table-striped">
+		<tr>
+			<th>Total Files</th>
+			<th>Total Size</th>
+			<th class="col-md-3 text-end">Optionen</th>
+		</tr>
+		<tr>
+			<td><?= $cache_infos["total_files"] ?></td>
+			<td><?= round($cache_infos["total_size"] / 1024 / 1024, 2) ?>MB</td>
+			<td class="text-nowrap text-end">
+				<a href="/cache/delete" class="button button-negativ"><?= Core::$_lang->getValue("translations", "delete") ?></a>
+			</td>
+		</tr>
+	</table>
 </div>

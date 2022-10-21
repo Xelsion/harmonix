@@ -1,0 +1,46 @@
+<?php
+use system\Core;
+use system\helper\StringHelper;
+
+$search_string = $this->get("search_string");
+$actor_list = $this->get("result_list");
+?>
+<div class="container-fluid">
+	<form action="/actors/search" method="POST">
+		<div class="row">
+			<div class="col"></div>
+			<div class="col-3"><input type="text" name="search_string" value="" /></div>
+			<div class="col-auto"><input type="submit" name="" value="<?= Core::$_lang->getValue("translations","search") ?>" class="button button-default" /></div>
+		</div>
+	</form>
+	<h1>Suchergebnisse f&uuml;r: <?= escaped_html($search_string) ?></h1>
+	<table class="table table-dark table-striped">
+		<tr>
+			<th>ID</th>
+			<th class="col-md-2">E-Mail</th>
+			<th>Vorname</th>
+			<th>Nachname</th>
+			<th class="col-md-3 text-end">Optionen</th>
+		</tr>
+		<?php foreach( $actor_list as $actor ):
+			$email = StringHelper::getHighlighted($search_string, escaped_html($actor->email));
+			$first_name = StringHelper::getHighlighted($search_string, escaped_html($actor->first_name));
+			$last_name = StringHelper::getHighlighted($search_string, escaped_html($actor->last_name));
+			?>
+			<tr>
+				<td><?= escaped_html($actor->id) ?></td>
+				<td><?= $email ?></td>
+				<td><?= $first_name ?></td>
+				<td><?= $last_name ?></td>
+				<td class="text-nowrap text-end">
+					<a href="/actors/roles/<?= $actor->id ?>" class="button button-default"><?= Core::$_lang->getValue("translations", "roles") ?></a>
+					<a href="/actors/<?= $actor->id ?>" class="button button-default"><?= Core::$_lang->getValue("translations", "edit") ?></a>
+					<a href="/actors/<?= $actor->id ?>" class="button button-negativ"><?= Core::$_lang->getValue("translations", "delete") ?></a>
+				</td>
+			</tr>
+		<?php endforeach; ?>
+	</table>
+	<?php if( count($actor_list) === 0 ) { ?>
+		<h2>NO RESULTS FOUND</h2>
+	<?php } ?>
+</div>

@@ -88,7 +88,7 @@ class Actor extends ACacheableEntity {
                 } else {
                     $this->password = $row["password"];
                 }
-                $sql = "UPDATE actors SET email=:email, password=:password, first_name=:first_name, last_name=:last_name, login_fails=:login_fails, login_disabled=:login_disabled WHERE id=:id";
+                $sql = "UPDATE actors SET email=:email, password=:password, first_name=:first_name, last_name=:last_name, login_fails=:login_fails, login_disabled=:login_disabled, deleted=:deleted WHERE id=:id";
                 $pdo->prepare($sql);
                 $pdo->bindParam(':id', $this->id, PDO::PARAM_INT);
                 $pdo->bindParam(':email', $this->email);
@@ -97,6 +97,7 @@ class Actor extends ACacheableEntity {
                 $pdo->bindParam(':last_name', $this->last_name);
                 $pdo->bindParam(':login_fails', $this->login_fails, PDO::PARAM_INT);
                 $pdo->bindParam(':login_disabled', $this->login_disabled, PDO::PARAM_INT);
+                $pdo->bindParam(':deleted', $this->deleted);
                 $pdo->execute();
             }
         } catch( Exception $e ) {

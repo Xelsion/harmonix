@@ -138,7 +138,7 @@
 #actor-menu-dropdown {
     position: absolute;
     display: none;
-    right: 0;
+    right: 10px;
     background-color: #222;
     border: 1px solid #555;
 }

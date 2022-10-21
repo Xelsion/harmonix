@@ -13,7 +13,7 @@ $type_list = $this->get("type_list");
 			<th>incl. gleiche Obergruppe</th>
 			<th>incl. direkter Untergruppen</th>
 			<th>incl. aller Untergruppen</th>
-			<th class="col-md-2">Optionen</th>
+			<th class="col-md-2 text-end">Optionen</th>
 		</tr>
 		<?php foreach( $type_list as $type ): ?>
 			<tr>
@@ -22,7 +22,7 @@ $type_list = $this->get("type_list");
 				<td><?= escaped_html($type->include_siblings) ?></td>
 				<td><?= escaped_html($type->include_children) ?></td>
 				<td><?= escaped_html($type->include_descendants) ?></td>
-				<td class="text-nowrap">
+				<td class="text-nowrap text-end">
 					<a href="/restrictions/types/<?= $type->id ?>" class="button button-default"><?= Core::$_lang->getValue("translations", "edit") ?></a>
 					<a href="/restrictions/types/delete/<?= $type->id ?>" class="button button-negativ"><?= Core::$_lang->getValue("translations", "delete") ?></a>
 				</td>

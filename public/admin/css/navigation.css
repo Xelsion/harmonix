@@ -86,6 +86,7 @@
 /* css styling */
 #navigation {
     background: linear-gradient(to bottom, #444, #222);
+    border-bottom: 1px solid #303030;
 }
 
 #navigation li > ul {
@@ -138,7 +139,7 @@
 #actor-menu-dropdown {
     position: absolute;
     display: none;
-    right: 0;
+    right: 10px;
     background-color: #222;
     border: 1px solid #555;
 }
