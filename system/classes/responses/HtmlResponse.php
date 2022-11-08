@@ -10,7 +10,7 @@ use system\abstracts\AResponse;
  * @author Markus Schröder <xelsion@gmail.com>
  * @version 1.0.0;
  */
-class ResponseHTML extends AResponse {
+class HtmlResponse extends AResponse {
 
 	// the default status for html status headers
 	public int $status_code = 200;

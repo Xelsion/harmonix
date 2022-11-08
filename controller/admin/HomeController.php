@@ -4,7 +4,7 @@ namespace controller\admin;
 
 use system\abstracts\AResponse;
 use system\abstracts\AController;
-use system\classes\responses\ResponseHTML;
+use system\classes\responses\HtmlResponse;
 use system\classes\Router;
 use system\classes\Template;
 use system\exceptions\SystemException;
@@ -46,7 +46,7 @@ class HomeController extends AController {
      * @inheritDoc
      */
 	public function index(): AResponse {
-		$response = new ResponseHTML();
+		$response = new HtmlResponse();
 		$template = new Template(PATH_VIEWS."template.html");
 		$template->set("navigation", $this::$_menu);
 		$template->set("view", new Template(PATH_VIEWS."home/index.html"));

@@ -4,7 +4,7 @@ namespace controller\admin;
 
 use system\abstracts\AResponse;
 use system\abstracts\AController;
-use system\classes\responses\ResponseHTML;
+use system\classes\responses\HtmlResponse;
 use system\classes\Router;
 use system\classes\Template;
 
@@ -44,7 +44,7 @@ class CacheFileController extends AController {
 	 * @inheritDoc
 	 */
 	public function index(): AResponse {
-		$response = new ResponseHTML();
+		$response = new HtmlResponse();
 
         $cache_infos = array();
         $this->getCacheFiles(PATH_CACHE_ROOT, $cache_infos);
@@ -64,7 +64,7 @@ class CacheFileController extends AController {
      * @return AResponse
      */
     public function delete(): AResponse {
-        $response = new ResponseHTML();
+        $response = new HtmlResponse();
         $this->deleteCacheFiles(PATH_CACHE_ROOT);
         redirect("/cache");
         return $response;

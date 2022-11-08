@@ -4,7 +4,7 @@ namespace controller\www;
 
 use system\abstracts\AController;
 use system\abstracts\AResponse;
-use system\classes\responses\ResponseHTML;
+use system\classes\responses\HtmlResponse;
 use system\classes\Router;
 use system\classes\Template;
 use system\exceptions\SystemException;
@@ -44,7 +44,7 @@ class ErrorController extends AController {
      * @inheritDoc
      */
     public function index(): AResponse {
-        $response = new ResponseHTML();
+        $response = new HtmlResponse();
         $template = new Template(PATH_VIEWS."template.html");
         $template->set("navigation", $this::$_menu);
         $template->set("view", new Template(PATH_VIEWS."home/index.html"));
@@ -56,7 +56,7 @@ class ErrorController extends AController {
      * @throws SystemException
      */
     public function error( int $error_code ): AResponse {
-        $response = new ResponseHTML();
+        $response = new HtmlResponse();
         $response->status_code = $error_code;
         $template = new Template(PATH_VIEWS."template.html");
         $template->set("navigation", $this::$_menu);

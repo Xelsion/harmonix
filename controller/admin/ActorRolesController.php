@@ -6,7 +6,7 @@ use Exception;
 
 use system\abstracts\AResponse;
 use system\abstracts\AController;
-use system\classes\responses\ResponseHTML;
+use system\classes\responses\HtmlResponse;
 use system\classes\Router;
 use system\classes\Template;
 use system\exceptions\SystemException;
@@ -53,7 +53,7 @@ class ActorRolesController extends AController {
      * @throws Exception
      */
 	public function index(): AResponse {
-		$response = new ResponseHTML();
+		$response = new HtmlResponse();
 		$template = new Template(PATH_VIEWS."template.html");
 
 		$template->set("navigation", $this::$_menu);
@@ -84,7 +84,7 @@ class ActorRolesController extends AController {
 			}
 		}
 
-		$response = new ResponseHTML();
+		$response = new HtmlResponse();
 		$template = new Template(PATH_VIEWS."template.html");
 		$template->set("navigation", $this::$_menu);
 		$template->set("option_list", ActorRole::find());
@@ -117,7 +117,7 @@ class ActorRolesController extends AController {
 			}
 		}
 
-		$response = new ResponseHTML();
+		$response = new HtmlResponse();
 		$template = new Template(PATH_VIEWS."template.html");
 		$template->set("role", $role);
 		$template->set("option_list", ActorRole::find(array(["id", "!=", $role->id])));
@@ -142,7 +142,7 @@ class ActorRolesController extends AController {
                 throw new SystemException(__FILE__, __LINE__, $e->getMessage());
             }
         }
-        $response = new ResponseHTML();
+        $response = new HtmlResponse();
         $template = new Template(PATH_VIEWS."template.html");
         $template->set("role", $role);
         $template->set("navigation", $this::$_menu);

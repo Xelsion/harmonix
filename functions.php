@@ -38,7 +38,9 @@ function redirect( string $url ): void {
 }
 
 function print_debug( $message ) {
-	if( is_object($message) ) {
+    if( $message === null ) {
+        echo "NULL";
+    } elseif( is_object($message) ) {
 		echo "<pre>";
 		var_dump($message);
 		echo "</pre>";

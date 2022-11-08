@@ -12,7 +12,7 @@ use system\abstracts\AController;
 use system\abstracts\AResponse;
 use system\classes\Router;
 use system\classes\Template;
-use system\classes\responses\ResponseHTML;
+use system\classes\responses\HtmlResponse;
 use system\helper\HtmlHelper;
 use system\helper\RequestHelper;
 use system\exceptions\SystemException;
@@ -66,7 +66,7 @@ class ActorController extends AController {
      * @throws SystemException
      */
 	public function index(): AResponse {
-        $response = new ResponseHTML();
+        $response = new HtmlResponse();
         $params = RequestHelper::getPaginationParams();
 
         $cache = Core::$_response_cache;
@@ -102,7 +102,7 @@ class ActorController extends AController {
      * @throws SystemException
      */
     public function search(): AResponse {
-        $response = new ResponseHTML();
+        $response = new HtmlResponse();
         $search_string = Core::$_request->get("search_string");
 
         $params = array($search_string);
@@ -158,7 +158,7 @@ class ActorController extends AController {
 			}
 		}
 
-        $response = new ResponseHTML();
+        $response = new HtmlResponse();
 
         $cache = Core::$_response_cache;
         $cache->initCacheFor(__METHOD__);
@@ -209,7 +209,7 @@ class ActorController extends AController {
 			}
 		}
 
-		$response = new ResponseHTML();
+		$response = new HtmlResponse();
 
         $access_permissions = array();
         $view = new Template(PATH_VIEWS."actor/edit.html");
@@ -245,7 +245,7 @@ class ActorController extends AController {
         $actor->deleted = $delete_date->format('Y-m-d H:i:s');
         $actor->update();
         redirect("/actors");
-        return new ResponseHTML();
+        return new HtmlResponse();
     }
 
     /**
@@ -265,7 +265,7 @@ class ActorController extends AController {
 			redirect("/actors");
 		}
 
-		$response = new ResponseHTML();
+		$response = new HtmlResponse();
 		$template = new Template(PATH_VIEWS."template.html");
 
 		$template->set("navigation", $this::$_menu);
@@ -349,7 +349,4 @@ class ActorController extends AController {
 		}
 	}
 
-	public function __toString(): string {
-		return __CLASS__;
-	}
 }

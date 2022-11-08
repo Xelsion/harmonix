@@ -8,7 +8,7 @@ use JsonException;
 use system\Core;
 use system\abstracts\AResponse;
 use system\abstracts\AController;
-use system\classes\responses\ResponseHTML;
+use system\classes\responses\HtmlResponse;
 use system\classes\Router;
 use system\classes\Template;
 use system\exceptions\SystemException;
@@ -57,7 +57,7 @@ class RestrictionController extends AController {
             $this->saveRestrictions();
         }
 
-        $response = new ResponseHTML();
+        $response = new HtmlResponse();
         $template = new Template(PATH_VIEWS."template.html");
 
         $routes = array();
@@ -88,7 +88,7 @@ class RestrictionController extends AController {
      * @throws SystemException|JsonException
      */
     public function types(): AResponse {
-        $response = new ResponseHTML();
+        $response = new HtmlResponse();
         $template = new Template(PATH_VIEWS."template.html");
         $template->set("navigation", $this::$_menu);
         $template->set("view", new Template(PATH_VIEWS."restrictions/types.html"));
@@ -118,7 +118,7 @@ class RestrictionController extends AController {
                 redirect("/restrictions/types");
             }
         }
-        $response = new ResponseHTML();
+        $response = new HtmlResponse();
         $template = new Template(PATH_VIEWS."template.html");
         $template->set("navigation", $this::$_menu);
         $template->set("view", new Template(PATH_VIEWS."restrictions/types_create.html"));
@@ -146,7 +146,7 @@ class RestrictionController extends AController {
                 redirect("/restrictions/types");
             }
         }
-        $response = new ResponseHTML();
+        $response = new HtmlResponse();
         $template = new Template(PATH_VIEWS."template.html");
         $template->set("navigation", $this::$_menu);
         $template->set("view", new Template(PATH_VIEWS."restrictions/types_edit.html"));

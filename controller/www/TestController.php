@@ -7,7 +7,7 @@ use JsonException;
 
 use system\abstracts\AController;
 use system\abstracts\AResponse;
-use system\classes\responses\ResponseHTML;
+use system\classes\responses\HtmlResponse;
 use system\classes\Router;
 use system\classes\Template;
 use system\exceptions\SystemException;
@@ -52,7 +52,7 @@ class TestController extends AController {
      * @throws SystemException
      */
     public function index(): AResponse {
-        $response = new ResponseHTML();
+        $response = new HtmlResponse();
         $template = new Template(PATH_VIEWS . "template.html");
         $template->set("view", new Template(PATH_VIEWS . "tests/index.html"));
         $response->setOutput($template->parse());
@@ -65,7 +65,7 @@ class TestController extends AController {
      * @throws SystemException
      */
     public function charts(): AResponse {
-        $response = new ResponseHTML();
+        $response = new HtmlResponse();
         $template = new Template(PATH_VIEWS . "template.html");
         $template->set("view", new Template(PATH_VIEWS."tests/charts.html"));
         $response->setOutput($template->parse());
@@ -78,7 +78,7 @@ class TestController extends AController {
      * @throws JsonException
      */
     public function actors() : AResponse {
-        $response = new ResponseHTML();
+        $response = new HtmlResponse();
         $template = new Template(PATH_VIEWS . "template.html");
         $template->set("actor_list", Actor::find());
         $template->set("view", new Template(PATH_VIEWS."tests/actors.html"));
@@ -96,7 +96,7 @@ class TestController extends AController {
         if( count($results) === 0 ) {
             redirect("/error/404");
         }
-        $response = new ResponseHTML();
+        $response = new HtmlResponse();
         $template = new Template(PATH_VIEWS . "template.html");
         $template->set("actor", $results[0]);
         $template->set("view", new Template(PATH_VIEWS."tests/actors_detail.html"));
@@ -106,14 +106,14 @@ class TestController extends AController {
 
 	/**
      *
-	 * @return ResponseHTML
+	 * @return HtmlResponse
 	 * @throws SystemException
 	 */
 	public function tinymce() : AResponse {
 		if( !empty($_POST) && isset($_POST["content"]) ) {
 			print_debug($_POST["content"]);
 		}
-		$response = new ResponseHTML();
+		$response = new HtmlResponse();
 		$template = new Template(PATH_VIEWS . "template.html");
 		$template->set("view", new Template(PATH_VIEWS . "tests/tinymce.html"));
 		$response->setOutput($template->parse());

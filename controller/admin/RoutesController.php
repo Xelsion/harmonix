@@ -5,7 +5,7 @@ namespace controller\admin;
 use system\Core;
 use system\abstracts\AController;
 use system\abstracts\AResponse;
-use system\classes\responses\ResponseHTML;
+use system\classes\responses\HtmlResponse;
 use system\classes\Router;
 use system\classes\Template;
 
@@ -37,7 +37,7 @@ class RoutesController Extends AController {
      * @inheritDoc
      */
     public function index(): AResponse {
-        $response = new ResponseHTML();
+        $response = new HtmlResponse();
         $all_routes = array();
         Core::$_router->getAllRoutes( PATH_CONTROLLER_ROOT, $all_routes);
 
