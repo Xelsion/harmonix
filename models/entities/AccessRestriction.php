@@ -6,10 +6,10 @@ use PDO;
 use Exception;
 
 use system\Core;
-use system\abstracts\ACacheableEntity;
+use system\abstracts\AEntity;
 use system\exceptions\SystemException;
 
-class AccessRestriction extends ACacheableEntity {
+class AccessRestriction extends AEntity {
 
     public string $domain = "";
     public ?string $controller = null;

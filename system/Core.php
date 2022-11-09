@@ -14,8 +14,8 @@ use system\classes\tree\Menu;
 use system\classes\tree\RoleTree;
 use system\manager\ConnectionManager;
 
-use models\Actor;
-use models\ActorRole;
+use models\ActorModel;
+use models\ActorRoleModel;
 
 /**
  * The system class holds all important object
@@ -54,10 +54,10 @@ class Core {
 	public static RoleTree $_role_tree;
 
 	// The current actor
-	public static Actor $_actor;
+	public static ActorModel $_actor;
 
 	// The current actor role
-	public static ActorRole $_actor_role;
+	public static ActorRoleModel $_actor_role;
 
 	// The router
 	public static Router $_router;

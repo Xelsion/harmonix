@@ -13,9 +13,9 @@ use system\classes\Router;
 use system\classes\Template;
 use system\exceptions\SystemException;
 
-use models\AccessRestrictionType;
-use models\AccessRestriction;
-use models\ActorRole;
+use models\AccessRestrictionTypeModel;
+use models\AccessRestrictionModel;
+use models\ActorRoleModel;
 
 class RestrictionController extends AController {
 
@@ -63,7 +63,7 @@ class RestrictionController extends AController {
         $routes = array();
         Core::$_router->getAllRoutes(PATH_CONTROLLER_ROOT, $routes);
 
-        $access_restrictions = AccessRestriction::find();
+        $access_restrictions = AccessRestrictionModel::find();
         $current_restrictions = array();
         foreach( $access_restrictions as $restriction ) {
             $current_restrictions[$restriction->domain][$restriction->controller][$restriction->method] = array(
@@ -76,8 +76,8 @@ class RestrictionController extends AController {
         $template->set("view", new Template(PATH_VIEWS."restrictions/index.html"));
         $template->set("routes", $routes);
         $template->set("current_restrictions", $current_restrictions);
-        $template->set("role_options", ActorRole::find());
-        $template->set("type_options", AccessRestrictionType::find());
+        $template->set("role_options", ActorRoleModel::find());
+        $template->set("type_options", AccessRestrictionTypeModel::find());
 
         $response->setOutput($template->parse());
         return $response;
@@ -92,7 +92,7 @@ class RestrictionController extends AController {
         $template = new Template(PATH_VIEWS."template.html");
         $template->set("navigation", $this::$_menu);
         $template->set("view", new Template(PATH_VIEWS."restrictions/types.html"));
-        $template->set("type_list", AccessRestrictionType::find());
+        $template->set("type_list", AccessRestrictionTypeModel::find());
         $response->setOutput($template->parse());
         return $response;
     }
@@ -109,7 +109,7 @@ class RestrictionController extends AController {
         if( isset($_POST['create']) ) {
             $is_valid = $this->postIsValid();
             if( $is_valid ) {
-                $type = new AccessRestrictionType();
+                $type = new AccessRestrictionTypeModel();
                 $type->name = $_POST["name"];
                 $type->include_siblings = ($_POST["include_siblings"]) ? 1 :  0;
                 $type->include_children = ($_POST["include_children"]) ? 1 :  0;
@@ -127,11 +127,11 @@ class RestrictionController extends AController {
     }
 
     /**
-     * @param AccessRestrictionType $type
+     * @param AccessRestrictionTypeModel $type
      * @return AResponse
      * @throws SystemException
      */
-    public function typesUpdate( AccessRestrictionType $type ): AResponse {
+    public function typesUpdate( AccessRestrictionTypeModel $type ): AResponse {
         if( isset($_POST['cancel']) ) {
             redirect("/restrictions/types");
         }
@@ -182,11 +182,11 @@ class RestrictionController extends AController {
             }
         }
 
-        AccessRestriction::deleteAll();
+        AccessRestrictionModel::deleteAll();
         foreach($restrictions as $domain => $controllers) {
             foreach( $controllers as $controller => $methods ) {
                 foreach( $methods as $method => $entry ) {
-                    $restriction = new AccessRestriction();
+                    $restriction = new AccessRestrictionModel();
                     $restriction->domain = $domain;
                     $restriction->controller = ( $controller !== "") ? $controller : null;
                     $restriction->method = ( $method !== "") ? $method : null;

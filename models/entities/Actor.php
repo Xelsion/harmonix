@@ -6,18 +6,18 @@ use PDO;
 use Exception;
 
 use system\Core;
-use system\abstracts\ACacheableEntity;
+use system\abstracts\AEntity;
 use system\helper\StringHelper;
 use system\exceptions\SystemException;
 
 /**
- * The Actor entity
+ * The ActorModel entity
  * Represents a single entry in the database
  *
  * @author Markus Schröder <xelsion@gmail.com>
  * @version 1.0.0;
  */
-class Actor extends ACacheableEntity {
+class Actor extends AEntity {
 
 	// the columns
 	public int $id = 0;
@@ -27,6 +27,9 @@ class Actor extends ACacheableEntity {
 	public string $last_name = "";
 	public int $login_fails = 0;
 	public bool $login_disabled = false;
+    public string $created = "";
+    public ?string $updated = null;
+    public ?string $deleted = null;
 
     /**
      * The constructor loads the database content into this object.

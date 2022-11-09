@@ -25,7 +25,7 @@ $view_content = ( $view instanceof Template ) ? $view->parse() : "";
 	<?php } ?>
 	<script src="<?= PATH_SRC ?>bootstrap-5.2.2/js/bootstrap.bundle.min.js"></script>
 	<script src="<?= PATH_SRC ?>jquery/jquery-3.6.0.min.js"></script>
-    <script src="<?= PATH_SRC ?>tinymce.v6/tinymce.min.js"></script>
+    <script src="<?= PATH_SRC ?>tinymce/tinymce.min.js"></script>
 	<?php foreach( $this->getHeaderScripts() as $script_file => $async ) { ?>
 		<?php if ( $async ) { ?>
 			<script async src="<?= $script_file ?>"></script>
@@ -57,6 +57,13 @@ $view_content = ( $view instanceof Template ) ? $view->parse() : "";
 											<input type="password" name="password" value="" placeholder="Password" autocomplete="new-password" />
 										</label>
 									</div>
+									<?php if( Core::$_configuration->getSectionValue("security", "permanent_login") ) { ?>
+										<div class="form-row form-check">
+											<input id="perma_login" class="form-check-input" type="checkbox" name="permanent_login" value="yes" />
+											<label for="perma_login" class="form-check-label font-monospace">eingeloggt bleiben?</label>
+										</div>
+									<?php } ?>
+
 									<div><a href="" class="font-monospace">Passwort vergessen?</a></div>
 									<div class="form-row">
 										<button type="submit" name="login">Login</button>

@@ -10,14 +10,14 @@ use system\abstracts\AController;
 use system\Core;
 use system\exceptions\SystemException;
 
-use models\AccessRestrictionType;
-use models\ActorRole;
+use models\AccessRestrictionTypeModel;
+use models\ActorRoleModel;
 
 class Auth {
 
-    private ActorRole $_actor_role;
-    private ActorRole $_restriction_role;
-    private AccessRestrictionType $_restriction_type;
+    private ActorRoleModel $_actor_role;
+    private ActorRoleModel $_restriction_role;
+    private AccessRestrictionTypeModel $_restriction_type;
 
     /**
      * The class constructor
@@ -71,15 +71,15 @@ class Auth {
     /**
      * Returns if the actor role has access to the restriction role
      *
-     * @param ActorRole $actor_role
-     * @param ActorRole $restriction_role
-     * @param AccessRestrictionType $restriction_type
+     * @param ActorRoleModel $actor_role
+     * @param ActorRoleModel $restriction_role
+     * @param AccessRestrictionTypeModel $restriction_type
      * @return bool
      *
      * @throws JsonException
      * @throws SystemException
      */
-    private function getAccessibility( ActorRole $actor_role, ActorRole $restriction_role, AccessRestrictionType $restriction_type ) : bool {
+    private function getAccessibility( ActorRoleModel $actor_role, ActorRoleModel $restriction_role, AccessRestrictionTypeModel $restriction_type ) : bool {
         if( $restriction_role->id === 4 ) {
             return true;
         }
@@ -124,8 +124,8 @@ class Auth {
         $pdo_results = $this->getRestrictionRole( $controller, $method, $domain );
         if( $pdo_results->rowCount() === 1 ) {
             $row = $pdo_results->fetch();
-            $result["role"] = new ActorRole($row["role_id"]);
-            $result["type"] = new AccessRestrictionType($row["restriction_type"]);
+            $result["role"] = new ActorRoleModel($row["role_id"]);
+            $result["type"] = new AccessRestrictionTypeModel($row["restriction_type"]);
             $role_is_set = true;
         }
 
@@ -133,8 +133,8 @@ class Auth {
             $pdo_results = $this->getRestrictionRole( $controller, null, $domain );
             if( $pdo_results->rowCount() === 1 ) {
                 $row = $pdo_results->fetch();
-                $result["role"] = new ActorRole($row["role_id"]);
-                $result["type"] = new AccessRestrictionType($row["restriction_type"]);
+                $result["role"] = new ActorRoleModel($row["role_id"]);
+                $result["type"] = new AccessRestrictionTypeModel($row["restriction_type"]);
                 $role_is_set = true;
             }
         }
@@ -143,15 +143,15 @@ class Auth {
             $pdo_results = $this->getRestrictionRole( null, null, $domain );
             if( $pdo_results->rowCount() === 1 ) {
                 $row = $pdo_results->fetch();
-                $result["role"] = new ActorRole($row["role_id"]);
-                $result["type"] = new AccessRestrictionType($row["restriction_type"]);
+                $result["role"] = new ActorRoleModel($row["role_id"]);
+                $result["type"] = new AccessRestrictionTypeModel($row["restriction_type"]);
                 $role_is_set = true;
             }
         }
 
         if( !$role_is_set ) {
-            $result["role"] = new ActorRole(4);
-            $result["type"] = new AccessRestrictionType(4);
+            $result["role"] = new ActorRoleModel(4);
+            $result["type"] = new AccessRestrictionTypeModel(4);
         }
 
         return $result;

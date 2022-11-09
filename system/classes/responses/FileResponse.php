@@ -9,6 +9,7 @@ class FileResponse extends AResponse {
     // the default status for html status headers
     public int $status_code = 200;
 
+    // the full path of the download file
     public string $file_path = "";
 
     /**

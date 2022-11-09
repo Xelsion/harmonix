@@ -28,7 +28,7 @@ use system\manager\ConnectionManager;
 use system\helper\StringHelper;
 use system\exceptions\SystemException;
 
-use models\Session;
+use models\SessionModel;
 
 /**
  * The Process class of type singleton
@@ -129,7 +129,7 @@ class Process {
         //$this->deleteTestData();
 
         // initiate the session
-        $session = new Session();
+        $session = new SessionModel();
         Core::$_actor = $session->start();
 
         // Try to get the responsible route for this requested uri

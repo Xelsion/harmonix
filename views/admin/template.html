@@ -56,6 +56,13 @@ $view_content = ( $view instanceof Template) ? $view->parse() : $view;
 									</label>
 								</div>
 								<div class="form-row">
+									<input id="perma_login" type="checkbox" name="permanent_login" value="yes" />
+									<label for="perma_login">eingeloggt bleiben?</label>
+								</div>
+								<?php if( Core::$_configuration->getSectionValue("security", "permanent_login") ) { ?>
+
+								<?php } ?>
+								<div class="form-row">
 									<button type="submit" name="login">Login</button>
 								</div>
 							</form>

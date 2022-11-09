@@ -55,4 +55,21 @@ class Configuration {
 	public function getSection( string $name ): array {
 		return $this->_config[$name] ?? array();
 	}
+
+    /**
+     * Returns a specific value in a specific section
+     *
+     * @param string $name
+     * @param string $key
+     *
+     * @return mixed
+     */
+    public function getSectionValue( string $name, string $key): mixed {
+        $section = $this->getSection($name);
+        if( empty($section) || !array_key_exists($key, $section) ) {
+            return null;
+        }
+        return $section[$key];
+    }
+
 }

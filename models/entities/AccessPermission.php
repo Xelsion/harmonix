@@ -6,17 +6,17 @@ use PDO;
 use Exception;
 
 use system\Core;
-use system\abstracts\ACacheableEntity;
+use system\abstracts\AEntity;
 use system\exceptions\SystemException;
 
 /**
- * The AccessPermission entity
+ * The AccessPermissionModel entity
  * Represents a single entry in the database
  *
  * @author Markus Schröder <xelsion@gmail.com>
  * @version 1.0.0;
  */
-class AccessPermission extends ACacheableEntity {
+class AccessPermission extends AEntity {
 
 	// The columns
 	public int $actor_id = 0;
@@ -24,6 +24,9 @@ class AccessPermission extends ACacheableEntity {
 	public string $domain = "";
 	public ?string $controller = null;
 	public ?string $method = null;
+    public string $created = "";
+    public ?string $updated = null;
+    public ?string $deleted = null;
 
 	/**
 	 * The constructor loads the database content into this object.

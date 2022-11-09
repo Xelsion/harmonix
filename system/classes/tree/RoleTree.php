@@ -4,7 +4,7 @@ namespace system\classes\tree;
 
 use Exception;
 
-use models\ActorRole;
+use models\ActorRoleModel;
 
 class RoleTree extends TreeWalker {
 
@@ -19,7 +19,7 @@ class RoleTree extends TreeWalker {
      */
 	private function __construct() {
 		parent::__construct();
-		$actor_roles = ActorRole::find();
+		$actor_roles = ActorRoleModel::find();
 		foreach( $actor_roles as $role ) {
             $node = new RoleNode($role);
 			$this->addNode($node);

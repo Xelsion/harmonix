@@ -12,7 +12,7 @@ use system\classes\Router;
 use system\classes\Template;
 use system\exceptions\SystemException;
 
-use models\Actor;
+use models\ActorModel;
 
 class TestController extends AController {
 
@@ -80,7 +80,7 @@ class TestController extends AController {
     public function actors() : AResponse {
         $response = new HtmlResponse();
         $template = new Template(PATH_VIEWS . "template.html");
-        $template->set("actor_list", Actor::find());
+        $template->set("actor_list", ActorModel::find());
         $template->set("view", new Template(PATH_VIEWS."tests/actors.html"));
         $response->setOutput($template->parse());
         return $response;
@@ -92,7 +92,7 @@ class TestController extends AController {
      * @throws JsonException
      */
     public function actorsDetail( int $id ) : AResponse {
-        $results = Actor::find([["id", "=", $id]]);
+        $results = ActorModel::find([["id", "=", $id]]);
         if( count($results) === 0 ) {
             redirect("/error/404");
         }

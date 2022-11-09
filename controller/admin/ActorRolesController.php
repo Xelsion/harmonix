@@ -11,7 +11,7 @@ use system\classes\Router;
 use system\classes\Template;
 use system\exceptions\SystemException;
 
-use models\ActorRole;
+use models\ActorRoleModel;
 
 /**
  * @see \system\abstracts\AController
@@ -57,7 +57,7 @@ class ActorRolesController extends AController {
 		$template = new Template(PATH_VIEWS."template.html");
 
 		$template->set("navigation", $this::$_menu);
-		$template->set("result_list", ActorRole::find());
+		$template->set("result_list", ActorRoleModel::find());
 		$template->set("view", new Template(PATH_VIEWS."actor_roles/index.html"));
 		$response->setOutput($template->parse());
 		return $response;
@@ -73,7 +73,7 @@ class ActorRolesController extends AController {
 				$all = ( isset($_POST["all"]) ) ? $this->getPermissions($_POST["all"]) : 0b000;
 				$group = ( isset($_POST["group"]) ) ? $this->getPermissions($_POST["group"]) : 0b000;
 				$own = ( isset($_POST["own"]) ) ? $this->getPermissions($_POST["own"]) : 0b000;
-				$role = new ActorRole();
+				$role = new ActorRoleModel();
 				$role->name = $_POST["name"];
 				$role->child_of = ( (int)$_POST["child_of"] > 0 ) ? (int)$_POST["child_of"] : null;
 				$role->rights_all = $all;
@@ -87,7 +87,7 @@ class ActorRolesController extends AController {
 		$response = new HtmlResponse();
 		$template = new Template(PATH_VIEWS."template.html");
 		$template->set("navigation", $this::$_menu);
-		$template->set("option_list", ActorRole::find());
+		$template->set("option_list", ActorRoleModel::find());
 		$template->set("view", new Template(PATH_VIEWS."actor_roles/create.html"));
 		$response->setOutput($template->parse());
 		return $response;
@@ -96,7 +96,7 @@ class ActorRolesController extends AController {
     /**
      * @throws Exception
      */
-    public function update( ActorRole $role ): AResponse {
+    public function update( ActorRoleModel $role ): AResponse {
 		if( isset($_POST['cancel']) ) {
 			redirect("/actor-roles");
 		}
@@ -120,7 +120,7 @@ class ActorRolesController extends AController {
 		$response = new HtmlResponse();
 		$template = new Template(PATH_VIEWS."template.html");
 		$template->set("role", $role);
-		$template->set("option_list", ActorRole::find(array(["id", "!=", $role->id])));
+		$template->set("option_list", ActorRoleModel::find(array(["id", "!=", $role->id])));
 		$template->set("navigation", $this::$_menu);
 		$template->set("view", new Template(PATH_VIEWS."actor_roles/edit.html"));
 		$response->setOutput($template->parse());
@@ -130,7 +130,7 @@ class ActorRolesController extends AController {
     /**
      * @throws SystemException
      */
-    public function delete( ActorRole $role ) : AResponse {
+    public function delete( ActorRoleModel $role ) : AResponse {
         if( isset($_POST['cancel']) ) {
             redirect("/actor-roles");
         }
@@ -155,16 +155,16 @@ class ActorRolesController extends AController {
 	private function getPermissions( array $settings ): int {
 		$permissions = 0b0000;
 		if( isset($settings["read"]) ) {
-			$permissions = ActorRole::$CAN_READ;
+			$permissions = ActorRoleModel::$CAN_READ;
 		}
 		if( isset($settings["create"]) ) {
-			$permissions |= ActorRole::$CAN_CREATE;
+			$permissions |= ActorRoleModel::$CAN_CREATE;
 		}
 		if( isset($settings["update"]) ) {
-			$permissions |= ActorRole::$CAN_UPDATE;
+			$permissions |= ActorRoleModel::$CAN_UPDATE;
 		}
 		if( isset($settings["delete"]) ) {
-			$permissions |= ActorRole::$CAN_DELETE;
+			$permissions |= ActorRoleModel::$CAN_DELETE;
 		}
 		return $permissions;
 	}

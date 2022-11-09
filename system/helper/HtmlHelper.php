@@ -2,11 +2,11 @@
 
 namespace system\helper;
 
-use models\ActorRole;
+use models\ActorRoleModel;
 
 class HtmlHelper {
 
-    public static function getRoleOptions( ActorRole $curr_role, int $selected, string &$output ) : void {
+    public static function getRoleOptions( ActorRoleModel $curr_role, int $selected, string &$output ) : void {
         $output .= '<option value="'. $curr_role->id.'"'. (($curr_role->id === $selected) ? ' selected="selected"' : '') .'>'. escaped_html($curr_role->name).'</option>';
         $children = $curr_role->getChildren();
         foreach( $children as $child ) {

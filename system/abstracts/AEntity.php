@@ -41,13 +41,6 @@ abstract class AEntity {
     abstract public function delete(): bool;
 
     /**
-     * @return bool
-     */
-    public static function isCacheable() : bool {
-        return false;
-    }
-
-    /**
      * Converts a string to a DateTime object
      *
      * @param string $datetime
@@ -56,4 +49,5 @@ abstract class AEntity {
     public function str2DateTime( string $datetime ) {
         return DateTime::createFromFormat("Y-m-d H:i:s", $datetime);
     }
+
 }

@@ -7,17 +7,17 @@ use Exception;
 use JsonException;
 
 use system\Core;
-use system\abstracts\ACacheableEntity;
+use system\abstracts\AEntity;
 use system\exceptions\SystemException;
 
 /**
- * The ActorRole entity
+ * The ActorRoleModel entity
  * Represents a single entry in the database
  *
  * @author Markus Schröder <xelsion@gmail.com>
  * @version 1.0.0;
  */
-class ActorRole extends ACacheableEntity {
+class ActorRole extends AEntity {
 
 	// The columns
 	public int $id = 0;
@@ -28,6 +28,9 @@ class ActorRole extends ACacheableEntity {
 	public int $rights_own = 0b0000;
 	public bool $is_default = false;
 	public bool $is_protected = false;
+    public string $created = "";
+    public ?string $updated = null;
+    public ?string $deleted = null;
 
     /**
      * The constructor loads the database content into this object.
