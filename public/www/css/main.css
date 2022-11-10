@@ -28,6 +28,10 @@
     src: url("../../fonts/FiraCode-Bold.ttf") format("truetype")
 }
 
+{
+    box-sizing: border-box;
+}
+
 html {
     min-width: 758px !important;
 }

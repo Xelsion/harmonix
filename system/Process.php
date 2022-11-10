@@ -29,8 +29,6 @@ use system\manager\ConnectionManager;
 use system\helper\StringHelper;
 use system\exceptions\SystemException;
 
-use models\SessionModel;
-
 /**
  * The Process class of type singleton
  * This class handles the main procedure from getting a request
@@ -83,9 +81,9 @@ class Process {
      */
 	public function start(): void {
         // Initiate general settings
-        $settings = Core::$_configuration->getSection("development");
-        Core::$_storage::set("environment", $settings["environment"]);
-        Core::$_storage::set("debug_mode", (bool)$settings["debug"]);
+        $environment = Core::$_configuration->getSectionValue("system", "environment");
+        $debug = Core::$_configuration->getSectionValue($environment, "debug");
+        Core::$_storage::set("debug_mode", (bool)$debug);
 
         Core::$_analyser = new TimeAnalyser();
 

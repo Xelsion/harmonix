@@ -98,6 +98,26 @@ class ActorModel extends entities\Actor {
 	}
 
     /**
+     * @param int $actor_id
+     *
+     * @return bool
+     *
+     * @throws JsonException
+     * @throws SystemException
+     */
+    public static function isDeveloper( int $actor_id = 0 ) {
+        if( $actor_id > 0 ) {
+            $actor = new ActorModel($actor_id);
+            return ( $actor->type_id === 1 );
+        }
+        if( Core::$_actor->id > 0 ) {
+            return (Core::$_actor->type_id === 1);
+        }
+        return false;
+    }
+
+
+    /**
      * Returns the number of total actors
      *
      * @return int

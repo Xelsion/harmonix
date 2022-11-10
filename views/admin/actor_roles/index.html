@@ -15,6 +15,7 @@ $role_list = $this->get("result_list");
 			<th>Rechte: Alle</th>
 			<th>Rechte: Gruppe</th>
 			<th>Rechte: Eigene</th>
+			<th>Gesch&uuml;tzt</th>
 			<th class="col-md-2 text-end">Optionen</th>
 		</tr>
 		<?php foreach( $role_list as $role ):
@@ -28,6 +29,7 @@ $role_list = $this->get("result_list");
 				<td><?= escaped_html(implode(", ", $rights["all"])) ?></td>
 				<td><?= escaped_html(implode(", ", $rights["group"])) ?></td>
 				<td><?= escaped_html(implode(", ", $rights["own"])) ?></td>
+				<td><?= ($role->is_protected) ? "Ja" : "Nein" ?></td>
 				<td class="text-nowrap text-end">
 					<a href="/actor-roles/<?= $role->id ?>" class="button button-default"><?= Core::$_lang->getValue("translations", "edit") ?></a>
 					<a href="/actor-roles/delete/<?= $role->id ?>" class="button button-negativ"><?= Core::$_lang->getValue("translations", "delete") ?></a>

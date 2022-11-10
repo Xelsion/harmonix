@@ -2,11 +2,21 @@
 use system\Core;
 
 $this->set("title", "Benutzer bearbeiten");
+$type_options = $this->get("type_options");
 $actor = $this->get("actor");
 ?>
 <div class="container-fluid">
 	<h1>Neuen Benutzer anlegen</h1>
 	<form action="/actors/<?= $actor->id ?>" method="POST" class="needs-validation" autocomplete="off" novalidate>
+		<div class="form-group row">
+			<label for="type_id">Type</label>
+			<select id="type_id" name="type_id">
+				<?php foreach( $type_options as $option ) { ?>
+					<option value="<?= $option->id ?>"<?= ( $option->id === $actor->type_id ) ? ' selected="selected"' : '' ?>><?= escaped_html($option->name)  ?></option>
+				<?php } ?>
+			</select>
+			<div class="invalid-feedback"><?= Core::$_lang->getValue("error-messages", "type") ?></div>
+		</div>
 		<div class="form-group row">
 			<label for="email">E-Mail</label>
 			<input type="email" name="email" value="<?= escaped_html($actor->email) ?>" id="email" required />

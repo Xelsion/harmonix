@@ -6,6 +6,7 @@ use DateTime;
 use Exception;
 use JsonException;
 
+use models\ActorTypeModel;
 use PDO;
 use system\Core;
 use system\abstracts\AController;
@@ -73,7 +74,7 @@ class ActorController extends AController {
         $cache->initCacheFor(__METHOD__, ...$params);
         $cache->addFileCheck(__FILE__);
         $cache->addFileCheck(PATH_VIEWS."actor/index.html");
-        if( $cache->isUpToDate() ) {
+        if( self::$caching && $cache->isUpToDate() ) {
             $view_content = $cache->getContent();
         } else {
             $pagination = "";
@@ -83,7 +84,12 @@ class ActorController extends AController {
             $view->set("result_list", ActorModel::find(array(), $params['order'], $params['direction'], $params['limit'], $params['page']));
             $view->set("pagination", $pagination);
             $view_content = $view->parse();
-            $cache->saveContent($view_content);
+
+            // if caching is enabled write the generated output into the cache file
+            if(self::$caching) {
+                $cache->saveContent($view_content);
+            }
+
         }
 
         $template = new Template(PATH_VIEWS."template.html");
@@ -111,7 +117,7 @@ class ActorController extends AController {
         $cache->addFileCheck(__FILE__);
         $cache->addFileCheck(PATH_VIEWS."actor/search.html");
 
-        if( $cache->isUpToDate() ) {
+        if( self::$caching && $cache->isUpToDate() ) {
             $view_content = $cache->getContent();
         } else {
             $results = array();
@@ -127,7 +133,11 @@ class ActorController extends AController {
             $view->set("search_string", $search_string);
             $view->set("result_list", $results);
             $view_content = $view->parse();
-            $cache->saveContent($view_content);
+
+            // if caching is enabled write the generated output into the cache file
+            if(self::$caching) {
+                $cache->saveContent($view_content);
+            }
         }
 
         $template = new Template(PATH_VIEWS."template.html");
@@ -163,16 +173,23 @@ class ActorController extends AController {
         $cache = Core::$_response_cache;
         $cache->initCacheFor(__METHOD__);
         $cache->addFileCheck(__FILE__);
+        $cache->addFileCheck(PATH_VIEWS."template.html");
         $cache->addFileCheck(PATH_VIEWS."actor/create.html");
-        if( $cache->isUpToDate() ) {
+        $cache->addDBCheck("mvc", "actor_roles");
+        $cache->addDBCheck("mvc", "actor_types");
+        if( self::$caching && $cache->isUpToDate() ) {
             $view_content = $cache->getContent();
         } else {
             $view = new Template(PATH_VIEWS."actor/create.html");
             $view->set("role_options", ActorRoleModel::find());
+            $view->set("type_options", ActorTypeModel::find());
             $view->set("access_permissions", array());
-
             $view_content = $view->parse();
-            $cache->saveContent($view_content);
+
+            // if caching is enabled write the generated output into the cache file
+            if(self::$caching) {
+                $cache->saveContent($view_content);
+            }
         }
 
         $template = new Template(PATH_VIEWS."template.html");
@@ -198,6 +215,7 @@ class ActorController extends AController {
 		if( isset($_POST['update']) ) {
 			$is_valid = $this->postIsValid();
 			if( $is_valid ) {
+                $actor->type_id = (int)$_POST["type_id"];
 				$actor->email = $_POST["email"];
 				$actor->password = $_POST["password"];
 				$actor->first_name = $_POST["first_name"];
@@ -215,6 +233,7 @@ class ActorController extends AController {
         $view = new Template(PATH_VIEWS."actor/edit.html");
         $view->set("actor", $actor);
         $view->set("role_options", ActorRoleModel::find());
+        $view->set("type_options", ActorTypeModel::find());
         $view->set("access_permissions", $access_permissions);
         $view_content = $view->parse();
 

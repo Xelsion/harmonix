@@ -3,6 +3,7 @@ use system\Core;
 use system\classes\Template;
 
 $this->set("title", "Benutzer erstellen");
+$type_options = $this->get("type_options");
 $snippet = new Template(PATH_VIEWS."snippets/access_permission.html");
 ?>
 <div class="container-fluid">
@@ -11,6 +12,15 @@ $snippet = new Template(PATH_VIEWS."snippets/access_permission.html");
 		<div class="row">
 			<div class="col-4">
 				<h2>Benutzer</h2>
+				<div class="form-group row">
+					<label for="type_id">Type</label>
+					<select id="type_id" name="type_id">
+						<?php foreach( $type_options as $option ) { ?>
+							<option value="<?= $option->id ?>"><?= escaped_html($option->name)  ?></option>
+						<?php } ?>
+					</select>
+					<div class="invalid-feedback"><?= Core::$_lang->getValue("error-messages", "type") ?></div>
+				</div>
 				<div class="form-group row">
 					<label for="email">E-Mail</label>
 					<input type="email" name="email" value="" id="email" required />

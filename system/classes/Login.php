@@ -79,12 +79,15 @@ class Login extends Session {
             $this->ip = $_SERVER["REMOTE_ADDR"];
             $this->expired = $date_time->format("Y-m-d H:i:s");
             $actor = new ActorModel($this->actor_id);
-            if( $actor->id === 1 && ($this->as_actor > 0 || isset($_POST["login-as"], $_POST["actor_id"])) ) {
+
+            // only developer can log in as any actor
+            if( ($this->as_actor > 0 || isset($_POST["login-as"], $_POST["actor_id"])) && ActorModel::isDeveloper() ) {
                 if( isset($_POST["actor_id"]) ) {
                     $this->as_actor = (int)$_POST["actor_id"];
                 }
                 $actor = new ActorModel($this->as_actor);
             }
+
             $this->update();
             $this->writeCookie();
 			return $actor;

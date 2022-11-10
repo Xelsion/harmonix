@@ -21,6 +21,15 @@ use system\exceptions\SystemException;
  */
 abstract class AController extends Core {
 
+    protected static ?bool $caching = null;
+
+    public function __construct() {
+        if( self::$caching === null ) {
+            $environment = Core::$_configuration->getSectionValue("system", "environment");
+            self::$caching = (bool)Core::$_configuration->getSectionValue($environment, "caching");
+        }
+    }
+
     /**
      * This function will add all routes it has to the given Router
      * It can also add MenuItems to the navigation Menu (The Menu

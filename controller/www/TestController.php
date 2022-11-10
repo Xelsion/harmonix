@@ -88,15 +88,19 @@ class TestController extends AController {
         $cache->addFileCheck(__FILE__);
         $cache->addFileCheck(PATH_VIEWS."template.html");
         $cache->addFileCheck(PATH_VIEWS."tests/actors.html");
-        $cache->addDBCheck("mvs", "actors");
-        if( $cache->isUpToDate() ) {
+        $cache->addDBCheck("mvc", "actors");
+        if( self::$caching && $cache->isUpToDate() ) {
             $view_content = $cache->getContent();
         } else {
             $template = new Template(PATH_VIEWS . "template.html");
             $template->set("actor_list", ActorModel::find());
             $template->set("view", new Template(PATH_VIEWS . "tests/actors.html"));
             $view_content = $template->parse();
-            $cache->saveContent($view_content);
+
+            // if caching is enabled write the generated output into the cache file
+            if(self::$caching) {
+                $cache->saveContent($view_content);
+            }
         }
         $response->setOutput($view_content);
         return $response;
