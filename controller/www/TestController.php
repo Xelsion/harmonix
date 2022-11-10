@@ -10,9 +10,11 @@ use system\abstracts\AResponse;
 use system\classes\responses\HtmlResponse;
 use system\classes\Router;
 use system\classes\Template;
+use system\Core;
 use system\exceptions\SystemException;
 
 use models\ActorModel;
+use system\helper\RequestHelper;
 
 class TestController extends AController {
 
@@ -79,10 +81,24 @@ class TestController extends AController {
      */
     public function actors() : AResponse {
         $response = new HtmlResponse();
-        $template = new Template(PATH_VIEWS . "template.html");
-        $template->set("actor_list", ActorModel::find());
-        $template->set("view", new Template(PATH_VIEWS."tests/actors.html"));
-        $response->setOutput($template->parse());
+        $params = RequestHelper::getPaginationParams();
+
+        $cache = Core::$_response_cache;
+        $cache->initCacheFor(__METHOD__, ...$params);
+        $cache->addFileCheck(__FILE__);
+        $cache->addFileCheck(PATH_VIEWS."template.html");
+        $cache->addFileCheck(PATH_VIEWS."tests/actors.html");
+        $cache->addDBCheck("mvs", "actors");
+        if( $cache->isUpToDate() ) {
+            $view_content = $cache->getContent();
+        } else {
+            $template = new Template(PATH_VIEWS . "template.html");
+            $template->set("actor_list", ActorModel::find());
+            $template->set("view", new Template(PATH_VIEWS . "tests/actors.html"));
+            $view_content = $template->parse();
+            $cache->saveContent($view_content);
+        }
+        $response->setOutput($view_content);
         return $response;
     }
 

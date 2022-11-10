@@ -12,11 +12,11 @@ namespace system\classes\tree;
 class TreeNode {
 
 	// the node id
-	public int $_id = 0;
+	public int $id = 0;
 	// the id of its parent
-	public ?int $_child_of = null;
+	public ?int $child_of = null;
 	// the name of the node
-	public string $_name = "";
+	public string $name = "";
 
 	/**
 	 * The constructor creates a TreeNode
@@ -26,9 +26,9 @@ class TreeNode {
 	 * @param string $name
 	 */
 	public function __construct( int $id, ?int $child_of, string $name ) {
-		$this->_id = $id;
-		$this->_child_of = $child_of;
-		$this->_name = $name;
+		$this->id = $id;
+		$this->child_of = $child_of;
+		$this->name = $name;
 	}
 
 }

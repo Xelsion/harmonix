@@ -18,7 +18,7 @@ use system\exceptions\SystemException;
 class ActorModel extends entities\Actor {
 
 	// a collection of all permission this user has
-	public array $_permissions = array();
+	public array $permissions = array();
 
     /**
      * The class constructor
@@ -124,23 +124,23 @@ class ActorModel extends entities\Actor {
         // do we have a loaded actor object?
         if( $this->id > 0 ) {
             // no permission restriction is set?
-			if( empty($this->_permissions) ) {
+			if( empty($this->permissions) ) {
 				$this->initPermission();
 			}
 
             // check if there is a permission set for this method if so return the actor role
-			if( isset($this->_permissions[$domain][$controller][$method]) ) {
-				return $this->_permissions[$domain][$controller][$method];
+			if( isset($this->permissions[$domain][$controller][$method]) ) {
+				return $this->permissions[$domain][$controller][$method];
 			}
 
             // check if there is a permission set for this controller if so return the actor role
-			if( isset($this->_permissions[$domain][$controller][null]) ) {
-				return $this->_permissions[$domain][$controller][null];
+			if( isset($this->permissions[$domain][$controller][null]) ) {
+				return $this->permissions[$domain][$controller][null];
 			}
 
             // check if there is a permission set for this domain if so return the actor role
-			if( isset($this->_permissions[$domain][null][null]) ) {
-				return $this->_permissions[$domain][null][null];
+			if( isset($this->permissions[$domain][null][null]) ) {
+				return $this->permissions[$domain][null][null];
 			}
 		}
 
@@ -183,7 +183,7 @@ class ActorModel extends entities\Actor {
 	private function initPermission(): void {
 		$permissions = AccessPermissionModel::find(array(["actor_id", "=", $this->id] ));
 		foreach( $permissions as $permission ) {
-			$this->_permissions[$permission->domain][$permission->controller][$permission->method] = $permission->getRole();
+			$this->permissions[$permission->domain][$permission->controller][$permission->method] = $permission->getRole();
 		}
 	}
 

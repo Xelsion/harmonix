@@ -4,11 +4,11 @@ namespace system\abstracts;
 
 abstract class ADBConnection {
 
-    public string $_host;
-    public string $_port;
-    public string $_dbname;
-    public string $_user;
-    public string $_pass;
+    public string $host;
+    public string $port;
+    public string $dbname;
+    public string $user;
+    public string $pass;
 
     abstract public function getConnectionString(): string;
 

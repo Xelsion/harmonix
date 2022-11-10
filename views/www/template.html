@@ -8,7 +8,7 @@ $actor_role = Core::$_actor_role;
 $menu = Core::$_menu;
 
 $view = $this->get("view");
-$view_content = ( $view instanceof Template ) ? $view->parse() : "";
+$view_content = ( $view instanceof Template) ? $view->parse() : $view;
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -102,7 +102,7 @@ $view_content = ( $view instanceof Template ) ? $view->parse() : "";
 		<div class="row text-end" style="margin: 0;">
 			<div class="col"></div>
 			<div class="col-3">Harmonix by: <?= escaped_html(AUTHOR) ?> version: <?= escaped_html(MVC_VERSION) ?></div>
-			<div class="col-2">build in: {{build_time}}sec</div>
+			<div class="col-2">build in: {{build_time}}</div>
 		</div>
 		<div class="cleaner"></div>
 	</footer>

@@ -11,12 +11,12 @@ namespace system\classes;
  */
 class Language {
 
-    private static ?Language $_instance = null;
+    private static ?Language $instance = null;
 
-    private array $_lang;
+    private array $lang;
 
     private function __construct( $lang = "de" ) {
-        $this->_lang = parse_ini_file(PATH_ROOT."lang-".$lang.".ini", true);
+        $this->lang = parse_ini_file(PATH_ROOT."lang-".$lang.".ini", true);
     }
 
     /**
@@ -27,10 +27,10 @@ class Language {
      * @return Language
      */
     public static function getInstance( string $language_key = "de" ): Language {
-        if( static::$_instance === null ) {
-            static::$_instance = new Language( $language_key );
+        if( static::$instance === null ) {
+            static::$instance = new Language( $language_key );
         }
-        return static::$_instance;
+        return static::$instance;
     }
 
     /**
@@ -41,7 +41,7 @@ class Language {
      * @return array
      */
     public function getSection( string $name ): array {
-        return $this->_lang[$name] ?? array();
+        return $this->lang[$name] ?? array();
     }
 
     /**

@@ -12,18 +12,18 @@ namespace system\classes;
 class TemplateData {
 
     // scripts and css that will be added to html head section
-    private static array $_header = array(
+    private static array $header = array(
         "css" => array(),
         "script" => array()
     );
 
     // scripts that will be added to the end ob the html body section
-    private static array $_footer = array(
+    private static array $footer = array(
         "script" => array()
     );
 
 	// the data storage for the template
-	private static array $_data = array();
+	private static array $data = array();
 
 	/**
 	 * Adds a key => value pair to the data storage
@@ -32,7 +32,7 @@ class TemplateData {
 	 * @param $value
 	 */
 	public function set( $key, $value ): void {
-		static::$_data[$key] = $value;
+		static::$data[$key] = $value;
 	}
 
 	/**
@@ -43,7 +43,7 @@ class TemplateData {
 	 * @return mixed|null
 	 */
 	public function get( $key ) {
-		return static::$_data[$key] ?? null;
+		return static::$data[$key] ?? null;
 	}
 
 	/**
@@ -55,9 +55,9 @@ class TemplateData {
 	 */
 	public function toArray( string $name, $value, $index = null ): void {
 		if( !is_null($index) ) {
-			static::$_data[$name][$index] = $value;
+			static::$data[$name][$index] = $value;
 		} else {
-			static::$_data[$name][] = $value;
+			static::$data[$name][] = $value;
 		}
 	}
 
@@ -70,7 +70,7 @@ class TemplateData {
 	 * @return mixed|null
 	 */
 	public function fromArray( $name, $index ) {
-		return static::$_data[$name][$index] ?? null;
+		return static::$data[$name][$index] ?? null;
 	}
 
     /**
@@ -79,8 +79,8 @@ class TemplateData {
      * @param string $value
      */
     public function addHeaderCss( string $value ): void {
-        if( !in_array($value, static::$_header["css"], false) ) {
-            static::$_header["css"][] = $value;
+        if( !in_array($value, static::$header["css"], false) ) {
+            static::$header["css"][] = $value;
         }
     }
 
@@ -90,7 +90,7 @@ class TemplateData {
      * @return array
      */
     public function getHeaderCss() : array {
-        return static::$_header["css"];
+        return static::$header["css"];
     }
 
     /**
@@ -100,7 +100,7 @@ class TemplateData {
      * @param bool $async
      */
     public function addHeaderScript( string $value, bool $async = false ): void {
-        static::$_header["script"][$value] = $async;
+        static::$header["script"][$value] = $async;
     }
 
     /**
@@ -109,7 +109,7 @@ class TemplateData {
      * @return array
      */
     public function getHeaderScripts() : array {
-        return static::$_header["script"];
+        return static::$header["script"];
     }
 
     /**
@@ -119,7 +119,7 @@ class TemplateData {
      * @param bool $async
      */
     public function addFooterScript( string $value, bool $async = false ): void {
-        static::$_footer["script"][$value] = $async;
+        static::$footer["script"][$value] = $async;
     }
 
     /**
@@ -128,6 +128,6 @@ class TemplateData {
      * @return array
      */
     public function getFooterScripts() : array {
-        return static::$_footer["script"];
+        return static::$footer["script"];
     }
 }

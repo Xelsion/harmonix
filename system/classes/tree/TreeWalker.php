@@ -12,7 +12,7 @@ namespace system\classes\tree;
 class TreeWalker {
 
 	// all nodes of the tree
-	private array $_nodes = array();
+	private array $nodes = array();
 
 	/**
 	 * The constructor
@@ -27,8 +27,8 @@ class TreeWalker {
 	 * @param TreeNode $node
 	 */
 	public function addNode( TreeNode $node ): void {
-		$this->_nodes[$node->_id] = $node;
-		ksort($this->_nodes);
+		$this->nodes[$node->id] = $node;
+		ksort($this->nodes);
 	}
 
 	/**
@@ -39,7 +39,7 @@ class TreeWalker {
 	 * @return TreeNode|null
 	 */
 	public function getNode( int $node_id ): ?TreeNode {
-		return $this->_nodes[$node_id] ?? null;
+		return $this->nodes[$node_id] ?? null;
 	}
 
     /**
@@ -51,7 +51,7 @@ class TreeWalker {
      */
     public function getParentOf( int $node_id ): ?TreeNode {
         $node = $this->getNode($node_id);
-        return ( !is_null($node) ) ? $this->getNode($node->_child_of) : null;
+        return ( !is_null($node) ) ? $this->getNode($node->child_of) : null;
     }
 
 	/**
@@ -75,8 +75,8 @@ class TreeWalker {
 	 */
 	public function getChildrenOf( ?int $node_id ): array {
 		$children = array();
-		foreach( $this->_nodes as $id => $current_node ) {
-			if( $current_node->_child_of === $node_id ) {
+		foreach( $this->nodes as $id => $current_node ) {
+			if( $current_node->child_of === $node_id ) {
 				$children[$id] = $current_node;
 			}
 		}
@@ -94,10 +94,10 @@ class TreeWalker {
         $curr_node = $descendant_id;
         $parent_node = $this->getParentOf($curr_node);
         while( !is_null($parent_node) ) {
-            if( $parent_node->_id === $node_id ) {
+            if( $parent_node->id === $node_id ) {
                 return true;
             }
-            $parent_node = $this->getParentOf($parent_node->_id);
+            $parent_node = $this->getParentOf($parent_node->id);
         }
         return false;
     }
@@ -113,7 +113,7 @@ class TreeWalker {
 		$ancestors = array();
 		$parent = $this->getParentOf($node_id);
 		while( $parent !== null ) {
-			$ancestors[$parent->_id] = $parent;
+			$ancestors[$parent->id] = $parent;
 			$parent = $this->getParentOf($parent->id);
 		}
 		return $ancestors;
@@ -144,7 +144,7 @@ class TreeWalker {
         foreach( $curr_children as $id => $child ) {
             $descendants[$id] = $child;
             if( $child->hasChildren() ) {
-                $this->getDescendantsOf($child->_id, $descendants);
+                $this->getDescendantsOf($child->id, $descendants);
             }
         }
         return $descendants;
@@ -161,7 +161,7 @@ class TreeWalker {
         $node1 = $this->getNode($node_id);
         $node2 = $this->getNode($sibling_id);
         if( !is_null($node1) && !is_null($node2) ) {
-            return ( $node1->_child_of === $node2->_child_of);
+            return ( $node1->child_of === $node2->child_of);
         }
         return false;
     }
@@ -179,21 +179,21 @@ class TreeWalker {
 		$siblings = array();
 		$node = $this->getNode($node_id);
 		if( !is_null($node) ) {
-			if( $node->_child_of !== null ) {
-				$parent = $this->getParentOf($node->_id);
+			if( $node->child_of !== null ) {
+				$parent = $this->getParentOf($node->id);
 				if( !is_null($parent) ) {
-					$siblings = $this->getChildrenOf($parent->_id);
+					$siblings = $this->getChildrenOf($parent->id);
 				}
 			} else {
-				foreach( $this->_nodes as $id => $current_node ) {
-					if( is_null($current_node->_child_of) ) {
+				foreach( $this->nodes as $id => $current_node ) {
+					if( is_null($current_node->child_of) ) {
 						$siblings[$id] = $current_node;
 					}
 				}
 			}
 
-			if( $exclude_self && isset($siblings[$node->_id]) ) {
-				unset($siblings[$node->_id]);
+			if( $exclude_self && isset($siblings[$node->id]) ) {
+				unset($siblings[$node->id]);
 			}
 		}
 		return $siblings;

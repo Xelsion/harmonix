@@ -33,6 +33,10 @@ $pagination = $this->get("pagination");
 				<td<?= $row_class ?>><?= escaped_html($actor->first_name) ?></td>
 				<td<?= $row_class ?>><?= escaped_html($actor->last_name) ?></td>
 				<td class="text-nowrap text-end">
+					<form action="https://www.harmonix.de" target="_blank" method="POST" class="minimized">
+						<input type="hidden" name="actor_id" value="<?= $actor->id ?>" />
+						<button type="submit" name="login-as" class="button button-default"><?= Core::$_lang->getValue("phrases", "login_as") ?></button>
+					</form>
 					<a href="/actors/roles/<?= $actor->id ?>" class="button button-default"><?= Core::$_lang->getValue("translations", "roles") ?></a>
 					<a href="/actors/<?= $actor->id ?>" class="button button-default"><?= Core::$_lang->getValue("translations", "edit") ?></a>
 					<button class="button button-negativ" onclick="$('#delete-target').attr('href', '/actors/delete/<?= $actor->id ?>')" data-bs-toggle="modal" data-bs-target="#confirm-delete"><?= Core::$_lang->getValue("translations", "delete") ?></button>

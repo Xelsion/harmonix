@@ -58,14 +58,14 @@ class Menu extends TreeWalker {
 		if( !empty($children) ) {
 			$html .= '<ul>';
 			foreach( $children as $child ) {
-                $route = Core::$_router->getRouteFor($child->_target);
+                $route = Core::$_router->getRouteFor($child->target);
                 if( Core::$_auth->hasAccessTo($route["controller"], $route["method"]) ) {
-                    $has_children = $this->hasChildren($child->_id);
+                    $has_children = $this->hasChildren($child->id);
                     $class = ( $has_children ) ? "has-children" : "";
                     $html .= '<li class="'.$class.'">';
                     $html .= $child->getLink();
                     if( $has_children ) {
-                        $this->buildHtmlTree($child->_id, $html);
+                        $this->buildHtmlTree($child->id, $html);
                     }
                     $html .= '</li>';
                 }

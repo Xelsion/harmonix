@@ -15,9 +15,9 @@ use models\ActorRoleModel;
 
 class Auth {
 
-    private ActorRoleModel $_actor_role;
-    private ActorRoleModel $_restriction_role;
-    private AccessRestrictionTypeModel $_restriction_type;
+    private ActorRoleModel $actor_role;
+    private ActorRoleModel $restriction_role;
+    private AccessRestrictionTypeModel $restriction_type;
 
     /**
      * The class constructor
@@ -27,11 +27,11 @@ class Auth {
      * @throws ReflectionException
      */
     public function __construct() {
-        $this->_actor_role = Core::$_actor_role;
+        $this->actor_role = Core::$_actor_role;
         $route = Core::$_router->getRoute(Core::$_request);
         $restriction = $this->getRestriction(get_class($route["controller"]), $route["method"]);
-        $this->_restriction_role = $restriction["role"];
-        $this->_restriction_type = $restriction["type"];
+        $this->restriction_role = $restriction["role"];
+        $this->restriction_type = $restriction["type"];
     }
 
     /**
@@ -42,7 +42,7 @@ class Auth {
      * @throws SystemException
      */
     public function hasAccess() : bool {
-        return $this->getAccessibility($this->_actor_role, $this->_restriction_role, $this->_restriction_type);
+        return $this->getAccessibility($this->actor_role, $this->restriction_role, $this->restriction_type);
     }
 
     /**

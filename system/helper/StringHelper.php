@@ -12,8 +12,8 @@ use Exception;
  */
 class StringHelper {
 
-	private static string $_allowed_characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_$!%";
-	private static string $_allowed_password_characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ123456789-_$!%@#&=?";
+	private static string $allowed_characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_$!%";
+	private static string $allowed_password_characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ123456789-_$!%@#&=?";
 
 	private static string $enc_key = 'Q#?9Q=M-&m$@o>>7\ZC$:~?:oRx%@uubnH>YrNwLjt,ieoLK;Mw%,xn2NPhs*c2<>SZQV&NbQA5W_vN;p=UVVd^vHWK&e`;xp9Mpr`azgvUXPph~Zd*2Eh/zx-5,dMmm';
     private static string $enc_ciphering = "AES-128-CTR";
@@ -69,11 +69,11 @@ class StringHelper {
 	 */
 	public static function getRandomString( int $length = 16 ): string {
 		$index_start = 0;
-		$index_end = strlen(self::$_allowed_characters) - 1;
+		$index_end = strlen(self::$allowed_characters) - 1;
 		$result = "";
 		for( $i = 0; $i < $length; $i++ ) {
 			$random_index = random_int($index_start, $index_end);
-			$result .= self::$_allowed_characters[$random_index];
+			$result .= self::$allowed_characters[$random_index];
 		}
 		return $result;
     }
@@ -89,11 +89,11 @@ class StringHelper {
 	 */
 	public static function getRandomPassword( int $length = 8 ): string {
 		$index_start = 0;
-		$index_end = strlen(self::$_allowed_password_characters) - 1;
+		$index_end = strlen(self::$allowed_password_characters) - 1;
 		$result = "";
 		for( $i = 0; $i < $length; $i++ ) {
 			$random_index = random_int($index_start, $index_end);
-			$result .= self::$_allowed_password_characters[$random_index];
+			$result .= self::$allowed_password_characters[$random_index];
 		}
 		return $result;
 	}

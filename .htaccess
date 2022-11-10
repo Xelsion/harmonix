@@ -2,8 +2,9 @@ RewriteEngine On
 ServerSignature Off
 Options -Indexes
 
-# SECUIRTY BLOCK
 <IfModule mod_rewrite.c>
+
+    #[MVC] SECUIRTY BLOCK TO PREVENT INCOMING ATTACKS
 	RewriteCond %{QUERY_STRING} ([a-z0-9]{2000,}) [NC,OR]
 	RewriteCond %{QUERY_STRING} (/|%2f)(:|%3a)(/|%2f) [NC,OR]
 	RewriteCond %{QUERY_STRING} (order(\s|%20)by(\s|%20)1--) [NC,OR]
@@ -44,24 +45,23 @@ Options -Indexes
 	RewriteCond %{QUERY_STRING} (union)(.*)(select)(.*)(\(|%28) [NC,OR]
 	RewriteCond %{QUERY_STRING} (concat|eval)(.*)(\(|%28) [NC]
 	RewriteRule .* - [F,L]
-</IfModule>
 
-<IfModule mod_rewrite.c>
-    # SEO ALWAS USE HTTPS
+    #[SEO] ALWAYS USE HTTPS TO PREVENT DUPLICATED CONTENT (GOOGLE)
     RewriteCond %{SERVER_PORT} 80 [NC]
     RewriteRule ^(public)?(.*)$ https://%{SERVER_NAME}$2 [R=301,L]
 
-    # SEO ALWAS USR WWW AS SUBDOMAIN
+    #[SEO] ALWAYS USE URL'S WITH SUBDOMAIN TO PREVENT DUPLICATED CONTENT (GOOGLE)
     RewriteCond %{HTTP_HOST} !^admin\.
     RewriteCond %{HTTP_HOST} !^www\. [NC]
     RewriteRule ^(public)?(.*)$ https://www.%{HTTP_HOST}$2 [R=301,L]
 
-    # SEO REMOVE ENDING SLASH
+    #[SEO] REMOVE ENDING SLASHES TO PREVENT DUPLICATED CONTENT (GOOGLE)
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteRule ^(public)?(.*)/$ /$2 [R=301,L]
 
-    # MVC REDIRECTS
+    #[MVC] REDIRECTS THE REQUEST TO THE HANDLER
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteRule .* public/index.php [L]
+
 </IfModule>

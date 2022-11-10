@@ -17,7 +17,7 @@ use system\exceptions\SystemException;
 class Logger extends File {
 
 	// The log text format
-	private string $_log_type;
+	private string $log_type;
 
 	/**
 	 * The class constructor
@@ -25,7 +25,7 @@ class Logger extends File {
 	 * @param string $log_type
 	 */
 	public function __construct( string $log_type ) {
-		$this->_log_type = $log_type;
+		$this->log_type = $log_type;
 		parent::__construct($this->getLogPath($log_type));
 	}
 
@@ -69,8 +69,8 @@ class Logger extends File {
 		}
 
 		// Sets the actual file path
-		$this->_file_path = $this->getLogPath($this->_log_type);
-		$path_parts = pathinfo($this->_file_path);
+		$this->file_path = $this->getLogPath($this->log_type);
+		$path_parts = pathinfo($this->file_path);
 		// Create all necessary folders
 		if( !file_exists($path_parts["dirname"]) && !mkdir($path_parts["dirname"], 0777, true) && !is_dir($path_parts["dirname"]) ) {
 			throw new SystemException(__FILE__, __LINE__, sprintf('Directory "%s" was not created', $path_parts["dirname"]));

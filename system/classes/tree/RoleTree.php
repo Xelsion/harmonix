@@ -8,7 +8,7 @@ use models\ActorRoleModel;
 
 class RoleTree extends TreeWalker {
 
-	private static ?RoleTree $_instance = null;
+	private static ?RoleTree $instance = null;
 
     /**
      * The class constructor
@@ -32,10 +32,10 @@ class RoleTree extends TreeWalker {
      * @return RoleTree
      */
 	public static function getInstance(): RoleTree {
-		if( static::$_instance === null ) {
-			static::$_instance = new RoleTree();
+		if( static::$instance === null ) {
+			static::$instance = new RoleTree();
 		}
-		return static::$_instance;
+		return static::$instance;
 	}
 
 }

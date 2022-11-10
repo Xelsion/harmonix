@@ -14,6 +14,7 @@ use system\classes\connections\MsSqlConnection;
 use system\classes\connections\MySqlConnection;
 use system\classes\connections\PostgresConnection;
 use system\classes\Language;
+use system\classes\Login;
 use system\classes\Storage;
 use system\classes\TimeAnalyser;
 use system\classes\Auth;
@@ -109,11 +110,11 @@ class Process {
             };
 
             if( $connection instanceof ADBConnection ) {
-                $connection->_host = $conn["host"];
-                $connection->_port = (int) $conn["port"];
-                $connection->_dbname = $conn["dbname"];
-                $connection->_user = $conn["user"];
-                $connection->_pass = $conn["password"];
+                $connection->host = $conn["host"];
+                $connection->port = (int) $conn["port"];
+                $connection->dbname = $conn["dbname"];
+                $connection->user = $conn["user"];
+                $connection->pass = $conn["password"];
                 Core::$_connection_manager->addConnection($connection);
             }
         }
@@ -129,7 +130,7 @@ class Process {
         //$this->deleteTestData();
 
         // initiate the session
-        $session = new SessionModel();
+        $session = new Login();
         Core::$_actor = $session->start();
 
         // Try to get the responsible route for this requested uri
@@ -165,6 +166,7 @@ class Process {
                 Core::$_response_cache = ResponseCache::getInstance();
 
                 // Always check on these files
+                Core::$_response_cache->addFileCheck(__FILE__);
                 Core::$_response_cache->addFileCheck(PATH_ROOT."lang-de.ini");
                 Core::$_response_cache->addFileCheck(PATH_ROOT."functions.php");
                 Core::$_response_cache->addFileCheck(PATH_ROOT."constants.php");
@@ -200,7 +202,8 @@ class Process {
         $output = $this->_response->getOutput();
         Core::$_analyser->stopTimer("template-parsing");
         $elapsed_time = Core::$_analyser->getTimerElapsedTime("template-parsing");
-        return str_replace("{{build_time}}", round($elapsed_time, 4), $output);
+        $elapsed_time = round($elapsed_time * 1000, 2);
+        return str_replace("{{build_time}}", $elapsed_time."ms",$output);
 	}
 
 

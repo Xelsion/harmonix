@@ -4040,7 +4040,7 @@
         this._templateFactory.changeContent(content);
       } else {
         this._templateFactory = new TemplateFactory({ ...this._config,
-          // the `content` var has to be after `this._config`
+          // the `content` var has to be after `this.config`
           // to override config.content in case of popover
           content,
           extraClass: this._resolvePossibleFunction(this._config.customClass)
@@ -4284,7 +4284,7 @@
 
       config.selector = false;
       config.trigger = 'manual'; // In the future can be replaced with:
-      // const keysWithDifferentValues = Object.entries(this._config).filter(entry => this.constructor.Default[entry[0]] !== this._config[entry[0]])
+      // const keysWithDifferentValues = Object.entries(this.config).filter(entry => this.constructor.Default[entry[0]] !== this.config[entry[0]])
       // `Object.fromEntries(keysWithDifferentValues)`
 
       return config;

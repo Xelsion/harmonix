@@ -21,9 +21,9 @@ use system\exceptions\SystemException;
  */
 class PDOCache {
 
-    private PDOConnection $_pdo;
-    private CacheFile $_cache;
-    private int $_last_modified = 0;
+    private PDOConnection $pdo;
+    private CacheFile $cache;
+    private int $last_modified = 0;
 
     /**
      * The class constructor
@@ -31,9 +31,9 @@ class PDOCache {
      * @param PDOConnection $conn
      */
     public function __construct( PDOConnection $conn ) {
-        $this->_pdo = $conn;
-        $cache_name = $this->_pdo->getFinalizedQuery();
-        $this->_cache = new CacheFile($cache_name);
+        $this->pdo = $conn;
+        $cache_name = $this->pdo->getFinalizedQuery();
+        $this->cache = new CacheFile($cache_name);
     }
 
     /**
@@ -61,7 +61,7 @@ class PDOCache {
             }
             $modified = $last_update->getTimestamp();
         }
-        $this->_last_modified = $modified;
+        $this->last_modified = $modified;
     }
 
     /**
@@ -88,7 +88,7 @@ class PDOCache {
                 }
             }
         }
-        $this->_last_modified = $modified;
+        $this->last_modified = $modified;
     }
 
     /**
@@ -100,21 +100,21 @@ class PDOCache {
      * @throws SystemException
      */
     public function getResults( string $fetch_class = "" ): array {
-        if( $this->_cache->isUpToDate($this->_last_modified) ) {
-            Core::$_analyser->addTimer("PDOCache.getResults", $this->_cache->getFileName());
+        if( $this->cache->isUpToDate($this->last_modified) ) {
+            Core::$_analyser->addTimer("PDOCache.getResults", $this->cache->getFileName());
             Core::$_analyser->startTimer("PDOCache.getResults");
-            $results = unserialize($this->_cache->loadFromCache(), array(false));
+            $results = unserialize($this->cache->loadFromCache(), array(false));
             Core::$_analyser->stopTimer("PDOCache.getResults");
         } else {
-            Core::$_analyser->addTimer("PDOCache.getResults", $this->_pdo->getFinalizedQuery());
+            Core::$_analyser->addTimer("PDOCache.getResults", $this->pdo->getFinalizedQuery());
             Core::$_analyser->startTimer("PDOCache.getResults");
             if( $fetch_class !== "" ) {
-                $results = $this->_pdo->execute()->fetchAll(PDO::FETCH_CLASS, $fetch_class);
+                $results = $this->pdo->execute()->fetchAll(PDO::FETCH_CLASS, $fetch_class);
             } else {
-                $results = $this->_pdo->execute()->fetchAll();
+                $results = $this->pdo->execute()->fetchAll();
             }
             Core::$_analyser->stopTimer("PDOCache.getResults");
-            $this->_cache->saveToCache(serialize($results));
+            $this->cache->saveToCache(serialize($results));
         }
         $elapsed_time = Core::$_analyser->getTimerElapsedTime("PDOCache.getResults");
         $label = Core::$_analyser->getTimerLabel("PDOCache.getResults");

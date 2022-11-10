@@ -19,9 +19,9 @@ use system\exceptions\SystemException;
 class Router {
 
 	// the instance of this class
-	private static ?Router $_instance = null;
+	private static ?Router $instance = null;
 	// the collection of the collected controllers
-	private array $_routes = array();
+	private array $routes = array();
 
     /**
      * The class constructor
@@ -40,10 +40,10 @@ class Router {
 	 * @return Router
 	 */
 	public static function getInstance(): Router {
-		if( static::$_instance === null ) {
-			static::$_instance = new Router();
+		if( static::$instance === null ) {
+			static::$instance = new Router();
 		}
-		return static::$_instance;
+		return static::$instance;
 	}
 
 	/**
@@ -52,7 +52,7 @@ class Router {
 	 * @return array
 	 */
 	public function getRoutes(): array {
-		return $this->_routes;
+		return $this->routes;
 	}
 
     /**
@@ -66,13 +66,13 @@ class Router {
      * @throws SystemException
      */
 	public function addRoute( string $route, string $class, ?string $method = null ): void {
-		if( !isset($this->_routes[$route]) ) {
+		if( !isset($this->routes[$route]) ) {
 			if( is_null($method) ) {
 				$method = "index";
 			}
             $regex = str_replace("/" , "\/", $route);
             $regex = preg_replace("/{.*}/", "([\w|0-9]+)", $regex);
-			$this->_routes[$regex] = array( "controller" => $class, 'method' => $method, 'regex' => $regex );
+			$this->routes[$regex] = array( "controller" => $class, 'method' => $method, 'regex' => $regex );
 		} else {
 			throw new SystemException(__FILE__, __LINE__,"Router: The route [".$route."] is already taken");
 		}
@@ -85,10 +85,10 @@ class Router {
 	 * @return bool
 	 */
 	public function hasRoute( string $route ): bool {
-		if( isset($this->_routes[$route]) ) {
+		if( isset($this->routes[$route]) ) {
 			return true;
 		}
-		$matches = preg_grep("/^".preg_quote($route, '/')."/i", array_keys($this->_routes));
+		$matches = preg_grep("/^".preg_quote($route, '/')."/i", array_keys($this->routes));
 		return count($matches) > 0;
 	}
 
@@ -135,15 +135,15 @@ class Router {
      */
     private function getRouteArray( string $request ): array {
         // first check for static urls
-        if( array_key_exists( addcslashes($request, "/"), $this->_routes ) ) {
-            $entry = $this->_routes[addcslashes($request, "/")];
+        if( array_key_exists( addcslashes($request, "/"), $this->routes ) ) {
+            $entry = $this->routes[addcslashes($request, "/")];
             $controller = new $entry["controller"]();
             $method = $entry["method"];
             return array( "controller" => $controller, "method" => $method, "params" => array() );
         }
 
         // then check for dynamic urls
-        foreach( $this->_routes as $regex => $entry ) {
+        foreach( $this->routes as $regex => $entry ) {
             $matches = array();
             if( preg_match("/^".$regex."$/i", $request, $matches) ) {
                 array_shift($matches);

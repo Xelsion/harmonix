@@ -21,6 +21,7 @@ class Actor extends AEntity {
 
 	// the columns
 	public int $id = 0;
+    public int $type_id = 0;
 	public string $email = "";
 	public string $password = "";
 	public string $first_name = "";
@@ -59,9 +60,10 @@ class Actor extends AEntity {
 	public function create(): void {
         try {
             $pdo = Core::$_connection_manager->getConnection("mvc");
-            $sql = "INSERT INTO actors (email, password, first_name, last_name, login_fails, login_disabled) VALUES (:email, :password, :first_name, :last_name, :login_fails, :login_disabled)";
+            $sql = "INSERT INTO actors (type_id, email, password, first_name, last_name, login_fails, login_disabled) VALUES (:type_id, :email, :password, :first_name, :last_name, :login_fails, :login_disabled)";
             $this->password = StringHelper::getBCrypt($this->password);
             $pdo->prepare($sql);
+            $pdo->bindParam(':type_id', $this->type_id);
             $pdo->bindParam(':email', $this->email);
             $pdo->bindParam(':password', $this->password);
             $pdo->bindParam(':first_name', $this->first_name);

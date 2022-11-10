@@ -14,7 +14,7 @@ class MsSqlConnection extends ADBConnection {
     );
 
     public function getConnectionString(): string {
-        return sprintf("sqlsrv:server=%s;port=%d;Database=%s", $this->_host, $this->_port, $this->_dbname);
+        return sprintf("sqlsrv:server=%s;port=%d;Database=%s", $this->host, $this->port, $this->dbname);
     }
 
     public function getConnectionOptions(): array {

@@ -11,8 +11,8 @@ namespace system\classes;
  */
 class Timer {
 
-    private float $_start;
-    private float $_elapsed_time = 0.0;
+    private float $start;
+    private float $elapsed_time = 0.0;
 
     /**
      * The class constructor
@@ -27,7 +27,7 @@ class Timer {
      * @return void
      */
     public function start(): void {
-        $this->_start = microtime(TRUE);
+        $this->start = microtime(TRUE);
     }
 
     /**
@@ -36,7 +36,7 @@ class Timer {
      * @return void
      */
     public function stop(): void {
-        $this->_elapsed_time += microtime(TRUE) - $this->_start;
+        $this->elapsed_time += microtime(TRUE) - $this->start;
     }
 
     /**
@@ -45,7 +45,7 @@ class Timer {
      * @return float
      */
     public function getElapsedTime(): float {
-        return $this->_elapsed_time;
+        return $this->elapsed_time;
     }
 
 }

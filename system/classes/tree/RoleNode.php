@@ -7,7 +7,7 @@ use models\ActorRoleModel;
 class RoleNode extends TreeNode {
 
     // the target url of this menu item
-    public ?ActorRoleModel $_role = null;
+    public ?ActorRoleModel $role = null;
 
     /**
      * The constructor creates a MenuItem
@@ -16,7 +16,7 @@ class RoleNode extends TreeNode {
      */
     public function __construct( ActorRoleModel $role ) {
         parent::__construct($role->id, $role->child_of, $role->name);
-        $this->_role = $role;
+        $this->role = $role;
     }
 
 }

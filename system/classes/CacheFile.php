@@ -22,7 +22,7 @@ class CacheFile extends File {
 
     // the age of the cache file
     private DateTime $cache_age;
-    private bool $_encrypt;
+    private bool $encrypt;
 
     /**
      * The constructor
@@ -37,7 +37,7 @@ class CacheFile extends File {
      */
     public function __construct( string $file_name = "", string $hash = "" ) {
         $cache_setting = Core::$_configuration->getSection("cache");
-        $this->_encrypt = $cache_setting["encryption"];
+        $this->encrypt = $cache_setting["encryption"];
 
         if( $file_name !== "" ) {
             $file_name = str_replace("::", "/", $file_name);
@@ -47,11 +47,11 @@ class CacheFile extends File {
             $dir_part = PATH_CACHE_ROOT. $path_infos["dirname"] . DIRECTORY_SEPARATOR
                 . $path_infos["filename"] . DIRECTORY_SEPARATOR
                 . Core::$_actor->id . DIRECTORY_SEPARATOR;
-            $cache_file = $dir_part . (int)$this->_encrypt."_".md5($hash) . ".cache";
+            $cache_file = $dir_part . (int)$this->encrypt."_".md5($hash) . ".cache";
 
             parent::__construct($cache_file);
             $this->cache_age = new DateTime();
-            if( file_exists($this->_file_path) ) {
+            if( file_exists($this->file_path) ) {
                 $this->cache_age->setTimestamp(filemtime($cache_file));
             } else {
                 $this->cache_age->setTimestamp(0);
@@ -68,7 +68,7 @@ class CacheFile extends File {
     public function load( string $cache_file ): void {
         parent::__construct($cache_file);
         $this->cache_age = new DateTime();
-        if( file_exists($this->_file_path) ) {
+        if( file_exists($this->file_path) ) {
             $creation_time = filectime($cache_file);
             $modification_time = filemtime($cache_file);
             $time = ( $modification_time > $creation_time ) ? $modification_time : $creation_time;
@@ -86,7 +86,7 @@ class CacheFile extends File {
      * @return bool
      */
     public function isUpToDate( int $timestamp ): bool {
-        if( !file_exists($this->_file_path) ) {
+        if( !file_exists($this->file_path) ) {
             return false;
         }
         $data_age = new DateTime();
@@ -109,7 +109,7 @@ class CacheFile extends File {
      * @throws SystemException
      */
     public function saveToCache( string $content ): void {
-        if( $this->_encrypt ) {
+        if( $this->encrypt ) {
             $this->setContent(StringHelper::encrypt($content));
         } else {
             $this->setContent($content);
@@ -124,7 +124,7 @@ class CacheFile extends File {
      * @return string
      */
     public function loadFromCache(): string {
-        if( $this->_encrypt ) {
+        if( $this->encrypt ) {
             return StringHelper::decrypt($this->getContent());
         }
         return $this->getContent();

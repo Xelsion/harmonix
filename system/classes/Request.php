@@ -12,11 +12,11 @@ namespace system\classes;
 class Request {
 
 	// The instance of this class
-	private static ?Request $_request = null;
-    private string $_request_uri;
+	private static ?Request $request = null;
+    private string $request_uri;
 
 	// GET, POST & FILES data from the request
-	private array $_form;
+	private array $form;
 
 	/**
 	 * The class constructor
@@ -24,15 +24,15 @@ class Request {
 	 * calls the method initController()
 	 */
 	private function __construct() {
-        $this->_request_uri = $_SERVER["REQUEST_URI"];
+        $this->request_uri = $_SERVER["REQUEST_URI"];
 		foreach( $_GET as $key => $value ) {
-			$this->_form[$key] = $value;
+			$this->form[$key] = $value;
 		}
 		foreach( $_POST as $key => $value ) {
-			$this->_form[$key] = $value;
+			$this->form[$key] = $value;
 		}
 		foreach( $_FILES as $key => $value ) {
-			$this->_form[$key] = $value;
+			$this->form[$key] = $value;
 		}
 	}
 
@@ -42,10 +42,10 @@ class Request {
 	 * @return Request
 	 */
 	public static function getInstance(): Request {
-		if( static::$_request === null ) {
-			static::$_request = new Request();
+		if( static::$request === null ) {
+			static::$request = new Request();
 		}
-		return static::$_request;
+		return static::$request;
 	}
 
     /**
@@ -55,7 +55,7 @@ class Request {
      * @return void
      */
     public function setRequestUri( string $uri ): void {
-        $this->_request_uri = $uri;
+        $this->request_uri = $uri;
     }
 
 	/**
@@ -64,7 +64,7 @@ class Request {
 	 * @return string
 	 */
 	public function getRequestUri(): string {
-		return $this->_request_uri;
+		return $this->request_uri;
 	}
 
 	/**
@@ -91,7 +91,7 @@ class Request {
 	 * @return array
 	 */
 	public function getAll(): array {
-		return $this->_form;
+		return $this->form;
 	}
 
 	/**
@@ -100,7 +100,7 @@ class Request {
 	 *
 	 */
 	public function get( string $key ) {
-		return $this->_form[$key] ?? null;
+		return $this->form[$key] ?? null;
 	}
 
 	/**

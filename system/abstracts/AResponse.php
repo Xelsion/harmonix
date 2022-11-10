@@ -11,7 +11,7 @@ namespace system\abstracts;
 abstract class AResponse {
 
 	// The output content
-	private string $_output;
+	private string $output;
 
 	/**
 	 * Sets the output content of the response
@@ -19,7 +19,7 @@ abstract class AResponse {
 	 * @param string $output
 	 */
 	public function setOutput( string $output ): void {
-		$this->_output = $output;
+		$this->output = $output;
 	}
 
 	/**
@@ -28,7 +28,7 @@ abstract class AResponse {
 	 * @return string
 	 */
 	public function getOutput(): string {
-		return $this->_output;
+		return $this->output;
 	}
 
     /**

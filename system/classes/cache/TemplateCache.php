@@ -22,9 +22,9 @@ use system\exceptions\SystemException;
  */
 class TemplateCache {
 
-    private Template $_tpl;
-    public CacheFile $_cache;
-    private int $_last_modified;
+    private Template $tpl;
+    public CacheFile $cache;
+    private int $last_modified;
 
     /**
      * The class constructor
@@ -33,8 +33,8 @@ class TemplateCache {
      * @param ...$param - 0 to many arguments that will be added to the cache filename
      */
     public function __construct(Template $tpl, ...$param) {
-        $this->_tpl = $tpl;
-        $this->_cache = new CacheFile($tpl->getFilePath() . implode("-", $param));
+        $this->tpl = $tpl;
+        $this->cache = new CacheFile($tpl->getFilePath() . implode("-", $param));
     }
 
     /**
@@ -64,7 +64,7 @@ class TemplateCache {
             }
             $modified = $last_update->getTimestamp();
         }
-        $this->_last_modified = $modified;
+        $this->last_modified = $modified;
     }
 
     /**
@@ -77,7 +77,7 @@ class TemplateCache {
      * @throws SystemException
      */
     public function saveContent(string $content): void {
-        $this->_cache->saveToCache($content);
+        $this->cache->saveToCache($content);
     }
 
     /**
@@ -86,7 +86,7 @@ class TemplateCache {
      * @return string
      */
     public function getContent(): string {
-        return $this->_cache->getContent();
+        return $this->cache->getContent();
     }
 
     /**
@@ -95,10 +95,10 @@ class TemplateCache {
      * @return bool
      */
     public function isUpToDate(): bool {
-        $f = new File($this->_tpl->getFilePath());
+        $f = new File($this->tpl->getFilePath());
         $tpl_age = $f->getLastModified();
-        $cache_age = $this->_cache->getLastModified();
-        return ($cache_age > $tpl_age && $cache_age > $this->_last_modified && $this->_cache->exists());
+        $cache_age = $this->cache->getLastModified();
+        return ($cache_age > $tpl_age && $cache_age > $this->last_modified && $this->cache->exists());
     }
 
 }

@@ -39,7 +39,7 @@ class ConnectionManager {
      * @param ADBConnection $conn
      */
 	public function addConnection( ADBConnection $conn ): void {
-        $this->_connections[$conn->_dbname] = $conn;
+        $this->_connections[$conn->dbname] = $conn;
 	}
 
     /**

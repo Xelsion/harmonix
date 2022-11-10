@@ -12,7 +12,7 @@ namespace system\classes;
 class TimeAnalyser {
 
     /* The timers */
-    private array $_timers = array();
+    private array $timers = array();
 
     /**
      * The class constructor
@@ -30,7 +30,7 @@ class TimeAnalyser {
      * @return void
      */
     public function addTimer(string $key, string $label = ""): void {
-        $this->_timers[$key] = array(
+        $this->timers[$key] = array(
             "label" => $label,
             "timer" => new Timer()
         );
@@ -44,7 +44,7 @@ class TimeAnalyser {
      * @return Timer|null
      */
     public function getTimer(string $key): ?Timer {
-        return $this->_timers[$key] ?? null;
+        return $this->timers[$key] ?? null;
     }
 
     /**
@@ -53,7 +53,7 @@ class TimeAnalyser {
      * @return array
      */
     public function getTimers(): array {
-        return $this->_timers;
+        return $this->timers;
     }
 
     /**
@@ -64,8 +64,8 @@ class TimeAnalyser {
      * @return bool
      */
     public function startTimer(string $key): bool {
-        if( array_key_exists($key, $this->_timers) ) {
-            $this->_timers[$key]["timer"]->start();
+        if( array_key_exists($key, $this->timers) ) {
+            $this->timers[$key]["timer"]->start();
             return true;
         }
         return false;
@@ -79,8 +79,8 @@ class TimeAnalyser {
      * @return bool
      */
     public function stopTimer( string $key ): bool {
-        if( array_key_exists($key, $this->_timers) ) {
-            $this->_timers[$key]["timer"]->stop();
+        if( array_key_exists($key, $this->timers) ) {
+            $this->timers[$key]["timer"]->stop();
             return true;
         }
         return false;
@@ -94,8 +94,8 @@ class TimeAnalyser {
      * @return float
      */
     public function getTimerElapsedTime(string $key): float {
-        if( array_key_exists($key, $this->_timers) ) {
-            return $this->_timers[$key]["timer"]->getElapsedTime();
+        if( array_key_exists($key, $this->timers) ) {
+            return $this->timers[$key]["timer"]->getElapsedTime();
         }
         return 0.0;
     }
@@ -108,8 +108,8 @@ class TimeAnalyser {
      * @return string
      */
     public function getTimerLabel(string $key): string {
-        if( array_key_exists($key, $this->_timers) ) {
-            return $this->_timers[$key]["label"];
+        if( array_key_exists($key, $this->timers) ) {
+            return $this->timers[$key]["label"];
         }
         return "";
     }

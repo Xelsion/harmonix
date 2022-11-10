@@ -12,9 +12,9 @@ namespace system\classes;
 class Configuration {
 
 	// the instance of this class
-	private static ?Configuration $_instance = null;
+	private static ?Configuration $instance = null;
 	// an array holding all configurations
-	private array $_config;
+	private array $config;
 
 	/**
 	 * The class constructor
@@ -22,7 +22,7 @@ class Configuration {
 	 * Parses the {configuration}.ini
 	 */
 	private function __construct() {
-		$this->_config = parse_ini_file(PATH_ROOT."application.ini", true);
+		$this->config = parse_ini_file(PATH_ROOT."application.ini", true);
 	}
 
 	/**
@@ -31,10 +31,10 @@ class Configuration {
 	 * @return Configuration
 	 */
 	public static function getInstance(): Configuration {
-		if( static::$_instance === null ) {
-			static::$_instance = new Configuration();
+		if( static::$instance === null ) {
+			static::$instance = new Configuration();
 		}
-		return static::$_instance;
+		return static::$instance;
 	}
 
 	/**
@@ -43,7 +43,7 @@ class Configuration {
 	 * @return array
 	 */
 	public function getConfig(): array {
-		return $this->_config;
+		return $this->config;
 	}
 
 	/**
@@ -53,7 +53,7 @@ class Configuration {
 	 * @return array
 	 */
 	public function getSection( string $name ): array {
-		return $this->_config[$name] ?? array();
+		return $this->config[$name] ?? array();
 	}
 
     /**

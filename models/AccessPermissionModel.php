@@ -17,7 +17,7 @@ use system\exceptions\SystemException;
  */
 class AccessPermissionModel extends entities\AccessPermission {
 
-	private ?ActorRoleModel $_role = null;
+	private ?ActorRoleModel $role = null;
 
 	/**
 	 * The class constructor
@@ -29,7 +29,7 @@ class AccessPermissionModel extends entities\AccessPermission {
 	public function __construct() {
 		parent::__construct();
 		if( $this->role_id > 0 ) {
-			$this->_role = new ActorRoleModel( $this->role_id );
+			$this->role = new ActorRoleModel( $this->role_id );
 		}
 	}
 
@@ -98,6 +98,6 @@ class AccessPermissionModel extends entities\AccessPermission {
 	 * @return ActorRoleModel|null
 	 */
 	public function getRole(): ?ActorRoleModel {
-		return $this->_role;
+		return $this->role;
 	}
 }

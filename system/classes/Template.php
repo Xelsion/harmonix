@@ -12,7 +12,7 @@ use system\exceptions\SystemException;
  */
 class Template extends TemplateData {
 
-	private string $_file_path;
+	private string $file_path;
 
 	/**
 	 * The constructor
@@ -27,7 +27,7 @@ class Template extends TemplateData {
 		if( !file_exists($file_path) ) {
 			throw new SystemException( __FILE__, __LINE__, "Template: file[".$file_path."] not found!");
 		}
-		$this->_file_path = $file_path;
+		$this->file_path = $file_path;
 	}
 
     /**
@@ -36,7 +36,7 @@ class Template extends TemplateData {
      * @return string
      */
     public function getFilePath(): string {
-        return $this->_file_path;
+        return $this->file_path;
     }
 
 	/**
@@ -46,7 +46,7 @@ class Template extends TemplateData {
 	 */
 	public function parse(): string {
 		ob_start();
-		require( $this->_file_path );
+		require( $this->file_path );
 		return ob_get_clean();
 	}
 }

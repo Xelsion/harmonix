@@ -14,7 +14,7 @@ class PostgresConnection extends ADBConnection {
     );
 
     public function getConnectionString(): string {
-        return sprintf("pgsql:host=%s;port=%d;dbname=%s", $this->_host, $this->_port, $this->_dbname);
+        return sprintf("pgsql:host=%s;port=%d;dbname=%s", $this->host, $this->port, $this->dbname);
     }
 
     public function getConnectionOptions(): array {

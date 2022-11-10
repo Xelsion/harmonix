@@ -11,9 +11,9 @@ class ResponseCache {
 
     private static ?ResponseCache $_instance = null;
 
-    private CacheFile $_cache;
-    private array $_db_checks = array();
-    private array $_file_checks = array();
+    private CacheFile $cache;
+    private array $db_checks = array();
+    private array $file_checks = array();
 
     /**
      */
@@ -40,14 +40,14 @@ class ResponseCache {
                 $entries[] = (string)$p;
             }
         }
-        $this->_cache = new CacheFile( $cache_name, implode("-", $entries) );
+        $this->cache = new CacheFile( $cache_name, implode("-", $entries) );
     }
 
     /**
      * @return string
      */
     public function getContent(): string {
-        return $this->_cache->getContent();
+        return $this->cache->getContent();
     }
 
     /**
@@ -58,7 +58,7 @@ class ResponseCache {
      * @throws SystemException
      */
     public function saveContent( string $content ): void {
-        $this->_cache->saveToCache($content);
+        $this->cache->saveToCache($content);
     }
 
     /**
@@ -68,10 +68,10 @@ class ResponseCache {
      * @return void
      */
     public function addDBCheck( $db_name, $table_name ): void {
-        if( array_key_exists($db_name, $this->_db_checks) && in_array($table_name, $this->_db_checks[$db_name], TRUE) ) {
+        if( array_key_exists($db_name, $this->db_checks) && in_array($table_name, $this->db_checks[$db_name], TRUE) ) {
             return;
         }
-        $this->_db_checks[$db_name][] = $table_name;
+        $this->db_checks[$db_name][] = $table_name;
     }
 
     /**
@@ -80,10 +80,10 @@ class ResponseCache {
      * @return void
      */
     public function addFileCheck( $file_name ): void {
-        if( in_array($file_name, $this->_file_checks, TRUE) ) {
+        if( in_array($file_name, $this->file_checks, TRUE) ) {
             return;
         }
-        $this->_file_checks[] = $file_name;
+        $this->file_checks[] = $file_name;
     }
 
     /**
@@ -103,11 +103,11 @@ class ResponseCache {
      *
      */
     private function doDBCheck(): bool {
-        foreach( $this->_db_checks as $dbname => $tables ) {
+        foreach( $this->db_checks as $dbname => $tables ) {
             $pdo = Core::$_connection_manager->getConnection($dbname);
             foreach( $tables as $table_name ) {
                 $table_time = $pdo->getModificationTimeOfTable($table_name);
-                if( !$this->_cache->isUpToDate($table_time) ) {
+                if( !$this->cache->isUpToDate($table_time) ) {
                     return false;
                 }
             }
@@ -119,8 +119,8 @@ class ResponseCache {
      * @return bool
      */
     private function doFileChecks(): bool {
-        $cache_time = $this->_cache->getLastModified();
-        foreach( $this->_file_checks as $file_name ) {
+        $cache_time = $this->cache->getLastModified();
+        foreach( $this->file_checks as $file_name ) {
             $file = new File($file_name);
             $file_time = $file->getLastModified();
             if( $file_time > $cache_time ) {
