@@ -3,18 +3,15 @@
 namespace controller\www;
 
 use JsonException;
-
-
+use models\ActorModel;
 use system\abstracts\AController;
 use system\abstracts\AResponse;
 use system\classes\responses\HtmlResponse;
 use system\classes\Router;
 use system\classes\Template;
-use system\Core;
 use system\exceptions\SystemException;
-
-use models\ActorModel;
 use system\helper\RequestHelper;
+use system\System;
 
 class TestController extends AController {
 
@@ -29,10 +26,10 @@ class TestController extends AController {
         }
 
         // Add MenuItems to the Menu
-        $this::$_menu->insertMenuItem(200, null, "Tests", "/tests");
-        $this::$_menu->insertMenuItem(210, 200, "Actors", "/tests/actors");
-        $this::$_menu->insertMenuItem(220, 200, "Charts", "/tests/charts");
-	    $this::$_menu->insertMenuItem(230, 200, "TinyMCE", "/tests/tinymce");
+        System::$Core->menu->insertMenuItem(200, null, "Tests", "/tests");
+        System::$Core->menu->insertMenuItem(210, 200, "Actors", "/tests/actors");
+        System::$Core->menu->insertMenuItem(220, 200, "Charts", "/tests/charts");
+        System::$Core->menu->insertMenuItem(230, 200, "TinyMCE", "/tests/tinymce");
     }
 
     /**
@@ -83,7 +80,7 @@ class TestController extends AController {
         $response = new HtmlResponse();
         $params = RequestHelper::getPaginationParams();
 
-        $cache = Core::$_response_cache;
+        $cache = System::$Core->response_cache;
         $cache->initCacheFor(__METHOD__, ...$params);
         $cache->addFileCheck(__FILE__);
         $cache->addFileCheck(PATH_VIEWS."template.html");

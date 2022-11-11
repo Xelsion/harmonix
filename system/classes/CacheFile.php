@@ -3,10 +3,9 @@
 namespace system\classes;
 
 use DateTime;
-
-use system\Core;
-use system\helper\StringHelper;
 use system\exceptions\SystemException;
+use system\helper\StringHelper;
+use system\System;
 
 /**
  * The CacheFile
@@ -36,7 +35,7 @@ class CacheFile extends File {
      * @param string $hash
      */
     public function __construct( string $file_name = "", string $hash = "" ) {
-        $cache_setting = Core::$_configuration->getSection("cache");
+        $cache_setting = System::$Core->configuration->getSection("cache");
         $this->encrypt = $cache_setting["encryption"];
 
         if( $file_name !== "" ) {
@@ -46,7 +45,7 @@ class CacheFile extends File {
             // build the cache file name
             $dir_part = PATH_CACHE_ROOT. $path_infos["dirname"] . DIRECTORY_SEPARATOR
                 . $path_infos["filename"] . DIRECTORY_SEPARATOR
-                . Core::$_actor->id . DIRECTORY_SEPARATOR;
+                . System::$Core->actor->id . DIRECTORY_SEPARATOR;
             $cache_file = $dir_part . (int)$this->encrypt."_".md5($hash) . ".cache";
 
             parent::__construct($cache_file);

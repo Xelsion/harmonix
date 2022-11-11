@@ -2,11 +2,13 @@
 
 namespace controller\admin;
 
-use system\abstracts\AResponse;
 use system\abstracts\AController;
+use system\abstracts\AResponse;
 use system\classes\responses\HtmlResponse;
 use system\classes\Router;
 use system\classes\Template;
+use system\System;
+
 
 /**
  * @see \system\abstracts\AController
@@ -27,7 +29,7 @@ class CacheFileController extends AController {
 		}
 
 		// Add MenuItems to the Menu
-		$this::$_menu->insertMenuItem(600, null, "Cache Files", "/cache");
+        System::$Core->menu->insertMenuItem(600, null, "Cache Files", "/cache");
 	}
 
 	/**
@@ -54,7 +56,7 @@ class CacheFileController extends AController {
         $view_content = $view->parse();
 
         $template = new Template(PATH_VIEWS."template.html");
-		$template->set("navigation", $this::$_menu);
+		$template->set("navigation", System::$Core->menu);
 		$template->set("view", $view_content);
 		$response->setOutput($template->parse());
 		return $response;

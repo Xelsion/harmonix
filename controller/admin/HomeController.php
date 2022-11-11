@@ -2,12 +2,13 @@
 
 namespace controller\admin;
 
-use system\abstracts\AResponse;
 use system\abstracts\AController;
+use system\abstracts\AResponse;
 use system\classes\responses\HtmlResponse;
 use system\classes\Router;
 use system\classes\Template;
 use system\exceptions\SystemException;
+use system\System;
 
 /**
  * @see \system\abstracts\AController
@@ -30,7 +31,7 @@ class HomeController extends AController {
         }
 
 		// Add MenuItems to the Menu
-        $this::$_menu->insertMenuItem(100, null, "Home", "/");
+        System::$Core->menu->insertMenuItem(100, null, "Home", "/");
 	}
 
     /**
@@ -48,7 +49,7 @@ class HomeController extends AController {
 	public function index(): AResponse {
 		$response = new HtmlResponse();
 		$template = new Template(PATH_VIEWS."template.html");
-		$template->set("navigation", $this::$_menu);
+		$template->set("navigation", System::$Core->menu);
 		$template->set("view", new Template(PATH_VIEWS."home/index.html"));
 		$response->setOutput($template->parse());
 		return $response;

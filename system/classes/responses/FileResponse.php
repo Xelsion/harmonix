@@ -4,6 +4,13 @@ namespace system\classes\responses;
 
 use system\abstracts\AResponse;
 
+/**
+ * The FileResponse class
+ * This class will handle responses of type file
+ *
+ * @author Markus Schröder <xelsion@gmail.com>
+ * @version 1.0.0;
+ */
 class FileResponse extends AResponse {
 
     // the default status for html status headers

@@ -5,7 +5,6 @@ namespace system\manager;
 use JsonException;
 use PDOException;
 use RuntimeException;
-
 use system\abstracts\ADBConnection;
 use system\classes\PDOConnection;
 use system\exceptions\SystemException;

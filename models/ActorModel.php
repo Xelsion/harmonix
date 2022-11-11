@@ -2,12 +2,11 @@
 
 namespace models;
 
-use PDO;
 use JsonException;
-
-use system\Core;
-use system\helper\SqlHelper;
+use PDO;
 use system\exceptions\SystemException;
+use system\helper\SqlHelper;
+use system\System;
 
 /**
  * The ActorModel
@@ -60,7 +59,7 @@ class ActorModel extends entities\Actor {
      */
 	public static function find( array $conditions = array(), ?string $order = "", ?string $direction = "asc", int $limit = 0, int $page = 1 ): array {
         $results = array();
-        $pdo = Core::$_connection_manager->getConnection("mvc");
+        $pdo = System::$Core->connection_manager->getConnection("mvc");
         if( !is_null($pdo) ) {
             $params = array();
 
@@ -86,7 +85,7 @@ class ActorModel extends entities\Actor {
                 $params["offset"] = $offset;
             }
 
-            $pdo->prepare($query);
+            $pdo->prepareQuery($query);
             foreach( $params as $key => $value ) {
                 $pdo->bindParam(":" . $key, $value, SqlHelper::getParamType($value));
             }
@@ -110,8 +109,8 @@ class ActorModel extends entities\Actor {
             $actor = new ActorModel($actor_id);
             return ( $actor->type_id === 1 );
         }
-        if( Core::$_actor->id > 0 ) {
-            return (Core::$_actor->type_id === 1);
+        if( System::$Core->actor->id > 0 ) {
+            return (System::$Core->actor->type_id === 1);
         }
         return false;
     }
@@ -123,7 +122,7 @@ class ActorModel extends entities\Actor {
      * @return int
      */
     public static function getNumActors(): int {
-        return Core::$_connection_manager->getConnection("mvc")->getNumRowsOfTable("actors");
+        return System::$Core->connection_manager->getConnection("mvc")->getNumRowsOfTable("actors");
     }
 
     /**
@@ -183,9 +182,9 @@ class ActorModel extends entities\Actor {
      * @throws JsonException
      */
     public function deletePermissions() : bool {
-        $pdo = Core::$_connection_manager->getConnection("mvc");
+        $pdo = System::$Core->connection_manager->getConnection("mvc");
         if( $this->id > 0 ) {
-            $pdo->prepare("DELETE FROM access_permissions WHERE actor_id=:actor_id");
+            $pdo->prepareQuery("DELETE FROM access_permissions WHERE actor_id=:actor_id");
             $pdo->bindParam(':actor_id', $this->id, PDO::PARAM_INT);
             $pdo->execute();
             return true;

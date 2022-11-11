@@ -4,6 +4,13 @@ namespace system\classes\responses;
 
 use system\abstracts\AResponse;
 
+/**
+ * The JsonResponse class
+ * This class will handle responses in JSON format
+ *
+ * @author Markus Schröder <xelsion@gmail.com>
+ * @version 1.0.0;
+ */
 class JsonResponse extends AResponse {
     // the default status for html status headers
     public int $status_code = 200;

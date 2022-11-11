@@ -44,7 +44,7 @@ class ErrorController extends AController {
 	public function index(): AResponse {
 		$response = new HtmlResponse();
 		$template = new Template(PATH_VIEWS."template.html");
-		$template->set("navigation", $this::$_menu);
+		$template->set("navigation", System::$Core->menu);
 		$template->set("view", new Template(PATH_VIEWS."home/index.html"));
 		$response->setOutput($template->parse());
 		return $response;
@@ -57,7 +57,7 @@ class ErrorController extends AController {
 		$response = new HtmlResponse();
 		$response->status_code = $error_code;
 		$template = new Template(PATH_VIEWS."template.html");
-		$template->set("navigation", $this::$_menu);
+		$template->set("navigation", System::$Core->menu);
 		$template->set("view", new Template(PATH_VIEWS."error/".$error_code.".html"));
 		$response->setOutput($template->parse());
 		return $response;

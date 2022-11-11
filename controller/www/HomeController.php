@@ -2,12 +2,14 @@
 
 namespace controller\www;
 
-use system\abstracts\AResponse;
 use system\abstracts\AController;
+use system\abstracts\AResponse;
 use system\classes\responses\HtmlResponse;
 use system\classes\Router;
 use system\classes\Template;
 use system\exceptions\SystemException;
+use system\System;
+
 
 /**
  * @author Markus Schröder <xelsion@gmail.com>
@@ -27,7 +29,7 @@ class HomeController extends AController {
         }
 
         // Add MenuItems to the Menu
-        $this::$_menu->insertMenuItem(100, null, "Home", "/");
+        System::$Core->menu->insertMenuItem(100, null, "Home", "/");
 	}
 
     /**

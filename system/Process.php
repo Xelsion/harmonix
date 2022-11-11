@@ -1,33 +1,30 @@
 <?php
-
 namespace system;
 
 use Exception;
 use JsonException;
 use ReflectionException;
-
-use system\abstracts\ADBConnection;
 use system\abstracts\AController;
+use system\abstracts\ADBConnection;
 use system\abstracts\AResponse;
+use system\classes\Auth;
 use system\classes\cache\ResponseCache;
+use system\classes\Configuration;
 use system\classes\connections\MsSqlConnection;
 use system\classes\connections\MySqlConnection;
 use system\classes\connections\PostgresConnection;
-use system\classes\Language;
-use system\classes\Login;
-use system\classes\Storage;
-use system\classes\TimeAnalyser;
-use system\classes\Auth;
 use system\classes\GarbageCollector;
-use system\classes\tree\RoleTree;
-use system\classes\tree\Menu;
-use system\classes\Configuration;
+use system\classes\Language;
 use system\classes\Logger;
+use system\classes\Login;
 use system\classes\Request;
 use system\classes\Router;
-use system\manager\ConnectionManager;
-use system\helper\StringHelper;
+use system\classes\TimeAnalyser;
+use system\classes\tree\Menu;
+use system\classes\tree\RoleTree;
 use system\exceptions\SystemException;
+use system\helper\StringHelper;
+use system\manager\ConnectionManager;
 
 /**
  * The Process class of type singleton
@@ -50,14 +47,19 @@ class Process {
      * Initiates all important core objects
 	 */
 	private function __construct() {
-        Core::$_storage = new Storage();
-		Core::$_configuration = Configuration::getInstance();
-		Core::$_debugger = new Logger("debug");
-		Core::$_connection_manager = new ConnectionManager();
-		Core::$_request = Request::getInstance();
-		Core::$_menu = new Menu();
-		Core::$_router = Router::getInstance();
-        Core::$_lang = Language::getInstance();
+        // init system
+        System::$Core = Core::getInstance();
+        System::$Storage = new Storage();
+
+        // init system core classes
+        System::$Core->configuration = Configuration::getInstance();
+        System::$Core->debugger = new Logger("debug");
+        System::$Core->connection_manager = new ConnectionManager();
+        System::$Core->request = Request::getInstance();
+        System::$Core->menu = new Menu();
+        System::$Core->router = Router::getInstance();
+        System::$Core->lang = Language::getInstance();
+        System::$Core->analyser = new TimeAnalyser();
 	}
 
 	/**
@@ -81,24 +83,22 @@ class Process {
      */
 	public function start(): void {
         // Initiate general settings
-        $environment = Core::$_configuration->getSectionValue("system", "environment");
-        $debug = Core::$_configuration->getSectionValue($environment, "debug");
-        Core::$_storage::set("debug_mode", (bool)$debug);
+        $environment = System::$Core->configuration->getSectionValue("system", "environment");
+        $debug = System::$Core->configuration->getSectionValue($environment, "debug");
+        System::$Storage::set("debug_mode", (bool)$debug);
 
-        Core::$_analyser = new TimeAnalyser();
-
-        if( Core::$_storage::get("debug_mode") ) {
-            Core::$_analyser->addTimer("template-parsing");
-            Core::$_analyser->startTimer("template-parsing");
+        if( System::$Storage::get("debug_mode") ) {
+            System::$Core->analyser->addTimer("template-parsing");
+            System::$Core->analyser->startTimer("template-parsing");
         }
 
         // Initiate session cookie settings
-        $cookie = Core::$_configuration->getSection("cookie");
+        $cookie = System::$Core->configuration->getSection("cookie");
         ini_set('session.cookie_domain', $cookie["domain"]);
         session_start();
 
         // Initiate database connections
-        $connections = Core::$_configuration->getSection("connections");
+        $connections =  System::$Core->configuration->getSection("connections");
         foreach( $connections as $conn ) {
             $connection = match ( $conn["type"] ) {
                 "postgres" => new PostgresConnection(),
@@ -113,7 +113,7 @@ class Process {
                 $connection->dbname = $conn["dbname"];
                 $connection->user = $conn["user"];
                 $connection->pass = $conn["password"];
-                Core::$_connection_manager->addConnection($connection);
+                System::$Core->connection_manager->addConnection($connection);
             }
         }
 
@@ -122,26 +122,26 @@ class Process {
         $gc->clean();
 
         // initiate actor roles tree
-        Core::$_role_tree = RoleTree::getInstance();
+        System::$Core->role_tree = RoleTree::getInstance();
 
         //$this->generateTestData();
         //$this->deleteTestData();
 
         // initiate the session
         $session = new Login();
-        Core::$_actor = $session->start();
+        System::$Core->actor = $session->start();
 
         // Try to get the responsible route for this requested uri
         try {
-            $route = Core::$_router->getRoute(Core::$_request);
+            $route = System::$Core->router->getRoute(System::$Core->request);
             if( empty($route) ) { // no route found
-                Core::$_request->setRequestUri("/error/404");
-                $route = Core::$_router->getRoute(Core::$_request);
+                System::$Core->request->setRequestUri("/error/404");
+                $route = System::$Core->router->getRoute(System::$Core->request);
             }
         } catch( Exception $e ) { // route was found but with mismatching arguments
-            Core::$_storage::set("message", $e->getMessage());
-            Core::$_request->setRequestUri("/error/400");
-            $route = Core::$_router->getRoute(Core::$_request);
+            System::$Storage::set("message", $e->getMessage());
+            System::$Core->request->setRequestUri("/error/400");
+            $route = System::$Core->router->getRoute(System::$Core->request);
         }
 
         // Get the controller
@@ -154,29 +154,29 @@ class Process {
             $params = $route["params"];
 
             // Set the actor role for the current request
-            Core::$_actor_role = Core::$_actor->getRole(get_class($controller), $method);
+            System::$Core->actor_role = System::$Core->actor->getRole(get_class($controller), $method);
 
             // Set the Authentication class
-            Core::$_auth = new Auth();
+            System::$Core->auth = new Auth();
 
             // Has the current actor access to this request?
-            if( Core::$_auth->hasAccess() ) {
-                Core::$_response_cache = ResponseCache::getInstance();
+            if( System::$Core->auth->hasAccess() ) {
+                System::$Core->response_cache = ResponseCache::getInstance();
 
                 // Always check on these files
-                Core::$_response_cache->addFileCheck(__FILE__);
-                Core::$_response_cache->addFileCheck(PATH_ROOT."lang-de.ini");
-                Core::$_response_cache->addFileCheck(PATH_ROOT."functions.php");
-                Core::$_response_cache->addFileCheck(PATH_ROOT."constants.php");
-                Core::$_response_cache->addFileCheck(PATH_SYSTEM."helper/HtmlHelper.php");
-                Core::$_response_cache->addFileCheck(PATH_SYSTEM."helper/RequestHelper.php");
-                Core::$_response_cache->addFileCheck(PATH_SYSTEM."helper/StringHelper.php");
+                System::$Core->response_cache->addFileCheck(__FILE__);
+                System::$Core->response_cache->addFileCheck(PATH_ROOT."lang-de.ini");
+                System::$Core->response_cache->addFileCheck(PATH_ROOT."functions.php");
+                System::$Core->response_cache->addFileCheck(PATH_ROOT."constants.php");
+                System::$Core->response_cache->addFileCheck(PATH_SYSTEM."helper/HtmlHelper.php");
+                System::$Core->response_cache->addFileCheck(PATH_SYSTEM."helper/RequestHelper.php");
+                System::$Core->response_cache->addFileCheck(PATH_SYSTEM."helper/StringHelper.php");
 
                 // Always check on these tables
-                Core::$_response_cache->addDBCheck("mvc", "actors");
-                Core::$_response_cache->addDBCheck("mvc", "actor_roles");
-                Core::$_response_cache->addDBCheck("mvc", "access_permissions");
-                Core::$_response_cache->addDBCheck("mvc", "access_restrictions");
+                System::$Core->response_cache->addDBCheck("mvc", "actors");
+                System::$Core->response_cache->addDBCheck("mvc", "actor_roles");
+                System::$Core->response_cache->addDBCheck("mvc", "access_permissions");
+                System::$Core->response_cache->addDBCheck("mvc", "access_restrictions");
 
                 // Get the Response obj from the controller
                 $this->_response = $controller->$method(...$params);
@@ -186,7 +186,7 @@ class Process {
             }
         } else {
             // No valid controller found
-            throw new SystemException(__FILE__, __LINE__, "Controller for request ".Core::$_request->getRequestUri()." cant be found!");
+            throw new SystemException(__FILE__, __LINE__, "Controller for request ".System::$Core->request->getRequestUri()." cant be found!");
         }
 
 	}
@@ -198,8 +198,8 @@ class Process {
 	 */
     public function getResult(): string {
         $output = $this->_response->getOutput();
-        Core::$_analyser->stopTimer("template-parsing");
-        $elapsed_time = Core::$_analyser->getTimerElapsedTime("template-parsing");
+        System::$Core->analyser->stopTimer("template-parsing");
+        $elapsed_time = System::$Core->analyser->getTimerElapsedTime("template-parsing");
         $elapsed_time = round($elapsed_time * 1000, 2);
         return str_replace("{{build_time}}", $elapsed_time."ms",$output);
 	}
@@ -216,8 +216,8 @@ class Process {
                 $last_name = StringHelper::getRandomString();
                 $password = StringHelper::getRandomString();
 
-                $pdo = Core::$_connection_manager->getConnection("mvc");
-                $pdo->prepare("INSERT INTO actors (email, first_name, last_name, password) VALUES (:email, :first_name, :last_name, :password)");
+                $pdo = System::$Core->connection_manager->getConnection("mvc");
+                $pdo->prepareQuery("INSERT INTO actors (email, first_name, last_name, password) VALUES (:email, :first_name, :last_name, :password)");
                 $pdo->bindParam('email', $email);
                 $pdo->bindParam('first_name', $first_name);
                 $pdo->bindParam('last_name', $last_name);
@@ -231,7 +231,7 @@ class Process {
 
     private function deleteTestData(): void {
         try {
-            $pdo = Core::$_connection_manager->getConnection("mvc");
+            $pdo = System::$Core->connection_manager->getConnection("mvc");
             $pdo->run("DELETE FROM actors WHERE first_name LIKE 'TEST_%'");
             $pdo->run("ALTER TABLE actors AUTO_INCREMENT=4");
         } catch( Exception $e ) {

@@ -2,11 +2,18 @@
 
 namespace system\classes\cache;
 
-use system\Core;
+use system\System;
 use system\classes\CacheFile;
 use system\classes\File;
 use system\exceptions\SystemException;
 
+
+/**
+ * The ResponseCache class
+ *
+ * @author Markus Schröder <xelsion@gmail.com>
+ * @version 1.0.0;
+ */
 class ResponseCache {
 
     private static ?ResponseCache $_instance = null;
@@ -16,12 +23,17 @@ class ResponseCache {
     private array $file_checks = array();
 
     /**
+     * The class constructor
+     * will be called once by the static method getInstance()
+     *
      */
     private function __construct() {
 
     }
 
     /**
+     * The initializer for this class
+     *
      * @return ResponseCache
      */
     public static function getInstance(): ResponseCache {
@@ -31,6 +43,15 @@ class ResponseCache {
         return static::$_instance;
     }
 
+    /**
+     * Initializes a cache file with a combination of the given name and the
+     * parameters
+     *
+     * @param string $cache_name
+     * @param ...$param
+     *
+     * @return void
+     */
     public function initCacheFor( string $cache_name, ...$param ): void {
         $entries = array();
         foreach( $param as $p ) {
@@ -44,6 +65,8 @@ class ResponseCache {
     }
 
     /**
+     * Returns the content of the current cache file
+     *
      * @return string
      */
     public function getContent(): string {
@@ -51,6 +74,8 @@ class ResponseCache {
     }
 
     /**
+     * Saves the given content to the current cache file
+     *
      * @param string $content
      *
      * @return void
@@ -62,6 +87,8 @@ class ResponseCache {
     }
 
     /**
+     * Adds the given table of the given database to the checklist
+     *
      * @param $db_name
      * @param $table_name
      *
@@ -75,6 +102,8 @@ class ResponseCache {
     }
 
     /**
+     * Adds the given file to the checklist
+     *
      * @param $file_name
      *
      * @return void
@@ -97,14 +126,14 @@ class ResponseCache {
     }
 
     /**
-     * Reads the last modification date for the given table ind the given db
+     * Reads the last modification date of all tables in the current checklist
      *
      * @return bool
      *
      */
     private function doDBCheck(): bool {
         foreach( $this->db_checks as $dbname => $tables ) {
-            $pdo = Core::$_connection_manager->getConnection($dbname);
+            $pdo = System::$Core->connection_manager->getConnection($dbname);
             foreach( $tables as $table_name ) {
                 $table_time = $pdo->getModificationTimeOfTable($table_name);
                 if( !$this->cache->isUpToDate($table_time) ) {
@@ -116,6 +145,8 @@ class ResponseCache {
     }
 
     /**
+     * Reads the last modification date of all files in the current checklist
+     *
      * @return bool
      */
     private function doFileChecks(): bool {

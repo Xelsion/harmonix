@@ -2,12 +2,11 @@
 
 namespace models;
 
-use PDO;
 use JsonException;
-
-use system\Core;
-use system\helper\SqlHelper;
+use PDO;
 use system\exceptions\SystemException;
+use system\helper\SqlHelper;
+use system\System;
 
 /**
  * The ActorModel Role
@@ -59,7 +58,7 @@ class ActorRoleModel extends entities\ActorRole {
      */
     public static function find( array $conditions = array(), ?string $order = "", ?string $direction = "asc", int $limit = 0, int $page = 1 ) : array {
         $results = array();
-        $pdo = Core::$_connection_manager->getConnection("mvc");
+        $pdo = System::$Core->connection_manager->getConnection("mvc");
         if( !is_null($pdo) ) {
             $params = array();
 
@@ -85,7 +84,7 @@ class ActorRoleModel extends entities\ActorRole {
                 $params["offset"] = $offset;
             }
 
-            $pdo->prepare($query);
+            $pdo->prepareQuery($query);
             foreach( $params as $key => $value ) {
                 $pdo->bindParam(":" . $key, $value, SqlHelper::getParamType($value));
             }
@@ -121,8 +120,8 @@ class ActorRoleModel extends entities\ActorRole {
      */
 	public function getChildren(): array {
 		$children = array();
-        $pdo = Core::$_connection_manager->getConnection("mvc");
-        $pdo->prepare("SELECT * FROM actor_roles WHERE child_of=:id");
+        $pdo = System::$Core->connection_manager->getConnection("mvc");
+        $pdo->prepareQuery("SELECT * FROM actor_roles WHERE child_of=:id");
         $pdo->bindParam(":id", $this->id, PDO::PARAM_INT);
         $results = $pdo->execute()->fetchAll(PDO::FETCH_CLASS, __CLASS__);
         foreach( $results as $child ) {
@@ -362,10 +361,10 @@ class ActorRoleModel extends entities\ActorRole {
         if( $this->canUpdateAll() ) {
             return true;
         }
-        if( (Core::$_actor_role->isAncestorOf($owner_role) || $this->isGuest($owner_role)) && $this->canUpdateGroup() ) {
+        if( (System::$Core->actor_role->isAncestorOf($owner_role) || $this->isGuest($owner_role)) && $this->canUpdateGroup() ) {
             return true;
         }
-        if( Core::$_actor->id === $owner_id && $this->canUpdateOwn() ) {
+        if( System::$Core->actor->id === $owner_id && $this->canUpdateOwn() ) {
             return true;
         }
         return false;
@@ -387,10 +386,10 @@ class ActorRoleModel extends entities\ActorRole {
         if( $this->canDeleteAll() ) {
             return true;
         }
-        if( (Core::$_actor_role->isAncestorOf($owner_role) || $this->isGuest($owner_role) ) && $this->canDeleteGroup() ) {
+        if( (System::$Core->actor_role->isAncestorOf($owner_role) || $this->isGuest($owner_role) ) && $this->canDeleteGroup() ) {
             return true;
         }
-        if( Core::$_actor->id === $owner_id && $this->canDeleteOwn() ) {
+        if( System::$Core->actor->id === $owner_id && $this->canDeleteOwn() ) {
             return true;
         }
         return false;
@@ -410,40 +409,40 @@ class ActorRoleModel extends entities\ActorRole {
 			"own"   => array(),
 		);
 		if( $this->canCreateAll() ) {
-			$rights["all"][] = Core::$_lang->getValue("right-chars", "create");
+			$rights["all"][] = System::$Core->lang->getValue("right-chars", "create");
 		}
 		if( $this->canReadAll() ) {
-			$rights["all"][] = Core::$_lang->getValue("right-chars", "read");
+			$rights["all"][] = System::$Core->lang->getValue("right-chars", "read");
 		}
 		if( $this->canUpdateAll() ) {
-			$rights["all"][] = Core::$_lang->getValue("right-chars", "update");
+			$rights["all"][] = System::$Core->lang->getValue("right-chars", "update");
 		}
 		if( $this->canDeleteAll() ) {
-			$rights["all"][] = Core::$_lang->getValue("right-chars", "delete");
+			$rights["all"][] = System::$Core->lang->getValue("right-chars", "delete");
 		}
 		if( $this->canCreateGroup() ) {
-			$rights["group"][] = Core::$_lang->getValue("right-chars", "create");
+			$rights["group"][] = System::$Core->lang->getValue("right-chars", "create");
 		}
 		if( $this->canReadGroup() ) {
-			$rights["group"][] = Core::$_lang->getValue("right-chars", "read");
+			$rights["group"][] = System::$Core->lang->getValue("right-chars", "read");
 		}
 		if( $this->canUpdateGroup() ) {
-			$rights["group"][] = Core::$_lang->getValue("right-chars", "update");
+			$rights["group"][] = System::$Core->lang->getValue("right-chars", "update");
 		}
 		if( $this->canDeleteGroup() ) {
-			$rights["group"][] = Core::$_lang->getValue("right-chars", "delete");
+			$rights["group"][] = System::$Core->lang->getValue("right-chars", "delete");
 		}
 		if( $this->canCreateOwn() ) {
-			$rights["own"][] = Core::$_lang->getValue("right-chars", "create");
+			$rights["own"][] = System::$Core->lang->getValue("right-chars", "create");
 		}
 		if( $this->canReadOwn() ) {
-			$rights["own"][] = Core::$_lang->getValue("right-chars", "read");
+			$rights["own"][] = System::$Core->lang->getValue("right-chars", "read");
 		}
 		if( $this->canUpdateOwn() ) {
-			$rights["own"][] = Core::$_lang->getValue("right-chars", "update");
+			$rights["own"][] = System::$Core->lang->getValue("right-chars", "update");
 		}
 		if( $this->canDeleteOwn() ) {
-			$rights["own"][] = Core::$_lang->getValue("right-chars", "delete");
+			$rights["own"][] = System::$Core->lang->getValue("right-chars", "delete");
 		}
 		return $rights;
 	}

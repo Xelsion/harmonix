@@ -2,12 +2,11 @@
 
 namespace models\entities;
 
-use PDO;
 use Exception;
-
-use system\Core;
+use PDO;
 use system\abstracts\AEntity;
 use system\exceptions\SystemException;
+use system\System;
 
 class AccessRestriction extends AEntity {
 
@@ -29,9 +28,9 @@ class AccessRestriction extends AEntity {
      */
     public function create(): void {
         try {
-            $pdo = Core::$_connection_manager->getConnection("mvc");
+            $pdo = System::$Core->connection_manager->getConnection("mvc");
             $sql = "INSERT INTO access_restrictions (domain, controller, method, restriction_type, role_id) VALUES (:domain, :controller, :method, :restriction_type, :role_id)";
-            $pdo->prepare($sql);
+            $pdo->prepareQuery($sql);
             $pdo->bindParam(':domain', $this->domain);
             $pdo->bindParam(':controller', $this->controller);
             $pdo->bindParam(':method', $this->method);

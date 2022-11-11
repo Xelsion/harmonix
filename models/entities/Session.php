@@ -2,13 +2,12 @@
 
 namespace models\entities;
 
-use PDO;
 use Exception;
-
-use system\Core;
+use PDO;
 use system\abstracts\AEntity;
 use system\exceptions\SystemException;
 use system\helper\StringHelper;
+use system\System;
 
 /**
  * The Login entity
@@ -37,7 +36,7 @@ class Session extends AEntity {
      * empty entity
      */
 	public function __construct() {
-        $rotate_session = Core::$_configuration->getSectionValue("security", "rotate_session");
+        $rotate_session = System::$Core->configuration->getSectionValue("security", "rotate_session");
         if( !is_null($rotate_session) ) {
             $this->_rotate_session = (bool)$rotate_session;
         }
@@ -52,8 +51,8 @@ class Session extends AEntity {
      */
     protected function init( string $session_id ): void {
         try {
-            $pdo = Core::$_connection_manager->getConnection("mvc");
-            $pdo->prepare("SELECT * FROM sessions WHERE id=:id");
+            $pdo = System::$Core->connection_manager->getConnection("mvc");
+            $pdo->prepareQuery("SELECT * FROM sessions WHERE id=:id");
             $pdo->bindParam(":id", $session_id);
             $pdo->setFetchMode(PDO::FETCH_INTO, $this);
             $pdo->execute()->fetch();
@@ -68,9 +67,9 @@ class Session extends AEntity {
      */
 	public function create(): void {
 		try {
-			$pdo = Core::$_connection_manager->getConnection("mvc");
+			$pdo = System::$Core->connection_manager->getConnection("mvc");
 			$sql = "INSERT INTO sessions (id, actor_id, ip, expired) VALUES (:id, :actor_id, :ip, :expired)";
-			$pdo->prepare($sql);
+			$pdo->prepareQuery($sql);
 			$pdo->bindParam(':id', $this->id);
 			$pdo->bindParam(':actor_id', $this->actor_id, PDO::PARAM_INT);
             $pdo->bindParam(':ip', $this->ip);
@@ -92,9 +91,9 @@ class Session extends AEntity {
             if( $this->_rotate_session ) {
                 $this->id = StringHelper::getGuID();
             }
-			$pdo = Core::$_connection_manager->getConnection("mvc");
+			$pdo = System::$Core->connection_manager->getConnection("mvc");
 			$sql = "UPDATE sessions SET id=:id, actor_id=:actor_id, as_actor=:as_actor, ip=:ip, expired=:expired WHERE id=:curr_id";
-			$pdo->prepare($sql);
+			$pdo->prepareQuery($sql);
             $pdo->bindParam(':id', $this->id);
 			$pdo->bindParam(':curr_id', $curr_id);
 			$pdo->bindParam(':actor_id', $this->actor_id, PDO::PARAM_INT);
@@ -113,8 +112,8 @@ class Session extends AEntity {
 	public function delete(): bool {
 		if( $this->id !== "" ) {
 			try {
-				$pdo = Core::$_connection_manager->getConnection("mvc");
-				$pdo->prepare("DELETE FROM sessions WHERE id=:id");
+				$pdo = System::$Core->connection_manager->getConnection("mvc");
+				$pdo->prepareQuery("DELETE FROM sessions WHERE id=:id");
 				$pdo->bindParam(":id", $this->id, PDO::PARAM_INT);
 				$pdo->execute();
 				return true;

@@ -2,9 +2,8 @@
 
 namespace system\exceptions;
 
-use Throwable;
-
 use system\abstracts\ALoggableException;
+use Throwable;
 
 class SystemException extends ALoggableException {
 

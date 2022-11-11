@@ -2,12 +2,12 @@
 
 namespace system\classes;
 
-use PDO;
+use DateTime;
 use Exception;
+use JsonException;
+use PDO;
 use PDOException;
 use PDOStatement;
-use JsonException;
-use DateTime;
 
 use system\abstracts\ADBConnection;
 use system\exceptions\SystemException;
@@ -43,23 +43,28 @@ class PDOConnection extends PDO {
 	}
 
 	/**
+     * Prepares the given query with the given options
+     *
 	 * @param string $query
 	 * @param array $options
 	 */
-	public function prepare( string $query, array $options = [] ): void {
+	public function prepareQuery( string $query, array $options = [] ): void {
         $this->used_query = "";
         $this->used_params = array();
-		$this->stmt = parent::prepare($query, $options);
+		$this->stmt = $this->prepare($query, $options);
         $this->used_query = $query;
 	}
 
 	/**
+     * Binds the given value with the given key
+     *
 	 * @param string $key
-	 * @param $value
+	 * @param mixed $value
 	 * @param int $type
+     *
 	 * @return bool
 	 */
-	public function bindParam( string $key, $value, int $type = PDO::PARAM_STR ): bool {
+	public function bindParam( string $key, mixed $value, int $type = PDO::PARAM_STR ): bool {
         $this->used_params[$key] = $value;
         if( $type !== PDO::PARAM_STR) {
 		    return $this->stmt->bindValue($key, $value, $type);
@@ -96,6 +101,8 @@ class PDOConnection extends PDO {
     }
 
 	/**
+     * Sets the Fetch mode for the current query
+     *
 	 * @param int $mode
 	 * @param $class
 	 */
@@ -104,6 +111,8 @@ class PDOConnection extends PDO {
 	}
 
 	/**
+     * Returns the number of Entries of the current statement
+     *
 	 * @return int
 	 */
 	public function rowCount(): int {
@@ -111,7 +120,10 @@ class PDOConnection extends PDO {
 	}
 
 	/**
+     * Runs the given query directly to the database and returns the response
+     *
 	 * @param string $query
+     *
 	 * @return PDOStatement
 	 */
 	public function run( string $query ): PDOStatement {
@@ -119,6 +131,8 @@ class PDOConnection extends PDO {
 	}
 
     /**
+     * Execute the prepared query and returns a statement
+     *
      * @return PDOStatement
      *
      * @throws JsonException
@@ -161,6 +175,9 @@ class PDOConnection extends PDO {
     }
 
     /**
+     * Gets the last Modification time of each mysql of the current database
+     * and stores them into an array
+     *
      * @return void
      *
      * @throws JsonException
@@ -168,7 +185,7 @@ class PDOConnection extends PDO {
      * @throws Exception
      */
     private function setModificationTimes(): void {
-        $this->prepare("SELECT table_name, table_rows, create_time, update_time FROM information_schema.tables WHERE table_schema=:db");
+        $this->prepareQuery("SELECT table_name, table_rows, create_time, update_time FROM information_schema.tables WHERE table_schema=:db");
         $this->bindParam("db", $this->conn->dbname);
         $results = $this->execute()->fetchAll();
         foreach( $results as $row ) {

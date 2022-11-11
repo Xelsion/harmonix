@@ -5,22 +5,20 @@ namespace controller\admin;
 use DateTime;
 use Exception;
 use JsonException;
-
-use models\ActorTypeModel;
-use PDO;
-use system\Core;
-use system\abstracts\AController;
-use system\abstracts\AResponse;
-use system\classes\Router;
-use system\classes\Template;
-use system\classes\responses\HtmlResponse;
-use system\helper\HtmlHelper;
-use system\helper\RequestHelper;
-use system\exceptions\SystemException;
-
+use models\AccessPermissionModel;
 use models\ActorModel;
 use models\ActorRoleModel;
-use models\AccessPermissionModel;
+use models\ActorTypeModel;
+use PDO;
+use system\abstracts\AController;
+use system\abstracts\AResponse;
+use system\classes\responses\HtmlResponse;
+use system\classes\Router;
+use system\classes\Template;
+use system\exceptions\SystemException;
+use system\helper\HtmlHelper;
+use system\helper\RequestHelper;
+use system\System;
 
 /**
  * @see \system\abstracts\AController
@@ -41,8 +39,8 @@ class ActorController extends AController {
         }
 
 		// Add MenuItems to the Menu
-		$this::$_menu->insertMenuItem(200, null, "Benutzer", "/actors");
-        $this::$_menu->insertMenuItem(210, 200, "Benutzer erstellen", "/actors/create");
+        System::$Core->menu->insertMenuItem(200, null, "Benutzer", "/actors");
+        System::$Core->menu->insertMenuItem(210, 200, "Benutzer erstellen", "/actors/create");
 	}
 
     /**
@@ -70,7 +68,7 @@ class ActorController extends AController {
         $response = new HtmlResponse();
         $params = RequestHelper::getPaginationParams();
 
-        $cache = Core::$_response_cache;
+        $cache = System::$Core->response_cache;
         $cache->initCacheFor(__METHOD__, ...$params);
         $cache->addFileCheck(__FILE__);
         $cache->addFileCheck(PATH_VIEWS."actor/index.html");
@@ -93,7 +91,7 @@ class ActorController extends AController {
         }
 
         $template = new Template(PATH_VIEWS."template.html");
-        $template->set("navigation", $this::$_menu);
+        $template->set("navigation", System::$Core->menu);
 		$template->set("view", $view_content);
 
         $response->setOutput($template->parse());
@@ -109,10 +107,10 @@ class ActorController extends AController {
      */
     public function search(): AResponse {
         $response = new HtmlResponse();
-        $search_string = Core::$_request->get("search_string");
+        $search_string = System::$Core->request->get("search_string");
 
         $params = array($search_string);
-        $cache = Core::$_response_cache;
+        $cache = System::$Core->response_cache;
         $cache->initCacheFor(__METHOD__, ...$params);
         $cache->addFileCheck(__FILE__);
         $cache->addFileCheck(PATH_VIEWS."actor/search.html");
@@ -122,9 +120,9 @@ class ActorController extends AController {
         } else {
             $results = array();
             if( $search_string !== null ) {
-                $pdo = Core::$_connection_manager->getConnection("mvc");
+                $pdo = System::$Core->connection_manager->getConnection("mvc");
                 $sql = "SELECT * FROM actors WHERE first_name LIKE :word OR last_name LIKE :word OR email LIKE :word";
-                $pdo->prepare($sql);
+                $pdo->prepareQuery($sql);
                 $pdo->bindParam("word", "%".$search_string."%");
                 $pdo->setFetchMode(PDO::FETCH_CLASS, ActorModel::class );
                 $results = $pdo->execute()->fetchAll();
@@ -141,7 +139,7 @@ class ActorController extends AController {
         }
 
         $template = new Template(PATH_VIEWS."template.html");
-        $template->set("navigation", $this::$_menu);
+        $template->set("navigation", System::$Core->menu);
         $template->set("view", $view_content);
         $response->setOutput($template->parse());
         return $response;
@@ -151,7 +149,7 @@ class ActorController extends AController {
      * @throws Exception
      */
     public function create(): AResponse {
-		if( !$this::$_actor_role->canCreateAll() ) {
+		if( !System::$Core->actor_role->canCreateAll() ) {
 			redirect("/error/403");
 		}
 		if( isset($_POST['create']) ) {
@@ -170,7 +168,7 @@ class ActorController extends AController {
 
         $response = new HtmlResponse();
 
-        $cache = Core::$_response_cache;
+        $cache = System::$Core->response_cache;
         $cache->initCacheFor(__METHOD__);
         $cache->addFileCheck(__FILE__);
         $cache->addFileCheck(PATH_VIEWS."template.html");
@@ -193,7 +191,7 @@ class ActorController extends AController {
         }
 
         $template = new Template(PATH_VIEWS."template.html");
-        $template->set("navigation", $this::$_menu);
+        $template->set("navigation", System::$Core->menu);
         $template->set("view", $view_content);
 
         $response->setOutput($template->parse());
@@ -206,7 +204,7 @@ class ActorController extends AController {
      * @throws JsonException
      */
     public function update( ActorModel $actor ): AResponse {
-		if( !$this::$_actor_role->canUpdate($actor->id) ) {
+		if( !System::$Core->actor_role->canUpdate($actor->id) ) {
 			redirect("/error/403");
 		}
 		if( isset($_POST['cancel']) ) {
@@ -238,7 +236,7 @@ class ActorController extends AController {
         $view_content = $view->parse();
 
         $template = new Template(PATH_VIEWS."template.html");
-        $template->set("navigation", $this::$_menu);
+        $template->set("navigation", System::$Core->menu);
         $template->set("view", $view_content);
 
         $response->setOutput($template->parse());
@@ -254,7 +252,7 @@ class ActorController extends AController {
      * @throws SystemException
      */
     public function delete( ActorModel $actor ): AResponse {
-        if( !$this::$_actor_role->canDelete($actor->id) ) {
+        if( !System::$Core->actor_role->canDelete($actor->id) ) {
             redirect("/error/403");
         }
         if( isset($_POST['cancel']) ) {
@@ -272,7 +270,7 @@ class ActorController extends AController {
      * @throws Exception
      */
     public function roles( ActorModel $actor ): AResponse {
-		if( !$this::$_actor_role->canUpdate($actor->id) ) {
+		if( !System::$Core->actor_role->canUpdate($actor->id) ) {
 			redirect("/error/403");
 		}
 		if( isset($_POST['cancel']) ) {
@@ -287,7 +285,7 @@ class ActorController extends AController {
 		$response = new HtmlResponse();
 		$template = new Template(PATH_VIEWS."template.html");
 
-		$template->set("navigation", $this::$_menu);
+		$template->set("navigation", System::$Core->menu);
 		$template->set("actor", $actor);
 	    $template->set("role_options", ActorRoleModel::find());
 	    $template->set("access_permissions", AccessPermissionModel::find(array(

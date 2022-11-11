@@ -6,8 +6,8 @@ use Exception;
 use JsonException;
 use PDO;
 use system\abstracts\AEntity;
-use system\Core;
 use system\exceptions\SystemException;
+use system\System;
 
 class ActorTypes extends AEntity {
 
@@ -29,8 +29,8 @@ class ActorTypes extends AEntity {
      */
     public function __construct( int $id = 0 ) {
         if( $id > 0 ) {
-            $pdo = Core::$_connection_manager->getConnection("mvc");
-            $pdo->prepare("SELECT * FROM actor_types WHERE id=:id");
+            $pdo = System::$Core->connection_manager->getConnection("mvc");
+            $pdo->prepareQuery("SELECT * FROM actor_types WHERE id=:id");
             $pdo->bindParam(":id", $id, PDO::PARAM_INT);
             $pdo->setFetchMode(PDO::FETCH_INTO, $this);
             $pdo->execute()->fetch();
@@ -42,9 +42,9 @@ class ActorTypes extends AEntity {
      */
     public function create(): void {
         try {
-            $pdo = Core::$_connection_manager->getConnection("mvc");
+            $pdo = System::$Core->connection_manager->getConnection("mvc");
             $sql = "INSERT INTO actor_types (name) VALUES (:name)";
-            $pdo->prepare($sql);
+            $pdo->prepareQuery($sql);
             $pdo->bindParam(':name', $this->name);
             $pdo->execute();
             $this->id = $pdo->lastInsertId();
@@ -61,9 +61,9 @@ class ActorTypes extends AEntity {
     public function update(): void {
         if( $this->id > 0 ) {
             try {
-                $pdo = Core::$_connection_manager->getConnection("mvc");
+                $pdo = System::$Core->connection_manager->getConnection("mvc");
                 $sql = "UPDATE actor_types SET name=:name WHERE id=:id";
-                $pdo->prepare($sql);
+                $pdo->prepareQuery($sql);
                 $pdo->bindParam(':id', $this->id, PDO::PARAM_INT);
                 $pdo->bindParam(':name', $this->name);
                 $pdo->execute();
@@ -79,8 +79,8 @@ class ActorTypes extends AEntity {
     public function delete(): bool {
         if( $this->id > 0 && !$this->is_protected ) {
             try {
-                $pdo = Core::$_connection_manager->getConnection("mvc");
-                $pdo->prepare("DELETE FROM actor_types WHERE id=:id");
+                $pdo = System::$Core->connection_manager->getConnection("mvc");
+                $pdo->prepareQuery("DELETE FROM actor_types WHERE id=:id");
                 $pdo->bindParam(':id', $this->id, PDO::PARAM_INT);
                 $pdo->execute();
                 return true;

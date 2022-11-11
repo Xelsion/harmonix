@@ -1,4 +1,4 @@
-import { AnyObject } from '../basic';
+import {AnyObject} from '../basic';
 
 /**
  * An empty function that can be used, for example, for optional callback.

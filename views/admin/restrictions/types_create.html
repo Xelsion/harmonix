@@ -1,5 +1,6 @@
 <?php
-use system\Core;
+
+use system\System;
 
 $this->set("title", "Zugriffstype erstellen");
 ?>
@@ -9,7 +10,7 @@ $this->set("title", "Zugriffstype erstellen");
 		<div class="form-group row">
 			<label for="name">Name</label>
 			<input type="text" name="name" value="" id="name" required />
-			<div class="invalid-feedback"><?= Core::$_lang->getValue("error-messages", "name") ?></div>
+			<div class="invalid-feedback"><?= System::$Core->lang->getValue("error-messages", "name") ?></div>
 		</div>
 		<div class="clearfix">
 			<input type="checkbox" name="include_siblings" value="1" id="include_siblings" class="form-check-input float-start" />
@@ -25,11 +26,11 @@ $this->set("title", "Zugriffstype erstellen");
 		</div>
 		<div class="form-group row clearfix">
 			<div class="col-auto">
-				<a href="/restrictions/types" class="button button-default float-start"><?= Core::$_lang->getValue("translations", "cancel") ?></a>
+				<a href="/restrictions/types" class="button button-default float-start"><?= System::$Core->lang->getValue("translations", "cancel") ?></a>
 			</div>
 			<div class="col"></div>
 			<div class="col-auto">
-				<button type="submit" name="create" class="button button-positiv float-end"><?= Core::$_lang->getValue("translations", "create") ?></button>
+				<button type="submit" name="create" class="button button-positiv float-end"><?= System::$Core->lang->getValue("translations", "create") ?></button>
 			</div>
 		</div>
 	</form>

@@ -1,5 +1,5 @@
-import { AnyObject } from './basic';
-import { Point } from './geometric';
+import {AnyObject} from './basic';
+import {Point} from './geometric';
 
 export interface Element<T = AnyObject, O = AnyObject> {
   readonly x: number;

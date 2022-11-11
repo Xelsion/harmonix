@@ -2,16 +2,14 @@
 
 namespace system\classes;
 
-use PDOStatement;
-use ReflectionException;
 use JsonException;
-
-use system\abstracts\AController;
-use system\Core;
-use system\exceptions\SystemException;
-
 use models\AccessRestrictionTypeModel;
 use models\ActorRoleModel;
+use PDOStatement;
+use ReflectionException;
+use system\abstracts\AController;
+use system\exceptions\SystemException;
+use system\System;
 
 class Auth {
 
@@ -27,8 +25,8 @@ class Auth {
      * @throws ReflectionException
      */
     public function __construct() {
-        $this->actor_role = Core::$_actor_role;
-        $route = Core::$_router->getRoute(Core::$_request);
+        $this->actor_role = System::$Core->actor_role;
+        $route = System::$Core->router->getRoute(System::$Core->request);
         $restriction = $this->getRestriction(get_class($route["controller"]), $route["method"]);
         $this->restriction_role = $restriction["role"];
         $this->restriction_type = $restriction["type"];
@@ -36,6 +34,7 @@ class Auth {
 
     /**
      * Returns if the current actor has access to the current request
+     *
      * @return bool
      *
      * @throws JsonException
@@ -51,6 +50,7 @@ class Auth {
      * @param $controller
      * @param string $method
      * @param string|mixed $domain
+     *
      * @return bool
      *
      * @throws JsonException
@@ -60,7 +60,7 @@ class Auth {
         if( $controller instanceof AController ) {
             $controller = get_class($controller);
         }
-        $actor_role = Core::$_actor->getRole($controller, $method, $domain);
+        $actor_role = System::$Core->actor->getRole($controller, $method, $domain);
         $restriction = $this->getRestriction($controller, $method, $domain);
         $restriction_role = $restriction["role"];
         $restriction_type = $restriction["type"];
@@ -74,6 +74,7 @@ class Auth {
      * @param ActorRoleModel $actor_role
      * @param ActorRoleModel $restriction_role
      * @param AccessRestrictionTypeModel $restriction_type
+     *
      * @return bool
      *
      * @throws JsonException
@@ -112,6 +113,7 @@ class Auth {
      * @param string|null $controller
      * @param string|null $method
      * @param string|mixed $domain
+     *
      * @return array
      *
      * @throws JsonException
@@ -163,13 +165,14 @@ class Auth {
      * @param string|null $controller
      * @param string|null $method
      * @param string|mixed $domain
+     *
      * @return PDOStatement
      *
      * @throws JsonException
      * @throws SystemException
      */
     private function getRestrictionRole( ?string $controller, ?string $method, string $domain = SUB_DOMAIN ): PDOStatement {
-        $pdo = Core::$_connection_manager->getConnection("mvc");
+        $pdo = System::$Core->connection_manager->getConnection("mvc");
         $sql = "SELECT role_id, restriction_type FROM access_restrictions WHERE domain=:domain";
         if( $controller === null ) {
             $sql .= " AND controller IS NULL";
@@ -181,7 +184,7 @@ class Auth {
         } else {
             $sql .= " AND method=:method";
         }
-        $pdo->prepare($sql);
+        $pdo->prepareQuery($sql);
         $pdo->bindParam("domain", $domain);
         if( $controller !== null ) {
             $pdo->bindParam("controller", $controller);

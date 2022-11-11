@@ -2,12 +2,12 @@
 
 namespace controller\admin;
 
-use system\Core;
 use system\abstracts\AController;
 use system\abstracts\AResponse;
 use system\classes\responses\HtmlResponse;
 use system\classes\Router;
 use system\classes\Template;
+use system\System;
 
 class RoutesController Extends AController {
 
@@ -21,7 +21,7 @@ class RoutesController Extends AController {
         }
 
         // Add MenuItems to the Menu
-        $this::$_menu->insertMenuItem(500, null, "Routen", "/routes");
+        System::$Core->menu->insertMenuItem(500, null, "Routen", "/routes");
     }
 
     /**
@@ -39,9 +39,9 @@ class RoutesController Extends AController {
     public function index(): AResponse {
         $response = new HtmlResponse();
         $all_routes = array();
-        Core::$_router->getAllRoutes( PATH_CONTROLLER_ROOT, $all_routes);
+        System::$Core->router->getAllRoutes( PATH_CONTROLLER_ROOT, $all_routes);
 
-        $cache = Core::$_response_cache;
+        $cache = System::$Core->response_cache;
         $cache->initCacheFor(__METHOD__);
         $cache->addFileCheck(__FILE__);
         $cache->addFileCheck(PATH_VIEWS."routes/index.html");
@@ -56,7 +56,7 @@ class RoutesController Extends AController {
         }
 
         $template = new Template(PATH_VIEWS."template.html");
-        $template->set("navigation", $this::$_menu);
+        $template->set("navigation", System::$Core->menu);
         $template->set("view", $view_content);
 
         $response->setOutput($template->parse());

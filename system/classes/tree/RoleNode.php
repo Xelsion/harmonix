@@ -4,6 +4,13 @@ namespace system\classes\tree;
 
 use models\ActorRoleModel;
 
+/**
+ * The RoleNode class extends TreeNode
+ * Represents a Node within a RoleTree
+ *
+ * @author Markus Schröder <xelsion@gmail.com>
+ * @version 1.0.0;
+ */
 class RoleNode extends TreeNode {
 
     // the target url of this menu item

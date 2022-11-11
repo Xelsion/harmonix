@@ -1,5 +1,6 @@
 <?php
-use system\Core;
+
+use system\System;
 
 $this->set("title", "Rollen");
 
@@ -31,8 +32,8 @@ $role_list = $this->get("result_list");
 				<td><?= escaped_html(implode(", ", $rights["own"])) ?></td>
 				<td><?= ($role->is_protected) ? "Ja" : "Nein" ?></td>
 				<td class="text-nowrap text-end">
-					<a href="/actor-roles/<?= $role->id ?>" class="button button-default"><?= Core::$_lang->getValue("translations", "edit") ?></a>
-					<a href="/actor-roles/delete/<?= $role->id ?>" class="button button-negativ"><?= Core::$_lang->getValue("translations", "delete") ?></a>
+					<a href="/actor-roles/<?= $role->id ?>" class="button button-default"><?= System::$Core->lang->getValue("translations", "edit") ?></a>
+					<a href="/actor-roles/delete/<?= $role->id ?>" class="button button-negativ"><?= System::$Core->lang->getValue("translations", "delete") ?></a>
 				</td>
 			</tr>
 		<?php endforeach; ?>

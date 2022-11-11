@@ -2,12 +2,11 @@
 
 namespace models;
 
-use PDO;
 use JsonException;
-
-use system\Core;
-use system\helper\SqlHelper;
+use PDO;
 use system\exceptions\SystemException;
+use system\helper\SqlHelper;
+use system\System;
 
 class AccessRestrictionTypeModel extends entities\AccessRestrictionType {
 
@@ -47,7 +46,7 @@ class AccessRestrictionTypeModel extends entities\AccessRestrictionType {
      */
     public static function find( array $conditions = array(), ?string $order = "", ?string $direction = "asc", int $limit = 0, int $page = 1 ) : ?array {
         $results = array();
-        $pdo = Core::$_connection_manager->getConnection("mvc");
+        $pdo = System::$Core->connection_manager->getConnection("mvc");
         if( !is_null($pdo) ) {
             $params = array();
 
@@ -73,7 +72,7 @@ class AccessRestrictionTypeModel extends entities\AccessRestrictionType {
                 $params["offset"] = $offset;
             }
 
-            $pdo->prepare($query);
+            $pdo->prepareQuery($query);
             foreach( $params as $key => $value ) {
                 $pdo->bindParam(":" . $key, $value, SqlHelper::getParamType($value));
             }

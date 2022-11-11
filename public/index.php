@@ -6,6 +6,7 @@
  * @version 1.0.0;
  */
 declare(strict_types = 1);
+error_reporting(E_ALL);
 
 use system\abstracts\ALoggableException;
 use system\classes\Logger;

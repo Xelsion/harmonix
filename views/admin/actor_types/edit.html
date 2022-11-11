@@ -1,7 +1,8 @@
 <?php
-use system\Core;
 
-$actor_role = Core::$_actor_role;
+use system\System;
+
+$actor_role = System::$Core->actor_role;
 $this->set("title", "Benutzer-Typ bearbeiten");
 $actor_type = $this->get("actor_type");
 $protected = ( $actor_type->is_protected && !$actor_role->canUpdateALl() );
@@ -12,15 +13,15 @@ $protected = ( $actor_type->is_protected && !$actor_role->canUpdateALl() );
 		<div class="form-group row">
 			<label for="name">Name</label>
 			<input type="text" name="name" value="<?= escaped_html($actor_type->name) ?>" id="name"<?= ( $protected ) ? ' disabled' : '' ?> required />
-			<div class="invalid-feedback"><?= Core::$_lang->getValue("error-messages", "name") ?></div>
+			<div class="invalid-feedback"><?= System::$Core->lang->getValue("error-messages", "name") ?></div>
 		</div>
 		<div class="form-group row">
 			<div class="col-auto">
-				<button type="submit" name="cancel" class="button button-default"><?= Core::$_lang->getValue("translations", "cancel") ?></button>
+				<button type="submit" name="cancel" class="button button-default"><?= System::$Core->lang->getValue("translations", "cancel") ?></button>
 			</div>
 			<div class="col"></div>
 			<div class="col-auto">
-				<button type="submit" name="update" class="button button-positiv"<?= ( $protected ) ? ' disabled' : '' ?>><?= Core::$_lang->getValue("translations", "save") ?></button>
+				<button type="submit" name="update" class="button button-positiv"<?= ( $protected ) ? ' disabled' : '' ?>><?= System::$Core->lang->getValue("translations", "save") ?></button>
 			</div>
 		</div>
 	</form>

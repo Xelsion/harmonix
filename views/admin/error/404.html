@@ -1,10 +1,11 @@
 <?php
-use system\Core;
+
+use system\System;
 
 ?>
 <div class="container-fluid">
 	<h1>Fehler 404: Seite nicht gefunden!</h1>
-	<?php if( Core::$_storage::get("message") !== null ) {
-		echo Core::$_storage::get("message");
+	<?php if( System::$Storage::get("message") !== null ) {
+		echo System::$Storage::get("message");
 	} ?>
 </div>

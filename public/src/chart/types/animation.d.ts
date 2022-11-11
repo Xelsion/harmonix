@@ -1,5 +1,5 @@
-import { Chart } from './index.esm';
-import { AnyObject } from './basic';
+import {Chart} from './index.esm';
+import {AnyObject} from './basic';
 
 export class Animation {
   constructor(cfg: AnyObject, target: AnyObject, prop: string, to?: unknown);

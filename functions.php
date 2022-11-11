@@ -1,7 +1,12 @@
 <?php
 spl_autoload_register(static function( $class_name ) {
-	$class_name = Namespace2Path($class_name);
-	require_once PATH_ROOT . $class_name . ".php";
+	$file_name = Namespace2Path($class_name);
+    if( file_exists(PATH_ROOT . $file_name. ".php") ) {
+        require_once PATH_ROOT . $file_name . ".php";
+    } else if( true ) {
+        echo "failed to find class[".$class_name."] file: ".$file_name."<br />";
+    }
+
 });
 
 function Namespace2Path( string $namespace ): string {

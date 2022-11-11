@@ -1,10 +1,11 @@
 <?php
-use system\Core;
+
+use system\System;
 use models\ActorRoleModel;
 
 $routes = array();
-Core::$_router->getAllRoutes(PATH_CONTROLLER_ROOT, $routes);
-$curr_actor_role = Core::$_actor_role;
+System::$Core->router->getAllRoutes(PATH_CONTROLLER_ROOT, $routes);
+$curr_actor_role = System::$Core->actor_role;
 
 $actor = $this->get("actor");
 $access_permissions = $this->get("access_permissions");

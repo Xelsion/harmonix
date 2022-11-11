@@ -1,7 +1,8 @@
 <?php
-use system\Core;
 
-$debug_messages = Core::$_storage::get("debug");
+use system\System;
+
+$debug_messages = System::$Storage::get("debug");
 if( is_array($debug_messages) ) {
 	foreach($debug_messages as $msg) {
 		print_debug($msg);

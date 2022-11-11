@@ -2,12 +2,11 @@
 
 namespace models\entities;
 
-use PDO;
 use Exception;
-
-use system\Core;
+use PDO;
 use system\abstracts\AEntity;
 use system\exceptions\SystemException;
+use system\System;
 
 /**
  * The AccessPermissionModel entity
@@ -42,9 +41,9 @@ class AccessPermission extends AEntity {
      */
 	public function create(): void {
 		try {
-			$pdo = Core::$_connection_manager->getConnection("mvc");
+			$pdo = System::$Core->connection_manager->getConnection("mvc");
 			$sql = "INSERT INTO access_permissions (actor_id, role_id, domain, controller, method) VALUES (:actor_id, :role_id, :domain, :controller, :method)";
-			$pdo->prepare($sql);
+			$pdo->prepareQuery($sql);
 			$pdo->bindParam(':actor_id', $this->actor_id, PDO::PARAM_INT);
 			$pdo->bindParam(':role_id', $this->role_id, PDO::PARAM_INT);
 			$pdo->bindParam(':domain', $this->domain);

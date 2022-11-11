@@ -1,4 +1,4 @@
-import { ChartEvent } from '../index.esm';
+import {ChartEvent} from '../index.esm';
 
 export function getMaximumSize(node: HTMLElement, width?: number, height?: number, aspectRatio?: number): { width: number, height: number };
 export function getRelativePosition(

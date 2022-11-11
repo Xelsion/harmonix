@@ -2,9 +2,10 @@
 
 namespace system\abstracts;
 
-use system\Core;
 use system\classes\Router;
 use system\exceptions\SystemException;
+use system\System;
+
 
 /**
  * The Abstract version of a Controller.
@@ -19,14 +20,14 @@ use system\exceptions\SystemException;
  * @author Markus Schröder <xelsion@gmail.com>
  * @version 1.0.0;
  */
-abstract class AController extends Core {
+abstract class AController {
 
     protected static ?bool $caching = null;
 
     public function __construct() {
         if( self::$caching === null ) {
-            $environment = Core::$_configuration->getSectionValue("system", "environment");
-            self::$caching = (bool)Core::$_configuration->getSectionValue($environment, "caching");
+            $environment = System::$Core->configuration->getSectionValue("system", "environment");
+            self::$caching = (bool)System::$Core->configuration->getSectionValue($environment, "caching");
         }
     }
 

@@ -1,5 +1,6 @@
 <?php
-use system\Core;
+
+use system\System;
 
 $cache_infos = $this->get("cache_infos");
 ?>
@@ -15,7 +16,7 @@ $cache_infos = $this->get("cache_infos");
 			<td><?= $cache_infos["total_files"] ?></td>
 			<td><?= round($cache_infos["total_size"] / 1024 / 1024, 2) ?>MB</td>
 			<td class="text-nowrap text-end">
-				<a href="/cache/delete" class="button button-negativ"><?= Core::$_lang->getValue("translations", "delete") ?></a>
+				<a href="/cache/delete" class="button button-negativ"><?= System::$Core->lang->getValue("translations", "delete") ?></a>
 			</td>
 		</tr>
 	</table>

@@ -4,18 +4,16 @@ namespace controller\admin;
 
 use Exception;
 use JsonException;
-
-use system\Core;
-use system\abstracts\AResponse;
+use models\AccessRestrictionModel;
+use models\AccessRestrictionTypeModel;
+use models\ActorRoleModel;
 use system\abstracts\AController;
+use system\abstracts\AResponse;
 use system\classes\responses\HtmlResponse;
 use system\classes\Router;
 use system\classes\Template;
 use system\exceptions\SystemException;
-
-use models\AccessRestrictionTypeModel;
-use models\AccessRestrictionModel;
-use models\ActorRoleModel;
+use system\System;
 
 class RestrictionController extends AController {
 
@@ -30,9 +28,9 @@ class RestrictionController extends AController {
         }
 
         // Add MenuItems to the Menu
-        $this::$_menu->insertMenuItem(400, null, "Zugriffsrechte", "/restrictions");
-        $this::$_menu->insertMenuItem(410, 400, "Zugriffs Typen", "/restrictions/types");
-        $this::$_menu->insertMenuItem(411, 410, "Type erstellen", "/restrictions/types/create");
+        System::$Core->menu->insertMenuItem(400, null, "Zugriffsrechte", "/restrictions");
+        System::$Core->menu->insertMenuItem(410, 400, "Zugriffs Typen", "/restrictions/types");
+        System::$Core->menu->insertMenuItem(411, 410, "Type erstellen", "/restrictions/types/create");
     }
 
     /**
@@ -61,7 +59,7 @@ class RestrictionController extends AController {
         $template = new Template(PATH_VIEWS."template.html");
 
         $routes = array();
-        Core::$_router->getAllRoutes(PATH_CONTROLLER_ROOT, $routes);
+        System::$Core->router->getAllRoutes(PATH_CONTROLLER_ROOT, $routes);
 
         $access_restrictions = AccessRestrictionModel::find();
         $current_restrictions = array();
@@ -72,7 +70,7 @@ class RestrictionController extends AController {
             );
         }
 
-        $template->set("navigation", $this::$_menu);
+        $template->set("navigation", System::$Core->menu);
         $template->set("view", new Template(PATH_VIEWS."restrictions/index.html"));
         $template->set("routes", $routes);
         $template->set("current_restrictions", $current_restrictions);
@@ -90,7 +88,7 @@ class RestrictionController extends AController {
     public function types(): AResponse {
         $response = new HtmlResponse();
         $template = new Template(PATH_VIEWS."template.html");
-        $template->set("navigation", $this::$_menu);
+        $template->set("navigation", System::$Core->menu);
         $template->set("view", new Template(PATH_VIEWS."restrictions/types.html"));
         $template->set("type_list", AccessRestrictionTypeModel::find());
         $response->setOutput($template->parse());
@@ -120,7 +118,7 @@ class RestrictionController extends AController {
         }
         $response = new HtmlResponse();
         $template = new Template(PATH_VIEWS."template.html");
-        $template->set("navigation", $this::$_menu);
+        $template->set("navigation", System::$Core->menu);
         $template->set("view", new Template(PATH_VIEWS."restrictions/types_create.html"));
         $response->setOutput($template->parse());
         return $response;
@@ -148,7 +146,7 @@ class RestrictionController extends AController {
         }
         $response = new HtmlResponse();
         $template = new Template(PATH_VIEWS."template.html");
-        $template->set("navigation", $this::$_menu);
+        $template->set("navigation", System::$Core->menu);
         $template->set("view", new Template(PATH_VIEWS."restrictions/types_edit.html"));
         $template->set("type", $type);
         $response->setOutput($template->parse());

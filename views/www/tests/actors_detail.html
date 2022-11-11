@@ -1,23 +1,24 @@
 <?php
-use system\Core;
+
+use system\System;
 
 $actor = $this->get("actor");
 ?>
 <div>
 	<div class="row">
-		<div class="col"><?= Core::$_lang->getValue("translations", "first_name") ?></div>
+		<div class="col"><?= System::$Core->lang->getValue("translations", "first_name") ?></div>
         <div class="col"><?= $actor->first_name ?></div>
 	</div>
 	<div class="row">
-		<div class="col"><?= Core::$_lang->getValue("translations", "last_name") ?></div>
+		<div class="col"><?= System::$Core->lang->getValue("translations", "last_name") ?></div>
 		<div class="col"><?= $actor->last_name ?></div>
 	</div>
 	<div class="row">
-		<div class="col"><?= Core::$_lang->getValue("translations", "email") ?></div>
+		<div class="col"><?= System::$Core->lang->getValue("translations", "email") ?></div>
 		<div class="col"><?= $actor->email ?></div>
 	</div>
 	<div class="row">
-		<div class="col"><?= Core::$_lang->getValue("translations", "created") ?></div>
+		<div class="col"><?= System::$Core->lang->getValue("translations", "created") ?></div>
 		<div class="col"><?= $actor->created ?></div>
 	</div>
 </div>

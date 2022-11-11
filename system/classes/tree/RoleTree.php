@@ -6,6 +6,12 @@ use Exception;
 
 use models\ActorRoleModel;
 
+/**
+ * The RoleTree class extends TreeWalker
+ *
+ * @author Markus Schröder <xelsion@gmail.com>
+ * @version 1.0.0;
+ */
 class RoleTree extends TreeWalker {
 
 	private static ?RoleTree $instance = null;

@@ -1,12 +1,12 @@
-import { DeepPartial, DistributiveArray, UnionToIntersection } from './utils';
+import {DeepPartial, DistributiveArray, UnionToIntersection} from './utils';
 
-import { TimeUnit } from './adapters';
-import { AnimationEvent } from './animation';
-import { AnyObject, EmptyObject } from './basic';
-import { Color } from './color';
-import { Element } from './element';
-import { ChartArea, Point } from './geometric';
-import { LayoutItem, LayoutPosition } from './layout';
+import {TimeUnit} from './adapters';
+import {AnimationEvent} from './animation';
+import {AnyObject, EmptyObject} from './basic';
+import {Color} from './color';
+import {Element} from './element';
+import {ChartArea, Point} from './geometric';
+import {LayoutItem, LayoutPosition} from './layout';
 
 export { DateAdapter, TimeUnit, _adapters } from './adapters';
 export { Animation, Animations, Animator, AnimationEvent } from './animation';

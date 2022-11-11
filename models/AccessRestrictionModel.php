@@ -2,12 +2,11 @@
 
 namespace models;
 
-use PDO;
 use JsonException;
-
-use system\Core;
-use system\helper\SqlHelper;
+use PDO;
 use system\exceptions\SystemException;
+use system\helper\SqlHelper;
+use system\System;
 
 class AccessRestrictionModel extends entities\AccessRestriction {
 
@@ -43,7 +42,7 @@ class AccessRestrictionModel extends entities\AccessRestriction {
      */
     public static function find( array $conditions = array(), ?string $order = "", ?string $direction = "asc", int $limit = 0, int $page = 1 ) : ?array {
         $results = array();
-        $pdo = Core::$_connection_manager->getConnection("mvc");
+        $pdo = System::$Core->connection_manager->getConnection("mvc");
         if( !is_null($pdo) ) {
             $params = array();
 
@@ -69,7 +68,7 @@ class AccessRestrictionModel extends entities\AccessRestriction {
                 $params["offset"] = $offset;
             }
 
-            $pdo->prepare($query);
+            $pdo->prepareQuery($query);
             foreach( $params as $key => $value ) {
                 $pdo->bindParam(":" . $key, $value, SqlHelper::getParamType($value));
             }
@@ -86,9 +85,9 @@ class AccessRestrictionModel extends entities\AccessRestriction {
      * @throws SystemException
      */
     public static function deleteAll() : void {
-        $pdo = Core::$_connection_manager->getConnection("mvc");
+        $pdo = System::$Core->connection_manager->getConnection("mvc");
         $sql = "TRUNCATE access_restrictions";
-        $pdo->prepare($sql);
+        $pdo->prepareQuery($sql);
         $pdo->execute();
     }
 }

@@ -6,11 +6,11 @@ use DateTime;
 use Exception;
 use JsonException;
 
-use models\ActorModel;
-use models\entities\Session;
-use system\Core;
+use system\System;
 use system\helper\StringHelper;
 use system\exceptions\SystemException;
+use models\ActorModel;
+use models\entities\Session;
 
 /**
  * The Login
@@ -30,10 +30,15 @@ class Login extends Session {
 	private string $cookie_same_site = "lax";
 	private string $error;
 
+    /**
+     * The class constructor
+     * Initializes the cookie settings from the configuration
+     *
+     */
     public function __construct() {
         parent::__construct();
 
-        $configuration = Core::$_configuration->getSection("cookie");
+        $configuration = System::$Core->configuration->getSection("cookie");
         if( !empty($configuration) ) {
             $this->cookie_name = $configuration["name"];
             $this->cookie_domain = $configuration["domain"];
@@ -41,8 +46,7 @@ class Login extends Session {
             $this->cookie_secure = $configuration["secure"];
             $this->cookie_same_site = $configuration["same_site"];
         }
-
-        $this->encryption = (bool)Core::$_configuration->getSectionValue("security", "encrypted_session");
+        $this->encryption = (bool)System::$Core->configuration->getSectionValue("security", "encrypted_session");
     }
 
     /**
@@ -108,8 +112,8 @@ class Login extends Session {
      */
 	public function login( string $email, string $password ): ActorModel {
         $permanent = ( array_key_exists("permanent_login", $_POST) && $_POST["permanent_login"] === "yes");
-		$pdo = Core::$_connection_manager->getConnection("mvc");
-		$pdo->prepare("SELECT * FROM actors WHERE email=:email AND deleted IS NULL");
+		$pdo = System::$Core->connection_manager->getConnection("mvc");
+		$pdo->prepareQuery("SELECT * FROM actors WHERE email=:email AND deleted IS NULL");
 		$pdo->bindParam(":email", $email);
 		$stmt = $pdo->execute();
 		if( $stmt->rowCount() === 1 ) {
