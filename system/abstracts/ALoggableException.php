@@ -22,8 +22,8 @@ abstract class ALoggableException extends Exception {
      * @param int $code - the exception code (optional)
      * @param Throwable|null $previous - the previous throwable object (optional)
      */
-    public function __construct( string $file, int $line, string $message, int $code = 0, Throwable $previous = null) {
-        parent::__construct($message, $code, $previous);
+    public function __construct( string $file, int $line, string $message, mixed $code = 0, Throwable $previous = null) {
+        parent::__construct($message, intval($code), $previous);
         $this->file = $file;
         $this->line = $line;
         $this->logger = new Logger("exception");

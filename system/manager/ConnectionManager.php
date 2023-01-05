@@ -42,6 +42,15 @@ class ConnectionManager {
 	}
 
     /**
+     * Returns an array of all available connection keys
+     *
+     * @return array
+     */
+    public function getAvailableConnections(): array {
+        return array_keys($this->_connections);
+    }
+    
+    /**
      * Returns a connections
      * First checks if the connection is already active, if so returns it
      * else it activates the connection, stores it to the active connections
@@ -70,6 +79,7 @@ class ConnectionManager {
                 }
 				return $pdo_conn;
 			} catch( PDOException|SystemException|JsonException $e ) {
+                print_debug($e);
 				throw new RuntimeException($e->getMessage(), $e->getCode(), $e->getTrace());
 			}
         } else {

@@ -14,7 +14,7 @@ $routes_list = $this->get("routes_list");
 						<div class="row">
 							<div class="col-4"><?= $route ?></div>
 							<div class="col-2"><?= $domain ?></div>
-							<div class="col-6"><?= $controller ?>-><?= $method ?></div>
+							<div class="col-6"><?= basename($controller) ?>-><?= $method ?></div>
 						</div>
 					<?php } ?>
 				</div>

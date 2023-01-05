@@ -1,0 +1,24 @@
+<?php
+use system\System;
+
+$menu = System::$Core->menu;
+$menu->insertMenuItem(100, null, "Home", "/");
+
+$menu->insertMenuItem(200, null, "Benutzer", "/actors");
+$menu->insertMenuItem(201, 200, "Benutzer erstellen", "/actors/create");
+$menu->insertMenuItem(210, 200, "Benutzer-Typen", "/actor-types");
+$menu->insertMenuItem(211, 210, "Benutzer-Typ erstellen", "/actor-types/create");
+$menu->insertMenuItem(220, 200, "Verbindungen", "/data-connections");
+$menu->insertMenuItem(221, 220, "Verbindungen erstellen", "/data-connections/create");
+
+$menu->insertMenuItem(300, null, "Rollen", "/actor-roles");
+$menu->insertMenuItem(310, 300, "Rolle erstellen", "/actor-roles/create");
+
+$menu->insertMenuItem(400, null, "Zugriffsrechte", "/restrictions");
+$menu->insertMenuItem(410, 400, "Zugriffs Typen", "/restrictions/types");
+$menu->insertMenuItem(411, 410, "Type erstellen", "/restrictions/types/create");
+
+$menu->insertMenuItem(500, null, "Routen", "/routes");
+
+$menu->insertMenuItem(600, null, "Cache Files", "/cache");
+echo $menu->getAsHtml();

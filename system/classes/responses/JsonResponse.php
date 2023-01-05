@@ -2,6 +2,7 @@
 
 namespace system\classes\responses;
 
+use JsonSerializable;
 use system\abstracts\AResponse;
 
 /**
@@ -11,9 +12,12 @@ use system\abstracts\AResponse;
  * @author Markus Schröder <xelsion@gmail.com>
  * @version 1.0.0;
  */
-class JsonResponse extends AResponse {
+class JsonResponse extends AResponse implements JsonSerializable {
     // the default status for html status headers
     public int $status_code = 200;
+
+    // a parameter which will be used for the JsonSerializable implementation
+    private mixed $value;
 
     /**
      * @inherite
@@ -39,5 +43,25 @@ class JsonResponse extends AResponse {
             default:
                 header("HTTP/1.1 200 OK");
         }
+    }
+
+    /**
+     * Sets the given value as json encoded string to the response output
+     *
+     * @param mixed $value
+     * @return void
+     */
+    public function setOutput( mixed $value ): void {
+        $this->value = $value;
+        parent::setOutput(json_encode($this->jsonSerialize()));
+    }
+
+    /**
+     * Returns a serializable value
+     *
+     * @return mixed
+     */
+    public function jsonSerialize(): mixed {
+        return $this->value;
     }
 }

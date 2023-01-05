@@ -4,6 +4,7 @@ namespace controller\admin;
 
 use system\abstracts\AController;
 use system\abstracts\AResponse;
+use system\attributes\Route;
 use system\classes\responses\HtmlResponse;
 use system\classes\Router;
 use system\classes\Template;
@@ -16,37 +17,14 @@ use system\System;
  * @author Markus Schröder <xelsion@gmail.com>
  * @version 1.0.0;
  */
+#[Route("/")]
 class HomeController extends AController {
 
     /**
-     * @inheritDoc
-     *
-     * @throws SystemException
+     *  Get the starting site
      */
-	public function init( Router $router ): void {
-		// Add routes to router
-        $routes = $this->getRoutes();
-        foreach( $routes as $url => $route ) {
-            $router->addRoute($url, $route["controller"], $route["method"] );
-        }
-
-		// Add MenuItems to the Menu
-        System::$Core->menu->insertMenuItem(100, null, "Home", "/");
-	}
-
-    /**
-     * @inheritDoc
-     */
-    public function getRoutes(): array {
-        return array(
-            "/" => array("controller" => __CLASS__, "method" => "index")
-        );
-    }
-
-    /**
-     * @inheritDoc
-     */
-	public function index(): AResponse {
+    #[Route("/")]
+    public function index(): AResponse {
 		$response = new HtmlResponse();
 		$template = new Template(PATH_VIEWS."template.html");
 		$template->set("navigation", System::$Core->menu);

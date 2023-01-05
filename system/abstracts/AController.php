@@ -31,45 +31,6 @@ abstract class AController {
         }
     }
 
-    /**
-     * This function will add all routes it has to the given Router
-     * It can also add MenuItems to the navigation Menu (The Menu
-     * is accessible through the Core class)
-     *
-     * @param Router $router
-     * @see \system\Core
-     *
-     * @throws SystemException
-     */
-    abstract public function init( Router $router ): void;
-
-    /**
-     * Returns all routes of the controller in an array.
-     * The array structure is like:
-     * <p>
-     * [
-     *      url => array[
-     *          "controller" => the controller class,
-     *          "method" => the controller method
-     *      ],
-     *      ...
-     * ]
-     * </p>
-     *
-     * @return array
-     */
-    abstract public function getRoutes() : array;
-
-    /**
-     * The default method that will be called if no
-     * specific method was requested by the request.
-     *
-     * @return AResponse
-     *
-     * @throws SystemException
-     */
-    abstract public function index(): AResponse;
-
 	public function __toString(): string {
 		return __CLASS__;
 	}

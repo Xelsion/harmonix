@@ -175,6 +175,54 @@ class PDOConnection extends PDO {
     }
 
     /**
+     * Returns all table name in the current db
+     *
+     * @return array
+     *
+     * @throws JsonException
+     * @throws SystemException
+     */
+    public function getTables(): array {
+        $this->prepareQuery("SELECT table_name FROM information_schema.tables WHERE table_schema=:db");
+        $this->bindParam("db", $this->conn->dbname);
+        return $this->execute()->fetchAll();
+    }
+
+    /**
+     * Returns the names of the tables unique columns such as primary keys or uniques
+     *
+     * @param string $table_name
+     *
+     * @return array
+     *
+     * @throws JsonException
+     * @throws SystemException
+     */
+    public function getTableKeyColumns( string $table_name ): array {
+        $this->prepareQuery("SELECT column_name FROM information_schema.columns WHERE table_schema=:db AND table_name=:table_name AND column_key IN('PRI','UNI')");
+        $this->bindParam("db", $this->conn->dbname);
+        $this->bindParam("table_name", $table_name);
+        return $this->execute()->fetchAll();
+    }
+
+    /**
+     * Returns the names of the tables columns
+     *
+     * @param string $table_name
+     *
+     * @return array
+     *
+     * @throws JsonException
+     * @throws SystemException
+     */
+    public function getTableColumns( string $table_name ): array {
+        $this->prepareQuery("SELECT column_name FROM information_schema.columns WHERE table_schema=:db AND table_name=:table_name");
+        $this->bindParam("db", $this->conn->dbname);
+        $this->bindParam("table_name", $table_name);
+        return $this->execute()->fetchAll();
+    }
+
+    /**
      * Gets the last Modification time of each mysql of the current database
      * and stores them into an array
      *
@@ -189,12 +237,8 @@ class PDOConnection extends PDO {
         $this->bindParam("db", $this->conn->dbname);
         $results = $this->execute()->fetchAll();
         foreach( $results as $row ) {
-            $create_time = $row["create_time"];
-            $update_time = ( !is_null($row["update_time"]) )
-                ? $row["update_time"]
-                : "1970-01-01 00:00:00";
-            $create_date = new DateTime($create_time);
-            $update_date = new DateTime($update_time);
+            $create_date = new DateTime($row["create_time"] ?? '1970-01-01 00:00:00');
+            $update_date = new DateTime($row["update_time"] ?? '1970-01-01 00:00:00');
 
             $modification_time = ( $update_date > $create_date )
                 ? $update_date->getTimestamp()
@@ -205,4 +249,5 @@ class PDOConnection extends PDO {
             );
         }
     }
+
 }

@@ -4,8 +4,6 @@ use system\System;
 use system\classes\Template;
 
 $actor = System::$Core->actor;
-$menu = System::$Core->menu;
-
 $view = $this->get("view");
 $view_content = ( $view instanceof Template) ? $view->parse() : $view;
 ?>
@@ -37,7 +35,7 @@ $view_content = ( $view instanceof Template) ? $view->parse() : $view;
 <body>
 <header>
 	<nav id="navigation">
-		<?= $menu->getAsHtml() ?>
+		<?php include(PATH_VIEWS . "main_menu.html") ?>
 		<div id="actor-menu">
 			<div class="has-children">
 				<span onclick="$('#actor-menu-dropdown').toggle();" class="menu-item"><?= ( $actor->id > 0 ) ? $actor->first_name." ".$actor->last_name : "Profile" ?></span>
@@ -96,7 +94,8 @@ $view_content = ( $view instanceof Template) ? $view->parse() : $view;
 	<div class="row text-end" style="margin: 0;">
 		<div class="col"></div>
 		<div class="col-3">Harmonix by: <?= escaped_html(AUTHOR) ?> version: <?= escaped_html(MVC_VERSION) ?></div>
-		<div class="col-2">build in: {{build_time}}</div>
+        <div class="col-1">Cached: {{is_cached}}</div>
+		<div class="col-1">build in: {{build_time}}</div>
 	</div>
 	<div class="cleaner"></div>
 </footer>

@@ -6,47 +6,25 @@ use JsonException;
 use models\ActorTypeModel;
 use system\abstracts\AController;
 use system\abstracts\AResponse;
+use system\attributes\Route;
 use system\classes\responses\HtmlResponse;
 use system\classes\Router;
 use system\classes\Template;
 use system\exceptions\SystemException;
 use system\System;
 
+#[Route("actor-types")]
 class ActorTypeController extends AController {
 
     /**
-     * @inheritDoc
-     */
-    public function init( Router $router ): void {
-        // Add routes to router
-        $routes = $this->getRoutes();
-        foreach( $routes as $url => $route ) {
-            $router->addRoute($url, $route["controller"], $route["method"] );
-        }
-
-        // Add MenuItems to the Menu
-        System::$Core->menu->insertMenuItem(220, 200, "Benutzer-Typen", "/actor-types");
-        System::$Core->menu->insertMenuItem(230, 220, "Benutzer-Typ erstellen", "/actor-types/create");
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function getRoutes(): array {
-        return array(
-            "/actor-types" => array("controller" => __CLASS__, "method" => "index"),
-            "/actor-types/{type}" => array("controller" => __CLASS__, "method" => "update"),
-            "/actor-types/create" => array("controller" => __CLASS__, "method" => "create"),
-            "/actor-types/delete/{type}" => array("controller" => __CLASS__, "method" => "delete")
-        );
-    }
-
-    /**
+     * Get a list of all actor types
+     *
      * @return AResponse
      *
      * @throws SystemException
      * @throws JsonException
      */
+    #[Route("/", HTTP_GET)]
     public function index(): AResponse {
         $response = new HtmlResponse();
         $template = new Template(PATH_VIEWS."template.html");
@@ -66,6 +44,7 @@ class ActorTypeController extends AController {
      * @throws JsonException
      * @throws SystemException
      */
+    #[Route("create", HTTP_GET)]
     public function create(): AResponse {
         if( !System::$Core->actor_role->canCreateAll() ) {
             redirect("/error/403");
@@ -104,6 +83,7 @@ class ActorTypeController extends AController {
      * @throws SystemException
      * @throws JsonException
      */
+    #[Route("/{actor_type}", HTTP_GET)]
     public function update ( ActorTypeModel $actor_type): AResponse {
         if( !System::$Core->actor_role->canUpdate($actor_type->id) ) {
             redirect("/error/403");
@@ -140,6 +120,7 @@ class ActorTypeController extends AController {
      * @throws JsonException
      * @throws SystemException
      */
+    #[Route("delete/{actor_type}", HTTP_GET)]
     public function delete(ActorTypeModel $actor_type): AResponse {
         if( !System::$Core->actor_role->canDelete($actor_type->id) ) {
             redirect("/error/403");

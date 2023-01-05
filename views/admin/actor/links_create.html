@@ -1,0 +1,27 @@
+<?php
+
+use system\System;
+
+$actor = $this->get("actor");
+$connections = System::$Core->connection_manager->getAvailableConnections();
+?>
+<div class="container-fluid">
+    <form>
+        <div class="col-2">
+            <select id="db_name" name="db_name" onchange="getTables();">
+                <option value="">- Datenbank -</option>
+                <?php foreach( $connections as $conn_key ) { ?>
+                    <option value="<?= $conn_key ?>"><?= $conn_key ?></option>
+                <?php } ?>
+            </select>
+        </div>
+        <div class="col-2">
+            <select id="table_name" name="table_name" onchange="getPrimaryKey();">
+                <option value="">- Tabelle -</option>
+                <optgroup id="table_list" label="Available">
+
+                </optgroup>
+            </select>
+        </div>
+    </form>
+</div>

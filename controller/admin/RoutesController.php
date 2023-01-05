@@ -4,55 +4,43 @@ namespace controller\admin;
 
 use system\abstracts\AController;
 use system\abstracts\AResponse;
+use system\attributes\Route;
 use system\classes\responses\HtmlResponse;
 use system\classes\Router;
 use system\classes\Template;
+use system\exceptions\SystemException;
 use system\System;
 
+#[Route("routes")]
 class RoutesController Extends AController {
 
     /**
-     * @inheritDoc
+     * Get a list of all Routes
+     *
+     * @return AResponse
+     *
+     * @throws SystemException
      */
-    public function init( Router $router ): void {
-        $routes = $this->getRoutes();
-        foreach( $routes as $url => $route ) {
-            $router->addRoute($url, $route["controller"], $route["method"] );
-        }
-
-        // Add MenuItems to the Menu
-        System::$Core->menu->insertMenuItem(500, null, "Routen", "/routes");
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function getRoutes(): array {
-        return array(
-            "/routes" => array("controller" => __CLASS__, "method" => "index"),
-        );
-    }
-
-    /**
-     * @inheritDoc
-     */
+    #[Route("/")]
     public function index(): AResponse {
         $response = new HtmlResponse();
-        $all_routes = array();
-        System::$Core->router->getAllRoutes( PATH_CONTROLLER_ROOT, $all_routes);
+        $routes = System::$Core->router->getSortedRoutes();
 
         $cache = System::$Core->response_cache;
         $cache->initCacheFor(__METHOD__);
         $cache->addFileCheck(__FILE__);
+        $cache->addFileCheck(PATH_VIEWS."template.html");
         $cache->addFileCheck(PATH_VIEWS."routes/index.html");
 
-        if( $cache->isUpToDate() ) {
+        if( self::$caching && $cache->isUpToDate() ) {
             $view_content = $cache->getContent();
         } else {
             $view = new Template(PATH_VIEWS."routes/index.html");
-            $view->set("routes_list", $all_routes);
+            $view->set("routes_list", $routes);
             $view_content = $view->parse();
-            $cache->saveContent($view_content);
+            if( self::$caching ) {
+                $cache->saveContent($view_content);
+            }
         }
 
         $template = new Template(PATH_VIEWS."template.html");

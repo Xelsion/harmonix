@@ -4,38 +4,24 @@ namespace controller\admin;
 
 use system\abstracts\AController;
 use system\abstracts\AResponse;
+use system\attributes\Route;
 use system\classes\responses\HtmlResponse;
 use system\classes\Router;
 use system\classes\Template;
+use system\exceptions\SystemException;
 use system\System;
 
+#[Route("tests")]
 class TestController Extends AController {
 
     /**
-     * @inheritDoc
+     * Shows the starting page of the test controller
+     *
+     * @return AResponse
+     *
+     * @throws SystemException
      */
-    public function init( Router $router ): void {
-        $routes = $this->getRoutes();
-        foreach( $routes as $url => $route ) {
-            $router->addRoute($url, $route["controller"], $route["method"] );
-        }
-
-        // Add MenuItems to the Menu
-        System::$Core->menu->insertMenuItem(700, null, "Testen", "/test");
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function getRoutes(): array {
-        return array(
-            "/test" => array("controller" => __CLASS__, "method" => "index"),
-        );
-    }
-
-    /**
-     * @inheritDoc
-     */
+    #[Route("/")]
     public function index(): AResponse {
         $response = new HtmlResponse();
         $all_routes = array();

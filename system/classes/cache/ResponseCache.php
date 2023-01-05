@@ -70,6 +70,7 @@ class ResponseCache {
      * @return string
      */
     public function getContent(): string {
+        System::$Storage::set("is_cached", true);
         return $this->cache->getContent();
     }
 
@@ -122,6 +123,9 @@ class ResponseCache {
      *
      */
     public function isUpToDate(): bool {
+        if( !$this->cache->exists() ) {
+            return false;
+        }
         return ($this->doDBCheck() && $this->doFileChecks());
     }
 

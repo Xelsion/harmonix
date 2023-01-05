@@ -8,6 +8,12 @@ use system\exceptions\SystemException;
 use system\helper\SqlHelper;
 use system\System;
 
+/**
+ * The AccessRestrictionModel
+ *
+ * @author Markus Schröder <xelsion@gmail.com>
+ * @version 1.0.0;
+ */
 class AccessRestrictionModel extends entities\AccessRestriction {
 
     /**

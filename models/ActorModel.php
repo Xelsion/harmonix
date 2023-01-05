@@ -2,11 +2,15 @@
 
 namespace models;
 
-use JsonException;
+use models\entities\ActorData;
 use PDO;
-use system\exceptions\SystemException;
-use system\helper\SqlHelper;
+use Exception;
+use JsonException;
+
 use system\System;
+use system\helper\SqlHelper;
+use system\exceptions\SystemException;
+use models\entities\DataConnection;
 
 /**
  * The ActorModel
@@ -18,6 +22,10 @@ class ActorModel extends entities\Actor {
 
 	// a collection of all permission this user has
 	public array $permissions = array();
+
+    public array $data = array();
+
+    public array $ext_data = array();
 
     /**
      * The class constructor
@@ -32,6 +40,7 @@ class ActorModel extends entities\Actor {
 		parent::__construct($id);
         if( $id > 0 ) {
             $this->initPermission();
+            $this->initData();
         }
 	}
 
@@ -97,6 +106,8 @@ class ActorModel extends entities\Actor {
 	}
 
     /**
+     * Returns if the actor is of type developer or not
+     *
      * @param int $actor_id
      *
      * @return bool
@@ -205,5 +216,42 @@ class ActorModel extends entities\Actor {
 			$this->permissions[$permission->domain][$permission->controller][$permission->method] = $permission->getRole();
 		}
 	}
+
+    /**
+     * @return void
+     *
+     * @throws SystemException
+     */
+    public function initData(): void {
+        try {
+            $pdo = System::$Core->connection_manager->getConnection("mvc");
+            $pdo->prepareQuery("SELECT * FROM actor_data WHERE actor_id=:id");
+            $pdo->bindParam(":id", $this->id, PDO::PARAM_INT);
+            $pdo->setFetchMode(PDO::FETCH_CLASS, ActorData::class);
+            $this->data = $pdo->execute()->fetchAll();
+            foreach($this->data as $data) {
+                if( $data->connection_id === 0 ) {
+                    continue;
+                }
+                $data_connection = new DataConnectionModel($data->connection_id);
+                $ext_db = $data_connection->db_name;
+                $ext_table = $data_connection->table_name;
+                $ext_col = $data_connection->table_col;
+
+                $pdo_ext = System::$Core->connection_manager->getConnection($ext_db);
+                $sql = "SELECT ". implode(", ", $data_connection->columns)
+                    ." FROM ". $ext_table
+                    ." WHERE ". $ext_col ."=:value";
+                $pdo_ext->prepareQuery($sql);
+                $pdo_ext->bindParam("value", $data->data_value, PDO::PARAM_INT);
+                $result = $pdo_ext->execute()->fetch();
+                foreach( $result as $key => $value ) {
+                    $this->ext_data[$ext_db][$key] = $value;
+                }
+            }
+        } catch( Exception $e ) {
+            throw new SystemException(__FILE__, __LINE__, $e->getMessage());
+        }
+    }
 
 }

@@ -2,31 +2,37 @@
 
 namespace models;
 
-use JsonException;
+use Exception;
 use PDO;
+
 use system\exceptions\SystemException;
 use system\helper\SqlHelper;
 use system\System;
 
-/**
- * The ActorTypeModel
- *
- * @author Markus Schröder <xelsion@gmail.com>
- * @version 1.0.0;
- */
-class ActorTypeModel extends entities\ActorTypes {
+class DataConnectionModel extends entities\DataConnection {
+
+    public array $columns = array();
 
     /**
-     * The class constructor
-     * If id is 0 it will return an empty actor
-     *
      * @param int $id
      *
-     * @throws JsonException
      * @throws SystemException
      */
-    public function __construct( int $id = 0 ) {
+    public function __construct(int $id = 0) {
         parent::__construct($id);
+        if( $id > 0 ) {
+            try {
+                $pdo = System::$Core->connection_manager->getConnection("mvc");
+                $pdo->prepareQuery("SELECT column_name FROM data_connection_columns WHERE connection_id=:id");
+                $pdo->bindParam("id", $id, PDO::PARAM_INT);
+                $results = $pdo->execute()->fetchAll();
+                foreach($results as $row) {
+                    $this->columns[] = $row["column_name"];
+                }
+            } catch( Exception $e ) {
+                throw new SystemException(__FILE__, __LINE__, $e->getMessage());
+            }
+        }
     }
 
     /**
@@ -57,7 +63,7 @@ class ActorTypeModel extends entities\ActorTypes {
         if( !is_null($pdo) ) {
             $params = array();
 
-            $query = "SELECT * FROM actor_types";
+            $query = "SELECT * FROM data_connections";
             if( !empty($conditions) ) {
                 $columns = array();
 

@@ -14,6 +14,8 @@ use system\exceptions\SystemException;
  */
 abstract class AEntity {
 
+    public array $data = array();
+
 	/**
 	 * Creates an entry in the database with the current object
 	 * and tries to return the id of the new entry
@@ -47,6 +49,24 @@ abstract class AEntity {
      */
     public function str2DateTime( string $datetime ) {
         return DateTime::createFromFormat("Y-m-d H:i:s", $datetime);
+    }
+
+    public function __set(string $key, mixed $value): void {
+        $this->data[$key] = $value;
+    }
+
+    public function __get(string $key): mixed {
+        return $this->data[$key] ?? null;
+    }
+
+    public function __isset($key): bool {
+        return isset($this->data[$key]);
+    }
+
+    public function __unset($key): void {
+        if( array_key_exists($key, $this->data) ) {
+            unset($this->data[$key]);
+        }
     }
 
 }

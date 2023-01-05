@@ -2,6 +2,12 @@
 const AUTHOR = "Markus Schröder";
 const MVC_VERSION = "1.0.0";
 
+const HTTP_GET = "GET";
+const HTTP_POST = "POST";
+const HTTP_PUT = "PUT";
+const HTTP_UPDATE = "UPDATE";
+const HTTP_DELETE = "DELETE";
+
 const PATH_ROOT = "..".DIRECTORY_SEPARATOR;
 const PATH_SYSTEM = PATH_ROOT."system".DIRECTORY_SEPARATOR;
 const PATH_CONTROLLER_ROOT = PATH_ROOT."controller".DIRECTORY_SEPARATOR;

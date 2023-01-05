@@ -155,6 +155,7 @@ class File {
             if( $mtime && $mtime > $ctime ) {
                 return $mtime;
             }
+            return $ctime;
         }
         return 0;
     }

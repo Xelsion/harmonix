@@ -9,47 +9,22 @@ use models\AccessRestrictionTypeModel;
 use models\ActorRoleModel;
 use system\abstracts\AController;
 use system\abstracts\AResponse;
+use system\attributes\Route;
 use system\classes\responses\HtmlResponse;
 use system\classes\Router;
 use system\classes\Template;
 use system\exceptions\SystemException;
 use system\System;
 
+#[Route("restrictions")]
 class RestrictionController extends AController {
 
     /**
-     * @inheritDoc
-     */
-    public function init( Router $router ): void {
-        // Add routes to router
-        $routes = $this->getRoutes();
-        foreach( $routes as $url => $route ) {
-            $router->addRoute($url, $route["controller"], $route["method"] );
-        }
-
-        // Add MenuItems to the Menu
-        System::$Core->menu->insertMenuItem(400, null, "Zugriffsrechte", "/restrictions");
-        System::$Core->menu->insertMenuItem(410, 400, "Zugriffs Typen", "/restrictions/types");
-        System::$Core->menu->insertMenuItem(411, 410, "Type erstellen", "/restrictions/types/create");
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function getRoutes(): array {
-        return array(
-            "/restrictions" => array("controller" => __CLASS__, "method" => "index"),
-            "/restrictions/types" => array("controller" => __CLASS__, "method" => "types"),
-            "/restrictions/types/create" => array("controller" => __CLASS__, "method" => "typesCreate"),
-            "/restrictions/types/{type}" => array("controller" => __CLASS__, "method" => "typesUpdate"),
-            "/restrictions/types/delete/{type}" => array("controller" => __CLASS__, "method" => "typesDelete")
-        );
-    }
-
-    /**
-     * @inheritDoc
+     * Get a list of all restrictions
+     *
      * @throws Exception
      */
+    #[Route("/")]
     public function index(): AResponse {
         if( isset($_POST['update']) ) {
             $this->saveRestrictions();
@@ -58,8 +33,15 @@ class RestrictionController extends AController {
         $response = new HtmlResponse();
         $template = new Template(PATH_VIEWS."template.html");
 
-        $routes = array();
-        System::$Core->router->getAllRoutes(PATH_CONTROLLER_ROOT, $routes);
+        $routes = System::$Core->router->getRoutes();
+        $sorted_routes = array();
+        foreach( $routes as $domain => $entries) {
+            foreach( $entries as $path => $settings) {
+                $controller = $settings["controller"];
+                $method = $settings["method"];
+                $sorted_routes[$domain][$controller][$method] = $path;
+            }
+        }
 
         $access_restrictions = AccessRestrictionModel::find();
         $current_restrictions = array();
@@ -72,7 +54,7 @@ class RestrictionController extends AController {
 
         $template->set("navigation", System::$Core->menu);
         $template->set("view", new Template(PATH_VIEWS."restrictions/index.html"));
-        $template->set("routes", $routes);
+        $template->set("routes", $sorted_routes);
         $template->set("current_restrictions", $current_restrictions);
         $template->set("role_options", ActorRoleModel::find());
         $template->set("type_options", AccessRestrictionTypeModel::find());
@@ -85,6 +67,7 @@ class RestrictionController extends AController {
      * @return AResponse
      * @throws SystemException|JsonException
      */
+    #[Route("types")]
     public function types(): AResponse {
         $response = new HtmlResponse();
         $template = new Template(PATH_VIEWS."template.html");
@@ -100,6 +83,7 @@ class RestrictionController extends AController {
      * @throws JsonException
      * @throws SystemException
      */
+    #[Route("types/create")]
     public function typesCreate(): AResponse {
         if( isset($_POST['cancel']) ) {
             redirect("/restrictions/types");
@@ -129,6 +113,7 @@ class RestrictionController extends AController {
      * @return AResponse
      * @throws SystemException
      */
+    #[Route("types/{type}")]
     public function typesUpdate( AccessRestrictionTypeModel $type ): AResponse {
         if( isset($_POST['cancel']) ) {
             redirect("/restrictions/types");
@@ -195,7 +180,6 @@ class RestrictionController extends AController {
             }
         }
     }
-
 
     /**
      * Checks if all required values are set

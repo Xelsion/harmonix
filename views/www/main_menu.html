@@ -1,0 +1,10 @@
+<?php
+use system\System;
+
+$menu = System::$Core->menu;
+$menu->insertMenuItem(100, null, "Home", "/");
+
+$menu->insertMenuItem(200, null, "Tests", "/tests");
+$menu->insertMenuItem(201, 200, "Charts", "/tests/charts");
+$menu->insertMenuItem(202, 200, "TinyMCE", "/tests/tinymce");
+echo $menu->getAsHtml();

@@ -86,6 +86,7 @@ class Process {
         $environment = System::$Core->configuration->getSectionValue("system", "environment");
         $debug = System::$Core->configuration->getSectionValue($environment, "debug");
         System::$Storage::set("debug_mode", (bool)$debug);
+        System::$Storage::set("is_cached", false);
 
         if( System::$Storage::get("debug_mode") ) {
             System::$Core->analyser->addTimer("template-parsing");
@@ -201,6 +202,8 @@ class Process {
         System::$Core->analyser->stopTimer("template-parsing");
         $elapsed_time = System::$Core->analyser->getTimerElapsedTime("template-parsing");
         $elapsed_time = round($elapsed_time * 1000, 2);
+        $is_cached = ( System::$Storage::get("is_cached") ) ? "true" : "false";
+        $output = str_replace("{{is_cached}}", $is_cached, $output);
         return str_replace("{{build_time}}", $elapsed_time."ms",$output);
 	}
 

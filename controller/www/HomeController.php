@@ -4,51 +4,27 @@ namespace controller\www;
 
 use system\abstracts\AController;
 use system\abstracts\AResponse;
+use system\attributes\Route;
 use system\classes\responses\HtmlResponse;
-use system\classes\Router;
 use system\classes\Template;
 use system\exceptions\SystemException;
-use system\System;
-
 
 /**
  * @author Markus Schröder <xelsion@gmail.com>
  * @version 1.0.0;
  */
+#[Route("")]
 class HomeController extends AController {
 
     /**
-     * @param Router $router
-     * @throws SystemException
-     */
-	public function init( Router $router ): void {
-        // Add routes to router
-        $routes = $this->getRoutes();
-        foreach( $routes as $url => $route ) {
-            $router->addRoute($url, $route["controller"], $route["method"] );
-        }
-
-        // Add MenuItems to the Menu
-        System::$Core->menu->insertMenuItem(100, null, "Home", "/");
-	}
-
-    /**
-     * @return array[]
-     */
-    public function getRoutes(): array {
-        return array(
-            "/" => array("controller" => __CLASS__, "method" => "index")
-        );
-    }
-
-    /**
-     * @Route("/", methods: {"GET})
+     * Shows the landing page
      *
      * @return AResponse
      *
      * @throws SystemException
      */
-	public function index(): AResponse {
+	#[Route("/", HTTP_GET)]
+    public function index(): AResponse {
 		$response = new HtmlResponse();
 		$template = new Template(PATH_VIEWS."template.html");
         $template->set("view", new Template(PATH_VIEWS."home/index.html"));

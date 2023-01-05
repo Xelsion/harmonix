@@ -7,7 +7,9 @@ use ReflectionException;
 use ReflectionMethod;
 
 use system\abstracts\AController;
+use system\attributes\Route;
 use system\exceptions\SystemException;
+use system\System;
 
 /**
  * The Router Type singleton
@@ -28,11 +30,71 @@ class Router {
      * will be called once by the static method getInstance()
      * calls the method initController()
      *
-     * @throws SystemException
+     * @throws SystemException|ReflectionException
      */
 	private function __construct() {
-		$this->initController(PATH_CONTROLLER);
+        $this->registerController( "www",PATH_CONTROLLER_ROOT);
+        $this->registerController( "admin",PATH_CONTROLLER_ROOT);
 	}
+
+    /**
+     * @param string $directory
+     *
+     * @return void
+     *
+     * @throws ReflectionException|SystemException
+     */
+    private function registerController( string $sub_domain, string $directory ): void {
+        $path = $directory.$sub_domain.DIRECTORY_SEPARATOR;
+        $files = scandir($path);
+        foreach( $files as $file ) {
+            // do we have a file?
+            if( !is_dir($path.$file) ) {
+                $class_file = $path.$file;
+                // Get the namespace of this path
+                $class = Path2Namespace($class_file);
+                // get an instance of this class
+                $controller = new $class();
+                if( $controller instanceof AController ) {
+                    // It's a valid Controller so initialize its routes
+                    $reflection = new \ReflectionClass($controller::class);
+                    $class_attributes = $reflection->getAttributes(Route::class);
+                    $class_path = "";
+                    if( !empty($class_attributes) ) {
+                        foreach($class_attributes as $attr ) {
+                            $class_route = $attr->newInstance();
+                            $class_path = $class_route->path;
+                        }
+                    }
+                    if( !str_starts_with($class_path, "/") ) {
+                        $class_path = "/".$class_path;
+                    }
+
+                    foreach( $reflection->getMethods() as $method) {
+                        $method_attributes = $method->getAttributes(Route::class);
+                        if( !empty($method_attributes) ) {
+                            foreach( $method_attributes as $attr ) {
+                                $route = $attr->newInstance();
+                                $method_path = $route->path;
+                                $route_path = $class_path;
+                                if( $method_path !== "" && $method_path !== "/" ) {
+                                    if( !str_starts_with($method_path, "/") ) {
+                                        $method_path = "/" . $method_path;
+                                    }
+                                    $route_path .= $method_path;
+                                }
+                                $route->path = $route_path;
+                                $this->addRoute($sub_domain, $route, $controller::class, $method->getName());
+                            }
+                        }
+                    }
+                }
+            } else if( $file !== "." && $file !== ".." && is_dir($path.DIRECTORY_SEPARATOR.$file) ) {
+                // Let's go through this subdirectory
+                $this->registerController( $sub_domain,$directory.$file.DIRECTORY_SEPARATOR);
+            }
+        }
+    }
 
 	/**
 	 * The initializer for this class
@@ -59,20 +121,21 @@ class Router {
      * Sets a route for a specific call.
      * The call looks like "ControllerName->methodName"
      *
-     * @param string $route
+     * @param string $sub_domain
+     * @param Route $route
      * @param string $class
      * @param string|null $method
      *
      * @throws SystemException
      */
-	public function addRoute( string $route, string $class, ?string $method = null ): void {
-		if( !isset($this->routes[$route]) ) {
+	public function addRoute( string $sub_domain, Route $route, string $class, ?string $method = null ): void {
+		if( !isset($this->routes[$sub_domain][$route->method][$route->path]) ) {
 			if( is_null($method) ) {
 				$method = "index";
 			}
-            $regex = str_replace("/" , "\/", $route);
-            $regex = preg_replace("/{.*}/", "([\w|0-9]+)", $regex);
-			$this->routes[$regex] = array( "controller" => $class, 'method' => $method, 'regex' => $regex );
+            $regex = str_replace("/" , "\/", $route->path);
+            $regex = preg_replace("/{[a-zA-Z|_|-]+}/", "([\w|0-9]+)", $regex);
+			$this->routes[$sub_domain][$route->method][$route->path] = array( "controller" => $class, 'method' => $method, 'regex' => $regex );
 		} else {
 			throw new SystemException(__FILE__, __LINE__,"Router: The route [".$route."] is already taken");
 		}
@@ -84,11 +147,12 @@ class Router {
 	 * @param string $route
 	 * @return bool
 	 */
-	public function hasRoute( string $route ): bool {
-		if( isset($this->routes[$route]) ) {
+	public function hasRoute( string $path ): bool {
+        $request_method = System::$Core->request->getRequestMethod();
+		if( isset($this->routes[SUB_DOMAIN][$request_method][$path]) ) {
 			return true;
 		}
-		$matches = preg_grep("/^".preg_quote($route, '/')."/i", array_keys($this->routes));
+		$matches = preg_grep("/^".preg_quote($path, '/')."/i", array_keys($this->routes[SUB_DOMAIN][$request_method]));
 		return count($matches) > 0;
 	}
 
@@ -105,7 +169,7 @@ class Router {
      * @throws SystemException
      */
 	public function getRoute( Request $request ): ?array {
-        return $this->getRouteArray($request->getRequestUri());
+        return $this->getRouteArray($request->getRequestUri(),$request->getRequestMethod());
 	}
 
     /**
@@ -133,28 +197,43 @@ class Router {
      * @throws ReflectionException
      * @throws SystemException
      */
-    private function getRouteArray( string $request ): array {
+    private function getRouteArray( string $request, string $method = HTTP_GET ): array {
         // first check for static urls
         if( array_key_exists( addcslashes($request, "/"), $this->routes ) ) {
-            $entry = $this->routes[addcslashes($request, "/")];
+            $entry = $this->routes[SUB_DOMAIN][$method][addcslashes($request, "/")];
             $controller = new $entry["controller"]();
-            $method = $entry["method"];
-            return array( "controller" => $controller, "method" => $method, "params" => array() );
+            $controller_method = $entry["method"];
+            return array( "controller" => $controller, "method" => $controller_method, "params" => array() );
         }
 
         // then check for dynamic urls
-        foreach( $this->routes as $regex => $entry ) {
+        foreach( $this->routes[SUB_DOMAIN][$method] as $path => $entry ) {
             $matches = array();
-            if( preg_match("/^".$regex."$/i", $request, $matches) ) {
+            if( preg_match("/^".$entry["regex"]."$/i", $request, $matches) ) {
                 array_shift($matches);
                 $controller = new $entry["controller"]();
-                $method = $entry["method"];
-                $params = $this->getFormattedParameters($controller, $method, $matches);
-                return array( "controller" => $controller, "method" => $method, "params" => $params );
+                $controller_method = $entry["method"];
+                $params = $this->getFormattedParameters($controller, $controller_method, $matches);
+                return array( "controller" => $controller, "method" => $controller_method, "params" => $params );
             }
         }
         return array();
     }
+
+    public function getSortedRoutes(): array {
+        $sorted_routes = array();
+        foreach( $this->routes as $domain => $methods) {
+            foreach( $methods as $method => $entries ){
+                foreach( $entries as $path => $settings) {
+                    $controller = $settings["controller"];
+                    $controller_method = $settings["method"];
+                    $sorted_routes[$domain][$controller]["[".$method."] ".$controller_method] = $path;
+                }
+            }
+        }
+        return $sorted_routes;
+    }
+
 
     /**
      * Checks if the needed parameters of the controller method
@@ -237,71 +316,4 @@ class Router {
         throw new SystemException( __FILE__,__LINE__,"Router: Param count mismatch for method[".$controller."->".$method."]");
 	}
 
-    /**
-     * Walks through the given $directory and collects all
-     * Classes that are an instance of system\abstracts\AController
-     *
-     * @param string $directory
-     *
-     * @throws SystemException
-     */
-	private function initController( string $directory ): void {
-		$files = scandir($directory);
-		// Go through all files/directories in this directory
-		foreach( $files as $file ) {
-			// do we have a file?
-			if( !is_dir($directory.$file) ) {
-				$class_file = $directory.$file;
-				// Get the namespace of this path
-				$class = Path2Namespace($class_file);
-				// get an instance of this class
-				$controller = new $class();
-				if( $controller instanceof AController ) {
-					// It's a valid Controller so initialize its routes
-					$controller->init($this);
-				}
-			} else if( $file !== "." && $file !== ".." && is_dir($directory.DIRECTORY_SEPARATOR.$file) ) {
-				// Let's go through this subdirectory
-				$this->initController($directory.$file.DIRECTORY_SEPARATOR);
-			}
-		}
-	}
-
-	/**
-	 * Collect all Controllers from all "subdomains" and returns them
-	 * in an array
-	 *
-	 * @param string $directory
-	 * @param array $results
-	 */
-	public function getAllRoutes( string $directory, array &$results ): void {
-		$files = scandir($directory);
-		// Go through all files/directories in this directory
-		foreach( $files as $file ) {
-			// do we have a file?
-			if( !is_dir($directory.$file) ) {
-				$class_file = $directory.$file;
-
-                // Get the namespace of this path
-				$class = Path2Namespace($class_file);
-
-                // get the controller path
-                $pattern = "/^controller\\".DIRECTORY_SEPARATOR."(.*)\\".DIRECTORY_SEPARATOR."/";
-                preg_match($pattern, $class, $matches);
-                $domain = $matches[1];
-
-				// get an instance of this class
-				$controller = new $class();
-				if( $controller instanceof AController ) {
-                    $routes = $controller->getRoutes();
-                    foreach( $routes as $url => $route ) {
-                        $results[$domain][$route["controller"]][$route["method"]] = $url;
-                    }
-				}
-			} else if( $file !== "." && $file !== ".." && is_dir($directory.DIRECTORY_SEPARATOR.$file) ) {
-				// Let's go through this subdirectory
-				$this->getAllRoutes($directory.$file.DIRECTORY_SEPARATOR, $results);
-			}
-		}
-	}
 }

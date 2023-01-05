@@ -85,7 +85,7 @@ class Login extends Session {
             $actor = new ActorModel($this->actor_id);
 
             // only developer can log in as any actor
-            if( ($this->as_actor > 0 || isset($_POST["login-as"], $_POST["actor_id"])) && ActorModel::isDeveloper() ) {
+            if( ($this->as_actor > 0 || isset($_POST["login-as"], $_POST["actor_id"])) && ActorModel::isDeveloper($actor->id) ) {
                 if( isset($_POST["actor_id"]) ) {
                     $this->as_actor = (int)$_POST["actor_id"];
                 }

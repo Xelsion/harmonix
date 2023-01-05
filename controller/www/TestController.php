@@ -6,6 +6,7 @@ use JsonException;
 use models\ActorModel;
 use system\abstracts\AController;
 use system\abstracts\AResponse;
+use system\attributes\Route;
 use system\classes\responses\HtmlResponse;
 use system\classes\Router;
 use system\classes\Template;
@@ -13,43 +14,15 @@ use system\exceptions\SystemException;
 use system\helper\RequestHelper;
 use system\System;
 
+#[Route("tests")]
 class TestController extends AController {
 
     /**
-     * @inheritDoc
-     */
-    public function init( Router $router ): void {
-        // Add routes to router
-        $routes = $this->getRoutes();
-        foreach( $routes as $url => $route ) {
-            $router->addRoute($url, $route["controller"], $route["method"] );
-        }
-
-        // Add MenuItems to the Menu
-        System::$Core->menu->insertMenuItem(200, null, "Tests", "/tests");
-        System::$Core->menu->insertMenuItem(210, 200, "Actors", "/tests/actors");
-        System::$Core->menu->insertMenuItem(220, 200, "Charts", "/tests/charts");
-        System::$Core->menu->insertMenuItem(230, 200, "TinyMCE", "/tests/tinymce");
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function getRoutes(): array {
-        return array(
-            "/tests" => array("controller" => __CLASS__, "method" => "index"),
-            "/tests/actors" => array("controller" => __CLASS__, "method" => "actors"),
-            "/tests/actors/{id}" => array("controller" => __CLASS__, "method" => "actorsDetail"),
-            "/tests/charts" => array("controller" => __CLASS__, "method" => "charts"),
-	        "/tests/tinymce" => array("controller" => __CLASS__, "method" => "tinymce")
-        );
-    }
-
-    /**
-     * @inheritDoc
+     * Shows the starting page of the test controller
      *
      * @throws SystemException
      */
+    #[Route("/", HTTP_GET)]
     public function index(): AResponse {
         $response = new HtmlResponse();
         $template = new Template(PATH_VIEWS . "template.html");
@@ -63,6 +36,7 @@ class TestController extends AController {
      *
      * @throws SystemException
      */
+    #[Route("charts", HTTP_GET)]
     public function charts(): AResponse {
         $response = new HtmlResponse();
         $template = new Template(PATH_VIEWS . "template.html");
@@ -76,6 +50,7 @@ class TestController extends AController {
      * @throws SystemException
      * @throws JsonException
      */
+    #[Route("actors", HTTP_GET)]
     public function actors() : AResponse {
         $response = new HtmlResponse();
         $params = RequestHelper::getPaginationParams();
@@ -108,8 +83,9 @@ class TestController extends AController {
      * @throws SystemException
      * @throws JsonException
      */
-    public function actorsDetail( int $id ) : AResponse {
-        $results = ActorModel::find([["id", "=", $id]]);
+    #[Route("actors/{actor_id}", HTTP_GET)]
+    public function actorsDetail( int $actor_id ) : AResponse {
+        $results = ActorModel::find([["id", "=", $actor_id]]);
         if( count($results) === 0 ) {
             redirect("/error/404");
         }
@@ -126,7 +102,8 @@ class TestController extends AController {
 	 * @return HtmlResponse
 	 * @throws SystemException
 	 */
-	public function tinymce() : AResponse {
+    #[Route("tinymce", HTTP_GET)]
+    public function tinymce() : AResponse {
 		if( !empty($_POST) && isset($_POST["content"]) ) {
 			print_debug($_POST["content"]);
 		}

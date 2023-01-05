@@ -20,15 +20,25 @@ class Actor extends AEntity {
 
 	// the columns
 	public int $id = 0;
+
     public int $type_id = 0;
+
 	public string $email = "";
-	public string $password = "";
-	public string $first_name = "";
-	public string $last_name = "";
+
+    public string $password = "";
+
+    public string $first_name = "";
+
+    public string $last_name = "";
+
 	public int $login_fails = 0;
+
 	public bool $login_disabled = false;
+
     public string $created = "";
+
     public ?string $updated = null;
+
     public ?string $deleted = null;
 
     /**

@@ -1,0 +1,53 @@
+<?php
+
+use system\System;
+
+$this->set("title", "Daten Verbindungen");
+
+$result_list = $this->get("result_list");
+$pagination = $this->get("pagination");
+?>
+<div class="container-fluid">
+	<h1>Verbindungen</h1>
+	<table class="table table-dark table-striped">
+		<tr>
+			<th>ID</th>
+			<th class="col-md-2">Datenbank</th>
+			<th>Tabelle</th>
+			<th>Spalte</th>
+			<th class="col-md-3 text-end">Optionen</th>
+		</tr>
+		<?php foreach( $result_list as $entry ): ?>
+			<tr>
+				<td><?= escaped_html($entry->id) ?></td>
+				<td><?= escaped_html($entry->db_name) ?></td>
+				<td><?= escaped_html($entry->table_name) ?></td>
+				<td><?= escaped_html($entry->table_col) ?></td>
+				<td class="text-nowrap text-end">
+					<a href="/actors/roles/<?= $entry->id ?>" class="button button-default"><?= System::$Core->lang->getValue("translations", "roles") ?></a>
+					<a href="/actors/<?= $entry->id ?>" class="button button-default"><?= System::$Core->lang->getValue("translations", "edit") ?></a>
+					<button class="button button-negativ" onclick="$('#delete-target').attr('href', '/actors/delete/<?= $entry->id ?>')" data-bs-toggle="modal" data-bs-target="#confirm-delete"><?= System::$Core->lang->getValue("translations", "delete") ?></button>
+				</td>
+			</tr>
+		<?php endforeach; ?>
+	</table>
+</div>
+
+<div class="modal fade" id="confirm-delete" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h1 class="modal-title fs-5" id="exampleModalLabel">Achtung!!!</h1>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body">
+				Sind Sie sicher, das Sie diesen Eintrag löschen wollen?
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="button button-default" data-bs-dismiss="modal">Close</button>
+				<a id="delete-target" href="" class="button button-negativ">Löschen</a>
+			</div>
+		</div>
+	</div>
+</div>
+

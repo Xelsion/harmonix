@@ -15,9 +15,12 @@ class Request {
 	private static ?Request $request = null;
     private string $request_uri;
 
+    private string $request_method;
+
 	// GET, POST & FILES data from the request
 	private array $form;
 
+    private array $files;
 	/**
 	 * The class constructor
 	 * sets the current requested uri
@@ -25,6 +28,7 @@ class Request {
 	 */
 	private function __construct() {
         $this->request_uri = $_SERVER["REQUEST_URI"];
+        $this->request_method = $_SERVER['REQUEST_METHOD'];
 		foreach( $_GET as $key => $value ) {
 			$this->form[$key] = $value;
 		}
@@ -32,7 +36,7 @@ class Request {
 			$this->form[$key] = $value;
 		}
 		foreach( $_FILES as $key => $value ) {
-			$this->form[$key] = $value;
+			$this->files[$key] = $value;
 		}
 	}
 
@@ -73,7 +77,7 @@ class Request {
 	 * @return string
 	 */
 	public function getRequestMethod(): string {
-		return $_SERVER["REQUEST_METHOD"];
+		return $this->request_method;
 	}
 
 	/**
@@ -90,9 +94,18 @@ class Request {
 	 *
 	 * @return array
 	 */
-	public function getAll(): array {
+	public function getPosts(): array {
 		return $this->form;
 	}
+
+    /**
+     * Returns all submitted key => value pairs
+     *
+     * @return array
+     */
+    public function getFiles(): array {
+        return $this->files;
+    }
 
 	/**
 	 * Returns the value from the submitted pairs

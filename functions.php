@@ -31,9 +31,9 @@ function escaped_html( ?string $string ): ?string {
         return null;
     }
     if( mb_detect_encoding($string) === "UTF-8") {
-        $string = utf8_decode($string);
+        $string = mb_convert_encoding($string, "UTF-8", "ISO-8859-1");
     }
-    $string = utf8_encode($string);
+    $string = mb_convert_encoding($string, "ISO-8859-1", "UTF-8");
     return htmlentities($string, ENT_HTML5, "UTF-8");
 }
 

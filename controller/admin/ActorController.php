@@ -2,18 +2,21 @@
 
 namespace controller\admin;
 
+use PDO;
 use DateTime;
 use Exception;
 use JsonException;
+
 use models\AccessPermissionModel;
 use models\ActorModel;
 use models\ActorRoleModel;
 use models\ActorTypeModel;
-use PDO;
+use models\DataConnectionModel;
+use models\entities\ActorData;
 use system\abstracts\AController;
 use system\abstracts\AResponse;
+use system\attributes\Route;
 use system\classes\responses\HtmlResponse;
-use system\classes\Router;
 use system\classes\Template;
 use system\exceptions\SystemException;
 use system\helper\HtmlHelper;
@@ -26,51 +29,25 @@ use system\System;
  * @author Markus Schröder <xelsion@gmail.com>
  * @version 1.0.0;
  */
+#[Route("actors")]
 class ActorController extends AController {
 
     /**
-     * @inheritDoc
-     */
-	public function init( Router $router ): void {
-		// Add routes to router
-        $routes = $this->getRoutes();
-        foreach( $routes as $url => $route ) {
-            $router->addRoute($url, $route["controller"], $route["method"] );
-        }
-
-		// Add MenuItems to the Menu
-        System::$Core->menu->insertMenuItem(200, null, "Benutzer", "/actors");
-        System::$Core->menu->insertMenuItem(210, 200, "Benutzer erstellen", "/actors/create");
-	}
-
-    /**
-     * @inheritDoc
-     */
-    public function getRoutes(): array {
-        return array(
-            "/actors" => array("controller" => __CLASS__, "method" => "index"),
-            "/actors/search" => array("controller" => __CLASS__, "method" => "search"),
-            "/actors/{actor}" => array("controller" => __CLASS__, "method" => "update"),
-            "/actors/create" => array("controller" => __CLASS__, "method" => "create"),
-            "/actors/delete/{actor}" => array("controller" => __CLASS__, "method" => "delete"),
-            "/actors/roles/{actor}" => array("controller" => __CLASS__, "method" => "roles")
-        );
-    }
-
-    /**
-     * @inheritDoc
+     * Get a list of all actors
      *
      * @throws Exception
      * @throws JsonException
      * @throws SystemException
      */
-	public function index(): AResponse {
+	#[Route("/", HTTP_GET)]
+    public function index(): AResponse {
         $response = new HtmlResponse();
         $params = RequestHelper::getPaginationParams();
 
         $cache = System::$Core->response_cache;
         $cache->initCacheFor(__METHOD__, ...$params);
         $cache->addFileCheck(__FILE__);
+        $cache->addFileCheck(PATH_VIEWS."template.html");
         $cache->addFileCheck(PATH_VIEWS."actor/index.html");
         if( self::$caching && $cache->isUpToDate() ) {
             $view_content = $cache->getContent();
@@ -99,12 +76,14 @@ class ActorController extends AController {
 	}
 
     /**
+     * Searches the db for actors that mache the search string
      *
      * @return AResponse
      *
      * @throws JsonException
      * @throws SystemException
      */
+    #[Route("search", HTTP_GET)]
     public function search(): AResponse {
         $response = new HtmlResponse();
         $search_string = System::$Core->request->get("search_string");
@@ -146,8 +125,11 @@ class ActorController extends AController {
     }
 
     /**
+     * Shows a create form for an actor
+     *
      * @throws Exception
      */
+    #[Route("create", HTTP_GET)]
     public function create(): AResponse {
 		if( !System::$Core->actor_role->canCreateAll() ) {
 			redirect("/error/403");
@@ -173,12 +155,16 @@ class ActorController extends AController {
         $cache->addFileCheck(__FILE__);
         $cache->addFileCheck(PATH_VIEWS."template.html");
         $cache->addFileCheck(PATH_VIEWS."actor/create.html");
+        $cache->addFileCheck(PATH_VIEWS."snippets/access_permissions.html");
+
         $cache->addDBCheck("mvc", "actor_roles");
         $cache->addDBCheck("mvc", "actor_types");
-        if( self::$caching && $cache->isUpToDate() ) {
+        if( self::$caching && $cache->isUpToDate() && false ) {
             $view_content = $cache->getContent();
         } else {
+            $routes = System::$Core->router->getSortedRoutes();
             $view = new Template(PATH_VIEWS."actor/create.html");
+            $view->set("routes", $routes);
             $view->set("role_options", ActorRoleModel::find());
             $view->set("type_options", ActorTypeModel::find());
             $view->set("access_permissions", array());
@@ -203,6 +189,7 @@ class ActorController extends AController {
      * @throws SystemException
      * @throws JsonException
      */
+    #[Route("{actor}", HTTP_GET)]
     public function update( ActorModel $actor ): AResponse {
 		if( !System::$Core->actor_role->canUpdate($actor->id) ) {
 			redirect("/error/403");
@@ -221,6 +208,28 @@ class ActorController extends AController {
                 $actor->login_fails = (int) $_POST["login_fails"];
                 $actor->login_disabled = (int) $_POST["login_disabled"];
 				$actor->update();
+
+                foreach( $_POST["actor_data"] as $index => $entry ) {
+                    $key = $entry["key"];
+                    $value = $entry["value"];
+                    $connection_id = intval($entry["connection"]);
+                    if( $index === 0 ) {
+                        $actor_data = new ActorData();
+                        $actor_data->actor_id = $actor->id;
+                        $actor_data->data_key = $key;
+                        $actor_data->data_value = $value;
+                        $actor_data->connection_id = $connection_id;
+                        $actor_data->create();
+                    } else {
+                        $actor_data = new ActorData($index);
+                        $actor_data->data_key = $key;
+                        $actor_data->data_value = $value;
+                        $actor_data->connection_id = $connection_id;
+                        $actor_data->update();
+                    }
+                }
+
+
                 redirect("/actors");
 			}
 		}
@@ -232,6 +241,7 @@ class ActorController extends AController {
         $view->set("actor", $actor);
         $view->set("role_options", ActorRoleModel::find());
         $view->set("type_options", ActorTypeModel::find());
+        $view->set("connection_options", DataConnectionModel::find());
         $view->set("access_permissions", $access_permissions);
         $view_content = $view->parse();
 
@@ -251,6 +261,7 @@ class ActorController extends AController {
      * @throws JsonException
      * @throws SystemException
      */
+    #[Route("delete/{actor}", HTTP_GET)]
     public function delete( ActorModel $actor ): AResponse {
         if( !System::$Core->actor_role->canDelete($actor->id) ) {
             redirect("/error/403");
@@ -269,6 +280,7 @@ class ActorController extends AController {
      * @throws SystemException
      * @throws Exception
      */
+    #[Route("roles/{actor}", HTTP_GET)]
     public function roles( ActorModel $actor ): AResponse {
 		if( !System::$Core->actor_role->canUpdate($actor->id) ) {
 			redirect("/error/403");
@@ -281,12 +293,13 @@ class ActorController extends AController {
 			$this->savePermissions($actor);
 			redirect("/actors");
 		}
-
+        $routes = System::$Core->router->getSortedRoutes();
 		$response = new HtmlResponse();
 		$template = new Template(PATH_VIEWS."template.html");
 
 		$template->set("navigation", System::$Core->menu);
 		$template->set("actor", $actor);
+        $template->set("routes", $routes);
 	    $template->set("role_options", ActorRoleModel::find());
 	    $template->set("access_permissions", AccessPermissionModel::find(array(
 		    ["actor_id", "=", $actor->id]

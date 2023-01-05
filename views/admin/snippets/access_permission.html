@@ -3,8 +3,7 @@
 use system\System;
 use models\ActorRoleModel;
 
-$routes = array();
-System::$Core->router->getAllRoutes(PATH_CONTROLLER_ROOT, $routes);
+$sorted_routes = $this->get("routes");
 $curr_actor_role = System::$Core->actor_role;
 
 $actor = $this->get("actor");
@@ -21,7 +20,7 @@ $role_options = $this->get("role_options");
 		<label>
 			<select onchange="showPath(this.value)">
 				<option value="">- Global -</option>
-				<?php foreach( array_keys($routes) as $domain ) { ?>
+				<?php foreach( array_keys($sorted_routes) as $domain ) { ?>
 					<option value="<?= $domain ?>"><?= $domain ?></option>
 				<?php } ?>
 			</select>
@@ -32,11 +31,9 @@ $role_options = $this->get("role_options");
 	<div class="col-auto"></div>
 	<div class="col-1">Bereich</div>
 	<div class="col">Controller</div>
-	<div class="col-2">Methode</div>
-	<div class="col-2">URL</div>
 	<div class="col-2">Rolle</div>
 </div>
-<?php foreach( $routes as $domain => $controllers ) {
+<?php foreach( $sorted_routes as $domain => $controllers ) {
 	$curr_role = $permissions[$domain][null][null] ?? 0;
 	$is_protected = ( $curr_actor_role->isDescendantOf(new ActorRoleModel($curr_role)) ) ? ' readonly' : '';
 	?>
@@ -96,9 +93,8 @@ $role_options = $this->get("role_options");
 					<div class="row g-2">
 						<div class="col-auto" style="width: 20px;"></div>
 						<div class="col-1 table-col text-nowrap"></div>
-						<div class="col table-col text-nowrap"></div>
 						<div class="col-2 table-col text-nowrap"><?= $method ?></div>
-						<div class="col-2 table-col text-nowrap"><?= $url ?></div>
+						<div class="col table-col text-nowrap"><?= $url ?></div>
 						<div class="col-2">
 							<label>
 								<select name="role[<?= $domain ?>][controller][<?= $controller_name ?>][method][<?= $method ?>]"<?= $is_disabled ?>>
