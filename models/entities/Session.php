@@ -3,14 +3,14 @@
 namespace models\entities;
 
 use Exception;
+use lib\abstracts\AEntity;
+use lib\core\System;
+use lib\exceptions\SystemException;
+use lib\helper\StringHelper;
 use PDO;
-use system\abstracts\AEntity;
-use system\exceptions\SystemException;
-use system\helper\StringHelper;
-use system\System;
 
 /**
- * The Login entity
+ * The SessionModel entity
  * Represents a single entry in the database
  *
  * @author Markus Schröder <xelsion@gmail.com>
@@ -49,7 +49,7 @@ class Session extends AEntity {
      *
      * @throws SystemException
      */
-    protected function init( string $session_id ): void {
+    public function init( string $session_id ): void {
         try {
             $pdo = System::$Core->connection_manager->getConnection("mvc");
             $pdo->prepareQuery("SELECT * FROM sessions WHERE id=:id");

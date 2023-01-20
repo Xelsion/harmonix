@@ -3,10 +3,10 @@
 namespace models;
 
 use JsonException;
+use lib\core\System;
+use lib\exceptions\SystemException;
+use lib\helper\SqlHelper;
 use PDO;
-use system\exceptions\SystemException;
-use system\helper\SqlHelper;
-use system\System;
 
 /**
  * The AccessRestrictionModel

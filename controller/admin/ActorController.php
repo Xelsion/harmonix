@@ -2,29 +2,28 @@
 
 namespace controller\admin;
 
-use PDO;
 use DateTime;
 use Exception;
 use JsonException;
-
+use lib\abstracts\AController;
+use lib\abstracts\AResponse;
+use lib\attributes\Route;
+use lib\classes\responses\HtmlResponse;
+use lib\classes\Template;
+use lib\core\System;
+use lib\exceptions\SystemException;
+use lib\helper\HtmlHelper;
+use lib\helper\RequestHelper;
 use models\AccessPermissionModel;
 use models\ActorModel;
 use models\ActorRoleModel;
 use models\ActorTypeModel;
 use models\DataConnectionModel;
 use models\entities\ActorData;
-use system\abstracts\AController;
-use system\abstracts\AResponse;
-use system\attributes\Route;
-use system\classes\responses\HtmlResponse;
-use system\classes\Template;
-use system\exceptions\SystemException;
-use system\helper\HtmlHelper;
-use system\helper\RequestHelper;
-use system\System;
+use PDO;
 
 /**
- * @see \system\abstracts\AController
+ * @see \lib\abstracts\AController
  *
  * @author Markus Schröder <xelsion@gmail.com>
  * @version 1.0.0;
@@ -39,9 +38,8 @@ class ActorController extends AController {
      * @throws JsonException
      * @throws SystemException
      */
-	#[Route("/", HTTP_GET)]
+	#[Route("")]
     public function index(): AResponse {
-        $response = new HtmlResponse();
         $params = RequestHelper::getPaginationParams();
 
         $cache = System::$Core->response_cache;
@@ -50,7 +48,7 @@ class ActorController extends AController {
         $cache->addFileCheck(PATH_VIEWS."template.html");
         $cache->addFileCheck(PATH_VIEWS."actor/index.html");
         if( self::$caching && $cache->isUpToDate() ) {
-            $view_content = $cache->getContent();
+            $content = $cache->getContent();
         } else {
             $pagination = "";
             HTMLHelper::getPagination( $params['page'],  ActorModel::getNumActors(), $params['limit'], $pagination);
@@ -58,21 +56,21 @@ class ActorController extends AController {
             $view = new Template(PATH_VIEWS."actor/index.html");
             $view->set("result_list", ActorModel::find(array(), $params['order'], $params['direction'], $params['limit'], $params['page']));
             $view->set("pagination", $pagination);
-            $view_content = $view->parse();
+
+            $template = new Template(PATH_VIEWS."template.html");
+            $template->set("navigation", System::$Core->menu);
+            $template->set("view", $view->parse());
+
+            $content = $template->parse();
 
             // if caching is enabled write the generated output into the cache file
             if(self::$caching) {
-                $cache->saveContent($view_content);
+                $cache->saveContent($content);
             }
 
         }
 
-        $template = new Template(PATH_VIEWS."template.html");
-        $template->set("navigation", System::$Core->menu);
-		$template->set("view", $view_content);
-
-        $response->setOutput($template->parse());
-		return $response;
+		return new HtmlResponse($content);
 	}
 
     /**
@@ -83,19 +81,19 @@ class ActorController extends AController {
      * @throws JsonException
      * @throws SystemException
      */
-    #[Route("search", HTTP_GET)]
+    #[Route("search")]
     public function search(): AResponse {
-        $response = new HtmlResponse();
         $search_string = System::$Core->request->get("search_string");
 
         $params = array($search_string);
         $cache = System::$Core->response_cache;
         $cache->initCacheFor(__METHOD__, ...$params);
         $cache->addFileCheck(__FILE__);
+        $cache->addFileCheck(PATH_VIEWS."template.html");
         $cache->addFileCheck(PATH_VIEWS."actor/search.html");
 
         if( self::$caching && $cache->isUpToDate() ) {
-            $view_content = $cache->getContent();
+            $content = $cache->getContent();
         } else {
             $results = array();
             if( $search_string !== null ) {
@@ -109,19 +107,20 @@ class ActorController extends AController {
             $view = new Template(PATH_VIEWS."actor/search.html");
             $view->set("search_string", $search_string);
             $view->set("result_list", $results);
-            $view_content = $view->parse();
+
+            $template = new Template(PATH_VIEWS."template.html");
+            $template->set("navigation", System::$Core->menu);
+            $template->set("view", $view->parse());
+
+            $content = $template->parse();
 
             // if caching is enabled write the generated output into the cache file
             if(self::$caching) {
-                $cache->saveContent($view_content);
+                $cache->saveContent($content);
             }
         }
 
-        $template = new Template(PATH_VIEWS."template.html");
-        $template->set("navigation", System::$Core->menu);
-        $template->set("view", $view_content);
-        $response->setOutput($template->parse());
-        return $response;
+        return new HtmlResponse($content);
     }
 
     /**
@@ -129,11 +128,12 @@ class ActorController extends AController {
      *
      * @throws Exception
      */
-    #[Route("create", HTTP_GET)]
+    #[Route("create")]
     public function create(): AResponse {
 		if( !System::$Core->actor_role->canCreateAll() ) {
 			redirect("/error/403");
 		}
+
 		if( isset($_POST['create']) ) {
 			$is_valid = $this->postIsValid();
 			if( $is_valid ) {
@@ -148,19 +148,17 @@ class ActorController extends AController {
 			}
 		}
 
-        $response = new HtmlResponse();
-
         $cache = System::$Core->response_cache;
         $cache->initCacheFor(__METHOD__);
         $cache->addFileCheck(__FILE__);
         $cache->addFileCheck(PATH_VIEWS."template.html");
         $cache->addFileCheck(PATH_VIEWS."actor/create.html");
         $cache->addFileCheck(PATH_VIEWS."snippets/access_permissions.html");
-
         $cache->addDBCheck("mvc", "actor_roles");
         $cache->addDBCheck("mvc", "actor_types");
-        if( self::$caching && $cache->isUpToDate() && false ) {
-            $view_content = $cache->getContent();
+
+        if( self::$caching && $cache->isUpToDate() ) {
+            $content = $cache->getContent();
         } else {
             $routes = System::$Core->router->getSortedRoutes();
             $view = new Template(PATH_VIEWS."actor/create.html");
@@ -168,20 +166,20 @@ class ActorController extends AController {
             $view->set("role_options", ActorRoleModel::find());
             $view->set("type_options", ActorTypeModel::find());
             $view->set("access_permissions", array());
-            $view_content = $view->parse();
+
+            $template = new Template(PATH_VIEWS."template.html");
+            $template->set("navigation", System::$Core->menu);
+            $template->set("view", $view->parse());
+
+            $content = $template->parse();
 
             // if caching is enabled write the generated output into the cache file
             if(self::$caching) {
-                $cache->saveContent($view_content);
+                $cache->saveContent($content);
             }
         }
 
-        $template = new Template(PATH_VIEWS."template.html");
-        $template->set("navigation", System::$Core->menu);
-        $template->set("view", $view_content);
-
-        $response->setOutput($template->parse());
-		return $response;
+		return new HtmlResponse($content);
 	}
 
 
@@ -189,14 +187,16 @@ class ActorController extends AController {
      * @throws SystemException
      * @throws JsonException
      */
-    #[Route("{actor}", HTTP_GET)]
+    #[Route("{actor}")]
     public function update( ActorModel $actor ): AResponse {
 		if( !System::$Core->actor_role->canUpdate($actor->id) ) {
 			redirect("/error/403");
 		}
+
 		if( isset($_POST['cancel']) ) {
 			redirect("/actors");
 		}
+
 		if( isset($_POST['update']) ) {
 			$is_valid = $this->postIsValid();
 			if( $is_valid ) {
@@ -228,13 +228,9 @@ class ActorController extends AController {
                         $actor_data->update();
                     }
                 }
-
-
                 redirect("/actors");
 			}
 		}
-
-		$response = new HtmlResponse();
 
         $access_permissions = array();
         $view = new Template(PATH_VIEWS."actor/edit.html");
@@ -243,14 +239,12 @@ class ActorController extends AController {
         $view->set("type_options", ActorTypeModel::find());
         $view->set("connection_options", DataConnectionModel::find());
         $view->set("access_permissions", $access_permissions);
-        $view_content = $view->parse();
 
         $template = new Template(PATH_VIEWS."template.html");
         $template->set("navigation", System::$Core->menu);
-        $template->set("view", $view_content);
+        $template->set("view", $view->parse());
 
-        $response->setOutput($template->parse());
-        return $response;
+        return new HtmlResponse($template->parse());
 	}
 
     /**
@@ -261,14 +255,16 @@ class ActorController extends AController {
      * @throws JsonException
      * @throws SystemException
      */
-    #[Route("delete/{actor}", HTTP_GET)]
+    #[Route("delete/{actor}")]
     public function delete( ActorModel $actor ): AResponse {
         if( !System::$Core->actor_role->canDelete($actor->id) ) {
             redirect("/error/403");
         }
+
         if( isset($_POST['cancel']) ) {
             redirect("/actors");
         }
+
         $delete_date = new DateTime();
         $actor->deleted = $delete_date->format('Y-m-d H:i:s');
         $actor->update();
@@ -280,11 +276,12 @@ class ActorController extends AController {
      * @throws SystemException
      * @throws Exception
      */
-    #[Route("roles/{actor}", HTTP_GET)]
+    #[Route("roles/{actor}")]
     public function roles( ActorModel $actor ): AResponse {
 		if( !System::$Core->actor_role->canUpdate($actor->id) ) {
 			redirect("/error/403");
 		}
+
 		if( isset($_POST['cancel']) ) {
 			redirect("/actors");
 		}
@@ -293,20 +290,20 @@ class ActorController extends AController {
 			$this->savePermissions($actor);
 			redirect("/actors");
 		}
-        $routes = System::$Core->router->getSortedRoutes();
-		$response = new HtmlResponse();
-		$template = new Template(PATH_VIEWS."template.html");
 
+        $view = new Template(PATH_VIEWS."actor/roles.html");
+        $view->set("actor", $actor);
+        $view->set("routes", System::$Core->router->getSortedRoutes());
+        $view->set("role_options", ActorRoleModel::find());
+        $view->set("access_permissions", AccessPermissionModel::find(array(
+            ["actor_id", "=", $actor->id]
+        )));
+
+		$template = new Template(PATH_VIEWS."template.html");
 		$template->set("navigation", System::$Core->menu);
-		$template->set("actor", $actor);
-        $template->set("routes", $routes);
-	    $template->set("role_options", ActorRoleModel::find());
-	    $template->set("access_permissions", AccessPermissionModel::find(array(
-		    ["actor_id", "=", $actor->id]
-	    )));
-	    $template->set("view", new Template(PATH_VIEWS."actor/roles.html"));
-		$response->setOutput($template->parse());
-		return $response;
+	    $template->set("view", $view->parse());
+
+		return new HtmlResponse($template->parse());
 	}
 
     /**

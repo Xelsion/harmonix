@@ -3,11 +3,11 @@
 namespace models\entities;
 
 use Exception;
+use lib\abstracts\AEntity;
+use lib\core\System;
+use lib\exceptions\SystemException;
+use lib\helper\StringHelper;
 use PDO;
-use system\abstracts\AEntity;
-use system\exceptions\SystemException;
-use system\helper\StringHelper;
-use system\System;
 
 /**
  * The ActorModel entity

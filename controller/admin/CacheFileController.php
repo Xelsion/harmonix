@@ -2,17 +2,17 @@
 
 namespace controller\admin;
 
-use system\abstracts\AController;
-use system\abstracts\AResponse;
-use system\attributes\Route;
-use system\classes\responses\HtmlResponse;
-use system\classes\Router;
-use system\classes\Template;
-use system\System;
+use lib\abstracts\AController;
+use lib\abstracts\AResponse;
+use lib\attributes\Route;
+use lib\classes\responses\HtmlResponse;
+use lib\classes\Template;
+use lib\core\System;
+use lib\exceptions\SystemException;
 
 
 /**
- * @see \system\abstracts\AController
+ * @see \lib\abstracts\AController
  *
  * @author Markus Schröder <xelsion@gmail.com>
  * @version 1.0.0;
@@ -22,29 +22,27 @@ class CacheFileController extends AController {
 
 	/**
 	 * Get a List of all cache files
-	 */
+     * @throws SystemException
+     */
     #[Route("/")]
     public function index(): AResponse {
-		$response = new HtmlResponse();
-
         $cache_infos = array();
         $this->getCacheFiles(PATH_CACHE_ROOT, $cache_infos);
 
         $view = new Template(PATH_VIEWS."cache/index.html");
         $view->set("cache_infos", $cache_infos);
-        $view_content = $view->parse();
 
         $template = new Template(PATH_VIEWS."template.html");
 		$template->set("navigation", System::$Core->menu);
-		$template->set("view", $view_content);
-		$response->setOutput($template->parse());
-		return $response;
+		$template->set("view", $view->parse());
+
+		return new HtmlResponse($template->parse());
 	}
 
     /**
      * @return AResponse
      */
-    #[Route("/delete", HTTP_DELETE)]
+    #[Route("/delete")]
     public function delete(): AResponse {
         $response = new HtmlResponse();
         $this->deleteCacheFiles(PATH_CACHE_ROOT);
@@ -94,7 +92,7 @@ class CacheFileController extends AController {
             if( is_file($file_name) ) {
                 unlink($file_name);
             } elseif(is_dir($file_name) ) {
-                $this->deleteCacheFiles($file_name.DIRECTORY_SEPARATOR, $cache_stats);
+                $this->deleteCacheFiles($file_name.DIRECTORY_SEPARATOR);
             }
         }
     }

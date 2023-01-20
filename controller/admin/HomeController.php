@@ -2,17 +2,18 @@
 
 namespace controller\admin;
 
-use system\abstracts\AController;
-use system\abstracts\AResponse;
-use system\attributes\Route;
-use system\classes\responses\HtmlResponse;
-use system\classes\Router;
-use system\classes\Template;
-use system\exceptions\SystemException;
-use system\System;
+use lib\abstracts\AController;
+use lib\abstracts\AResponse;
+use lib\attributes\Route;
+use lib\classes\R;
+use lib\classes\responses\HtmlResponse;
+use lib\classes\Template;
+use lib\classes\Test;
+use lib\core\System;
+use lib\exceptions\SystemException;
 
 /**
- * @see \system\abstracts\AController
+ * @see \lib\abstracts\AController
  *
  * @author Markus Schröder <xelsion@gmail.com>
  * @version 1.0.0;
@@ -20,17 +21,23 @@ use system\System;
 #[Route("/")]
 class HomeController extends AController {
 
+    public function __construct( ) {
+        parent::__construct();
+    }
+
     /**
      *  Get the starting site
+     * @throws SystemException
      */
-    #[Route("/")]
+    #[Route("")]
     public function index(): AResponse {
-		$response = new HtmlResponse();
+        $view = new Template(PATH_VIEWS."home/index.html");
+
 		$template = new Template(PATH_VIEWS."template.html");
 		$template->set("navigation", System::$Core->menu);
-		$template->set("view", new Template(PATH_VIEWS."home/index.html"));
-		$response->setOutput($template->parse());
-		return $response;
+		$template->set("view", $view->parse());
+
+		return new HtmlResponse($template->parse());
 	}
 
 	public function __toString(): string {

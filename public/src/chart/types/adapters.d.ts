@@ -41,7 +41,7 @@ export interface DateAdapter {
    */
   diff(a: number, b: number, unit: TimeUnit): number;
   /**
-   * Returns start of `unit` for the given `timestamp`.
+   * Returns getActor of `unit` for the given `timestamp`.
    * @param {number} timestamp - the input timestamp
    * @param {Unit|'isoWeek'} unit - the unit as string
    * @param {number} [weekday] - the ISO day of the week with 1 being Monday

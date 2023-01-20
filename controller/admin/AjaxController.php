@@ -3,13 +3,12 @@
 namespace controller\admin;
 
 use Exception;
-use system\abstracts\AController;
-use system\abstracts\AResponse;
-use system\attributes\Route;
-use system\classes\responses\JsonResponse;
-use system\classes\Router;
-use system\exceptions\SystemException;
-use system\System;
+use lib\abstracts\AController;
+use lib\abstracts\AResponse;
+use lib\attributes\Route;
+use lib\classes\responses\JsonResponse;
+use lib\core\System;
+use lib\exceptions\SystemException;
 
 #[Route("ajax")]
 class AjaxController extends AController {

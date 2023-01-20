@@ -2,15 +2,13 @@
 
 namespace models;
 
-use models\entities\ActorData;
-use PDO;
 use Exception;
 use JsonException;
-
-use system\System;
-use system\helper\SqlHelper;
-use system\exceptions\SystemException;
-use models\entities\DataConnection;
+use lib\core\System;
+use lib\exceptions\SystemException;
+use lib\helper\SqlHelper;
+use models\entities\ActorData;
+use PDO;
 
 /**
  * The ActorModel

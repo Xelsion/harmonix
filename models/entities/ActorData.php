@@ -4,11 +4,10 @@ namespace models\entities;
 
 use Exception;
 use JsonException;
+use lib\abstracts\AEntity;
+use lib\core\System;
+use lib\exceptions\SystemException;
 use PDO;
-
-use system\System;
-use system\abstracts\AEntity;
-use system\exceptions\SystemException;
 
 class ActorData extends AEntity {
 

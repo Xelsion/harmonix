@@ -3,15 +3,14 @@
 namespace controller\admin;
 
 use JsonException;
+use lib\abstracts\AController;
+use lib\abstracts\AResponse;
+use lib\attributes\Route;
+use lib\classes\responses\HtmlResponse;
+use lib\classes\Template;
+use lib\core\System;
+use lib\exceptions\SystemException;
 use models\ActorTypeModel;
-use system\abstracts\AController;
-use system\abstracts\AResponse;
-use system\attributes\Route;
-use system\classes\responses\HtmlResponse;
-use system\classes\Router;
-use system\classes\Template;
-use system\exceptions\SystemException;
-use system\System;
 
 #[Route("actor-types")]
 class ActorTypeController extends AController {
@@ -24,18 +23,16 @@ class ActorTypeController extends AController {
      * @throws SystemException
      * @throws JsonException
      */
-    #[Route("/", HTTP_GET)]
+    #[Route("")]
     public function index(): AResponse {
-        $response = new HtmlResponse();
-        $template = new Template(PATH_VIEWS."template.html");
-
         $view = new Template(PATH_VIEWS."actor_types/index.html");
         $view->set('result_list', ActorTypeModel::find());
 
+        $template = new Template(PATH_VIEWS."template.html");
         $template->set("navigation", System::$Core->menu);
         $template->set("view", $view->parse());
-        $response->setOutput($template->parse());
-        return $response;
+
+        return new HtmlResponse($template->parse());
     }
 
     /**
@@ -44,14 +41,16 @@ class ActorTypeController extends AController {
      * @throws JsonException
      * @throws SystemException
      */
-    #[Route("create", HTTP_GET)]
+    #[Route("create")]
     public function create(): AResponse {
         if( !System::$Core->actor_role->canCreateAll() ) {
             redirect("/error/403");
         }
+
         if( isset($_POST['cancel']) ) {
             redirect("/actor-types");
         }
+
         if( isset($_POST['create']) ) {
             $is_valid = $this->postIsValid();
             if( $is_valid ) {
@@ -62,15 +61,13 @@ class ActorTypeController extends AController {
             }
         }
 
-        $response = new HtmlResponse();
-        $template = new Template(PATH_VIEWS."template.html");
-        $template->set("navigation", System::$Core->menu);
-
         $view = new Template(PATH_VIEWS."actor_types/create.html");
 
+        $template = new Template(PATH_VIEWS."template.html");
+        $template->set("navigation", System::$Core->menu);
         $template->set("view", $view->parse());
-        $response->setOutput($template->parse());
-        return $response;
+
+        return new HtmlResponse($template->parse());
     }
 
 
@@ -83,14 +80,16 @@ class ActorTypeController extends AController {
      * @throws SystemException
      * @throws JsonException
      */
-    #[Route("/{actor_type}", HTTP_GET)]
+    #[Route("/{actor_type}")]
     public function update ( ActorTypeModel $actor_type): AResponse {
         if( !System::$Core->actor_role->canUpdate($actor_type->id) ) {
             redirect("/error/403");
         }
+
         if( isset($_POST['cancel']) ) {
             redirect("/actor-types");
         }
+
         if( isset($_POST['update']) ) {
             $is_valid = $this->postIsValid();
             if( $is_valid ) {
@@ -100,16 +99,14 @@ class ActorTypeController extends AController {
             }
         }
 
-        $response = new HtmlResponse();
-        $template = new Template(PATH_VIEWS."template.html");
-        $template->set("navigation", System::$Core->menu);
-
         $view = new Template(PATH_VIEWS."actor_types/edit.html");
         $view->set("actor_type", $actor_type);
 
+        $template = new Template(PATH_VIEWS."template.html");
+        $template->set("navigation", System::$Core->menu);
         $template->set("view", $view->parse());
-        $response->setOutput($template->parse());
-        return $response;
+
+        return new HtmlResponse($template->parse());
     }
 
     /**
@@ -120,14 +117,16 @@ class ActorTypeController extends AController {
      * @throws JsonException
      * @throws SystemException
      */
-    #[Route("delete/{actor_type}", HTTP_GET)]
+    #[Route("delete/{actor_type}")]
     public function delete(ActorTypeModel $actor_type): AResponse {
         if( !System::$Core->actor_role->canDelete($actor_type->id) ) {
             redirect("/error/403");
         }
+
         if( isset($_POST['cancel']) ) {
             redirect("/actors");
         }
+
         $actor_type->delete();
         redirect("/actor-types");
         return new HtmlResponse();

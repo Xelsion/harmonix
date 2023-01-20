@@ -4,17 +4,16 @@ namespace controller\admin;
 
 use Exception;
 use JsonException;
+use lib\abstracts\AController;
+use lib\abstracts\AResponse;
+use lib\attributes\Route;
+use lib\classes\responses\HtmlResponse;
+use lib\classes\Template;
+use lib\core\System;
+use lib\exceptions\SystemException;
 use models\AccessRestrictionModel;
 use models\AccessRestrictionTypeModel;
 use models\ActorRoleModel;
-use system\abstracts\AController;
-use system\abstracts\AResponse;
-use system\attributes\Route;
-use system\classes\responses\HtmlResponse;
-use system\classes\Router;
-use system\classes\Template;
-use system\exceptions\SystemException;
-use system\System;
 
 #[Route("restrictions")]
 class RestrictionController extends AController {
@@ -24,23 +23,10 @@ class RestrictionController extends AController {
      *
      * @throws Exception
      */
-    #[Route("/")]
+    #[Route("")]
     public function index(): AResponse {
         if( isset($_POST['update']) ) {
             $this->saveRestrictions();
-        }
-
-        $response = new HtmlResponse();
-        $template = new Template(PATH_VIEWS."template.html");
-
-        $routes = System::$Core->router->getRoutes();
-        $sorted_routes = array();
-        foreach( $routes as $domain => $entries) {
-            foreach( $entries as $path => $settings) {
-                $controller = $settings["controller"];
-                $method = $settings["method"];
-                $sorted_routes[$domain][$controller][$method] = $path;
-            }
         }
 
         $access_restrictions = AccessRestrictionModel::find();
@@ -52,15 +38,17 @@ class RestrictionController extends AController {
             );
         }
 
-        $template->set("navigation", System::$Core->menu);
-        $template->set("view", new Template(PATH_VIEWS."restrictions/index.html"));
-        $template->set("routes", $sorted_routes);
-        $template->set("current_restrictions", $current_restrictions);
-        $template->set("role_options", ActorRoleModel::find());
-        $template->set("type_options", AccessRestrictionTypeModel::find());
+        $view = new Template(PATH_VIEWS."restrictions/index.html");
+        $view->set("routes", System::$Core->router->getSortedRoutes());
+        $view->set("current_restrictions", $current_restrictions);
+        $view->set("role_options", ActorRoleModel::find());
+        $view->set("type_options", AccessRestrictionTypeModel::find());
 
-        $response->setOutput($template->parse());
-        return $response;
+        $template = new Template(PATH_VIEWS."template.html");
+        $template->set("navigation", System::$Core->menu);
+        $template->set("view", $view->parse());
+
+        return new HtmlResponse($template->parse());
     }
 
     /**
@@ -69,13 +57,14 @@ class RestrictionController extends AController {
      */
     #[Route("types")]
     public function types(): AResponse {
-        $response = new HtmlResponse();
+        $view = new Template(PATH_VIEWS."restrictions/types.html");
+        $view->set("type_list", AccessRestrictionTypeModel::find());
+
         $template = new Template(PATH_VIEWS."template.html");
         $template->set("navigation", System::$Core->menu);
-        $template->set("view", new Template(PATH_VIEWS."restrictions/types.html"));
-        $template->set("type_list", AccessRestrictionTypeModel::find());
-        $response->setOutput($template->parse());
-        return $response;
+        $template->set("view", $view->parse());
+
+        return new HtmlResponse($template->parse());
     }
 
     /**
@@ -88,6 +77,7 @@ class RestrictionController extends AController {
         if( isset($_POST['cancel']) ) {
             redirect("/restrictions/types");
         }
+
         if( isset($_POST['create']) ) {
             $is_valid = $this->postIsValid();
             if( $is_valid ) {
@@ -100,12 +90,14 @@ class RestrictionController extends AController {
                 redirect("/restrictions/types");
             }
         }
-        $response = new HtmlResponse();
+
+        $view = new Template(PATH_VIEWS."restrictions/types_create.html");
+
         $template = new Template(PATH_VIEWS."template.html");
         $template->set("navigation", System::$Core->menu);
-        $template->set("view", new Template(PATH_VIEWS."restrictions/types_create.html"));
-        $response->setOutput($template->parse());
-        return $response;
+        $template->set("view", $view->parse());
+
+        return new HtmlResponse($template->parse());
     }
 
     /**
@@ -118,6 +110,7 @@ class RestrictionController extends AController {
         if( isset($_POST['cancel']) ) {
             redirect("/restrictions/types");
         }
+
         if( isset($_POST['update']) ) {
             $is_valid = $this->postIsValid();
             if( $is_valid ) {
@@ -129,13 +122,15 @@ class RestrictionController extends AController {
                 redirect("/restrictions/types");
             }
         }
-        $response = new HtmlResponse();
+
+        $view = new Template(PATH_VIEWS."restrictions/types_edit.html");
+        $view->set("type", $type);
+
         $template = new Template(PATH_VIEWS."template.html");
         $template->set("navigation", System::$Core->menu);
-        $template->set("view", new Template(PATH_VIEWS."restrictions/types_edit.html"));
-        $template->set("type", $type);
-        $response->setOutput($template->parse());
-        return $response;
+        $template->set("view", $view->parse());
+
+        return new HtmlResponse($template->parse());
     }
 
     /**

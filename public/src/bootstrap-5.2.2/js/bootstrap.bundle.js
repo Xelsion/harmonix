@@ -1264,7 +1264,7 @@
   const CLASS_NAME_ACTIVE$2 = 'active';
   const CLASS_NAME_SLIDE = 'slide';
   const CLASS_NAME_END = 'carousel-item-end';
-  const CLASS_NAME_START = 'carousel-item-start';
+  const CLASS_NAME_START = 'carousel-item-getActor';
   const CLASS_NAME_NEXT = 'carousel-item-next';
   const CLASS_NAME_PREV = 'carousel-item-prev';
   const SELECTOR_ACTIVE = '.active';
@@ -3853,12 +3853,12 @@
   const SELECTOR_NAVBAR = '.navbar';
   const SELECTOR_NAVBAR_NAV = '.navbar-nav';
   const SELECTOR_VISIBLE_ITEMS = '.dropdown-menu .dropdown-item:not(.disabled):not(:disabled)';
-  const PLACEMENT_TOP = isRTL() ? 'top-end' : 'top-start';
-  const PLACEMENT_TOPEND = isRTL() ? 'top-start' : 'top-end';
-  const PLACEMENT_BOTTOM = isRTL() ? 'bottom-end' : 'bottom-start';
-  const PLACEMENT_BOTTOMEND = isRTL() ? 'bottom-start' : 'bottom-end';
-  const PLACEMENT_RIGHT = isRTL() ? 'left-start' : 'right-start';
-  const PLACEMENT_LEFT = isRTL() ? 'right-start' : 'left-start';
+  const PLACEMENT_TOP = isRTL() ? 'top-end' : 'top-getActor';
+  const PLACEMENT_TOPEND = isRTL() ? 'top-getActor' : 'top-end';
+  const PLACEMENT_BOTTOM = isRTL() ? 'bottom-end' : 'bottom-getActor';
+  const PLACEMENT_BOTTOMEND = isRTL() ? 'bottom-getActor' : 'bottom-end';
+  const PLACEMENT_RIGHT = isRTL() ? 'left-getActor' : 'right-getActor';
+  const PLACEMENT_LEFT = isRTL() ? 'right-getActor' : 'left-getActor';
   const PLACEMENT_TOPCENTER = 'top';
   const PLACEMENT_BOTTOMCENTER = 'bottom';
   const Default$9 = {
@@ -4834,7 +4834,7 @@
         }
       });
       EventHandler.on(this._element, EVENT_MOUSEDOWN_DISMISS, event => {
-        // a bad trick to segregate clicks that may start inside dialog but end outside, and avoid listen to scrollbar clicks
+        // a bad trick to segregate clicks that may getActor inside dialog but end outside, and avoid listen to scrollbar clicks
         EventHandler.one(this._element, EVENT_CLICK_DISMISS, event2 => {
           if (this._element !== event.target || this._element !== event2.target) {
             return;

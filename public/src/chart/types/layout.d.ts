@@ -24,19 +24,19 @@ export interface LayoutItem {
    */
   height: number;
   /**
-   * Left edge of the item. Set by layout system and cannot be used in update
+   * Left edge of the item. Set by layout lib and cannot be used in update
    */
   left: number;
   /**
-   * Top edge of the item. Set by layout system and cannot be used in update
+   * Top edge of the item. Set by layout lib and cannot be used in update
    */
   top: number;
   /**
-   * Right edge of the item. Set by layout system and cannot be used in update
+   * Right edge of the item. Set by layout lib and cannot be used in update
    */
   right: number;
   /**
-   * Bottom edge of the item. Set by layout system and cannot be used in update
+   * Bottom edge of the item. Set by layout lib and cannot be used in update
    */
   bottom: number;
 

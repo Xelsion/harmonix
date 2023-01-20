@@ -2,14 +2,13 @@
 
 namespace controller\admin;
 
-use system\abstracts\AController;
-use system\abstracts\AResponse;
-use system\attributes\Route;
-use system\classes\responses\HtmlResponse;
-use system\classes\Router;
-use system\classes\Template;
-use system\exceptions\SystemException;
-use system\System;
+use lib\abstracts\AController;
+use lib\abstracts\AResponse;
+use lib\attributes\Route;
+use lib\classes\responses\HtmlResponse;
+use lib\classes\Template;
+use lib\core\System;
+use lib\exceptions\SystemException;
 
 #[Route("tests")]
 class TestController Extends AController {
@@ -21,31 +20,34 @@ class TestController Extends AController {
      *
      * @throws SystemException
      */
-    #[Route("/")]
+    #[Route("")]
     public function index(): AResponse {
-        $response = new HtmlResponse();
-        $all_routes = array();
-        System::$Core->router->getAllRoutes( PATH_CONTROLLER_ROOT, $all_routes);
-
         $cache = System::$Core->response_cache;
         $cache->initCacheFor(__METHOD__);
         $cache->addFileCheck(__FILE__);
+        $cache->addFileCheck(PATH_VIEWS."template.html");
         $cache->addFileCheck(PATH_VIEWS."test/index.html");
 
         if( $cache->isUpToDate() ) {
-            $view_content = $cache->getContent();
+            $content = $cache->getContent();
         } else {
+            $all_routes = array();
+            System::$Core->router->getAllRoutes( PATH_CONTROLLER_ROOT, $all_routes);
+
             $view = new Template(PATH_VIEWS."test/index.html");
             $view->set("routes_list", $all_routes);
-            $view_content = $view->parse();
-            $cache->saveContent($view_content);
+
+            $template = new Template(PATH_VIEWS."template.html");
+            $template->set("navigation", System::$Core->menu);
+            $template->set("view", $view->parse());
+
+            $content = $template->parse();
+
+            $cache->saveContent($content);
         }
 
-        $template = new Template(PATH_VIEWS."template.html");
-        $template->set("navigation", System::$Core->menu);
-        $template->set("view", $view_content);
 
-        $response->setOutput($template->parse());
-        return $response;
+
+        return new HtmlResponse($content);
     }
 }

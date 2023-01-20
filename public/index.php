@@ -8,9 +8,9 @@
 declare(strict_types = 1);
 error_reporting(E_ALL);
 
-use system\abstracts\ALoggableException;
-use system\classes\Logger;
-use system\Process;
+use lib\abstracts\ALoggableException;
+use lib\classes\Logger;
+use lib\App;
 
 define("SUB_DOMAIN", explode(".", $_SERVER["HTTP_HOST"])[0]);
 require_once( "../constants.php" );
@@ -18,15 +18,16 @@ require_once( "../functions.php" );
 
 $runtime_logger = new Logger("runtime");
 try {
-    // start output buffering and prevent all direct output
+    // getActor output buffering and prevent all direct output
 	ob_start();
 
-    // start the process
-	$process = Process::getInstance();
-    $process->start();
+    // getActor the process
+	$app = App::getInstance();
+    $app->addMiddleware(\lib\middleware\SessionAuth::class);
+    $app->run();
 
     // write the process results to the output buffer
-	echo $process->getResult();
+	echo $app->getResult();
 
     // print the output buffer and empty it
 	ob_end_flush();

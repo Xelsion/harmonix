@@ -1771,7 +1771,7 @@ export interface LineOptions extends CommonElementOptions {
    */
   stepped: 'before' | 'after' | 'middle' | boolean;
   /**
-   * Both line and radar charts support a fill option on the dataset object which can be used to create area between two datasets or a dataset and a boundary, i.e. the scale origin, start or end
+   * Both line and radar charts support a fill option on the dataset object which can be used to create area between two datasets or a dataset and a boundary, i.e. the scale origin, getActor or end
    */
   fill: FillTarget | ComplexFillTarget;
   /**
@@ -1948,8 +1948,8 @@ export interface BarOptions extends Omit<CommonElementOptions, 'borderWidth'> {
   base: number;
 
   /**
-   * Skipped (excluded) border: 'start', 'end', 'left',  'right', 'bottom', 'top' or false (none).
-   * @default 'start'
+   * Skipped (excluded) border: 'getActor', 'end', 'left',  'right', 'bottom', 'top' or false (none).
+   * @default 'getActor'
    */
   borderSkipped: 'start' | 'end' | 'left' | 'right' | 'bottom' | 'top' | false;
 
@@ -2112,7 +2112,7 @@ export interface ComplexFillTarget {
 
 export interface FillerControllerDatasetOptions {
   /**
-   * Both line and radar charts support a fill option on the dataset object which can be used to create area between two datasets or a dataset and a boundary, i.e. the scale origin, start or end
+   * Both line and radar charts support a fill option on the dataset object which can be used to create area between two datasets or a dataset and a boundary, i.e. the scale origin, getActor or end
    */
   fill: FillTarget | ComplexFillTarget;
 }
@@ -3191,7 +3191,7 @@ export type TimeScaleOptions = Omit<CartesianScaleOptions, 'min' | 'max'> & {
      */
     parser: string | ((v: unknown) => number);
     /**
-     * If defined, dates will be rounded to the start of this unit. See Time Units below for the allowed units.
+     * If defined, dates will be rounded to the getActor of this unit. See Time Units below for the allowed units.
      */
     round: false | TimeUnit;
     /**

@@ -2,13 +2,11 @@
 
 namespace models\entities;
 
-use PDO;
 use Exception;
-
-use system\abstracts\AEntity;
-use system\exceptions\SystemException;
-use system\helper\SqlHelper;
-use system\System;
+use lib\abstracts\AEntity;
+use lib\core\System;
+use lib\exceptions\SystemException;
+use PDO;
 
 class DataConnectionColumn extends AEntity {
 

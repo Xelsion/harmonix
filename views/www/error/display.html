@@ -1,0 +1,11 @@
+<?php
+
+use lib\core\System;
+
+?>
+<div class="container-fluid">
+	<h1><?= System::$Storage::get("title") ?></h1>
+	<?php if( System::$Storage::get("message") !== null ) {
+		echo System::$Storage::get("message");
+	} ?>
+</div>

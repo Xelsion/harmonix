@@ -3,18 +3,17 @@
 namespace controller\admin;
 
 use Exception;
+use lib\abstracts\AController;
+use lib\abstracts\AResponse;
+use lib\attributes\Route;
+use lib\classes\responses\HtmlResponse;
+use lib\classes\Template;
+use lib\core\System;
+use lib\exceptions\SystemException;
 use models\ActorRoleModel;
-use system\abstracts\AController;
-use system\abstracts\AResponse;
-use system\attributes\Route;
-use system\classes\responses\HtmlResponse;
-use system\classes\Router;
-use system\classes\Template;
-use system\exceptions\SystemException;
-use system\System;
 
 /**
- * @see \system\abstracts\AController
+ * @see \lib\abstracts\AController
  *
  * @author Markus Schröder <xelsion@gmail.com>
  * @version 1.0.0;
@@ -27,7 +26,7 @@ class ActorRolesController extends AController {
      *
      * @throws Exception
      */
-	#[Route("/", HTTP_GET)]
+	#[Route("")]
     public function index(): AResponse {
 		$response = new HtmlResponse();
 		$template = new Template(PATH_VIEWS."template.html");
@@ -42,7 +41,7 @@ class ActorRolesController extends AController {
     /**
      * @throws Exception
      */
-    #[Route("create", HTTP_GET)]
+    #[Route("create")]
     public function create(): AResponse {
 		if( isset($_POST['create']) ) {
 			$is_valid = $this->postIsValid();
@@ -73,7 +72,7 @@ class ActorRolesController extends AController {
     /**
      * @throws Exception
      */
-    #[Route("/{role}", HTTP_GET)]
+    #[Route("/{role}")]
     public function update( ActorRoleModel $role ): AResponse {
 		if( isset($_POST['cancel']) ) {
 			redirect("/actor-roles");
@@ -108,7 +107,7 @@ class ActorRolesController extends AController {
     /**
      * @throws SystemException
      */
-    #[Route("delete", HTTP_GET)]
+    #[Route("delete")]
     public function delete( ActorRoleModel $role ) : AResponse {
         if( isset($_POST['cancel']) ) {
             redirect("/actor-roles");
@@ -121,16 +120,21 @@ class ActorRolesController extends AController {
                 throw new SystemException(__FILE__, __LINE__, $e->getMessage());
             }
         }
-        $response = new HtmlResponse();
+
+        $view = new Template(PATH_VIEWS . "actor_roles/delete.html");
+
         $template = new Template(PATH_VIEWS."template.html");
         $template->set("role", $role);
         $template->set("navigation", System::$Core->menu);
-        $template->set("view", new Template(PATH_VIEWS . "actor_roles/delete.html"));
-        $response->setOutput($template->parse());
-        return $response;
+        $template->set("view", $view->parse());
 
+        return new HtmlResponse($template->parse());
     }
 
+    /**
+     * @param array $settings
+     * @return int
+     */
 	private function getPermissions( array $settings ): int {
 		$permissions = 0b0000;
 		if( isset($settings["read"]) ) {
@@ -148,6 +152,9 @@ class ActorRolesController extends AController {
 		return $permissions;
 	}
 
+    /**
+     * @return bool
+     */
 	private function postIsValid(): bool {
 		$is_valid = true;
 		if( !isset($_POST["name"]) || $_POST["name"] === "" ) {

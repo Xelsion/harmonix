@@ -2,18 +2,18 @@
 
 namespace controller\www;
 
-use system\abstracts\AController;
-use system\abstracts\AResponse;
-use system\attributes\Route;
-use system\classes\responses\HtmlResponse;
-use system\classes\Template;
-use system\exceptions\SystemException;
+use lib\abstracts\AController;
+use lib\abstracts\AResponse;
+use lib\attributes\Route;
+use lib\classes\responses\HtmlResponse;
+use lib\classes\Template;
+use lib\exceptions\SystemException;
 
 /**
  * @author Markus Schröder <xelsion@gmail.com>
  * @version 1.0.0;
  */
-#[Route("")]
+#[Route("/")]
 class HomeController extends AController {
 
     /**
@@ -23,14 +23,21 @@ class HomeController extends AController {
      *
      * @throws SystemException
      */
-	#[Route("/", HTTP_GET)]
+	#[Route("")]
     public function index(): AResponse {
-		$response = new HtmlResponse();
-		$template = new Template(PATH_VIEWS."template.html");
-        $template->set("view", new Template(PATH_VIEWS."home/index.html"));
-		$response->setOutput($template->parse());
-		return $response;
+        $view = new Template(PATH_VIEWS."home/index.html");
+
+        $template = new Template(PATH_VIEWS."template.html");
+        $template->set("view", $view->parse());
+
+		return new HtmlResponse($template->parse());
 	}
+
+
+    #[Route("//test/")]
+    public function test() {
+
+    }
 
 	public function __toString(): string {
 		return __CLASS__;
