@@ -1,5 +1,4 @@
 <?php
-
 namespace lib\classes\tree;
 
 use models\ActorRoleModel;

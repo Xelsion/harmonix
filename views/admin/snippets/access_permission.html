@@ -1,10 +1,9 @@
 <?php
-
-use lib\core\System;
+use lib\App;
 use models\ActorRoleModel;
 
 $sorted_routes = $this->get("routes");
-$curr_actor_role = System::$Core->actor_role;
+$curr_actor_role = App::$curr_actor_role;
 
 $actor = $this->get("actor");
 $access_permissions = $this->get("access_permissions");

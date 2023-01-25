@@ -1,16 +1,15 @@
 <?php
-
 namespace controller\admin;
 
-use Exception;
+use lib\App;
 use lib\abstracts\AController;
 use lib\abstracts\AResponse;
 use lib\attributes\Route;
 use lib\classes\responses\HtmlResponse;
 use lib\classes\Template;
-use lib\core\System;
-use lib\exceptions\SystemException;
 use models\ActorRoleModel;
+
+use lib\exceptions\SystemException;
 
 /**
  * @see \lib\abstracts\AController
@@ -24,22 +23,25 @@ class ActorRolesController extends AController {
     /**
      * Get a list of all actor roles
      *
-     * @throws Exception
+     * @return AResponse
+     *
+     * @throws SystemException
      */
 	#[Route("")]
     public function index(): AResponse {
-		$response = new HtmlResponse();
-		$template = new Template(PATH_VIEWS."template.html");
+		$view = new Template(PATH_VIEWS."actor_roles/index.html");
+        $view->set("result_list", ActorRoleModel::find());
 
-		$template->set("navigation", System::$Core->menu);
-		$template->set("result_list", ActorRoleModel::find());
-		$template->set("view", new Template(PATH_VIEWS."actor_roles/index.html"));
-		$response->setOutput($template->parse());
-		return $response;
+		$template = new Template(PATH_VIEWS."template.html");
+		$template->set("view", $view->parse() );
+
+		return new HtmlResponse($template->parse());
 	}
 
     /**
-     * @throws Exception
+     * @return AResponse
+     *
+     * @throws SystemException
      */
     #[Route("create")]
     public function create(): AResponse {
@@ -49,7 +51,7 @@ class ActorRolesController extends AController {
 				$all = ( isset($_POST["all"]) ) ? $this->getPermissions($_POST["all"]) : 0b000;
 				$group = ( isset($_POST["group"]) ) ? $this->getPermissions($_POST["group"]) : 0b000;
 				$own = ( isset($_POST["own"]) ) ? $this->getPermissions($_POST["own"]) : 0b000;
-				$role = new ActorRoleModel();
+				$role = App::getInstance(ActorRoleModel::class);
 				$role->name = $_POST["name"];
 				$role->child_of = ( (int)$_POST["child_of"] > 0 ) ? (int)$_POST["child_of"] : null;
 				$role->rights_all = $all;
@@ -59,18 +61,21 @@ class ActorRolesController extends AController {
 				redirect("/actor-roles");
 			}
 		}
+        $view = new Template(PATH_VIEWS."actor_roles/create.html");
+        $view->set("option_list", ActorRoleModel::find());
 
-		$response = new HtmlResponse();
 		$template = new Template(PATH_VIEWS."template.html");
-		$template->set("navigation", System::$Core->menu);
-		$template->set("option_list", ActorRoleModel::find());
-		$template->set("view", new Template(PATH_VIEWS."actor_roles/create.html"));
-		$response->setOutput($template->parse());
-		return $response;
+		$template->set("view", $view->parse());
+
+		return new HtmlResponse($template->parse());
 	}
 
     /**
-     * @throws Exception
+     * @param ActorRoleModel $role
+     *
+     * @return AResponse
+     *
+     * @throws SystemException
      */
     #[Route("/{role}")]
     public function update( ActorRoleModel $role ): AResponse {
@@ -93,18 +98,22 @@ class ActorRolesController extends AController {
 				redirect("/actor-roles");
 			}
 		}
+        $view = new Template(PATH_VIEWS."actor_roles/edit.html");
+        $view->set("role", $role);
+        $view->set("actor_role", App::$curr_actor_role);
+        $view->set("option_list", ActorRoleModel::find(array(["id", "!=", $role->id])));
 
-		$response = new HtmlResponse();
 		$template = new Template(PATH_VIEWS."template.html");
-		$template->set("role", $role);
-		$template->set("option_list", ActorRoleModel::find(array(["id", "!=", $role->id])));
-		$template->set("navigation", System::$Core->menu);
-		$template->set("view", new Template(PATH_VIEWS."actor_roles/edit.html"));
-		$response->setOutput($template->parse());
-		return $response;
+		$template->set("view", $view->parse());
+
+		return new HTMLResponse($template->parse());
 	}
 
     /**
+     * @param ActorRoleModel $role
+     *
+     * @return AResponse
+     *
      * @throws SystemException
      */
     #[Route("delete")]
@@ -113,19 +122,14 @@ class ActorRolesController extends AController {
             redirect("/actor-roles");
         }
         if( isset($_POST['delete']) ) {
-            try {
-                $role->delete();
-                redirect("/actor-roles");
-            } catch( Exception $e ) {
-                throw new SystemException(__FILE__, __LINE__, $e->getMessage());
-            }
+            $role->delete();
+            redirect("/actor-roles");
         }
 
         $view = new Template(PATH_VIEWS . "actor_roles/delete.html");
+        $view->set("role", $role);
 
         $template = new Template(PATH_VIEWS."template.html");
-        $template->set("role", $role);
-        $template->set("navigation", System::$Core->menu);
         $template->set("view", $view->parse());
 
         return new HtmlResponse($template->parse());

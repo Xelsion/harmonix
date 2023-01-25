@@ -2,7 +2,6 @@
 namespace lib\classes\connections;
 
 use PDO;
-
 use lib\abstracts\ADBConnection;
 
 /**

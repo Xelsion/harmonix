@@ -1,6 +1,8 @@
 <?php
+use lib\App;
+use lib\classes\Language;
 
-use lib\core\System;
+$lang = App::getInstance(Language::class);
 
 $this->set("title", "Daten Verbindungen");
 
@@ -24,9 +26,9 @@ $pagination = $this->get("pagination");
 				<td><?= escaped_html($entry->table_name) ?></td>
 				<td><?= escaped_html($entry->table_col) ?></td>
 				<td class="text-nowrap text-end">
-					<a href="/actors/roles/<?= $entry->id ?>" class="button button-default"><?= System::$Core->lang->getValue("translations", "roles") ?></a>
-					<a href="/actors/<?= $entry->id ?>" class="button button-default"><?= System::$Core->lang->getValue("translations", "edit") ?></a>
-					<button class="button button-negativ" onclick="$('#delete-target').attr('href', '/actors/delete/<?= $entry->id ?>')" data-bs-toggle="modal" data-bs-target="#confirm-delete"><?= System::$Core->lang->getValue("translations", "delete") ?></button>
+					<a href="/actors/roles/<?= $entry->id ?>" class="button button-default"><?= $lang->getValue("translations", "roles") ?></a>
+					<a href="/actors/<?= $entry->id ?>" class="button button-default"><?= $lang->getValue("translations", "edit") ?></a>
+					<button class="button button-negativ" onclick="$('#delete-target').attr('href', '/actors/delete/<?= $entry->id ?>')" data-bs-toggle="modal" data-bs-target="#confirm-delete"><?= $lang->getValue("translations", "delete") ?></button>
 				</td>
 			</tr>
 		<?php endforeach; ?>

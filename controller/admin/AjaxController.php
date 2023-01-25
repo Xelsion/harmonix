@@ -1,13 +1,14 @@
 <?php
-
 namespace controller\admin;
 
-use Exception;
+use lib\App;
 use lib\abstracts\AController;
 use lib\abstracts\AResponse;
 use lib\attributes\Route;
 use lib\classes\responses\JsonResponse;
-use lib\core\System;
+use lib\manager\ConnectionManager;
+
+use Exception;
 use lib\exceptions\SystemException;
 
 #[Route("ajax")]
@@ -20,12 +21,12 @@ class AjaxController extends AController {
      *
      * @throws SystemException
      */
-    #[Route("get-tables/{db_name}")]
+    #[Route("getInstance-tables/{db_name}")]
     public function getTables( string $db_name ): AResponse {
         $response = new JsonResponse();
-
         try {
-            $pdo = System::$Core->connection_manager->getConnection($db_name);
+            $cm = App::getInstance(ConnectionManager::class);
+            $pdo = $cm->getConnection("mvc");
             $tables = $pdo->getTables();
             $response->setOutput($tables);
         } catch( Exception $e ) {
@@ -43,12 +44,13 @@ class AjaxController extends AController {
      *
      * @throws SystemException
      */
-    #[Route("get-table-key-columns/{db_name}/{table_name}")]
+    #[Route("getInstance-table-key-columns/{db_name}/{table_name}")]
     public function getTableKeyColumns( string $db_name, string $table_name ): AResponse {
         $response = new JsonResponse();
 
         try {
-            $pdo = System::$Core->connection_manager->getConnection($db_name);
+            $cm = App::getInstance(ConnectionManager::class);
+            $pdo = $cm->getConnection("mvc");
             $columns = $pdo->getTableKeyColumns( $table_name );
             $response->setOutput($columns);
         } catch( Exception $e ) {
@@ -65,12 +67,13 @@ class AjaxController extends AController {
      *
      * @throws SystemException
      */
-    #[Route("get-table-columns/{db_name}/{table_name}")]
+    #[Route("getInstance-table-columns/{db_name}/{table_name}")]
     public function getTableColumns( string $db_name, string $table_name ): AResponse {
         $response = new JsonResponse();
 
         try {
-            $pdo = System::$Core->connection_manager->getConnection($db_name);
+            $cm = App::getInstance(ConnectionManager::class);
+            $pdo = $cm->getConnection("mvc");
             $columns = $pdo->getTableColumns( $table_name );
             $response->setOutput($columns);
         } catch( Exception $e ) {

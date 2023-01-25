@@ -1,10 +1,9 @@
 <?php
-
 namespace lib\classes;
 
 use DateTime;
-use JsonException;
 
+use Exception;
 use lib\exceptions\SystemException;
 
 /**
@@ -39,7 +38,6 @@ class Logger extends File {
      * @param array $backtrace
      * @return bool
      *
-     * @throws JsonException
      * @throws SystemException
      */
 	public function log( string $file, int $line, string $message, array $backtrace = array() ): bool {
@@ -50,7 +48,7 @@ class Logger extends File {
 		if( !empty($backtrace) ) {
 			foreach( $backtrace as $trace ) {
 				$args = array();
-				// Go through all arguments and get a representable string for it
+				// Go through all arguments and getInstance a representable string for it
 				foreach( $trace["args"] as $arg ) {
 					if( is_object($arg) ) {
 						$args[] = get_class($arg);
@@ -60,8 +58,13 @@ class Logger extends File {
 				}
                 $string_args = "";
                 if( !empty($args) ) {
-                    $string_args = json_encode($args, JSON_THROW_ON_ERROR);
-                    $string_args = str_replace("\\\\", "\\", $string_args);
+                    try {
+                        $string_args = json_encode($args, JSON_THROW_ON_ERROR);
+                        $string_args = str_replace("\\\\", "\\", $string_args);
+                    } catch( Exception $e ) {
+                        throw new SystemException(__FILE__, __LINE__,"can't encode JSON data", $e->getCode(), $e->getPrevious());
+                    }
+
                 }
 				// Add the trace to the log string
 				$log .= sprintf("\t=>\tTrace: %s%s%s(%s) [Line %d]\n", $trace["class"], $trace["type"], $trace["function"],$string_args, $trace["line"]);

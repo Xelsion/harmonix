@@ -1,5 +1,4 @@
 <?php
-
 namespace lib\helper;
 
 use DateInterval;

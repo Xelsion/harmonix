@@ -1,7 +1,9 @@
 <?php
-
-use lib\core\System;
+use lib\App;
+use lib\classes\Language;
 use lib\helper\StringHelper;
+
+$lang = App::getInstance(Language::class);
 
 $search_string = $this->get("search_string");
 $actor_list = $this->get("result_list");
@@ -11,7 +13,7 @@ $actor_list = $this->get("result_list");
 		<div class="row">
 			<div class="col"></div>
 			<div class="col-3"><input type="text" name="search_string" value="" /></div>
-			<div class="col-auto"><input type="submit" name="" value="<?= System::$Core->lang->getValue("translations","search") ?>" class="button button-default" /></div>
+			<div class="col-auto"><input type="submit" name="" value="<?= $lang->getValue("translations","search") ?>" class="button button-default" /></div>
 		</div>
 	</form>
 	<h1>Suchergebnisse f&uuml;r: <?= escaped_html($search_string) ?></h1>
@@ -34,9 +36,9 @@ $actor_list = $this->get("result_list");
 				<td><?= $first_name ?></td>
 				<td><?= $last_name ?></td>
 				<td class="text-nowrap text-end">
-					<a href="/actors/roles/<?= $actor->id ?>" class="button button-default"><?= System::$Core->lang->getValue("translations", "roles") ?></a>
-					<a href="/actors/<?= $actor->id ?>" class="button button-default"><?= System::$Core->lang->getValue("translations", "edit") ?></a>
-					<a href="/actors/<?= $actor->id ?>" class="button button-negativ"><?= System::$Core->lang->getValue("translations", "delete") ?></a>
+					<a href="/actors/roles/<?= $actor->id ?>" class="button button-default"><?= $lang->getValue("translations", "roles") ?></a>
+					<a href="/actors/<?= $actor->id ?>" class="button button-default"><?= $lang->getValue("translations", "edit") ?></a>
+					<a href="/actors/<?= $actor->id ?>" class="button button-negativ"><?= $lang->getValue("translations", "delete") ?></a>
 				</td>
 			</tr>
 		<?php endforeach; ?>

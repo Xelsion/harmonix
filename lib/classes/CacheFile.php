@@ -1,9 +1,8 @@
 <?php
-
 namespace lib\classes;
 
 use DateTime;
-use lib\core\System;
+use lib\App;
 use lib\exceptions\SystemException;
 use lib\helper\StringHelper;
 
@@ -34,8 +33,8 @@ class CacheFile extends File {
      * @param string $file_name
      * @param string $hash
      */
-    public function __construct( string $file_name = "", string $hash = "" ) {
-        $cache_setting = System::$Core->configuration->getSection("cache");
+    public function __construct( Configuration $config, string $file_name = "", string $hash = "" ) {
+        $cache_setting = $config->getSection("cache");
         $this->encrypt = $cache_setting["encryption"];
 
         if( $file_name !== "" ) {
@@ -45,7 +44,7 @@ class CacheFile extends File {
             // build the cache file name
             $dir_part = PATH_CACHE_ROOT. $path_infos["dirname"] . DIRECTORY_SEPARATOR
                 . $path_infos["filename"] . DIRECTORY_SEPARATOR
-                . System::$Core->actor->id . DIRECTORY_SEPARATOR;
+                . App::$curr_actor->id . DIRECTORY_SEPARATOR;
             $cache_file = $dir_part . (int)$this->encrypt."_".md5($hash) . ".cache";
 
             parent::__construct($cache_file);

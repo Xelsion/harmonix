@@ -1,14 +1,11 @@
 <?php
-
 namespace lib\manager;
 
-use JsonException;
-use PDOException;
-use RuntimeException;
 use lib\abstracts\ADBConnection;
 use lib\classes\PDOConnection;
-use lib\exceptions\SystemException;
 
+use Exception;
+use lib\exceptions\SystemException;
 
 /**
  * This class will handle all database connections
@@ -49,7 +46,7 @@ class ConnectionManager {
     public function getAvailableConnections(): array {
         return array_keys($this->_connections);
     }
-    
+
     /**
      * Returns a connections
      * First checks if the connection is already active, if so returns it
@@ -57,13 +54,15 @@ class ConnectionManager {
      * and returns it.
      *
      * @param string $dbname
-     * @param bool $singelton - default is true
+     * @param bool $singleton
      *
      * @return mixed|PDOConnection
+     *
+     * @throws SystemException
      */
-	public function getConnection( string $dbname, bool $singelton = true ): mixed {
+	public function getConnection( string $dbname, bool $singleton = true ): mixed {
 		// is the connection already active?
-		if( isset($this->_active_connections[$dbname]) && $singelton ) {
+		if( isset($this->_active_connections[$dbname]) && $singleton ) {
 			return $this->_active_connections[$dbname];
 		}
 
@@ -74,16 +73,15 @@ class ConnectionManager {
 				// try to establish the connection
 				$pdo_conn = new PDOConnection($conn);
 				// add it to the active connections
-                if( $singelton ) {
+                if( $singleton ) {
 				    $this->_active_connections[$dbname] = $pdo_conn;
                 }
 				return $pdo_conn;
-			} catch( PDOException|SystemException|JsonException $e ) {
-                print_debug($e);
-				throw new RuntimeException($e->getMessage(), $e->getCode(), $e->getTrace());
+			} catch( Exception $e ) {
+				throw new SystemException($e->getFile(), $e->getLine(), $e->getMessage(), $e->getCode(), $e->getPrevious());
 			}
         } else {
-			throw new RuntimeException("ConnectionManager: [".$dbname."] connection not found");
+			throw new SystemException(__FILE__, __LINE__,"ConnectionManager: [".$dbname."] connection not found");
 		}
 	}
 

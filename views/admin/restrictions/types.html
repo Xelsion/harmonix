@@ -1,6 +1,8 @@
 <?php
+use lib\App;
+use lib\classes\Language;
 
-use lib\core\System;
+$lang = App::getInstance(Language::class);
 
 $this->set("title", "Zugriffstypen");
 $type_list = $this->get("type_list");
@@ -24,8 +26,8 @@ $type_list = $this->get("type_list");
 				<td><?= escaped_html($type->include_children) ?></td>
 				<td><?= escaped_html($type->include_descendants) ?></td>
 				<td class="text-nowrap text-end">
-					<a href="/restrictions/types/<?= $type->id ?>" class="button button-default"><?= System::$Core->lang->getValue("translations", "edit") ?></a>
-					<a href="/restrictions/types/delete/<?= $type->id ?>" class="button button-negativ"><?= System::$Core->lang->getValue("translations", "delete") ?></a>
+					<a href="/restrictions/types/<?= $type->id ?>" class="button button-default"><?= $lang->getValue("translations", "edit") ?></a>
+					<a href="/restrictions/types/delete/<?= $type->id ?>" class="button button-negativ"><?= $lang->getValue("translations", "delete") ?></a>
 				</td>
 			</tr>
 		<?php endforeach; ?>

@@ -1,5 +1,4 @@
 <?php
-
 namespace lib\classes;
 
 use DateTime;
@@ -8,6 +7,7 @@ use JsonException;
 use PDO;
 use PDOException;
 use PDOStatement;
+use lib\App;
 
 use lib\abstracts\ADBConnection;
 use lib\exceptions\SystemException;
@@ -38,7 +38,7 @@ class PDOConnection extends PDO {
 		parent::__construct($conn->getConnectionString(), $conn->user, $conn->pass, $conn->getConnectionOptions());
         $this->conn = $conn;
 		$this->stmt = new PDOStatement();
-		$this->logger = new Logger("database");
+		$this->logger = App::getInstance(Logger::class, null, ["log_type" => "database"]);
         $this->setModificationTimes();
 	}
 

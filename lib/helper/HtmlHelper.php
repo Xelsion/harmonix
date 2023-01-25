@@ -1,11 +1,21 @@
 <?php
-
 namespace lib\helper;
 
 use models\ActorRoleModel;
 
+use lib\exceptions\SystemException;
+
 class HtmlHelper {
 
+    /**
+     * @param ActorRoleModel $curr_role
+     * @param int $selected
+     * @param string $output
+     *
+     * @return void
+     *
+     * @throws SystemException
+     */
     public static function getRoleOptions( ActorRoleModel $curr_role, int $selected, string &$output ) : void {
         $output .= '<option value="'. $curr_role->id.'"'. (($curr_role->id === $selected) ? ' selected="selected"' : '') .'>'. escaped_html($curr_role->name).'</option>';
         $children = $curr_role->getChildren();
@@ -14,7 +24,15 @@ class HtmlHelper {
         }
     }
 
-    public static function getPagination( int $curr_page, int $num_entries, int $limit, string &$output ) {
+    /**
+     * @param int $curr_page
+     * @param int $num_entries
+     * @param int $limit
+     * @param string $output
+     *
+     * @return void
+     */
+    public static function getPagination( int $curr_page, int $num_entries, int $limit, string &$output ): void {
         $num_pages = ceil( $num_entries / $limit );
         if( (int)$num_pages === 1 ) {
             return;
@@ -45,7 +63,7 @@ class HtmlHelper {
 
         // 1 page back
         if( $curr_page > 1 ) {
-            $output .= '<li><button type="submit" name="page" value="'.($curr_page-1).'" class="button button-default">-1</button></li>';
+            $output .= '<li><button type="submit" name="page" value="'.($curr_page-1).'" class="button button-default">&lt;</button></li>';
         }
 
         // direct page numbers
@@ -59,7 +77,7 @@ class HtmlHelper {
 
         // 1 page forward
         if( $curr_page < $num_pages ) {
-            $output .= '<li><button type="submit" name="page" value="'.($curr_page+1).'" class="button button-default">+1</button></li>';
+            $output .= '<li><button type="submit" name="page" value="'.($curr_page+1).'" class="button button-default">&gt;</button></li>';
         }
 
         // 10 page forward

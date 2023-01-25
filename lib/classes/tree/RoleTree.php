@@ -1,10 +1,9 @@
 <?php
-
 namespace lib\classes\tree;
 
-use Exception;
-
 use models\ActorRoleModel;
+
+use lib\exceptions\SystemException;
 
 /**
  * The RoleTree class extends TreeWalker
@@ -21,7 +20,7 @@ class RoleTree extends TreeWalker {
      *
      * Collect all actor roles and add then to the tree
      *
-     * @throws Exception
+     * @throws SystemException
      */
 	private function __construct() {
 		parent::__construct();

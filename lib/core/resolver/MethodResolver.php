@@ -1,5 +1,4 @@
 <?php
-
 namespace lib\core\resolver;
 
 use lib\core\ClassManager;
@@ -36,7 +35,7 @@ class MethodResolver {
      * @throws SystemException
      */
     public function getValue(): mixed {
-        // get the class method reflection class
+        // getInstance the class method reflection class
         $method = new ReflectionMethod($this->instance, $this->method);
         // find and resolve the method arguments
         $argumentResolver = new ParameterResolver($this->cm, $method->getParameters(), $this->args);

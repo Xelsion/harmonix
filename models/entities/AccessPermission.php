@@ -1,12 +1,13 @@
 <?php
-
 namespace models\entities;
 
-use Exception;
-use lib\abstracts\AEntity;
-use lib\core\System;
-use lib\exceptions\SystemException;
 use PDO;
+use lib\App;
+use lib\abstracts\AEntity;
+use lib\manager\ConnectionManager;
+
+use Exception;
+use lib\exceptions\SystemException;
 
 /**
  * The AccessPermissionModel entity
@@ -41,7 +42,8 @@ class AccessPermission extends AEntity {
      */
 	public function create(): void {
 		try {
-			$pdo = System::$Core->connection_manager->getConnection("mvc");
+            $cm = App::getInstance(ConnectionManager::class);
+            $pdo = $cm->getConnection("mvc");
 			$sql = "INSERT INTO access_permissions (actor_id, role_id, domain, controller, method) VALUES (:actor_id, :role_id, :domain, :controller, :method)";
 			$pdo->prepareQuery($sql);
 			$pdo->bindParam(':actor_id', $this->actor_id, PDO::PARAM_INT);

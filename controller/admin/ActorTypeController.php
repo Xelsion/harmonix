@@ -1,16 +1,15 @@
 <?php
-
 namespace controller\admin;
 
-use JsonException;
+use lib\App;
 use lib\abstracts\AController;
 use lib\abstracts\AResponse;
 use lib\attributes\Route;
 use lib\classes\responses\HtmlResponse;
 use lib\classes\Template;
-use lib\core\System;
-use lib\exceptions\SystemException;
 use models\ActorTypeModel;
+
+use lib\exceptions\SystemException;
 
 #[Route("actor-types")]
 class ActorTypeController extends AController {
@@ -29,7 +28,6 @@ class ActorTypeController extends AController {
         $view->set('result_list', ActorTypeModel::find());
 
         $template = new Template(PATH_VIEWS."template.html");
-        $template->set("navigation", System::$Core->menu);
         $template->set("view", $view->parse());
 
         return new HtmlResponse($template->parse());
@@ -38,12 +36,11 @@ class ActorTypeController extends AController {
     /**
      * @return AResponse
      *
-     * @throws JsonException
      * @throws SystemException
      */
     #[Route("create")]
     public function create(): AResponse {
-        if( !System::$Core->actor_role->canCreateAll() ) {
+        if( !App::$curr_actor_role->canCreateAll() ) {
             redirect("/error/403");
         }
 
@@ -54,7 +51,7 @@ class ActorTypeController extends AController {
         if( isset($_POST['create']) ) {
             $is_valid = $this->postIsValid();
             if( $is_valid ) {
-                $actor_type = new ActorTypeModel();
+                $actor_type = App::getInstance(ActorTypeModel::class);
                 $actor_type->name = $_POST["name"];
                 $actor_type->create();
                 redirect("/actor-types");
@@ -64,7 +61,6 @@ class ActorTypeController extends AController {
         $view = new Template(PATH_VIEWS."actor_types/create.html");
 
         $template = new Template(PATH_VIEWS."template.html");
-        $template->set("navigation", System::$Core->menu);
         $template->set("view", $view->parse());
 
         return new HtmlResponse($template->parse());
@@ -78,11 +74,10 @@ class ActorTypeController extends AController {
      * @return AResponse
      *
      * @throws SystemException
-     * @throws JsonException
      */
     #[Route("/{actor_type}")]
     public function update ( ActorTypeModel $actor_type): AResponse {
-        if( !System::$Core->actor_role->canUpdate($actor_type->id) ) {
+        if( !App::$curr_actor_role->canUpdate($actor_type->id) ) {
             redirect("/error/403");
         }
 
@@ -101,9 +96,9 @@ class ActorTypeController extends AController {
 
         $view = new Template(PATH_VIEWS."actor_types/edit.html");
         $view->set("actor_type", $actor_type);
+        $view->set("actor_role", App::$curr_actor_role);
 
         $template = new Template(PATH_VIEWS."template.html");
-        $template->set("navigation", System::$Core->menu);
         $template->set("view", $view->parse());
 
         return new HtmlResponse($template->parse());
@@ -114,12 +109,11 @@ class ActorTypeController extends AController {
      *
      * @return AResponse
      *
-     * @throws JsonException
      * @throws SystemException
      */
     #[Route("delete/{actor_type}")]
     public function delete(ActorTypeModel $actor_type): AResponse {
-        if( !System::$Core->actor_role->canDelete($actor_type->id) ) {
+        if( !App::$curr_actor_role->canDelete($actor_type->id) ) {
             redirect("/error/403");
         }
 
@@ -133,7 +127,7 @@ class ActorTypeController extends AController {
     }
 
     /**
-     * Checks if all required values are set
+     * Checks if all required values are setClass
      *
      * @return bool
      */

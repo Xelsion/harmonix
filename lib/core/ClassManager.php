@@ -1,11 +1,11 @@
 <?php
-
 namespace lib\core;
 
 use lib\core\resolver\ClassResolver;
 use lib\core\resolver\MethodResolver;
-use lib\exceptions\SystemException;
+
 use ReflectionException;
+use lib\exceptions\SystemException;
 
 /**
  * The class manager is a Dependency Injection container.
@@ -40,12 +40,14 @@ class ClassManager {
      *
      * @return void
      */
-    public function sigleton(string $namespace, object $instance ): void {
+    public function singleton(string $namespace, object $instance ): void {
         $this->entries[$namespace] = $instance;
     }
 
     /**
      * Returns an instance for the given namespace
+     * Given args has to be key-value pairs and the keys must match the parameter names of the
+     * targets class constructor or methode.
      *
      * @param string $namespace
      * @param string $method
@@ -53,25 +55,28 @@ class ClassManager {
      *
      * @return mixed
      *
-     * @throws ReflectionException
      * @throws SystemException
      */
-    public function get(string $namespace, string $method = "", array $args = [] ): mixed {
-        if( $this->has($namespace) ) {
-            $entry =$this->entries[$namespace];
-            if( is_callable($entry) ) {
-                return $entry($this);
-            } elseif( is_object($entry) ) {
-                return $entry;
+    public function get(string $namespace, ?string $method = null, array $args = [] ): mixed {
+        try {
+            if( $this->has($namespace) ) {
+                $entry = $this->entries[$namespace];
+                if( is_callable($entry) ) {
+                    return $entry($this);
+                } elseif( is_object($entry) ) {
+                    return $entry;
+                }
+                $namespace = $entry;
             }
-            $namespace = $entry;
-        }
 
-        if( $method !== "") {
-            return (new MethodResolver($this, $namespace, $method, $args))->getValue();
-        }
+            if( !is_null($method) && $method !== "" ) {
+                return (new MethodResolver($this, $namespace, $method, $args))->getValue();
+            }
 
-        return (new ClassResolver($this, $namespace, $args))->getInstance();
+            return (new ClassResolver($this, $namespace, $args))->getInstance();
+        } catch( ReflectionException $e ) {
+            throw new SystemException($e->getFile(), $e->getLine(), $e->getMessage(), $e->getCode(), $e->getPrevious());
+        }
     }
 
     /**

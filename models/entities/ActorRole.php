@@ -1,16 +1,16 @@
 <?php
-
 namespace models\entities;
 
-use Exception;
-use JsonException;
-use lib\abstracts\AEntity;
-use lib\core\System;
-use lib\exceptions\SystemException;
 use PDO;
+use lib\App;
+use lib\abstracts\AEntity;
+use lib\manager\ConnectionManager;
+
+use Exception;
+use lib\exceptions\SystemException;
 
 /**
- * The ActorRoleModel entity
+ * The ActorRole entity
  * Represents a single entry in the database
  *
  * @author Markus Schröder <xelsion@gmail.com>
@@ -37,16 +37,20 @@ class ActorRole extends AEntity {
      *
      * @param int $id
      *
-     * @throws JsonException
      * @throws SystemException
      */
 	public function __construct( int $id = 0 ) {
 		if( $id > 0 ) {
-			$pdo = System::$Core->connection_manager->getConnection("mvc");
-			$pdo->prepareQuery("SELECT * FROM actor_roles WHERE id=:id");
-			$pdo->bindParam(":id", $id, PDO::PARAM_INT);
-			$pdo->setFetchMode(PDO::FETCH_INTO, $this);
-			$pdo->execute()->fetch();
+            try {
+                $cm = App::getInstance(ConnectionManager::class);
+                $pdo = $cm->getConnection("mvc");
+                $pdo->prepareQuery("SELECT * FROM actor_roles WHERE id=:id");
+                $pdo->bindParam(":id", $id, PDO::PARAM_INT);
+                $pdo->setFetchMode(PDO::FETCH_INTO, $this);
+                $pdo->execute()->fetch();
+            } catch( Exception $e ) {
+                throw new SystemException(__FILE__, __LINE__, $e->getMessage(), $e->getCode(), $e->getPrevious());
+            }
 		}
 	}
 
@@ -55,7 +59,8 @@ class ActorRole extends AEntity {
      */
 	public function create(): void {
 		try {
-			$pdo = System::$Core->connection_manager->getConnection("mvc");
+            $cm = App::getInstance(ConnectionManager::class);
+            $pdo = $cm->getConnection("mvc");
 			$sql = "INSERT INTO actor_roles (child_of, name, rights_all, rights_group, rights_own) VALUES (:child_of, :name, :rights_all, :rights_group, :rights_own)";
 			$pdo->prepareQuery($sql);
 			$pdo->bindParam(':child_of', $this->child_of, PDO::PARAM_INT);
@@ -78,7 +83,8 @@ class ActorRole extends AEntity {
 	public function update(): void {
 		if( $this->id > 0 ) {
 			try {
-				$pdo = System::$Core->connection_manager->getConnection("mvc");
+                $cm = App::getInstance(ConnectionManager::class);
+                $pdo = $cm->getConnection("mvc");
 				$sql = "UPDATE actor_roles SET child_of=:child_of, name=:name, rights_all=:rights_all, rights_group=:rights_group, rights_own=:rights_own WHERE id=:id";
 				$pdo->prepareQuery($sql);
 				$pdo->bindParam(':id', $this->id, PDO::PARAM_INT);
@@ -100,7 +106,8 @@ class ActorRole extends AEntity {
 	public function delete(): bool {
 		if( $this->id > 0 && !$this->is_protected ) {
 			try {
-				$pdo = System::$Core->connection_manager->getConnection("mvc");
+                $cm = App::getInstance(ConnectionManager::class);
+                $pdo = $cm->getConnection("mvc");
 				$pdo->prepareQuery("DELETE FROM actor_roles WHERE id=:id");
 				$pdo->bindParam(':id', $this->id, PDO::PARAM_INT);
 				$pdo->execute();

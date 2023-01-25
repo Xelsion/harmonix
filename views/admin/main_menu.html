@@ -1,8 +1,8 @@
 <?php
 
-use lib\core\System;
+use lib\classes\tree\Menu;
 
-$menu = System::$Core->menu;
+$menu = new Menu();
 $menu->insertMenuItem(100, null, "Home", "/");
 
 $menu->insertMenuItem(200, null, "Benutzer", "/actors");
@@ -23,3 +23,4 @@ $menu->insertMenuItem(500, null, "Routen", "/routes");
 
 $menu->insertMenuItem(600, null, "Cache Files", "/cache");
 echo $menu->getAsHtml();
+

@@ -1,13 +1,21 @@
 <?php
-
 namespace models\entities;
 
-use Exception;
-use lib\abstracts\AEntity;
-use lib\core\System;
-use lib\exceptions\SystemException;
 use PDO;
+use lib\App;
+use lib\abstracts\AEntity;
+use lib\manager\ConnectionManager;
 
+use Exception;
+use lib\exceptions\SystemException;
+
+/**
+ * The DataConnection entity
+ * Represents a single entry in the database
+ *
+ * @author Markus Schröder <xelsion@gmail.com>
+ * @version 1.0.0;
+ */
 class DataConnection extends AEntity {
 
     public int $id = 0;
@@ -34,25 +42,25 @@ class DataConnection extends AEntity {
     public function __construct( int $id = 0 ) {
         if( $id > 0 ) {
             try {
-                $pdo = System::$Core->connection_manager->getConnection("mvc");
+                $cm = App::getInstance(ConnectionManager::class);
+                $pdo = $cm->getConnection("mvc");
                 $pdo->prepareQuery("SELECT * FROM data_connections WHERE id=:id");
                 $pdo->bindParam(":id", $id, PDO::PARAM_INT);
                 $pdo->setFetchMode(PDO::FETCH_INTO, $this);
                 $pdo->execute()->fetch();
             } catch( Exception $e ) {
-                throw new SystemException(__FILE__, __LINE__, $e->getMessage());
+                throw new SystemException(__FILE__, __LINE__, $e->getMessage(), $e->getCode(), $e->getPrevious());
             }
         }
     }
 
     /**
-     * @return void
-     *
-     * @throws SystemException
+     * @inheritDoc
      */
     public function create(): void {
         try {
-            $pdo = System::$Core->connection_manager->getConnection("mvc");
+            $cm = App::getInstance(ConnectionManager::class);
+            $pdo = $cm->getConnection("mvc");
             $pdo->prepareQuery("INSERT INTO data_connections (name, db_name, table_name, table_col) VALUES (:name, :db_name, :table_name, :table_col)");
             $pdo->bindParam(":name", $this->name, PDO::PARAM_STR);
             $pdo->bindParam(":db_name", $this->db_name, PDO::PARAM_STR);
@@ -61,18 +69,17 @@ class DataConnection extends AEntity {
             $pdo->execute();
             $this->id = $pdo->lastInsertId();
         } catch( Exception $e ) {
-            throw new SystemException(__FILE__, __LINE__, $e->getMessage());
+            throw new SystemException(__FILE__, __LINE__, $e->getMessage(), $e->getCode(), $e->getPrevious());
         }
     }
 
     /**
-     * @return void
-     *
-     * @throws SystemException
+     * @inheritDoc
      */
     public function update(): void {
         try {
-            $pdo = System::$Core->connection_manager->getConnection("mvc");
+            $cm = App::getInstance(ConnectionManager::class);
+            $pdo = $cm->getConnection("mvc");
             $pdo->prepareQuery("UPDATE data_connections SET name=:name, db_name=:db_name, table_name=:table_name, table_col=:table_col WHERE id=:id");
             $pdo->bindParam(":name", $this->name, PDO::PARAM_STR);
             $pdo->bindParam(":db_name", $this->db_name, PDO::PARAM_STR);
@@ -81,20 +88,25 @@ class DataConnection extends AEntity {
             $pdo->bindParam(":id", $this->id, PDO::PARAM_INT);
             $pdo->execute();
         } catch( Exception $e ) {
-            throw new SystemException(__FILE__, __LINE__, $e->getMessage());
+            throw new SystemException(__FILE__, __LINE__, $e->getMessage(), $e->getCode(), $e->getPrevious());
         }
     }
 
     /**
-     * @return bool
+     * @inheritDoc
      */
     public function delete(): bool {
         if( $this->id > 0 ) {
-            $pdo = System::$Core->connection_manager->getConnection("mvc");
-            $pdo->prepareQuery("DELETE FROM data_connections WHERE id=:id");
-            $pdo->bindParam(":id", $this->id, PDO::PARAM_INT);
-            $pdo->execute();
-            return true;
+            try {
+                $cm = App::getInstance(ConnectionManager::class);
+                $pdo = $cm->getConnection("mvc");
+                $pdo->prepareQuery("DELETE FROM data_connections WHERE id=:id");
+                $pdo->bindParam(":id", $this->id, PDO::PARAM_INT);
+                $pdo->execute();
+                return true;
+            } catch( Exception $e ) {
+                throw new SystemException(__FILE__, __LINE__, $e->getMessage(), $e->getCode(), $e->getPrevious());
+            }
         }
         return false;
     }

@@ -1,17 +1,18 @@
 <?php
-
 namespace lib\core;
 
-use Exception;
-use lib\abstracts\AController;
-use lib\attributes\Route;
-use lib\exceptions\SystemException;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionMethod;
+use lib\App;
+use lib\abstracts\AController;
+use lib\attributes\Route;
+
+use Exception;
+use lib\exceptions\SystemException;
 
 /**
- * The Router Type singleton
+ * The Router Type setSingleton
  * Collect all the Controllers and returns the proper controller for the curren request
  *
  * @author Markus Schröder <xelsion@gmail.com>
@@ -55,8 +56,8 @@ class Router {
                 // Get the namespace of this path
                 $class = Path2Namespace($class_file);
 
-                // get an instance of this class
-                $controller = System::$ClassManager->get($class);
+                // getInstance an instance of this class
+                $controller = App::getInstance($class);
                 if( $controller instanceof AController ) {
                     // It's a valid Controller so initialize its routes
                     $reflection = new ReflectionClass($controller::class);
@@ -139,9 +140,10 @@ class Router {
      *
      * @param string $path
      * @return bool
+     * @throws SystemException
      */
 	public function hasRoute( string $path ): bool {
-        $request_method = System::$Core->request->getRequestMethod();
+        $request_method = App::$request->getRequestMethod();
 		if( isset($this->routes[SUB_DOMAIN][$path]) ) {
 			return true;
 		}
@@ -199,7 +201,7 @@ class Router {
     }
 
     /**
-     * Parses the request parts to get the controller and the wanted method
+     * Parses the request parts to getInstance the controller and the wanted method
      *
      * @param string $request
      * @return array
@@ -211,7 +213,7 @@ class Router {
         // first check for static urls
         if( array_key_exists( addcslashes($request, "/"), $this->routes ) ) {
             $entry = $this->routes[SUB_DOMAIN][addcslashes($request, "/")];
-            $controller = System::$ClassManager->get($entry["controller"]);
+            $controller = App::getInstance($entry["controller"]);
             $controller_method = $entry["method"];
             return array( "controller" => $controller, "method" => $controller_method, "params" => array() );
         }
@@ -221,7 +223,7 @@ class Router {
             $matches = array();
             if( preg_match("/^".$entry["regex"]."$/i", $request, $matches) ) {
                 array_shift($matches);
-                $controller = System::$ClassManager->get($entry["controller"]);
+                $controller = App::getInstance($entry["controller"]);
                 $controller_method = $entry["method"];
                 $params = $this->getFormattedParameters($controller, $controller_method, $matches);
                 return array( "controller" => $controller, "method" => $controller_method, "params" => $params );

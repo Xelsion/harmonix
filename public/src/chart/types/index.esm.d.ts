@@ -111,7 +111,7 @@ export interface BarControllerDatasetOptions
   categoryPercentage: number;
 
   /**
-   * Manually set width of each bar in pixels. If set to 'flex', it computes "optimal" sample widths that globally arrange bars side by side. If not set (default), bars are equally sized based on the smallest interval.
+   * Manually setClass width of each bar in pixels. If setClass to 'flex', it computes "optimal" sample widths that globally arrange bars side by side. If not setClass (default), bars are equally sized based on the smallest interval.
    */
   barThickness: number | 'flex';
 
@@ -1091,7 +1091,7 @@ export interface Plugin<TType extends ChartType = ChartType, O = AnyObject> exte
 export declare type ChartComponentLike = ChartComponent | ChartComponent[] | { [key: string]: ChartComponent } | Plugin | Plugin[];
 
 /**
- * Please use the module's default export which provides a singleton instance
+ * Please use the module's default export which provides a setSingleton instance
  * Note: class is exported for typedoc
  */
 export interface Registry {
@@ -1147,11 +1147,11 @@ export interface CoreScaleOptions {
    */
   beforeUpdate(axis: Scale): void;
   /**
-   * Callback that runs before dimensions are set.
+   * Callback that runs before dimensions are setClass.
    */
   beforeSetDimensions(axis: Scale): void;
   /**
-   * Callback that runs after dimensions are set.
+   * Callback that runs after dimensions are setClass.
    */
   afterSetDimensions(axis: Scale): void;
   /**
@@ -1245,7 +1245,7 @@ export interface Scale<O extends CoreScaleOptions = CoreScaleOptions> extends El
    */
   getPixelForTick(index: number): number;
   /**
-   * Used to get the label to display in the tooltip for the given value
+   * Used to getInstance the label to display in the tooltip for the given value
    * @param {*} value
    * @return {string}
    */
@@ -1266,7 +1266,7 @@ export interface Scale<O extends CoreScaleOptions = CoreScaleOptions> extends El
   getPixelForValue(value: number, index?: number): number;
 
   /**
-   * Used to get the data value from a given pixel. This is the inverse of getPixelForValue
+   * Used to getInstance the data value from a given pixel. This is the inverse of getPixelForValue
    * The coordinate (0, 0) is at the upper-left corner of the canvas
    * @param {number} pixel
    * @return {*}
@@ -1409,7 +1409,7 @@ export interface CoreInteractionOptions {
   intersect: boolean;
 
   /**
-   * Can be set to 'x', 'y', 'xy' or 'r' to define which directions are used in calculating distances. Defaults to 'x' for 'index' mode and 'xy' in dataset and 'nearest' modes.
+   * Can be setClass to 'x', 'y', 'xy' or 'r' to define which directions are used in calculating distances. Defaults to 'x' for 'index' mode and 'xy' in dataset and 'nearest' modes.
    */
   axis: 'x' | 'y' | 'xy' | 'r';
 }
@@ -1563,7 +1563,7 @@ export type AnimationSpec<TType extends ChartType> = {
   delay?: Scriptable<number, ScriptableContext<TType>>;
 
   /**
-   *   If set to true, the animations loop endlessly.
+   *   If setClass to true, the animations loop endlessly.
    * @default false
    */
   loop?: Scriptable<boolean, ScriptableContext<TType>>;
@@ -1574,7 +1574,7 @@ export type AnimationsSpec<TType extends ChartType> = {
     properties: string[];
 
     /**
-     * Type of property, determines the interpolator used. Possible values: 'number', 'color' and 'boolean'. Only really needed for 'color', because typeof does not get that right.
+     * Type of property, determines the interpolator used. Possible values: 'number', 'color' and 'boolean'. Only really needed for 'color', because typeof does not getInstance that right.
      */
     type: 'color' | 'number' | 'boolean';
 
@@ -1888,7 +1888,7 @@ export interface PointPrefixedOptions {
    */
   pointHitRadius: number;
   /**
-   * The radius of the point shape. If set to 0, the point is not rendered.
+   * The radius of the point shape. If setClass to 0, the point is not rendered.
    */
   pointRadius: number;
   /**
@@ -2101,7 +2101,7 @@ export interface ComplexFillTarget {
    */
   target: FillTarget;
   /**
-   * If no color is set, the default color will be the background color of the chart.
+   * If no color is setClass, the default color will be the background color of the chart.
    */
   above: Color;
   /**
@@ -2379,7 +2379,7 @@ export interface TitleOptions {
   font: FontSpec;
 
   /**
-   * Marks that this box should take the full width/height of the canvas (moving other boxes). If set to `false`, places the box above/beside the
+   * Marks that this box should take the full width/height of the canvas (moving other boxes). If setClass to `false`, places the box above/beside the
    * chart area
    * @default true
    */
@@ -2959,7 +2959,7 @@ export interface CartesianScaleOptions extends CoreScaleOptions {
   stackWeight?: number;
 
   /**
-   *   Which type of axis this is. Possible values are: 'x', 'y'. If not set, this is inferred from the first character of the ID which should be 'x' or 'y'.
+   *   Which type of axis this is. Possible values are: 'x', 'y'. If not setClass, this is inferred from the first character of the ID which should be 'x' or 'y'.
    */
   axis: 'x' | 'y';
 
@@ -2974,7 +2974,7 @@ export interface CartesianScaleOptions extends CoreScaleOptions {
   max: number;
 
   /**
-   *   If true, extra space is added to the both edges and the axis is scaled to fit into the chart area. This is set to true for a bar chart by default.
+   *   If true, extra space is added to the both edges and the axis is scaled to fit into the chart area. This is setClass to true for a bar chart by default.
    * @default false
    */
   offset: boolean;
@@ -3067,7 +3067,7 @@ export interface CartesianScaleOptions extends CoreScaleOptions {
      */
     mirror: boolean;
     /**
-     *   Padding between the tick label and the axis. When set on a vertical axis, this applies in the horizontal (X) direction. When set on a horizontal axis, this applies in the vertical (Y) direction.
+     *   Padding between the tick label and the axis. When setClass on a vertical axis, this applies in the horizontal (X) direction. When setClass on a horizontal axis, this applies in the vertical (Y) direction.
      * @default 0
      */
     padding: number;
@@ -3195,7 +3195,7 @@ export type TimeScaleOptions = Omit<CartesianScaleOptions, 'min' | 'max'> & {
      */
     round: false | TimeUnit;
     /**
-     * If boolean and true and the unit is set to 'week', then the first day of the week will be Monday. Otherwise, it will be Sunday.
+     * If boolean and true and the unit is setClass to 'week', then the first day of the week will be Monday. Otherwise, it will be Sunday.
      * If `number`, the index of the first day of the week (0 - Sunday, 6 - Saturday).
      * @default false
      */

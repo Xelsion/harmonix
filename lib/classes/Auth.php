@@ -1,16 +1,25 @@
 <?php
-
 namespace lib\classes;
 
-use JsonException;
+use PDOStatement;
+use lib\App;
+use lib\core\Request;
+use lib\core\Router;
 use lib\abstracts\AController;
-use lib\core\System;
-use lib\exceptions\SystemException;
+use lib\manager\ConnectionManager;
 use models\AccessRestrictionTypeModel;
 use models\ActorRoleModel;
-use PDOStatement;
-use ReflectionException;
 
+use Exception;
+use lib\exceptions\SystemException;
+
+/**
+ * The Auth class
+ * checks if the current actor role has access to the given route
+ *
+ * @author Markus Schröder <xelsion@gmail.com>
+ * @version 1.0.0;
+ */
 class Auth {
 
     private ActorRoleModel $actor_role;
@@ -20,13 +29,11 @@ class Auth {
     /**
      * The class constructor
      *
-     * @throws JsonException
      * @throws SystemException
-     * @throws ReflectionException
      */
-    public function __construct() {
-        $this->actor_role = System::$Core->actor_role;
-        $route = System::$Core->router->getRoute(System::$Core->request);
+    public function __construct( protected Request $request ) {
+        $this->actor_role = App::$curr_actor_role;
+        $route = App::getInstance(Router::class)->getRoute($request);
         $restriction = $this->getRestriction(get_class($route["controller"]), $route["method"]);
         $this->restriction_role = $restriction["role"];
         $this->restriction_type = $restriction["type"];
@@ -37,7 +44,6 @@ class Auth {
      *
      * @return bool
      *
-     * @throws JsonException
      * @throws SystemException
      */
     public function hasAccess() : bool {
@@ -53,14 +59,13 @@ class Auth {
      *
      * @return bool
      *
-     * @throws JsonException
      * @throws SystemException
      */
     public function hasAccessTo( $controller, string $method, string $domain = SUB_DOMAIN) : bool {
         if( $controller instanceof AController ) {
             $controller = get_class($controller);
         }
-        $actor_role = System::$Core->actor->getRole($controller, $method, $domain);
+        $actor_role = App::$curr_actor->getRole($controller, $method, $domain);
         $restriction = $this->getRestriction($controller, $method, $domain);
         $restriction_role = $restriction["role"];
         $restriction_type = $restriction["type"];
@@ -77,7 +82,6 @@ class Auth {
      *
      * @return bool
      *
-     * @throws JsonException
      * @throws SystemException
      */
     private function getAccessibility( ActorRoleModel $actor_role, ActorRoleModel $restriction_role, AccessRestrictionTypeModel $restriction_type ) : bool {
@@ -116,46 +120,37 @@ class Auth {
      *
      * @return array
      *
-     * @throws JsonException
      * @throws SystemException
      */
     private function getRestriction(?string $controller, ?string $method, string $domain = SUB_DOMAIN ) : array {
-        $role_is_set = false;
         $result = array();
 
         $pdo_results = $this->getRestrictionRole( $controller, $method, $domain );
         if( $pdo_results->rowCount() === 1 ) {
             $row = $pdo_results->fetch();
-            $result["role"] = new ActorRoleModel($row["role_id"]);
-            $result["type"] = new AccessRestrictionTypeModel($row["restriction_type"]);
-            $role_is_set = true;
+            $result["role"] = App::getInstance(ActorRoleModel::class, null, ["id" => $row["role_id"]]);
+            $result["type"] = App::getInstance(AccessRestrictionTypeModel::class, null, ["id" => $row["restriction_type"]]);
+            return $result;
         }
 
-        if( !$role_is_set ) {
-            $pdo_results = $this->getRestrictionRole( $controller, null, $domain );
-            if( $pdo_results->rowCount() === 1 ) {
-                $row = $pdo_results->fetch();
-                $result["role"] = new ActorRoleModel($row["role_id"]);
-                $result["type"] = new AccessRestrictionTypeModel($row["restriction_type"]);
-                $role_is_set = true;
-            }
+        $pdo_results = $this->getRestrictionRole( $controller, null, $domain );
+        if( $pdo_results->rowCount() === 1 ) {
+            $row = $pdo_results->fetch();
+            $result["role"] = App::getInstance(ActorRoleModel::class, null, ["id" => $row["role_id"]]);
+            $result["type"] = App::getInstance(AccessRestrictionTypeModel::class, null, ["id" => $row["restriction_type"]]);
+            return $result;
         }
 
-        if( !$role_is_set ) {
-            $pdo_results = $this->getRestrictionRole( null, null, $domain );
-            if( $pdo_results->rowCount() === 1 ) {
-                $row = $pdo_results->fetch();
-                $result["role"] = new ActorRoleModel($row["role_id"]);
-                $result["type"] = new AccessRestrictionTypeModel($row["restriction_type"]);
-                $role_is_set = true;
-            }
+        $pdo_results = $this->getRestrictionRole( null, null, $domain );
+        if( $pdo_results->rowCount() === 1 ) {
+            $row = $pdo_results->fetch();
+            $result["role"] = App::getInstance(ActorRoleModel::class, null, ["id" => $row["role_id"]]);
+            $result["type"] = App::getInstance(AccessRestrictionTypeModel::class, null, ["id" => $row["restriction_type"]]);
+            return $result;
         }
 
-        if( !$role_is_set ) {
-            $result["role"] = new ActorRoleModel(4);
-            $result["type"] = new AccessRestrictionTypeModel(4);
-        }
-
+        $result["role"] = App::getInstance(ActorRoleModel::class, null, ["id" => 4]);
+        $result["type"] = App::getInstance(AccessRestrictionTypeModel::class, null, ["id" => 4]);
         return $result;
     }
 
@@ -168,31 +163,35 @@ class Auth {
      *
      * @return PDOStatement
      *
-     * @throws JsonException
      * @throws SystemException
      */
     private function getRestrictionRole( ?string $controller, ?string $method, string $domain = SUB_DOMAIN ): PDOStatement {
-        $pdo = System::$Core->connection_manager->getConnection("mvc");
-        $sql = "SELECT role_id, restriction_type FROM access_restrictions WHERE domain=:domain";
-        if( $controller === null ) {
-            $sql .= " AND controller IS NULL";
-        } else {
-            $sql .= " AND controller=:controller";
+        try {
+            $cm = App::getInstance(ConnectionManager::class);
+            $pdo = $cm->getConnection("mvc");
+            $sql = "SELECT role_id, restriction_type FROM access_restrictions WHERE domain=:domain";
+            if( $controller === null || $controller === "" ) {
+                $sql .= " AND controller IS NULL";
+            } else {
+                $sql .= " AND controller=:controller";
+            }
+            if( $method === null || $method === "" ) {
+                $sql .= " AND method IS NULL";
+            } else {
+                $sql .= " AND method=:method";
+            }
+            $pdo->prepareQuery($sql);
+            $pdo->bindParam("domain", $domain);
+            if( $controller !== null && $controller !== "" ) {
+                $pdo->bindParam("controller", $controller);
+            }
+            if( $method !== null && $controller !== "" ) {
+                $pdo->bindParam("method", $method);
+            }
+            return $pdo->execute();
+        } catch( Exception $e ) {
+            throw new SystemException($e->getFile(), $e->getLine(), $e->getMessage(), $e->getCode(), $e->getPrevious());
         }
-        if( $method === null ) {
-            $sql .= " AND method IS NULL";
-        } else {
-            $sql .= " AND method=:method";
-        }
-        $pdo->prepareQuery($sql);
-        $pdo->bindParam("domain", $domain);
-        if( $controller !== null ) {
-            $pdo->bindParam("controller", $controller);
-        }
-        if( $method !== null ) {
-            $pdo->bindParam("method", $method);
-        }
-        return $pdo->execute();
     }
 
 }

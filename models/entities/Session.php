@@ -1,13 +1,15 @@
 <?php
-
 namespace models\entities;
 
-use Exception;
-use lib\abstracts\AEntity;
-use lib\core\System;
-use lib\exceptions\SystemException;
-use lib\helper\StringHelper;
 use PDO;
+use lib\App;
+use lib\abstracts\AEntity;
+use lib\classes\Configuration;
+use lib\helper\StringHelper;
+use lib\manager\ConnectionManager;
+
+use Exception;
+use lib\exceptions\SystemException;
 
 /**
  * The SessionModel entity
@@ -32,11 +34,11 @@ class Session extends AEntity {
 
     /**
      * The constructor loads the database content into this object.
-     * If a session was set it will load it else it will return an
+     * If a session was setClass it will load it else it will return an
      * empty entity
      */
-	public function __construct() {
-        $rotate_session = System::$Core->configuration->getSectionValue("security", "rotate_session");
+	public function __construct( Configuration $config ) {
+        $rotate_session = $config->getSectionValue("security", "rotate_session");
         if( !is_null($rotate_session) ) {
             $this->_rotate_session = (bool)$rotate_session;
         }
@@ -51,7 +53,8 @@ class Session extends AEntity {
      */
     public function init( string $session_id ): void {
         try {
-            $pdo = System::$Core->connection_manager->getConnection("mvc");
+            $cm = App::getInstance(ConnectionManager::class);
+            $pdo = $cm->getConnection("mvc");
             $pdo->prepareQuery("SELECT * FROM sessions WHERE id=:id");
             $pdo->bindParam(":id", $session_id);
             $pdo->setFetchMode(PDO::FETCH_INTO, $this);
@@ -67,7 +70,8 @@ class Session extends AEntity {
      */
 	public function create(): void {
 		try {
-			$pdo = System::$Core->connection_manager->getConnection("mvc");
+            $cm = App::getInstance(ConnectionManager::class);
+            $pdo = $cm->getConnection("mvc");
 			$sql = "INSERT INTO sessions (id, actor_id, ip, expired) VALUES (:id, :actor_id, :ip, :expired)";
 			$pdo->prepareQuery($sql);
 			$pdo->bindParam(':id', $this->id);
@@ -82,8 +86,6 @@ class Session extends AEntity {
 
     /**
      * @inheritDoc
-     *
-     * @throws SystemException
      */
 	public function update(): void {
 		try {
@@ -91,7 +93,8 @@ class Session extends AEntity {
             if( $this->_rotate_session ) {
                 $this->id = StringHelper::getGuID();
             }
-			$pdo = System::$Core->connection_manager->getConnection("mvc");
+            $cm = App::getInstance(ConnectionManager::class);
+            $pdo = $cm->getConnection("mvc");
 			$sql = "UPDATE sessions SET id=:id, actor_id=:actor_id, as_actor=:as_actor, ip=:ip, expired=:expired WHERE id=:curr_id";
 			$pdo->prepareQuery($sql);
             $pdo->bindParam(':id', $this->id);
@@ -112,7 +115,8 @@ class Session extends AEntity {
 	public function delete(): bool {
 		if( $this->id !== "" ) {
 			try {
-				$pdo = System::$Core->connection_manager->getConnection("mvc");
+                $cm = App::getInstance(ConnectionManager::class);
+                $pdo = $cm->getConnection("mvc");
 				$pdo->prepareQuery("DELETE FROM sessions WHERE id=:id");
 				$pdo->bindParam(":id", $this->id, PDO::PARAM_INT);
 				$pdo->execute();

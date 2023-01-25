@@ -1,10 +1,9 @@
 <?php
-
 namespace lib\classes;
 
 /**
  * The TimeAnalyser class
- * Can be used the set timers for different proposals
+ * Can be used the setClass timers for different proposals
  *
  * @author Markus Schröder <xelsion@gmail.com>
  * @version 1.0.0;

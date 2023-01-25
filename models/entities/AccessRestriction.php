@@ -1,13 +1,21 @@
 <?php
-
 namespace models\entities;
 
-use Exception;
-use lib\abstracts\AEntity;
-use lib\core\System;
-use lib\exceptions\SystemException;
 use PDO;
+use lib\App;
+use lib\abstracts\AEntity;
+use lib\manager\ConnectionManager;
 
+use Exception;
+use lib\exceptions\SystemException;
+
+/**
+ * The AccessRestriction entity
+ * Represents a single entry in the database
+ *
+ * @author Markus Schröder <xelsion@gmail.com>
+ * @version 1.0.0;
+ */
 class AccessRestriction extends AEntity {
 
     public string $domain = "";
@@ -28,7 +36,8 @@ class AccessRestriction extends AEntity {
      */
     public function create(): void {
         try {
-            $pdo = System::$Core->connection_manager->getConnection("mvc");
+            $cm = App::getInstance(ConnectionManager::class);
+            $pdo = $cm->getConnection("mvc");
             $sql = "INSERT INTO access_restrictions (domain, controller, method, restriction_type, role_id) VALUES (:domain, :controller, :method, :restriction_type, :role_id)";
             $pdo->prepareQuery($sql);
             $pdo->bindParam(':domain', $this->domain);

@@ -1,17 +1,19 @@
 <?php
-
 namespace controller\admin;
 
+use PDO;
 use DateTime;
-use Exception;
-use JsonException;
+use lib\App;
+use lib\classes\cache\ResponseCache;
+use lib\classes\Configuration;
+use lib\core\Request;
+use lib\core\Router;
+use lib\manager\ConnectionManager;
 use lib\abstracts\AController;
 use lib\abstracts\AResponse;
 use lib\attributes\Route;
 use lib\classes\responses\HtmlResponse;
 use lib\classes\Template;
-use lib\core\System;
-use lib\exceptions\SystemException;
 use lib\helper\HtmlHelper;
 use lib\helper\RequestHelper;
 use models\AccessPermissionModel;
@@ -20,7 +22,8 @@ use models\ActorRoleModel;
 use models\ActorTypeModel;
 use models\DataConnectionModel;
 use models\entities\ActorData;
-use PDO;
+
+use lib\exceptions\SystemException;
 
 /**
  * @see \lib\abstracts\AController
@@ -31,18 +34,22 @@ use PDO;
 #[Route("actors")]
 class ActorController extends AController {
 
+    public function __construct( private readonly Request $request, Configuration $config ) {
+        parent::__construct($config);
+    }
+
     /**
      * Get a list of all actors
      *
-     * @throws Exception
-     * @throws JsonException
+     * @return AResponse
+     *
      * @throws SystemException
      */
 	#[Route("")]
     public function index(): AResponse {
-        $params = RequestHelper::getPaginationParams();
+        $params = App::getInstance(RequestHelper::class)->getPaginationParams();
 
-        $cache = System::$Core->response_cache;
+        $cache = App::getInstance(ResponseCache::class);
         $cache->initCacheFor(__METHOD__, ...$params);
         $cache->addFileCheck(__FILE__);
         $cache->addFileCheck(PATH_VIEWS."template.html");
@@ -58,7 +65,6 @@ class ActorController extends AController {
             $view->set("pagination", $pagination);
 
             $template = new Template(PATH_VIEWS."template.html");
-            $template->set("navigation", System::$Core->menu);
             $template->set("view", $view->parse());
 
             $content = $template->parse();
@@ -78,15 +84,14 @@ class ActorController extends AController {
      *
      * @return AResponse
      *
-     * @throws JsonException
      * @throws SystemException
      */
     #[Route("search")]
     public function search(): AResponse {
-        $search_string = System::$Core->request->get("search_string");
+        $search_string = $this->request->get("search_string");
 
         $params = array($search_string);
-        $cache = System::$Core->response_cache;
+        $cache = App::getInstance(ResponseCache::class);
         $cache->initCacheFor(__METHOD__, ...$params);
         $cache->addFileCheck(__FILE__);
         $cache->addFileCheck(PATH_VIEWS."template.html");
@@ -97,7 +102,8 @@ class ActorController extends AController {
         } else {
             $results = array();
             if( $search_string !== null ) {
-                $pdo = System::$Core->connection_manager->getConnection("mvc");
+                $cm = App::getInstance(ConnectionManager::class);
+                $pdo = $cm->getConnection("mvc");
                 $sql = "SELECT * FROM actors WHERE first_name LIKE :word OR last_name LIKE :word OR email LIKE :word";
                 $pdo->prepareQuery($sql);
                 $pdo->bindParam("word", "%".$search_string."%");
@@ -109,7 +115,6 @@ class ActorController extends AController {
             $view->set("result_list", $results);
 
             $template = new Template(PATH_VIEWS."template.html");
-            $template->set("navigation", System::$Core->menu);
             $template->set("view", $view->parse());
 
             $content = $template->parse();
@@ -126,18 +131,20 @@ class ActorController extends AController {
     /**
      * Shows a create form for an actor
      *
-     * @throws Exception
+     * @return AResponse
+     *
+     * @throws SystemException
      */
     #[Route("create")]
     public function create(): AResponse {
-		if( !System::$Core->actor_role->canCreateAll() ) {
+		if( !App::$curr_actor_role->canCreateAll() ) {
 			redirect("/error/403");
 		}
 
 		if( isset($_POST['create']) ) {
 			$is_valid = $this->postIsValid();
 			if( $is_valid ) {
-				$actor = new ActorModel();
+				$actor = App::getInstance(ActorModel::class);
 				$actor->email = $_POST["email"];
 				$actor->password = $_POST["password"];
 				$actor->first_name = $_POST["first_name"];
@@ -148,7 +155,7 @@ class ActorController extends AController {
 			}
 		}
 
-        $cache = System::$Core->response_cache;
+        $cache = App::getInstance(ResponseCache::class);
         $cache->initCacheFor(__METHOD__);
         $cache->addFileCheck(__FILE__);
         $cache->addFileCheck(PATH_VIEWS."template.html");
@@ -160,7 +167,7 @@ class ActorController extends AController {
         if( self::$caching && $cache->isUpToDate() ) {
             $content = $cache->getContent();
         } else {
-            $routes = System::$Core->router->getSortedRoutes();
+            $routes = App::getInstance(Router::class)->getSortedRoutes();
             $view = new Template(PATH_VIEWS."actor/create.html");
             $view->set("routes", $routes);
             $view->set("role_options", ActorRoleModel::find());
@@ -168,7 +175,6 @@ class ActorController extends AController {
             $view->set("access_permissions", array());
 
             $template = new Template(PATH_VIEWS."template.html");
-            $template->set("navigation", System::$Core->menu);
             $template->set("view", $view->parse());
 
             $content = $template->parse();
@@ -184,12 +190,15 @@ class ActorController extends AController {
 
 
     /**
+     * @param ActorModel $actor
+     *
+     * @return AResponse
+     *
      * @throws SystemException
-     * @throws JsonException
      */
     #[Route("{actor}")]
     public function update( ActorModel $actor ): AResponse {
-		if( !System::$Core->actor_role->canUpdate($actor->id) ) {
+		if( !App::$curr_actor_role->canUpdate($actor->id) ) {
 			redirect("/error/403");
 		}
 
@@ -241,7 +250,6 @@ class ActorController extends AController {
         $view->set("access_permissions", $access_permissions);
 
         $template = new Template(PATH_VIEWS."template.html");
-        $template->set("navigation", System::$Core->menu);
         $template->set("view", $view->parse());
 
         return new HtmlResponse($template->parse());
@@ -252,12 +260,11 @@ class ActorController extends AController {
      *
      * @return AResponse
      *
-     * @throws JsonException
      * @throws SystemException
      */
     #[Route("delete/{actor}")]
     public function delete( ActorModel $actor ): AResponse {
-        if( !System::$Core->actor_role->canDelete($actor->id) ) {
+        if( !App::$curr_actor_role->canDelete($actor->id) ) {
             redirect("/error/403");
         }
 
@@ -273,12 +280,15 @@ class ActorController extends AController {
     }
 
     /**
+     * @param ActorModel $actor
+     *
+     * @return AResponse
+     *
      * @throws SystemException
-     * @throws Exception
      */
     #[Route("roles/{actor}")]
     public function roles( ActorModel $actor ): AResponse {
-		if( !System::$Core->actor_role->canUpdate($actor->id) ) {
+		if( !App::$curr_actor_role->canUpdate($actor->id) ) {
 			redirect("/error/403");
 		}
 
@@ -293,21 +303,20 @@ class ActorController extends AController {
 
         $view = new Template(PATH_VIEWS."actor/roles.html");
         $view->set("actor", $actor);
-        $view->set("routes", System::$Core->router->getSortedRoutes());
+        $view->set("routes", App::getInstance(Router::class)->getSortedRoutes());
         $view->set("role_options", ActorRoleModel::find());
         $view->set("access_permissions", AccessPermissionModel::find(array(
             ["actor_id", "=", $actor->id]
         )));
 
 		$template = new Template(PATH_VIEWS."template.html");
-		$template->set("navigation", System::$Core->menu);
 	    $template->set("view", $view->parse());
 
 		return new HtmlResponse($template->parse());
 	}
 
     /**
-     * Checks if all required values are set
+     * Checks if all required values are setClass
      *
      * @return bool
      */
@@ -334,9 +343,9 @@ class ActorController extends AController {
      * Save the permissions for the given actor
      *
      * @param ActorModel $actor
+     *
      * @return void
      *
-     * @throws JsonException
      * @throws SystemException
      */
 	private function savePermissions( ActorModel $actor ): void {

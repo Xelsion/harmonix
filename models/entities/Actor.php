@@ -1,13 +1,14 @@
 <?php
-
 namespace models\entities;
 
-use Exception;
-use lib\abstracts\AEntity;
-use lib\core\System;
-use lib\exceptions\SystemException;
-use lib\helper\StringHelper;
 use PDO;
+use lib\App;
+use lib\abstracts\AEntity;
+use lib\helper\StringHelper;
+use lib\manager\ConnectionManager;
+
+use Exception;
+use lib\exceptions\SystemException;
 
 /**
  * The ActorModel entity
@@ -52,7 +53,8 @@ class Actor extends AEntity {
 	public function __construct( int $id = 0 ) {
 		if( $id > 0 ) {
             try {
-                $pdo = System::$Core->connection_manager->getConnection("mvc");
+                $cm = App::getInstance(ConnectionManager::class);
+                $pdo = $cm->getConnection("mvc");
                 $pdo->prepareQuery("SELECT * FROM actors WHERE id=:id");
                 $pdo->bindParam(":id", $id, PDO::PARAM_INT);
                 $pdo->setFetchMode(PDO::FETCH_INTO, $this);
@@ -68,7 +70,8 @@ class Actor extends AEntity {
      */
 	public function create(): void {
         try {
-            $pdo = System::$Core->connection_manager->getConnection("mvc");
+            $cm = App::getInstance(ConnectionManager::class);
+            $pdo = $cm->getConnection("mvc");
             $sql = "INSERT INTO actors (type_id, email, password, first_name, last_name, login_fails, login_disabled) VALUES (:type_id, :email, :password, :first_name, :last_name, :login_fails, :login_disabled)";
             $this->password = StringHelper::getBCrypt($this->password);
             $pdo->prepareQuery($sql);
@@ -88,11 +91,10 @@ class Actor extends AEntity {
 
     /**
      * @inheritDoc
-     *
-     * @throws SystemException
      */
 	public function update(): void {
-        $pdo = System::$Core->connection_manager->getConnection("mvc");
+        $cm = App::getInstance(ConnectionManager::class);
+        $pdo = $cm->getConnection("mvc");
         $pdo->prepareQuery("SELECT password FROM actors WHERE id=:id");
         $pdo->bindParam(":id", $this->id, PDO::PARAM_INT);
         try {
@@ -124,11 +126,16 @@ class Actor extends AEntity {
      */
 	public function delete(): bool {
 		if( $this->id > 0 ) {
-			$pdo = System::$Core->connection_manager->getConnection("mvc");
-			$pdo->prepareQuery("DELETE FROM actors WHERE id=:id");
-			$pdo->bindParam("id", $this->id, PDO::PARAM_INT);
-			$pdo->execute();
-			return true;
+            try {
+                $cm = App::getInstance(ConnectionManager::class);
+                $pdo = $cm->getConnection("mvc");
+                $pdo->prepareQuery("DELETE FROM actors WHERE id=:id");
+                $pdo->bindParam("id", $this->id, PDO::PARAM_INT);
+                $pdo->execute();
+                return true;
+            } catch( Exception $e ) {
+                throw new SystemException(__FILE__, __LINE__, $e->getMessage(), $e->getCode(), $e->getPrevious());
+            }
 		}
 		return false;
 	}

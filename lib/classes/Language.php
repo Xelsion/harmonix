@@ -1,9 +1,8 @@
 <?php
-
 namespace lib\classes;
 
 /**
- * The Configuration type singleton
+ * The Configuration type setSingleton
  * Collect all the configurations and stores them in an array
  *
  * @author Markus Schröder <xelsion@gmail.com>

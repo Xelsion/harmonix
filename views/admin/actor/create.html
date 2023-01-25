@@ -1,7 +1,9 @@
 <?php
-
+use lib\App;
+use lib\classes\Language;
 use lib\classes\Template;
-use lib\core\System;
+
+$lang = App::getInstance(Language::class);
 
 $this->set("title", "Benutzer erstellen");
 $type_options = $this->get("type_options");
@@ -20,32 +22,32 @@ $snippet = new Template(PATH_VIEWS."snippets/access_permission.html");
 							<option value="<?= $option->id ?>"><?= escaped_html($option->name)  ?></option>
 						<?php } ?>
 					</select>
-					<div class="invalid-feedback"><?= System::$Core->lang->getValue("error-messages", "type") ?></div>
+					<div class="invalid-feedback"><?= $lang->getValue("error-messages", "type") ?></div>
 				</div>
 				<div class="form-group row">
 					<label for="email">E-Mail</label>
 					<input type="email" name="email" value="" id="email" required />
-					<div class="invalid-feedback"><?= System::$Core->lang->getValue("error-messages", "email") ?></div>
+					<div class="invalid-feedback"><?= $lang->getValue("error-messages", "email") ?></div>
 				</div>
 				<div class="form-group row">
 					<label for="password">Passwort</label>
 					<input type="password" name="password" value="" autocomplete="new-password" id="password" required />
-					<div class="invalid-feedback"><?= System::$Core->lang->getValue("error-messages", "password") ?></div>
+					<div class="invalid-feedback"><?= $lang->getValue("error-messages", "password") ?></div>
 				</div>
 				<div class="form-group row">
 					<label for="password_verify">Passwort Wiederholung</label>
 					<input type="password" name="password_verify" value="" autocomplete="new-password" id="password_verify" required />
-					<div class="invalid-feedback"><?= System::$Core->lang->getValue("error-messages", "password_verify") ?></div>
+					<div class="invalid-feedback"><?= $lang->getValue("error-messages", "password_verify") ?></div>
 				</div>
 				<div class="form-group row">
 					<label for="first_name">Vorname</label>
 					<input type="text" name="first_name" value="" placeholder="" id="first_name" required />
-					<div class="invalid-feedback"><?= System::$Core->lang->getValue("error-messages", "first_name") ?></div>
+					<div class="invalid-feedback"><?= $lang->getValue("error-messages", "first_name") ?></div>
 				</div>
 				<div class="form-group row">
 					<label for="last_name">Nachname</label>
 					<input type="text" name="last_name" value="" placeholder="" id="last_name" required />
-					<div class="invalid-feedback"><?= System::$Core->lang->getValue("error-messages", "last_name") ?></div>
+					<div class="invalid-feedback"><?= $lang->getValue("error-messages", "last_name") ?></div>
 				</div>
 			</div>
 			<div class="col-8">
@@ -58,7 +60,7 @@ $snippet = new Template(PATH_VIEWS."snippets/access_permission.html");
 		<div class="row clearfix">
 			<div class="col">&nbsp;</div>
 			<div class="col-auto">
-				<button type="submit" name="create" class="button button-positiv"><?= System::$Core->lang->getValue("translations", "create") ?></button>
+				<button type="submit" name="create" class="button button-positiv"><?= $lang->getValue("translations", "create") ?></button>
 			</div>
 		</div>
 	</form>

@@ -1,23 +1,24 @@
 <?php
-
 namespace lib\middleware;
 
-use JsonException;
+use lib\App;
 use lib\abstracts\AMiddleware;
-use lib\core\System;
-use lib\exceptions\SystemException;
 use lib\helper\StringHelper;
 use models\ActorModel;
 use models\SessionModel;
 
+use lib\exceptions\SystemException;
+
+/**
+ * Class SessionAuth
+ */
 class SessionAuth extends AMiddleware {
 
     /**
      * @throws SystemException
-     * @throws JsonException
      */
     public static function proceed() {
-        $session = new SessionModel();
+        $session = App::getInstance(SessionModel::class);
 
         if( isset($_COOKIE[$session->cookie_name]) ) {
             $session_id = ($session->encryption)
@@ -45,9 +46,8 @@ class SessionAuth extends AMiddleware {
                 $session->update();
                 $session->writeCookie();
             }
-            $actor = new ActorModel($session->as_actor);
+            $actor = App::getInstance(ActorModel::class, null, ["id" => $session->as_actor]);
         }
-
-        System::$Core->actor = $actor;
+        App::$curr_actor = $actor;
     }
 }

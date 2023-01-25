@@ -1,9 +1,8 @@
 <?php
-
 namespace lib\core;
 
 /**
- * The Request Type singleton
+ * The Request Type setSingleton
  * represents the requested URL
  *
  * @author Markus Schröder <xelsion@gmail.com>

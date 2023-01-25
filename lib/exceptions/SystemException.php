@@ -1,9 +1,9 @@
 <?php
-
 namespace lib\exceptions;
 
-use lib\abstracts\ALoggableException;
 use Throwable;
+use lib\abstracts\ALoggableException;
+
 
 class SystemException extends ALoggableException {
 

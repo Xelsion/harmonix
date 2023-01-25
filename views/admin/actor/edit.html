@@ -1,6 +1,8 @@
 <?php
+use lib\App;
+use lib\classes\Language;
 
-use lib\core\System;
+$lang = App::getInstance(Language::class);
 
 $this->set("title", "Benutzer bearbeiten");
 $type_options = $this->get("type_options");
@@ -17,32 +19,32 @@ $actor = $this->get("actor");
 					<option value="<?= $option->id ?>"<?= ( $option->id === $actor->type_id ) ? ' selected="selected"' : '' ?>><?= escaped_html($option->name)  ?></option>
 				<?php } ?>
 			</select>
-			<div class="invalid-feedback"><?= System::$Core->lang->getValue("error-messages", "type") ?></div>
+			<div class="invalid-feedback"><?= $lang->getValue("error-messages", "type") ?></div>
 		</div>
 		<div class="form-group row">
 			<label for="email">E-Mail</label>
 			<input type="email" name="email" value="<?= escaped_html($actor->email) ?>" id="email" required />
-			<div class="invalid-feedback"><?= System::$Core->lang->getValue("error-messages", "email") ?></div>
+			<div class="invalid-feedback"><?= $lang->getValue("error-messages", "email") ?></div>
 		</div>
 		<div class="form-group row">
 			<label for="password">Passwort</label>
 			<input type="password" name="password" value="" autocomplete="new-password" id="password" />
-			<div class="invalid-feedback"><?= System::$Core->lang->getValue("error-messages", "password") ?></div>
+			<div class="invalid-feedback"><?= $lang->getValue("error-messages", "password") ?></div>
 		</div>
 		<div class="form-group row">
 			<label for="password_verify">Passwort Wiederholung</label>
 			<input type="password" name="password_verify" value="" autocomplete="new-password" id="password_verify" />
-			<div class="invalid-feedback"><?= System::$Core->lang->getValue("error-messages", "password_verify") ?></div>
+			<div class="invalid-feedback"><?= $lang->getValue("error-messages", "password_verify") ?></div>
 		</div>
 		<div class="form-group row">
 			<label for="first_name">Vorname</label>
 			<input type="text" name="first_name" value="<?= escaped_html($actor->first_name) ?>" id="first_name" required />
-			<div class="invalid-feedback"><?= System::$Core->lang->getValue("error-messages", "first_name") ?></div>
+			<div class="invalid-feedback"><?= $lang->getValue("error-messages", "first_name") ?></div>
 		</div>
 		<div class="form-group row">
 			<label for="last_name">Nachname</label>
 			<input type="text" name="last_name" value="<?= escaped_html($actor->last_name) ?>" id="last_name" required />
-			<div class="invalid-feedback"><?= System::$Core->lang->getValue("error-messages", "last_name") ?></div>
+			<div class="invalid-feedback"><?= $lang->getValue("error-messages", "last_name") ?></div>
 		</div>
 		<div class="form-group row">
 			<label for="login_disabled">Login disabled</label>
@@ -50,7 +52,7 @@ $actor = $this->get("actor");
 				<option value="0"<?= ( !$actor->login_disabled ) ? ' selected="selected"' : ''?>>false</option>
 				<option value="1"<?= ( $actor->login_disabled ) ? ' selected="selected"' : ''?>>true</option>
 			</select>
-			<div class="invalid-feedback"><?= System::$Core->lang->getValue("error-messages", "selection") ?></div>
+			<div class="invalid-feedback"><?= $lang->getValue("error-messages", "selection") ?></div>
 		</div>
 		<div class="form-group row">
 			<label for="login_fails">Login fails</label>
@@ -87,11 +89,11 @@ $actor = $this->get("actor");
         </div>
 		<div class="form-group row clearfix">
 			<div class="col-auto">
-				<button type="submit" name="cancel" class="button button-default float-start"><?= System::$Core->lang->getValue("translations", "cancel") ?></button>
+				<button type="submit" name="cancel" class="button button-default float-start"><?= $lang->getValue("translations", "cancel") ?></button>
 			</div>
 			<div class="col"></div>
 			<div class="col-auto">
-				<button type="submit" name="update" class="button button-positiv float-end"><?= System::$Core->lang->getValue("translations", "save") ?></button>
+				<button type="submit" name="update" class="button button-positiv float-end"><?= $lang->getValue("translations", "save") ?></button>
 			</div>
 		</div>
 	</form>

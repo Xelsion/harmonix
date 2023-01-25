@@ -1,5 +1,4 @@
 <?php
-
 namespace controller\www;
 
 use lib\abstracts\AController;

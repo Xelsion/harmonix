@@ -1,8 +1,8 @@
 <?php
 
-use lib\core\System;
+use lib\classes\tree\Menu;
 
-$menu = System::$Core->menu;
+$menu = new Menu();
 $menu->insertMenuItem(100, null, "Home", "/");
 
 $menu->insertMenuItem(200, null, "Tests", "/tests");

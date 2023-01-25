@@ -1,9 +1,11 @@
 <?php
+use lib\App;
+use lib\classes\Language;
 
-use lib\core\System;
+$lang = App::getInstance(Language::class);
 
 $this->set("title", "Daten Verbindung erstellen");
-$connections = System::$Core->connection_manager->getAvailableConnections();
+$connections = $this->get("available_connections");
 ?>
 <div class="container-fluid">
 	<h1>Neue Verbindung anlegen</h1>
@@ -12,7 +14,7 @@ $connections = System::$Core->connection_manager->getAvailableConnections();
             <div class="col-2">
                 <label for="name">Name</label>
                 <input type="text" name="name" value="" id="name" required />
-                <div class="invalid-feedback"><?= System::$Core->lang->getValue("error-messages", "name") ?></div>
+                <div class="invalid-feedback"><?= $lang->getValue("error-messages", "name") ?></div>
             </div>
             <div class="col-2">
                 <label for="db_name">Datenbank</label>
@@ -22,7 +24,7 @@ $connections = System::$Core->connection_manager->getAvailableConnections();
                         <option value="<?= $conn_key ?>"><?= $conn_key ?></option>
                     <?php } ?>
                 </select>
-                <div class="invalid-feedback"><?= System::$Core->lang->getValue("error-messages", "name") ?></div>
+                <div class="invalid-feedback"><?= $lang->getValue("error-messages", "name") ?></div>
             </div>
             <div class="col-2">
                 <label for="table_name">Tabelle</label>
@@ -30,7 +32,7 @@ $connections = System::$Core->connection_manager->getAvailableConnections();
                     <option value="">- Tabelle -</option>
                     <optgroup id="table_list" label="Available"></optgroup>
                 </select>
-                <div class="invalid-feedback"><?= System::$Core->lang->getValue("error-messages", "name") ?></div>
+                <div class="invalid-feedback"><?= $lang->getValue("error-messages", "name") ?></div>
             </div>
             <div class="col-2">
                 <label for="table_col">Spalte</label>
@@ -38,14 +40,14 @@ $connections = System::$Core->connection_manager->getAvailableConnections();
                     <option value="">- Spalten -</option>
                     <optgroup id="column_key_list" label="Available"></optgroup>
                 </select>
-                <div class="invalid-feedback"><?= System::$Core->lang->getValue("error-messages", "name") ?></div>
+                <div class="invalid-feedback"><?= $lang->getValue("error-messages", "name") ?></div>
             </div>
             <div class="col-auto">
                 <div>Spalten anbinden</div>
                 <div id="column_list" style="min-height: 32px; width: 100%;"></div>
             </div>
             <div class="col-1" style="padding-top: 23px;">
-                <button type="submit" name="create" class="button button-positiv float-end"><?= System::$Core->lang->getValue("translations", "create") ?></button>
+                <button type="submit" name="create" class="button button-positiv float-end"><?= $lang->getValue("translations", "create") ?></button>
             </div>
 		</div>
 	</form>

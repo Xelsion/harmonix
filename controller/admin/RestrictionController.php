@@ -1,19 +1,18 @@
 <?php
-
 namespace controller\admin;
 
-use Exception;
-use JsonException;
+use lib\App;
+use lib\core\Router;
 use lib\abstracts\AController;
 use lib\abstracts\AResponse;
 use lib\attributes\Route;
 use lib\classes\responses\HtmlResponse;
 use lib\classes\Template;
-use lib\core\System;
-use lib\exceptions\SystemException;
 use models\AccessRestrictionModel;
 use models\AccessRestrictionTypeModel;
 use models\ActorRoleModel;
+
+use lib\exceptions\SystemException;
 
 #[Route("restrictions")]
 class RestrictionController extends AController {
@@ -21,7 +20,9 @@ class RestrictionController extends AController {
     /**
      * Get a list of all restrictions
      *
-     * @throws Exception
+     * @return AResponse
+     *
+     * @throws SystemException
      */
     #[Route("")]
     public function index(): AResponse {
@@ -39,13 +40,12 @@ class RestrictionController extends AController {
         }
 
         $view = new Template(PATH_VIEWS."restrictions/index.html");
-        $view->set("routes", System::$Core->router->getSortedRoutes());
+        $view->set("routes", App::getInstance(Router::class)->getSortedRoutes());
         $view->set("current_restrictions", $current_restrictions);
         $view->set("role_options", ActorRoleModel::find());
         $view->set("type_options", AccessRestrictionTypeModel::find());
 
         $template = new Template(PATH_VIEWS."template.html");
-        $template->set("navigation", System::$Core->menu);
         $template->set("view", $view->parse());
 
         return new HtmlResponse($template->parse());
@@ -53,7 +53,8 @@ class RestrictionController extends AController {
 
     /**
      * @return AResponse
-     * @throws SystemException|JsonException
+     *
+     * @throws SystemException
      */
     #[Route("types")]
     public function types(): AResponse {
@@ -61,7 +62,6 @@ class RestrictionController extends AController {
         $view->set("type_list", AccessRestrictionTypeModel::find());
 
         $template = new Template(PATH_VIEWS."template.html");
-        $template->set("navigation", System::$Core->menu);
         $template->set("view", $view->parse());
 
         return new HtmlResponse($template->parse());
@@ -69,7 +69,7 @@ class RestrictionController extends AController {
 
     /**
      * @return AResponse
-     * @throws JsonException
+     *
      * @throws SystemException
      */
     #[Route("types/create")]
@@ -94,7 +94,6 @@ class RestrictionController extends AController {
         $view = new Template(PATH_VIEWS."restrictions/types_create.html");
 
         $template = new Template(PATH_VIEWS."template.html");
-        $template->set("navigation", System::$Core->menu);
         $template->set("view", $view->parse());
 
         return new HtmlResponse($template->parse());
@@ -102,7 +101,9 @@ class RestrictionController extends AController {
 
     /**
      * @param AccessRestrictionTypeModel $type
+     *
      * @return AResponse
+     *
      * @throws SystemException
      */
     #[Route("types/{type}")]
@@ -127,7 +128,6 @@ class RestrictionController extends AController {
         $view->set("type", $type);
 
         $template = new Template(PATH_VIEWS."template.html");
-        $template->set("navigation", System::$Core->menu);
         $template->set("view", $view->parse());
 
         return new HtmlResponse($template->parse());
@@ -137,7 +137,7 @@ class RestrictionController extends AController {
      * Save the restrictions
      *
      * @return void
-     * @throws JsonException
+     *
      * @throws SystemException
      */
     private function saveRestrictions(): void {
@@ -177,7 +177,7 @@ class RestrictionController extends AController {
     }
 
     /**
-     * Checks if all required values are set
+     * Checks if all required values are setClass
      *
      * @return bool
      */

@@ -1,6 +1,8 @@
 <?php
+use lib\App;
+use lib\classes\Language;
 
-use lib\core\System;
+$lang = App::getInstance(Language::class);
 
 $this->set("title", "Zugriffsrechte");
 $routes = $this->get("routes");
@@ -150,7 +152,7 @@ $type_options = $this->get("type_options");
 		<?php } ?>
 		<div class="row clearfix">
 			<div class="col-md">
-				<button type="submit" name="update" class="button button-positiv float-end"><?= System::$Core->lang->getValue("translations", "save") ?></button>
+				<button type="submit" name="update" class="button button-positiv float-end"><?= $lang->getValue("translations", "save") ?></button>
 			</div>
 		</div>
 	</form>

@@ -1,7 +1,9 @@
 <?php
-
+use lib\App;
+use lib\classes\Language;
 use lib\classes\Template;
-use lib\core\System;
+
+$lang = App::getInstance(Language::class);
 
 $actor = $this->get("actor");
 $snippet = new Template(PATH_VIEWS."snippets/access_permission.html");
@@ -12,10 +14,10 @@ $snippet = new Template(PATH_VIEWS."snippets/access_permission.html");
 		<?= $snippet->parse() ?>
 		<div class="row clearfix">
 			<div class="col-md">
-				<button type="submit" name="cancel" class="button button-default float-start"><?= System::$Core->lang->getValue("translations", "cancel") ?></button>
+				<button type="submit" name="cancel" class="button button-default float-start"><?= $lang->getValue("translations", "cancel") ?></button>
 			</div>
 			<div class="col-md">
-				<button type="submit" name="update" class="button button-positiv float-end"><?= System::$Core->lang->getValue("translations", "save") ?></button>
+				<button type="submit" name="update" class="button button-positiv float-end"><?= $lang->getValue("translations", "save") ?></button>
 			</div>
 		</div>
 	</form>

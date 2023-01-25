@@ -1,5 +1,4 @@
 <?php
-
 namespace lib\core\resolver;
 
 use lib\core\ClassManager;

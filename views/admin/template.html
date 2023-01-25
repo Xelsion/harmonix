@@ -1,9 +1,12 @@
 <?php
 
+use lib\App;
+use lib\classes\Configuration;
 use lib\classes\Template;
 use lib\core\System;
 
-$actor = System::$Core->actor;
+$actor = App::$curr_actor;
+$config = App::getInstance(Configuration::class);
 $view = $this->get("view");
 $view_content = ( $view instanceof Template) ? $view->parse() : $view;
 ?>
@@ -55,7 +58,7 @@ $view_content = ( $view instanceof Template) ? $view->parse() : $view;
 										<input type="password" name="password" value="" placeholder="Password" autocomplete="new-password" />
 									</label>
 								</div>
-								<?php if( System::$Core->configuration->getSectionValue("security", "permanent_login") ) { ?>
+								<?php if( $config->getSectionValue("security", "permanent_login") ) { ?>
 									<div class="form-row form-check">
 										<input id="perma_login" class="form-check-input" type="checkbox" name="permanent_login" value="yes" />
 										<label for="perma_login" class="form-check-label font-monospace">eingeloggt bleiben?</label>
@@ -84,7 +87,7 @@ $view_content = ( $view instanceof Template) ? $view->parse() : $view;
 </header>
 <main><?= $view_content ?></main>
 <div>
-	<?php if( System::$Storage::get("debug_mode") ) {
+	<?php if( App::$storage::get("debug_mode") ) {
 		$debug = new Template(PATH_VIEWS_ROOT."snippets/debug.html");
 		$debug_content = $debug->parse();
 		echo $debug_content;

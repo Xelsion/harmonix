@@ -1,17 +1,17 @@
 <?php
-
 namespace controller\www;
 
-use JsonException;
+use lib\App;
 use lib\abstracts\AController;
 use lib\abstracts\AResponse;
 use lib\attributes\Route;
+use lib\classes\cache\ResponseCache;
 use lib\classes\responses\HtmlResponse;
 use lib\classes\Template;
-use lib\core\System;
-use lib\exceptions\SystemException;
 use lib\helper\RequestHelper;
 use models\ActorModel;
+
+use lib\exceptions\SystemException;
 
 #[Route("tests")]
 class TestController extends AController {
@@ -48,14 +48,15 @@ class TestController extends AController {
 
     /**
      *
+     * @return AResponse
+     *
      * @throws SystemException
-     * @throws JsonException
      */
     #[Route("actors")]
     public function actors() : AResponse {
         $params = RequestHelper::getPaginationParams();
 
-        $cache = System::$Core->response_cache;
+        $cache = App::getInstance(ResponseCache::class);
         $cache->initCacheFor(__METHOD__, ...$params);
         $cache->addFileCheck(__FILE__);
         $cache->addFileCheck(PATH_VIEWS."template.html");
@@ -80,8 +81,11 @@ class TestController extends AController {
 
     /**
      *
+     * @param int $actor_id
+     *
+     * @return AResponse
+     *
      * @throws SystemException
-     * @throws JsonException
      */
     #[Route("actors/{actor_id}")]
     public function actorsDetail( int $actor_id ) : AResponse {
@@ -101,7 +105,8 @@ class TestController extends AController {
 
 	/**
      *
-	 * @return HtmlResponse
+	 * @return AResponse
+     *
 	 * @throws SystemException
 	 */
     #[Route("tinymce")]

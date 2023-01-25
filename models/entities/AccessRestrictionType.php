@@ -1,13 +1,21 @@
 <?php
-
 namespace models\entities;
 
-use Exception;
-use lib\abstracts\AEntity;
-use lib\core\System;
-use lib\exceptions\SystemException;
 use PDO;
+use lib\App;
+use lib\abstracts\AEntity;
+use lib\manager\ConnectionManager;
 
+use Exception;
+use lib\exceptions\SystemException;
+
+/**
+ * The AccessRestrictionType entity
+ * Represents a single entry in the database
+ *
+ * @author Markus Schröder <xelsion@gmail.com>
+ * @version 1.0.0;
+ */
 class AccessRestrictionType extends AEntity {
 
     public int $id = 0;
@@ -27,7 +35,8 @@ class AccessRestrictionType extends AEntity {
     public function __construct( int $id = 0 ) {
         if( $id > 0 ) {
             try {
-                $pdo = System::$Core->connection_manager->getConnection("mvc");
+                $cm = App::getInstance(ConnectionManager::class);
+                $pdo = $cm->getConnection("mvc");
                 $pdo->prepareQuery("SELECT * FROM access_restriction_types WHERE id=:id");
                 $pdo->bindParam(":id", $id, PDO::PARAM_INT);
                 $pdo->setFetchMode(PDO::FETCH_INTO, $this);
@@ -43,7 +52,8 @@ class AccessRestrictionType extends AEntity {
      */
     public function create(): void {
         try {
-            $pdo = System::$Core->connection_manager->getConnection("mvc");
+            $cm = App::getInstance(ConnectionManager::class);
+            $pdo = $cm->getConnection("mvc");
             $sql = "INSERT INTO access_restriction_types (name, include_siblings, include_children, include_descendants) VALUES (:name, :include_siblings, :include_children, :include_descendants)";
             $pdo->prepareQuery($sql);
             $pdo->bindParam(':name', $this->name);
@@ -59,12 +69,11 @@ class AccessRestrictionType extends AEntity {
 
     /**
      * @inheritDoc
-     *
-     * @throws SystemException
      */
     public function update(): void {
         try {
-            $pdo = System::$Core->connection_manager->getConnection("mvc");
+            $cm = App::getInstance(ConnectionManager::class);
+            $pdo = $cm->getConnection("mvc");
             $sql = "UPDATE access_restriction_types SET name=:name, include_siblings=:include_siblings, include_children=:include_children, include_descendants=:include_descendants WHERE id=:id";
             $pdo->prepareQuery($sql);
             $pdo->bindParam(':id', $this->id, PDO::PARAM_INT);
@@ -83,11 +92,16 @@ class AccessRestrictionType extends AEntity {
      */
     public function delete(): bool {
         if( $this->id > 0 ) {
-            $pdo = System::$Core->connection_manager->getConnection("mvc");
-            $pdo->prepareQuery("DELETE FROM access_restriction_types WHERE id=:id");
-            $pdo->bindParam("id", $this->id, PDO::PARAM_INT);
-            $pdo->execute();
-            return true;
+            try {
+                $cm = App::getInstance(ConnectionManager::class);
+                $pdo = $cm->getConnection("mvc");
+                $pdo->prepareQuery("DELETE FROM access_restriction_types WHERE id=:id");
+                $pdo->bindParam("id", $this->id, PDO::PARAM_INT);
+                $pdo->execute();
+                return true;
+            } catch( Exception $e ) {
+                throw new SystemException(__FILE__, __LINE__, $e->getMessage(), $e->getCode(), $e->getPrevious());
+            }
         }
         return false;
     }

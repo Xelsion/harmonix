@@ -1,9 +1,8 @@
 <?php
-
 namespace lib\abstracts;
 
 use DateTime;
-use JsonException;
+
 use lib\exceptions\SystemException;
 
 /**
@@ -20,13 +19,14 @@ abstract class AEntity {
 	 * Creates an entry in the database with the current object
 	 * and tries to return the id of the new entry
 	 *
-	 * @throws JsonException
 	 * @throws SystemException
 	 */
 	abstract public function create(): void;
 
     /**
      * Updates an entry in the database with the current object
+     *
+     * @throws SystemException
      */
     abstract public function update(): void;
 
@@ -36,7 +36,6 @@ abstract class AEntity {
      *
      * @return bool
      *
-     * @throws JsonException
      * @throws SystemException
      */
     abstract public function delete(): bool;
@@ -47,7 +46,7 @@ abstract class AEntity {
      * @param string $datetime
      * @return DateTime|false
      */
-    public function str2DateTime( string $datetime ) {
+    public function str2DateTime( string $datetime ): DateTime|false {
         return DateTime::createFromFormat("Y-m-d H:i:s", $datetime);
     }
 

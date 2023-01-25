@@ -1,5 +1,4 @@
 <?php
-
 namespace controller\admin;
 
 use lib\abstracts\AController;
@@ -7,9 +6,8 @@ use lib\abstracts\AResponse;
 use lib\attributes\Route;
 use lib\classes\responses\HtmlResponse;
 use lib\classes\Template;
-use lib\core\System;
-use lib\exceptions\SystemException;
 
+use lib\exceptions\SystemException;
 
 /**
  * @see \lib\abstracts\AController
@@ -22,6 +20,9 @@ class CacheFileController extends AController {
 
 	/**
 	 * Get a List of all cache files
+     *
+     * @return AResponse
+     *
      * @throws SystemException
      */
     #[Route("/")]
@@ -33,7 +34,6 @@ class CacheFileController extends AController {
         $view->set("cache_infos", $cache_infos);
 
         $template = new Template(PATH_VIEWS."template.html");
-		$template->set("navigation", System::$Core->menu);
 		$template->set("view", $view->parse());
 
 		return new HtmlResponse($template->parse());
@@ -82,7 +82,14 @@ class CacheFileController extends AController {
         }
     }
 
-    private function deleteCacheFiles(string $path) {
+    /**
+     * Deletes all files in the given path
+     *
+     * @param string $path
+     *
+     * @return void
+     */
+    private function deleteCacheFiles(string $path): void {
         $files = scandir($path);
         foreach( $files as $f ) {
             if( $f === "." || $f === ".." ) {

@@ -1,9 +1,7 @@
 <?php
-
 namespace lib\abstracts;
 
-use lib\core\System;
-
+use lib\classes\Configuration;
 
 /**
  * The Abstract version of a Controller.
@@ -22,10 +20,10 @@ abstract class AController {
 
     protected static ?bool $caching = null;
 
-    public function __construct() {
+    public function __construct(Configuration $config) {
         if( self::$caching === null ) {
-            $environment = System::$Core->configuration->getSectionValue("system", "environment");
-            self::$caching = (bool)System::$Core->configuration->getSectionValue($environment, "caching");
+            $environment = $config->getSectionValue("system", "environment");
+            self::$caching = (bool)$config->getSectionValue($environment, "caching");
         }
     }
 

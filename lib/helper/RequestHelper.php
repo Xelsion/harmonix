@@ -1,20 +1,23 @@
 <?php
-
 namespace lib\helper;
 
-use lib\core\System;
+use lib\core\Request;
 
-class RequestHelper {
+readonly class RequestHelper {
 
-    public static function getPaginationParams(): array {
+    public function __construct(private Request $request) {
+
+    }
+
+    public function getPaginationParams(): array {
         $params = array();
-        $params['order'] = System::$Core->request->get("order") ?? "";
-        $params['direction'] = System::$Core->request->get("direction") ?? "asc";
-        $params['limit'] = ( System::$Core->request->get("limit") !== null )
-            ? (int) System::$Core->request->get("limit")
+        $params['order'] = $this->request->get("order") ?? "";
+        $params['direction'] = $this->request->get("direction") ?? "asc";
+        $params['limit'] = ( $this->request->get("limit") !== null )
+            ? (int) $this->request->get("limit")
             : 50;
-        $params['page'] = ( System::$Core->request->get("page") !== null )
-            ? (int) System::$Core->request->get("page")
+        $params['page'] = ( $this->request->get("page") !== null )
+            ? (int) $this->request->get("page")
             : 1;
         return $params;
     }

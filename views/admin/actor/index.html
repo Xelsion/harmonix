@@ -1,6 +1,8 @@
 <?php
+use lib\App;
+use lib\classes\Language;
 
-use lib\core\System;
+$lang = App::getInstance(Language::class);
 
 $this->set("title", "Benutzer");
 
@@ -12,7 +14,7 @@ $pagination = $this->get("pagination");
 		<div class="row">
 			<div class="col text-end pt-2">Suchbegriff</div>
 			<div class="col-3"><input type="text" name="search_string" value="" /></div>
-			<div class="col-auto"><input type="submit" name="" value="<?= System::$Core->lang->getValue("translations","search") ?>" class="button button-default" /></div>
+			<div class="col-auto"><input type="submit" name="" value="<?= $lang->getValue("translations","search") ?>" class="button button-default" /></div>
 		</div>
 	</form>
 	<h1>Benutzer</h1>
@@ -36,11 +38,11 @@ $pagination = $this->get("pagination");
 				<td class="text-nowrap text-end">
 					<form action="https://www.harmonix.de" target="_blank" method="POST" class="minimized">
 						<input type="hidden" name="actor_id" value="<?= $actor->id ?>" />
-						<button type="submit" name="login-as" class="button button-default"><?= System::$Core->lang->getValue("phrases", "login_as") ?></button>
+						<button type="submit" name="login-as" class="button button-default"><?= $lang->getValue("phrases", "login_as") ?></button>
 					</form>
-					<a href="/actors/roles/<?= $actor->id ?>" class="button button-default"><?= System::$Core->lang->getValue("translations", "roles") ?></a>
-					<a href="/actors/<?= $actor->id ?>" class="button button-default"><?= System::$Core->lang->getValue("translations", "edit") ?></a>
-					<button class="button button-negativ" onclick="$('#delete-target').attr('href', '/actors/delete/<?= $actor->id ?>')" data-bs-toggle="modal" data-bs-target="#confirm-delete"><?= System::$Core->lang->getValue("translations", "delete") ?></button>
+					<a href="/actors/roles/<?= $actor->id ?>" class="button button-default"><?= $lang->getValue("translations", "roles") ?></a>
+					<a href="/actors/<?= $actor->id ?>" class="button button-default"><?= $lang->getValue("translations", "edit") ?></a>
+					<button class="button button-negativ" onclick="$('#delete-target').attr('href', '/actors/delete/<?= $actor->id ?>')" data-bs-toggle="modal" data-bs-target="#confirm-delete"><?= $lang->getValue("translations", "delete") ?></button>
 				</td>
 			</tr>
 		<?php endforeach; ?>

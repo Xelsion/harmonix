@@ -26,7 +26,7 @@ export function toTRBLCorners(value: number | Partial<TRBLCorners>): TRBLCorners
 
 /**
  * Converts the given value into a padding object with pre-computed width/height.
- * @param {number|object} value - If a number, set the value to all TRBL component;
+ * @param {number|object} value - If a number, setClass the value to all TRBL component;
  *  else, if an object, use defined properties and sets undefined ones to 0.
  * @returns {object} The padding values (top, right, bottom, left, width, height)
  * @since 2.7.0
@@ -43,7 +43,7 @@ export function toPadding(
  * @param [index] - If defined and the current value is an array, the value
  * at `index` become the new input.
  * @param [info] - object to return information about resolution in
- * @param [info.cacheable] - Will be set to `false` if option is not cacheable.
+ * @param [info.cacheable] - Will be setClass to `false` if option is not cacheable.
  * @since 2.7.0
  */
 export function resolve<T, C>(

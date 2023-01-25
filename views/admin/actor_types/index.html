@@ -1,6 +1,8 @@
 <?php
+use lib\App;
+use lib\classes\Language;
 
-use lib\core\System;
+$lang = App::getInstance(Language::class);
 
 $this->set("title", "Rollen");
 
@@ -21,8 +23,8 @@ $role_list = $this->get("result_list");
 				<td><?= escaped_html($type->name) ?></td>
 				<td><?= ($type->is_protected) ? "Ja" : "Nein" ?></td>
 				<td class="text-nowrap text-end">
-					<a href="/actor-types/<?= $type->id ?>" class="button button-default"><?= System::$Core->lang->getValue("translations", "edit") ?></a>
-					<a href="/actor-types/delete/<?= $type->id ?>" class="button button-negativ"><?= System::$Core->lang->getValue("translations", "delete") ?></a>
+					<a href="/actor-types/<?= $type->id ?>" class="button button-default"><?= $lang->getValue("translations", "edit") ?></a>
+					<a href="/actor-types/delete/<?= $type->id ?>" class="button button-negativ"><?= $lang->getValue("translations", "delete") ?></a>
 				</td>
 			</tr>
 		<?php endforeach; ?>

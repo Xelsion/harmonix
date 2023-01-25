@@ -1,5 +1,4 @@
 <?php
-
 namespace lib\core\resolver;
 
 use lib\core\ClassManager;
@@ -8,7 +7,7 @@ use ReflectionClass;
 use ReflectionException;
 
 /**
- * Tries to get an Instance of the given namespace.
+ * Tries to getInstance an Instance of the given namespace.
  * checks the class behind the namespace and if there are any dependencies required to create
  * and instance of it. If there are dependencies it uses the ClassManager to resolve them recursively.
  *
@@ -40,7 +39,7 @@ class ClassResolver {
         if( $this->cm->has($this->namespace) ) {
             $binding = $this->cm->get($this->namespace);
 
-            // return if there is a container instance / singleton
+            // return if there is a container instance / setSingleton
             if( is_object($binding) ) {
                 return $binding;
             }
@@ -50,7 +49,7 @@ class ClassResolver {
         // create a reflection class
         $refClass = new ReflectionClass($this->namespace);
 
-        // get the constructor
+        // getInstance the constructor
         $constructor = $refClass->getConstructor();
 
         // check constructor exists and is accessible

@@ -1,5 +1,4 @@
 <?php
-
 namespace lib\abstracts;
 
 abstract class AMiddleware {

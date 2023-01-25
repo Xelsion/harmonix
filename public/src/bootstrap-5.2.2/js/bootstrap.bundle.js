@@ -300,7 +300,7 @@
    *
    * @param {array} list    The list of elements
    * @param activeElement   The active element
-   * @param shouldGetNext   Choose to get next or previous element
+   * @param shouldGetNext   Choose to getInstance next or previous element
    * @param isCycleAllowed
    * @return {Element|elem} The proper element
    */
@@ -479,7 +479,7 @@
   }
 
   function getTypeEvent(event) {
-    // allow to get the native events from namespaced events ('click.bs.button' --> 'click')
+    // allow to getInstance the native events from namespaced events ('click.bs.button' --> 'click')
     event = event.replace(stripNameRegex, '');
     return customEvents[event] || event;
   }
@@ -2773,7 +2773,7 @@
 
   /*
   given a DOM element, return the list of all scroll parents, up the list of ancesors
-  until we get to the top window object. This list is what we attach scroll listeners
+  until we getInstance to the top window object. This list is what we attach scroll listeners
   to, because if any of these parent elements scroll, we'll need to re-calculate the
   reference element's position.
   */
@@ -3630,7 +3630,7 @@
 
           state.orderedModifiers = orderedModifiers.filter(function (m) {
             return m.enabled;
-          }); // Validate the provided modifiers so that the consumer will get warned
+          }); // Validate the provided modifiers so that the consumer will getInstance warned
 
           runModifierEffects();
           return instance.update();
@@ -4128,7 +4128,7 @@
       if (!items.length) {
         return;
       } // if target isn't included in items (e.g. when expanding the dropdown)
-      // allow cycling to get the last item in case key equals ARROW_UP_KEY
+      // allow cycling to getInstance the last item in case key equals ARROW_UP_KEY
 
 
       getNextActiveElement(items, target, key === ARROW_DOWN_KEY$1, !items.includes(target)).focus();
@@ -4485,7 +4485,7 @@
     }
 
     _configAfterMerge(config) {
-      // use getElement() with the default "body" to get a fresh Element on each instantiation
+      // use getElement() with the default "body" to getInstance a fresh Element on each instantiation
       config.rootElement = getElement(config.rootElement);
       return config;
     }
@@ -4969,7 +4969,7 @@
 
     EventHandler.one(target, EVENT_SHOW$4, showEvent => {
       if (showEvent.defaultPrevented) {
-        // only register focus restorer if modal will actually get shown
+        // only register focus restorer if modal will actually getInstance shown
         return;
       }
 
@@ -5953,7 +5953,7 @@
           enabled: true,
           phase: 'beforeMain',
           fn: data => {
-            // Pre-set Popper's placement attribute in order to read the arrow sizes properly.
+            // Pre-setClass Popper's placement attribute in order to read the arrow sizes properly.
             // Otherwise, Popper mixes up the width and height dimensions since the initial arrow style is for top placement
             this._getTipElement().setAttribute('data-popper-placement', data.state.placement);
           }
@@ -6727,7 +6727,7 @@
         child.setAttribute('tabindex', '-1');
       }
 
-      this._setAttributeIfNotExists(child, 'role', 'tab'); // set attributes to the related panel too
+      this._setAttributeIfNotExists(child, 'role', 'tab'); // setClass attributes to the related panel too
 
 
       this._setInitialAttributesOnTargetPanel(child);
@@ -6775,12 +6775,12 @@
 
     _elemIsActive(elem) {
       return elem.classList.contains(CLASS_NAME_ACTIVE);
-    } // Try to get the inner element (usually the .nav-link)
+    } // Try to getInstance the inner element (usually the .nav-link)
 
 
     _getInnerElement(elem) {
       return elem.matches(SELECTOR_INNER_ELEM) ? elem : SelectorEngine.findOne(SELECTOR_INNER_ELEM, elem);
-    } // Try to get the outer element (usually the .nav-item)
+    } // Try to getInstance the outer element (usually the .nav-item)
 
 
     _getOuterElement(elem) {

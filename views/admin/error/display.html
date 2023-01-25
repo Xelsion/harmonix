@@ -1,11 +1,9 @@
 <?php
-
-use lib\core\System;
-
+use lib\App;
 ?>
 <div class="container-fluid">
-	<h1><?= System::$Storage::get("title") ?></h1>
-	<?php if( System::$Storage::get("message") !== null ) {
-		echo System::$Storage::get("message");
+	<h1><?= $this->get("title") ?></h1>
+	<?php if( App::$storage::get("message") !== null ) {
+		echo App::$storage::get("message");
 	} ?>
 </div>

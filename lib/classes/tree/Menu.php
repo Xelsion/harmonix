@@ -1,8 +1,10 @@
 <?php
-
 namespace lib\classes\tree;
 
-use lib\core\System;
+use lib\App;
+use lib\core\Router;
+
+use lib\exceptions\SystemException;
 
 /**
  * The Menu class extends TreeWalker
@@ -47,19 +49,21 @@ class Menu extends TreeWalker {
 		return $html;
 	}
 
-	/**
-	 * builds the <ul><li> structure from the menu as tree
-	 *
-	 * @param int|null $parent_id
-	 * @param $html
-	 */
+    /**
+     * builds the <ul><li> structure from the menu as tree
+     *
+     * @param int|null $parent_id
+     * @param $html
+     * @throws SystemException
+     */
 	public function buildHtmlTree( ?int $parent_id, &$html ): void {
 		$children = $this->getChildrenOf($parent_id);
 		if( !empty($children) ) {
+            $router = App::getInstance(Router::class);
 			$html .= '<ul>';
 			foreach( $children as $child ) {
-                $route = System::$Core->router->getRouteFor($child->target);
-                if( System::$Core->auth->hasAccessTo($route["controller"], $route["method"]) ) {
+                $route = $router->getRouteFor($child->target);
+                if( App::$auth_settings->hasAccessTo($route["controller"], $route["method"]) ) {
                     $has_children = $this->hasChildren($child->id);
                     $class = ( $has_children ) ? "has-children" : "";
                     $html .= '<li class="'.$class.'">';

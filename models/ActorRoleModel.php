@@ -1,12 +1,14 @@
 <?php
-
 namespace models;
 
-use JsonException;
-use lib\core\System;
-use lib\exceptions\SystemException;
-use lib\helper\SqlHelper;
 use PDO;
+use lib\App;
+use lib\classes\Language;
+use lib\helper\SqlHelper;
+use lib\manager\ConnectionManager;
+
+use Exception;
+use lib\exceptions\SystemException;
 
 /**
  * The ActorModel Role
@@ -27,7 +29,6 @@ class ActorRoleModel extends entities\ActorRole {
      *
      * @param int $id
      *
-     * @throws JsonException
      * @throws SystemException
      */
 	public function __construct( int $id = 0 ) {
@@ -53,46 +54,50 @@ class ActorRoleModel extends entities\ActorRole {
      *
      * @return array
      *
-     * @throws JsonException
      * @throws SystemException
      */
     public static function find( array $conditions = array(), ?string $order = "", ?string $direction = "asc", int $limit = 0, int $page = 1 ) : array {
-        $results = array();
-        $pdo = System::$Core->connection_manager->getConnection("mvc");
-        if( !is_null($pdo) ) {
-            $params = array();
+        try {
+            $results = array();
+            $cm = App::getInstance(ConnectionManager::class);
+            $pdo = $cm->getConnection("mvc");
+            if( !is_null($pdo) ) {
+                $params = array();
 
-            $query = "SELECT * FROM actor_roles";
-            if( !empty($conditions) ) {
-                $columns = array();
+                $query = "SELECT * FROM actor_roles";
+                if( !empty($conditions) ) {
+                    $columns = array();
 
-                foreach( $conditions as $i => $condition ) {
-                    $columns[] = $condition[0] . $condition[1] . ":" . $i;
-                    $params[$i] = $condition[2];
+                    foreach( $conditions as $i => $condition ) {
+                        $columns[] = $condition[0] . $condition[1] . ":" . $i;
+                        $params[$i] = $condition[2];
+                    }
+                    $query .= " WHERE " . implode(" AND ", $columns);
                 }
-                $query .= " WHERE " . implode(" AND ", $columns);
+
+                if( $order !== "" ) {
+                    $query .= " ORDER BY " . $order . " " . $direction;
+                }
+
+                if( $limit > 0 ) {
+                    $offset = $limit * ($page - 1);
+                    $query .= " LIMIT :limit OFFSET :offset";
+                    $params["limit"] = $limit;
+                    $params["offset"] = $offset;
+                }
+
+                $pdo->prepareQuery($query);
+                foreach( $params as $key => $value ) {
+                    $pdo->bindParam(":" . $key, $value, SqlHelper::getParamType($value));
+                }
+                $pdo->setFetchMode(PDO::FETCH_CLASS, __CLASS__);
+                $results = $pdo->execute()->fetchAll();
             }
 
-            if( $order !== "" ) {
-                $query .= " ORDER BY " . $order . " " . $direction;
-            }
-
-            if( $limit > 0 ) {
-                $offset = $limit * ($page - 1);
-                $query .= " LIMIT :limit OFFSET :offset";
-                $params["limit"] = $limit;
-                $params["offset"] = $offset;
-            }
-
-            $pdo->prepareQuery($query);
-            foreach( $params as $key => $value ) {
-                $pdo->bindParam(":" . $key, $value, SqlHelper::getParamType($value));
-            }
-            $pdo->setFetchMode(PDO::FETCH_CLASS, __CLASS__);
-            $results = $pdo->execute()->fetchAll();
+            return $results;
+        } catch( Exception $e ) {
+            throw new SystemException($e->getFile(), $e->getLine(), $e->getMessage(), $e->getCode(), $e->getPrevious());
         }
-
-        return $results;
     }
 
     /**
@@ -100,12 +105,15 @@ class ActorRoleModel extends entities\ActorRole {
      *
      * @return ActorRoleModel|null
      *
-     * @throws JsonException
      * @throws SystemException
      */
 	public function getParent(): ?ActorRoleModel {
 		if( $this->child_of !== null ) {
-			return new ActorRoleModel($this->child_of);
+            try {
+                return new ActorRoleModel($this->child_of);
+            } catch( Exception $e ) {
+                throw new SystemException($e->getFile(), $e->getLine(), $e->getMessage(), $e->getCode(), $e->getPrevious());
+            }
 		}
 		return null;
 	}
@@ -115,19 +123,23 @@ class ActorRoleModel extends entities\ActorRole {
      *
      * @return array
      *
-     * @throws JsonException
      * @throws SystemException
      */
 	public function getChildren(): array {
-		$children = array();
-        $pdo = System::$Core->connection_manager->getConnection("mvc");
-        $pdo->prepareQuery("SELECT * FROM actor_roles WHERE child_of=:id");
-        $pdo->bindParam(":id", $this->id, PDO::PARAM_INT);
-        $results = $pdo->execute()->fetchAll(PDO::FETCH_CLASS, __CLASS__);
-        foreach( $results as $child ) {
-            $children[] = $child;
+        try {
+            $children = array();
+            $cm = App::getInstance(ConnectionManager::class);
+            $pdo = $cm->getConnection("mvc");
+            $pdo->prepareQuery("SELECT * FROM actor_roles WHERE child_of=:id");
+            $pdo->bindParam(":id", $this->id, PDO::PARAM_INT);
+            $results = $pdo->execute()->fetchAll(PDO::FETCH_CLASS, __CLASS__);
+            foreach( $results as $child ) {
+                $children[] = $child;
+            }
+            return $children;
+        } catch( Exception $e ) {
+            throw new SystemException($e->getFile(), $e->getLine(), $e->getMessage(), $e->getCode(), $e->getPrevious());
         }
-		return $children;
 	}
 
     /**
@@ -137,7 +149,7 @@ class ActorRoleModel extends entities\ActorRole {
      * @return bool
      */
     public function isParentOf( ActorRoleModel $role ): bool {
-        return $this->id === $role->child_of;
+        return ($this->id === $role->child_of);
     }
 
     /**
@@ -146,7 +158,7 @@ class ActorRoleModel extends entities\ActorRole {
      * @return bool
      */
     public function isGuest( ActorRoleModel $role ): bool {
-        return ( $role->id === 4 );
+        return ($role->id === 4);
     }
 
     /**
@@ -173,20 +185,24 @@ class ActorRoleModel extends entities\ActorRole {
      * Checks if this role is an ancestor of the given role
      *
      * @param ActorRoleModel $role
+     *
      * @return bool
      *
-     * @throws JsonException
      * @throws SystemException
      */
 	public function isAncestorOf( ActorRoleModel $role ): bool {
-		$current_role = $role;
-		while( $current_role->child_of !== null ) {
-			if( $current_role->child_of === $this->id ) {
-				return true;
-			}
-			$current_role = $current_role->getParent();
-		}
-		return false;
+        try {
+            $current_role = $role;
+            while( $current_role->child_of !== null ) {
+                if( $current_role->child_of === $this->id ) {
+                    return true;
+                }
+                $current_role = $current_role->getParent();
+            }
+            return false;
+        } catch( Exception $e ) {
+            throw new SystemException($e->getFile(), $e->getLine(), $e->getMessage(), $e->getCode(), $e->getPrevious());
+        }
 	}
 
     /**
@@ -195,18 +211,21 @@ class ActorRoleModel extends entities\ActorRole {
      * @param ActorRoleModel $role
      * @return bool
      *
-     * @throws JsonException
      * @throws SystemException
      */
 	public function isDescendantOf( ActorRoleModel $role ): bool {
-		$current_role = $this;
-		while( $current_role->child_of !== null ) {
-			if( $current_role->child_of === $role->id ) {
-				return true;
-			}
-			$current_role = $current_role->getParent();
-		}
-		return false;
+        try {
+            $current_role = $this;
+            while( $current_role->child_of !== null ) {
+                if( $current_role->child_of === $role->id ) {
+                    return true;
+                }
+                $current_role = $current_role->getParent();
+            }
+            return false;
+        } catch( Exception $e ) {
+            throw new SystemException($e->getFile(), $e->getLine(), $e->getMessage(), $e->getCode(), $e->getPrevious());
+        }
 	}
 
 	/**
@@ -350,24 +369,27 @@ class ActorRoleModel extends entities\ActorRole {
      *
      * @return bool
      *
-     * @throws JsonException
      * @throws SystemException
      */
     public function canUpdate(int $owner_id): bool {
-        $class = debug_backtrace()[1]['class'];
-        $method = debug_backtrace()[1]['function'];
-        $owner = new ActorModel($owner_id);
-        $owner_role = $owner->getRole($class, $method, SUB_DOMAIN);
-        if( $this->canUpdateAll() ) {
-            return true;
+        try {
+            $class = debug_backtrace()[1]['class'];
+            $method = debug_backtrace()[1]['function'];
+            $owner = new ActorModel($owner_id);
+            $owner_role = $owner->getRole($class, $method, SUB_DOMAIN);
+            if( $this->canUpdateAll() ) {
+                return true;
+            }
+            if( (App::$curr_actor_role->isAncestorOf($owner_role) || $this->isGuest($owner_role)) && $this->canUpdateGroup() ) {
+                return true;
+            }
+            if( App::$curr_actor->id === $owner_id && $this->canUpdateOwn() ) {
+                return true;
+            }
+            return false;
+        } catch( Exception $e ) {
+            throw new SystemException($e->getFile(), $e->getLine(), $e->getMessage(), $e->getCode(), $e->getPrevious());
         }
-        if( (System::$Core->actor_role->isAncestorOf($owner_role) || $this->isGuest($owner_role)) && $this->canUpdateGroup() ) {
-            return true;
-        }
-        if( System::$Core->actor->id === $owner_id && $this->canUpdateOwn() ) {
-            return true;
-        }
-        return false;
     }
 
     /**
@@ -375,32 +397,37 @@ class ActorRoleModel extends entities\ActorRole {
      *
      * @return bool
      *
-     * @throws JsonException
      * @throws SystemException
      */
     public function canDelete(int $owner_id): bool {
-        $class = debug_backtrace()[1]['class'];
-        $method = debug_backtrace()[1]['function'];
-        $owner = new ActorModel($owner_id);
-        $owner_role = $owner->getRole($class, $method, SUB_DOMAIN);
-        if( $this->canDeleteAll() ) {
-            return true;
+        try {
+            $class = debug_backtrace()[1]['class'];
+            $method = debug_backtrace()[1]['function'];
+            $owner = new ActorModel($owner_id);
+            $owner_role = $owner->getRole($class, $method, SUB_DOMAIN);
+            if( $this->canDeleteAll() ) {
+                return true;
+            }
+            if( (App::$curr_actor_role->isAncestorOf($owner_role) || $this->isGuest($owner_role) ) && $this->canDeleteGroup() ) {
+                return true;
+            }
+            if( App::$curr_actor->id === $owner_id && $this->canDeleteOwn() ) {
+                return true;
+            }
+            return false;
+        } catch( Exception $e ) {
+            throw new SystemException($e->getFile(), $e->getLine(), $e->getMessage(), $e->getCode(), $e->getPrevious());
         }
-        if( (System::$Core->actor_role->isAncestorOf($owner_role) || $this->isGuest($owner_role) ) && $this->canDeleteGroup() ) {
-            return true;
-        }
-        if( System::$Core->actor->id === $owner_id && $this->canDeleteOwn() ) {
-            return true;
-        }
-        return false;
     }
 
-	/**
-	 * Returns an array of all rights where the rights ar
-	 * represented as a string.
-	 *
-	 * @return array|array[]
-	 */
+    /**
+     * Returns an array of all rights where the rights ar
+     * represented as a string.
+     *
+     * @return array|array[]
+     *
+     * @throws SystemException
+     */
 	public function getStringArray(): array {
 		global $lang;
 		$rights = array(
@@ -409,40 +436,40 @@ class ActorRoleModel extends entities\ActorRole {
 			"own"   => array(),
 		);
 		if( $this->canCreateAll() ) {
-			$rights["all"][] = System::$Core->lang->getValue("right-chars", "create");
+			$rights["all"][] = App::getInstance(Language::class)->getValue("right-chars", "create");
 		}
 		if( $this->canReadAll() ) {
-			$rights["all"][] = System::$Core->lang->getValue("right-chars", "read");
+			$rights["all"][] = App::getInstance(Language::class)->getValue("right-chars", "read");
 		}
 		if( $this->canUpdateAll() ) {
-			$rights["all"][] = System::$Core->lang->getValue("right-chars", "update");
+			$rights["all"][] = App::getInstance(Language::class)->getValue("right-chars", "update");
 		}
 		if( $this->canDeleteAll() ) {
-			$rights["all"][] = System::$Core->lang->getValue("right-chars", "delete");
+			$rights["all"][] = App::getInstance(Language::class)->getValue("right-chars", "delete");
 		}
 		if( $this->canCreateGroup() ) {
-			$rights["group"][] = System::$Core->lang->getValue("right-chars", "create");
+			$rights["group"][] = App::getInstance(Language::class)->getValue("right-chars", "create");
 		}
 		if( $this->canReadGroup() ) {
-			$rights["group"][] = System::$Core->lang->getValue("right-chars", "read");
+			$rights["group"][] = App::getInstance(Language::class)->getValue("right-chars", "read");
 		}
 		if( $this->canUpdateGroup() ) {
-			$rights["group"][] = System::$Core->lang->getValue("right-chars", "update");
+			$rights["group"][] = App::getInstance(Language::class)->getValue("right-chars", "update");
 		}
 		if( $this->canDeleteGroup() ) {
-			$rights["group"][] = System::$Core->lang->getValue("right-chars", "delete");
+			$rights["group"][] = App::getInstance(Language::class)->getValue("right-chars", "delete");
 		}
 		if( $this->canCreateOwn() ) {
-			$rights["own"][] = System::$Core->lang->getValue("right-chars", "create");
+			$rights["own"][] = App::getInstance(Language::class)->getValue("right-chars", "create");
 		}
 		if( $this->canReadOwn() ) {
-			$rights["own"][] = System::$Core->lang->getValue("right-chars", "read");
+			$rights["own"][] = App::getInstance(Language::class)->getValue("right-chars", "read");
 		}
 		if( $this->canUpdateOwn() ) {
-			$rights["own"][] = System::$Core->lang->getValue("right-chars", "update");
+			$rights["own"][] = App::getInstance(Language::class)->getValue("right-chars", "update");
 		}
 		if( $this->canDeleteOwn() ) {
-			$rights["own"][] = System::$Core->lang->getValue("right-chars", "delete");
+			$rights["own"][] = App::getInstance(Language::class)->getValue("right-chars", "delete");
 		}
 		return $rights;
 	}

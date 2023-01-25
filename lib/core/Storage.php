@@ -1,5 +1,4 @@
 <?php
-
 namespace lib\core;
 
 /**
@@ -27,7 +26,7 @@ class Storage {
     }
 
     /**
-     * Returns the value of the given key if set or null if not
+     * Returns the value of the given key if setClass or null if not
      *
      * @param $key
      *
