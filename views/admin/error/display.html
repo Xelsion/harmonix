@@ -3,7 +3,7 @@ use lib\App;
 ?>
 <div class="container-fluid">
 	<h1><?= $this->get("title") ?></h1>
-	<?php if( App::$storage::get("message") !== null ) {
-		echo App::$storage::get("message");
+	<?php if( App::$storage->get("message") !== null ) {
+		echo App::$storage->get("message");
 	} ?>
 </div>

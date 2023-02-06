@@ -1,5 +1,6 @@
 <div>
     <form action="/tests/tinymce" method="POST">
+        <?= $this->getCsrfToken() ?>
         <textarea id="editor" name="content">Next, use our Get Started docs to setup Tiny!</textarea>
         <button type="submit">Senden</button>
     </form>

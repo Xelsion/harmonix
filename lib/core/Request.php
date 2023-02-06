@@ -1,8 +1,11 @@
 <?php
 namespace lib\core;
 
+use lib\core\classes\KeyValuePairs;
+use lib\core\exceptions\SystemException;
+
 /**
- * The Request Type setSingleton
+ * The Request Type setAsSingleton
  * represents the requested URL
  *
  * @author Markus Schröder <xelsion@gmail.com>
@@ -10,45 +13,40 @@ namespace lib\core;
  */
 class Request {
 
-	// The instance of this class
-	private static ?Request $request = null;
     private string $request_uri;
-
     private string $request_method;
-
 	// GET, POST & FILES data from the request
 	private array $form;
-
     private array $files;
-	/**
-	 * The class constructor
-	 * sets the current requested uri
-	 * calls the method initController()
-	 */
-	private function __construct() {
-        $this->request_uri = $_SERVER["REQUEST_URI"];
-        $this->request_method = $_SERVER['REQUEST_METHOD'];
-		foreach( $_GET as $key => $value ) {
-			$this->form[$key] = $value;
-		}
-		foreach( $_POST as $key => $value ) {
-			$this->form[$key] = $value;
-		}
-		foreach( $_FILES as $key => $value ) {
-			$this->files[$key] = $value;
-		}
-	}
 
-	/**
-	 * The initializer for this class
-	 *
-	 * @return Request
-	 */
-	public static function getInstance(): Request {
-		if( static::$request === null ) {
-			static::$request = new Request();
-		}
-		return static::$request;
+    /**
+     * The class constructor
+     * sets the current requested uri
+     * calls the method initController()
+     * @throws \lib\core\exceptions\SystemException
+     */
+	public function __construct( public KeyValuePairs $data ) {
+        //$this->data = App::getInstanceOf(KeyValuePairs::class);
+
+        $this->request_uri = $_SERVER["REQUEST_URI"]??"";
+        $this->request_method = $_SERVER['REQUEST_METHOD']??"";
+
+        if( isset($_SESSION["csrf_token"]) && isset($_POST['csrf_token']) ) {
+            if( $_POST['csrf_token'] && $_SESSION["csrf_token"] ) {
+                foreach( $_GET as $key => $value ) {
+                    $this->form[$key] = $value;
+                    $this->data->set($key, $value);
+                }
+                foreach( $_POST as $key => $value ) {
+                    $this->form[$key] = $value;
+                    $this->data->set($key, $value);
+                }
+                foreach( $_FILES as $key => $value ) {
+                    $this->files[$key] = $value;
+                    $this->data->set($key, $value);
+                }
+            }
+        }
 	}
 
     /**
@@ -106,14 +104,28 @@ class Request {
         return $this->files;
     }
 
-	/**
-	 * Returns the value from the submitted pairs
-	 * by its key
-	 *
-	 */
-	public function get( string $key ) {
+    /**
+     * Returns the value from the submitted pairs
+     * by its key
+     *
+     * @param string $key
+     *
+     * @return mixed
+     */
+	public function get( string $key ): mixed {
 		return $this->form[$key] ?? null;
 	}
+
+    /**
+     * Returns if a key exists in the form data
+     *
+     * @param string $key
+     *
+     * @return bool
+     */
+    public function has( string $key ): bool {
+        return isset($this->form[$key]);
+    }
 
 	/**
 	 * Split the requested uri into parts and

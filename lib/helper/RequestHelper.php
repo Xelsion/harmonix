@@ -11,13 +11,13 @@ readonly class RequestHelper {
 
     public function getPaginationParams(): array {
         $params = array();
-        $params['order'] = $this->request->get("order") ?? "";
-        $params['direction'] = $this->request->get("direction") ?? "asc";
-        $params['limit'] = ( $this->request->get("limit") !== null )
-            ? (int) $this->request->get("limit")
+        $params['order'] = $this->request->data->get("order") ?? "";
+        $params['direction'] = $this->request->data->get("direction") ?? "asc";
+        $params['limit'] = ( $this->request->data->contains("limit") )
+            ? (int) $this->request->data->get("limit")
             : 50;
-        $params['page'] = ( $this->request->get("page") !== null )
-            ? (int) $this->request->get("page")
+        $params['page'] = ( $this->request->data->contains("page") )
+            ? (int) $this->request->data->get("page")
             : 1;
         return $params;
     }

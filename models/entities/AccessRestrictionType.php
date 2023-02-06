@@ -1,13 +1,12 @@
 <?php
 namespace models\entities;
 
-use PDO;
-use lib\App;
-use lib\abstracts\AEntity;
-use lib\manager\ConnectionManager;
-
 use Exception;
-use lib\exceptions\SystemException;
+use lib\App;
+use lib\core\blueprints\AEntity;
+use lib\core\ConnectionManager;
+use lib\core\exceptions\SystemException;
+use PDO;
 
 /**
  * The AccessRestrictionType entity
@@ -35,7 +34,7 @@ class AccessRestrictionType extends AEntity {
     public function __construct( int $id = 0 ) {
         if( $id > 0 ) {
             try {
-                $cm = App::getInstance(ConnectionManager::class);
+                $cm = App::getInstanceOf(ConnectionManager::class);
                 $pdo = $cm->getConnection("mvc");
                 $pdo->prepareQuery("SELECT * FROM access_restriction_types WHERE id=:id");
                 $pdo->bindParam(":id", $id, PDO::PARAM_INT);
@@ -52,7 +51,7 @@ class AccessRestrictionType extends AEntity {
      */
     public function create(): void {
         try {
-            $cm = App::getInstance(ConnectionManager::class);
+            $cm = App::getInstanceOf(ConnectionManager::class);
             $pdo = $cm->getConnection("mvc");
             $sql = "INSERT INTO access_restriction_types (name, include_siblings, include_children, include_descendants) VALUES (:name, :include_siblings, :include_children, :include_descendants)";
             $pdo->prepareQuery($sql);
@@ -72,7 +71,7 @@ class AccessRestrictionType extends AEntity {
      */
     public function update(): void {
         try {
-            $cm = App::getInstance(ConnectionManager::class);
+            $cm = App::getInstanceOf(ConnectionManager::class);
             $pdo = $cm->getConnection("mvc");
             $sql = "UPDATE access_restriction_types SET name=:name, include_siblings=:include_siblings, include_children=:include_children, include_descendants=:include_descendants WHERE id=:id";
             $pdo->prepareQuery($sql);
@@ -93,7 +92,7 @@ class AccessRestrictionType extends AEntity {
     public function delete(): bool {
         if( $this->id > 0 ) {
             try {
-                $cm = App::getInstance(ConnectionManager::class);
+                $cm = App::getInstanceOf(ConnectionManager::class);
                 $pdo = $cm->getConnection("mvc");
                 $pdo->prepareQuery("DELETE FROM access_restriction_types WHERE id=:id");
                 $pdo->bindParam("id", $this->id, PDO::PARAM_INT);

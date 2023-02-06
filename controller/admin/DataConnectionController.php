@@ -2,16 +2,15 @@
 namespace controller\admin;
 
 use lib\App;
-use lib\abstracts\AController;
-use lib\abstracts\AResponse;
-use lib\attributes\Route;
-use lib\classes\responses\HtmlResponse;
 use lib\classes\Template;
-use lib\manager\ConnectionManager;
+use lib\core\attributes\Route;
+use lib\core\blueprints\AController;
+use lib\core\blueprints\AResponse;
+use lib\core\ConnectionManager;
+use lib\core\exceptions\SystemException;
+use lib\core\response_types\HtmlResponse;
 use models\DataConnectionModel;
 use models\entities\DataConnectionColumn;
-
-use lib\exceptions\SystemException;
 
 #[Route("data-connections")]
 class DataConnectionController extends AController {
@@ -21,7 +20,7 @@ class DataConnectionController extends AController {
      *
      * @return AResponse
      *
-     * @throws SystemException
+     * @throws \lib\core\exceptions\SystemException
      */
     #[Route("")]
     public function index(): AResponse {
@@ -37,7 +36,7 @@ class DataConnectionController extends AController {
     /**
      * @return AResponse
      *
-     * @throws SystemException
+     * @throws \lib\core\exceptions\SystemException
      */
     #[Route("/create")]
     public function create(): AResponse {
@@ -45,21 +44,21 @@ class DataConnectionController extends AController {
             redirect("/error/403");
         }
 
-        if( isset($_POST['cancel']) ) {
+        if( App::$request->data->contains('cancel') ) {
             redirect("/actor-types");
         }
 
-        if( isset($_POST['create']) ) {
+        if( App::$request->data->contains('create') ) {
             $is_valid = $this->postIsValid();
             if( $is_valid ) {
-                $data_connection = App::getInstance(DataConnectionModel::class);
-                $data_connection->name = $_POST["name"];
-                $data_connection->db_name = $_POST["db_name"];
-                $data_connection->table_name = $_POST["table_name"];
-                $data_connection->table_col = $_POST["table_col"];
+                $data_connection = App::getInstanceOf(DataConnectionModel::class);
+                $data_connection->name = App::$request->data->get('name');
+                $data_connection->db_name = App::$request->data->get('db_name');
+                $data_connection->table_name = App::$request->data->get('table_name');
+                $data_connection->table_col = App::$request->data->get('table_col');
                 $data_connection->create();
-                foreach( $_POST["data_columns"] as $col_name ) {
-                    $data_column = App::getInstance(DataConnectionColumn::class);
+                foreach( App::$request->data->get('data_columns') as $col_name ) {
+                    $data_column = App::getInstanceOf(DataConnectionColumn::class);
                     $data_column->connection_id = $data_connection->id;
                     $data_column->column_name = $col_name;
                     $data_column->create();
@@ -69,7 +68,7 @@ class DataConnectionController extends AController {
             }
         }
 
-        $cm = App::getInstance(ConnectionManager::class);
+        $cm = App::getInstanceOf(ConnectionManager::class);
 
         $view = new Template(PATH_VIEWS."data_connection/create.html");
         $view->set("available_connections", $cm->getAvailableConnections());
@@ -84,19 +83,19 @@ class DataConnectionController extends AController {
      * @return bool
      */
     private function postIsValid(): bool {
-        if( !isset($_POST["name"]) || $_POST["name"] === "" ) {
+        if( !App::$request->data->contains('name') || App::$request->data->get('name') === "" ) {
             return false;
         }
-        if( !isset($_POST["db_name"]) || $_POST["db_name"] === "" ) {
+        if( !App::$request->data->contains('db_name') || App::$request->data->get('db_name') === "" ) {
             return false;
         }
-        if( !isset($_POST["table_name"]) || $_POST["table_name"] === "" ) {
+        if( !App::$request->data->contains('table_name') || App::$request->data->get('table_name') === "" ) {
             return false;
         }
-        if( !isset($_POST["table_col"]) || $_POST["table_col"] === "" ) {
+        if( !App::$request->data->contains('table_col') || App::$request->data->get('table_col') === "" ) {
             return false;
         }
-        if( empty($_POST["data_columns"]) ) {
+        if( !App::$request->data->contains('data_columns') || empty(App::$request->data->get('data_columns')) ) {
             return false;
         }
         return true;

@@ -141,167 +141,167 @@ Search.appendIndex(
 		"summary": "",
 		"url": "classes/controller-www-HomeController.html#method___toString"
 	}, {
-		"fqsen": "\\lib\\abstracts\\AController",
+		"fqsen": "\\lib\\core\\blueprints\\AController",
 		"name": "AController",
 		"summary": "The\u0020Abstract\u0020version\u0020of\u0020a\u0020Controller",
 		"url": "classes/core-abstracts-AController.html"
 	}, {
-		"fqsen": "\\lib\\abstracts\\AController\u003A\u003A__toString\u0028\u0029",
+		"fqsen": "\\lib\\core\\blueprints\\AController\u003A\u003A__toString\u0028\u0029",
 		"name": "__toString",
 		"summary": "",
 		"url": "classes/core-abstracts-AController.html#method___toString"
 	}, {
-		"fqsen": "\\lib\\abstracts\\AEntity",
+		"fqsen": "\\lib\\core\\blueprints\\AEntity",
 		"name": "AEntity",
 		"summary": "The\u0020Abstract\u0020version\u0020of\u0020a\u0020Entity",
 		"url": "classes/core-abstracts-AEntity.html"
 	}, {
-		"fqsen": "\\lib\\abstracts\\AEntity\u003A\u003Astr2DateTime\u0028\u0029",
+		"fqsen": "\\lib\\core\\blueprints\\AEntity\u003A\u003Astr2DateTime\u0028\u0029",
 		"name": "str2DateTime",
 		"summary": "Converts\u0020a\u0020string\u0020to\u0020a\u0020DateTime\u0020object",
 		"url": "classes/core-abstracts-AEntity.html#method_str2DateTime"
 	}, {
-		"fqsen": "\\lib\\abstracts\\AEntity\u003A\u003AgetParamType\u0028\u0029",
+		"fqsen": "\\lib\\core\\blueprints\\AEntity\u003A\u003AgetParamType\u0028\u0029",
 		"name": "getParamType",
 		"summary": "Returns\u0020the\u0020PDO\u003A\u003APARAM\u0020type\u0020of\u0020the\u0020given\u0020value",
 		"url": "classes/core-abstracts-AEntity.html#method_getParamType"
 	}, {
-		"fqsen": "\\lib\\abstracts\\AResponse",
+		"fqsen": "\\lib\\core\\blueprints\\AResponse",
 		"name": "AResponse",
 		"summary": "The\u0020Abstract\u0020version\u0020of\u0020a\u0020Response",
 		"url": "classes/core-abstracts-AResponse.html"
 	}, {
-		"fqsen": "\\lib\\abstracts\\AResponse\u003A\u003AsetOutput\u0028\u0029",
+		"fqsen": "\\lib\\core\\blueprints\\AResponse\u003A\u003AsetOutput\u0028\u0029",
 		"name": "setOutput",
 		"summary": "Sets\u0020the\u0020output\u0020content\u0020of\u0020the\u0020response",
 		"url": "classes/core-abstracts-AResponse.html#method_setOutput"
 	}, {
-		"fqsen": "\\lib\\abstracts\\AResponse\u003A\u003AgetOutput\u0028\u0029",
+		"fqsen": "\\lib\\core\\blueprints\\AResponse\u003A\u003AgetOutput\u0028\u0029",
 		"name": "getOutput",
 		"summary": "Returns\u0020the\u0020content\u0020of\u0020the\u0020response",
 		"url": "classes/core-abstracts-AResponse.html#method_getOutput"
 	}, {
-		"fqsen": "\\lib\\abstracts\\AResponse\u003A\u003A\u0024_output",
+		"fqsen": "\\lib\\core\\blueprints\\AResponse\u003A\u003A\u0024_output",
 		"name": "_output",
 		"summary": "",
 		"url": "classes/core-abstracts-AResponse.html#property__output"
 	}, {
-		"fqsen": "\\lib\\classes\\Configuration",
+		"fqsen": "\\lib\\core\\classes\\Configuration",
 		"name": "Configuration",
 		"summary": "The\u0020Configuration\u0020type\u0020singleton\nCollect\u0020all\u0020the\u0020configurations\u0020and\u0020stores\u0020them\u0020in\u0020an\u0020array",
 		"url": "classes/core-classes-Configuration.html"
 	}, {
-		"fqsen": "\\lib\\classes\\Configuration\u003A\u003A__construct\u0028\u0029",
+		"fqsen": "\\lib\\core\\classes\\Configuration\u003A\u003A__construct\u0028\u0029",
 		"name": "__construct",
 		"summary": "The\u0020class\u0020constructor\nwill\u0020be\u0020called\u0020once\u0020by\u0020the\u0020static\u0020method\u0020getInstance\u0028\u0029\nParses\u0020the\u0020\u007Bconfiguration\u007D.ini",
 		"url": "classes/core-classes-Configuration.html#method___construct"
 	}, {
-		"fqsen": "\\lib\\classes\\Configuration\u003A\u003AgetInstance\u0028\u0029",
+		"fqsen": "\\lib\\core\\classes\\Configuration\u003A\u003AgetInstance\u0028\u0029",
 		"name": "getInstance",
 		"summary": "The\u0020initializer\u0020for\u0020this\u0020class",
 		"url": "classes/core-classes-Configuration.html#method_getInstance"
 	}, {
-		"fqsen": "\\lib\\classes\\Configuration\u003A\u003AgetConfig\u0028\u0029",
+		"fqsen": "\\lib\\core\\classes\\Configuration\u003A\u003AgetConfig\u0028\u0029",
 		"name": "getConfig",
 		"summary": "Returns\u0020the\u0020whole\u0020configuration",
 		"url": "classes/core-classes-Configuration.html#method_getConfig"
 	}, {
-		"fqsen": "\\lib\\classes\\Configuration\u003A\u003AgetSection\u0028\u0029",
+		"fqsen": "\\lib\\core\\classes\\Configuration\u003A\u003AgetSection\u0028\u0029",
 		"name": "getSection",
 		"summary": "Returns\u0020a\u0020specific\u0020section\u0020of\u0020the\u0020configuration",
 		"url": "classes/core-classes-Configuration.html#method_getSection"
 	}, {
-		"fqsen": "\\lib\\classes\\Configuration\u003A\u003A\u0024_instance",
+		"fqsen": "\\lib\\core\\classes\\Configuration\u003A\u003A\u0024_instance",
 		"name": "_instance",
 		"summary": "",
 		"url": "classes/core-classes-Configuration.html#property__instance"
 	}, {
-		"fqsen": "\\lib\\classes\\Configuration\u003A\u003A\u0024_config",
+		"fqsen": "\\lib\\core\\classes\\Configuration\u003A\u003A\u0024_config",
 		"name": "_config",
 		"summary": "",
 		"url": "classes/core-classes-Configuration.html#property__config"
 	}, {
-		"fqsen": "\\lib\\classes\\File",
+		"fqsen": "\\lib\\core\\classes\\File",
 		"name": "File",
 		"summary": "The\u0020File\u0020class",
 		"url": "classes/core-classes-File.html"
 	}, {
-		"fqsen": "\\lib\\classes\\File\u003A\u003A__construct\u0028\u0029",
+		"fqsen": "\\lib\\core\\classes\\File\u003A\u003A__construct\u0028\u0029",
 		"name": "__construct",
 		"summary": "The\u0020constructor\nSets\u0020the\u0020file\u0020path",
 		"url": "classes/core-classes-File.html#method___construct"
 	}, {
-		"fqsen": "\\lib\\classes\\File\u003A\u003Aexists\u0028\u0029",
+		"fqsen": "\\lib\\core\\classes\\File\u003A\u003Aexists\u0028\u0029",
 		"name": "exists",
 		"summary": "Checks\u0020if\u0020the\u0020current\u0020file\u0020exists",
 		"url": "classes/core-classes-File.html#method_exists"
 	}, {
-		"fqsen": "\\lib\\classes\\File\u003A\u003AsetContent\u0028\u0029",
+		"fqsen": "\\lib\\core\\classes\\File\u003A\u003AsetContent\u0028\u0029",
 		"name": "setContent",
 		"summary": "Sets\u0020the\u0020file\u0020content",
 		"url": "classes/core-classes-File.html#method_setContent"
 	}, {
-		"fqsen": "\\lib\\classes\\File\u003A\u003AgetContent\u0028\u0029",
+		"fqsen": "\\lib\\core\\classes\\File\u003A\u003AgetContent\u0028\u0029",
 		"name": "getContent",
 		"summary": "Returns\u0020the\u0020content\u0020of\u0020the\u0020file",
 		"url": "classes/core-classes-File.html#method_getContent"
 	}, {
-		"fqsen": "\\lib\\classes\\File\u003A\u003Aread\u0028\u0029",
+		"fqsen": "\\lib\\core\\classes\\File\u003A\u003Aread\u0028\u0029",
 		"name": "read",
 		"summary": "Checks\u0020if\u0020the\u0020file\u0020exists\u0020and\u0020reads\u0020its\u0020content\u0020if\u0020it\u0020does.",
 		"url": "classes/core-classes-File.html#method_read"
 	}, {
-		"fqsen": "\\lib\\classes\\File\u003A\u003Aappend\u0028\u0029",
+		"fqsen": "\\lib\\core\\classes\\File\u003A\u003Aappend\u0028\u0029",
 		"name": "append",
 		"summary": "Adds\u0020the\u0020given\u0020\u0024content\u0020to\u0020the\u0020end\u0020of\u0020the\u0020files\u0020content.",
 		"url": "classes/core-classes-File.html#method_append"
 	}, {
-		"fqsen": "\\lib\\classes\\File\u003A\u003Asave\u0028\u0029",
+		"fqsen": "\\lib\\core\\classes\\File\u003A\u003Asave\u0028\u0029",
 		"name": "save",
 		"summary": "writes\u0020the\u0020current\u0020content\u0020to\u0020the\u0020current\u0020file.",
 		"url": "classes/core-classes-File.html#method_save"
 	}, {
-		"fqsen": "\\lib\\classes\\File\u003A\u003AsaveAs\u0028\u0029",
+		"fqsen": "\\lib\\core\\classes\\File\u003A\u003AsaveAs\u0028\u0029",
 		"name": "saveAs",
 		"summary": "Tries\u0020to\u0020save\u0020the\u0020current\u0020content\u0020to\u0020the\u0020given\u0020file\u0020path.",
 		"url": "classes/core-classes-File.html#method_saveAs"
 	}, {
-		"fqsen": "\\lib\\classes\\File\u003A\u003A\u0024_file_path",
+		"fqsen": "\\lib\\core\\classes\\File\u003A\u003A\u0024_file_path",
 		"name": "_file_path",
 		"summary": "",
 		"url": "classes/core-classes-File.html#property__file_path"
 	}, {
-		"fqsen": "\\lib\\classes\\File\u003A\u003A\u0024_content",
+		"fqsen": "\\lib\\core\\classes\\File\u003A\u003A\u0024_content",
 		"name": "_content",
 		"summary": "",
 		"url": "classes/core-classes-File.html#property__content"
 	}, {
-		"fqsen": "\\lib\\classes\\Logger",
+		"fqsen": "\\lib\\core\\classes\\Logger",
 		"name": "Logger",
 		"summary": "The\u0020Logger\ncreates\u0020a\u0020Logfile\u0020and\u0020stores\u0020log\u0020information",
 		"url": "classes/core-classes-Logger.html"
 	}, {
-		"fqsen": "\\lib\\classes\\Logger\u003A\u003A__construct\u0028\u0029",
+		"fqsen": "\\lib\\core\\classes\\Logger\u003A\u003A__construct\u0028\u0029",
 		"name": "__construct",
 		"summary": "The\u0020class\u0020constructor",
 		"url": "classes/core-classes-Logger.html#method___construct"
 	}, {
-		"fqsen": "\\lib\\classes\\Logger\u003A\u003Alog\u0028\u0029",
+		"fqsen": "\\lib\\core\\classes\\Logger\u003A\u003Alog\u0028\u0029",
 		"name": "log",
 		"summary": "Appends\u0020the\u0020formatted\u0020log\u0020text\u0020to\u0020the\u0020log\u0020file\nReturn\u0020true\u0020if\u0020successful\u0020and\u0020false\u0020if\u0020not",
 		"url": "classes/core-classes-Logger.html#method_log"
 	}, {
-		"fqsen": "\\lib\\classes\\Logger\u003A\u003AgetLogPath\u0028\u0029",
+		"fqsen": "\\lib\\core\\classes\\Logger\u003A\u003AgetLogPath\u0028\u0029",
 		"name": "getLogPath",
 		"summary": "Returns\u0020the\u0020path\u0020with\u0020a\u0020formatted\u0020file\u0020name\nfolder\u0020structure\u003A\u0020\u007Blog\u0020directory\u007D\/\u007Byear\u007D\/\u007Bmonth_name\u007D\/\u007Bday\u002Dweekday\u007D_\u007Bfile\u0020name\u0020from\u0020constructor\u007D",
 		"url": "classes/core-classes-Logger.html#method_getLogPath"
 	}, {
-		"fqsen": "\\lib\\classes\\Logger\u003A\u003A\u0024_log_line",
+		"fqsen": "\\lib\\core\\classes\\Logger\u003A\u003A\u0024_log_line",
 		"name": "_log_line",
 		"summary": "",
 		"url": "classes/core-classes-Logger.html#property__log_line"
 	}, {
-		"fqsen": "\\lib\\classes\\Logger\u003A\u003A\u0024_log_type",
+		"fqsen": "\\lib\\core\\classes\\Logger\u003A\u003A\u0024_log_type",
 		"name": "_log_type",
 		"summary": "",
 		"url": "classes/core-classes-Logger.html#property__log_type"
@@ -721,37 +721,37 @@ Search.appendIndex(
 		"summary": "sets\u0020the\u0020headers\u0020for\u0020the\u0020response",
 		"url": "classes/core-interfaces-IResponse.html#method_setHeaders"
 	}, {
-		"fqsen": "\\lib\\manager\\ConnectionManager",
+		"fqsen": "\\lib\\core\\ConnectionManager",
 		"name": "ConnectionManager",
 		"summary": "This\u0020class\u0020will\u0020handle\u0020all\u0020database\u0020connections\nrequired\u0020by\u0020the\u0020application",
 		"url": "classes/core-manager-ConnectionManager.html"
 	}, {
-		"fqsen": "\\lib\\manager\\ConnectionManager\u003A\u003A__construct\u0028\u0029",
+		"fqsen": "\\lib\\core\\ConnectionManager\u003A\u003A__construct\u0028\u0029",
 		"name": "__construct",
 		"summary": "the\u0020class\u0020constructor",
 		"url": "classes/core-manager-ConnectionManager.html#method___construct"
 	}, {
-		"fqsen": "\\lib\\manager\\ConnectionManager\u003A\u003AaddConnection\u0028\u0029",
+		"fqsen": "\\lib\\core\\ConnectionManager\u003A\u003AaddConnection\u0028\u0029",
 		"name": "addConnection",
 		"summary": "Adds\u0020a\u0020connection\u0020the\u0020available\u0020connections",
 		"url": "classes/core-manager-ConnectionManager.html#method_addConnection"
 	}, {
-		"fqsen": "\\lib\\manager\\ConnectionManager\u003A\u003AgetConnection\u0028\u0029",
+		"fqsen": "\\lib\\core\\ConnectionManager\u003A\u003AgetConnection\u0028\u0029",
 		"name": "getConnection",
 		"summary": "Returns\u0020a\u0020connections\nFirst\u0020checks\u0020if\u0020the\u0020connection\u0020is\u0020already\u0020active,\u0020if\u0020so\u0020returns\u0020it\nelse\u0020it\u0020activates\u0020the\u0020connection,\u0020stores\u0020it\u0020to\u0020the\u0020active\u0020connections\nand\u0020returns\u0020it.",
 		"url": "classes/core-manager-ConnectionManager.html#method_getConnection"
 	}, {
-		"fqsen": "\\lib\\manager\\ConnectionManager\u003A\u003A\u0024_connections",
+		"fqsen": "\\lib\\core\\ConnectionManager\u003A\u003A\u0024_connections",
 		"name": "_connections",
 		"summary": "",
 		"url": "classes/core-manager-ConnectionManager.html#property__connections"
 	}, {
-		"fqsen": "\\lib\\manager\\ConnectionManager\u003A\u003A\u0024_active_connections",
+		"fqsen": "\\lib\\core\\ConnectionManager\u003A\u003A\u0024_active_connections",
 		"name": "_active_connections",
 		"summary": "",
 		"url": "classes/core-manager-ConnectionManager.html#property__active_connections"
 	}, {
-		"fqsen": "\\lib\\manager\\ConnectionManager\u003A\u003A\u0024options",
+		"fqsen": "\\lib\\core\\ConnectionManager\u003A\u003A\u0024options",
 		"name": "options",
 		"summary": "",
 		"url": "classes/core-manager-ConnectionManager.html#property_options"

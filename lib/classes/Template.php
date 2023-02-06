@@ -1,7 +1,7 @@
 <?php
 namespace lib\classes;
 
-use lib\exceptions\SystemException;
+use lib\core\exceptions\SystemException;
 
 /**
  * The Template class
@@ -20,9 +20,10 @@ class Template extends TemplateData {
 	 *
 	 * @param string $file_path
      *
-	 * @throws SystemException
+	 * @throws \lib\core\exceptions\SystemException
 	 */
 	public function __construct( string $file_path ) {
+        parent::__construct();
 		if( !file_exists($file_path) ) {
 			throw new SystemException( __FILE__, __LINE__, "Template: file[".$file_path."] not found!");
 		}
@@ -44,6 +45,8 @@ class Template extends TemplateData {
 	 * @return string
 	 */
 	public function parse(): string {
+        extract($this::$data);
+
 		ob_start();
 		require( $this->file_path );
 		return ob_get_clean();

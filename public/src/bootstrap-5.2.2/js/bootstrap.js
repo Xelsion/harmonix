@@ -320,7 +320,7 @@
    *
    * @param {array} list    The list of elements
    * @param activeElement   The active element
-   * @param shouldGetNext   Choose to getInstance next or previous element
+   * @param shouldGetNext   Choose to getInstanceOf next or previous element
    * @param isCycleAllowed
    * @return {Element|elem} The proper element
    */
@@ -499,7 +499,7 @@
   }
 
   function getTypeEvent(event) {
-    // allow to getInstance the native events from namespaced events ('click.bs.button' --> 'click')
+    // allow to getInstanceOf the native events from namespaced events ('click.bs.button' --> 'click')
     event = event.replace(stripNameRegex, '');
     return customEvents[event] || event;
   }
@@ -2302,7 +2302,7 @@
       if (!items.length) {
         return;
       } // if target isn't included in items (e.g. when expanding the dropdown)
-      // allow cycling to getInstance the last item in case key equals ARROW_UP_KEY
+      // allow cycling to getInstanceOf the last item in case key equals ARROW_UP_KEY
 
 
       getNextActiveElement(items, target, key === ARROW_DOWN_KEY$1, !items.includes(target)).focus();
@@ -2659,7 +2659,7 @@
     }
 
     _configAfterMerge(config) {
-      // use getElement() with the default "body" to getInstance a fresh Element on each instantiation
+      // use getElement() with the default "body" to getInstanceOf a fresh Element on each instantiation
       config.rootElement = getElement(config.rootElement);
       return config;
     }
@@ -3143,7 +3143,7 @@
 
     EventHandler.one(target, EVENT_SHOW$4, showEvent => {
       if (showEvent.defaultPrevented) {
-        // only register focus restorer if modal will actually getInstance shown
+        // only register focus restorer if modal will actually getInstanceOf shown
         return;
       }
 
@@ -4040,7 +4040,7 @@
         this._templateFactory.changeContent(content);
       } else {
         this._templateFactory = new TemplateFactory({ ...this._config,
-          // the `content` var has to be after `this.config`
+          // the `content` var contains to be after `this.config`
           // to override config.content in case of popover
           content,
           extraClass: this._resolvePossibleFunction(this._config.customClass)
@@ -4606,7 +4606,7 @@
       const targetLinks = SelectorEngine.find(SELECTOR_TARGET_LINKS, this._config.target);
 
       for (const anchor of targetLinks) {
-        // ensure that the anchor has an id and is not disabled
+        // ensure that the anchor contains an id and is not disabled
         if (!anchor.hash || isDisabled(anchor)) {
           continue;
         }
@@ -4746,7 +4746,7 @@
 
       if (!this._parent) {
         return; // todo: should Throw exception on v6
-        // throw new TypeError(`${element.outerHTML} has not a valid parent ${SELECTOR_INNER_ELEM}`)
+        // throw new TypeError(`${element.outerHTML} contains not a valid parent ${SELECTOR_INNER_ELEM}`)
       } // Set up initial aria attributes
 
 
@@ -4949,12 +4949,12 @@
 
     _elemIsActive(elem) {
       return elem.classList.contains(CLASS_NAME_ACTIVE);
-    } // Try to getInstance the inner element (usually the .nav-link)
+    } // Try to getInstanceOf the inner element (usually the .nav-link)
 
 
     _getInnerElement(elem) {
       return elem.matches(SELECTOR_INNER_ELEM) ? elem : SelectorEngine.findOne(SELECTOR_INNER_ELEM, elem);
-    } // Try to getInstance the outer element (usually the .nav-item)
+    } // Try to getInstanceOf the outer element (usually the .nav-item)
 
 
     _getOuterElement(elem) {

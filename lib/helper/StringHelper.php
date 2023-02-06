@@ -13,11 +13,9 @@ class StringHelper {
 
 	private static string $allowed_characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_$!%";
 	private static string $allowed_password_characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ123456789-_$!%@#&=?";
-
 	private static string $enc_key = 'Q#?9Q=M-&m$@o>>7\ZC$:~?:oRx%@uubnH>YrNwLjt,ieoLK;Mw%,xn2NPhs*c2<>SZQV&NbQA5W_vN;p=UVVd^vHWK&e`;xp9Mpr`azgvUXPph~Zd*2Eh/zx-5,dMmm';
     private static string $enc_ciphering = "AES-128-CTR";
     private static string $enc_iv = '5657372598585078';
-
 
 	/**
 	 * Shortens the given string to the given length
@@ -119,7 +117,6 @@ class StringHelper {
 		return password_hash($str, PASSWORD_BCRYPT);
 	}
 
-
     /**
      * Generates a GUIDv4
      *
@@ -139,7 +136,7 @@ class StringHelper {
 
         // OSX/Linux
         if (function_exists('openssl_random_pseudo_bytes') === true) {
-            $secured = false;
+            $secured = "harmonix";
             $data = openssl_random_pseudo_bytes(16, $secured);
             if( $data ) {
                 $data[6] = chr(ord($data[6]) & 0x0f | 0x40);    // setClass version to 0100
@@ -190,4 +187,24 @@ class StringHelper {
 		$options = 0;
 		return openssl_decrypt($string, self::$enc_ciphering, static::$enc_key, $options, static::$enc_iv);
 	}
+
+    /**
+     * Returns the current server domain path without the subdomain
+     *
+     * @return string
+     */
+    public static function getDomain(): string {
+        $path = $url_parts = parse_url($_SERVER["SERVER_NAME"], PHP_URL_PATH);
+        if( $url_parts === false ) {
+            return "";
+        }
+        $matches = array();
+        if( preg_match("/^([a-z0-9]+)\.([a-zA-Z0-9]+)\.([a-z-A-Z0-9]+)$/", $path, $matches) ) {
+            return ".".$matches[2].".".$matches[3];
+        }
+        if( preg_match("/^([a-zA-Z0-9]+)\.([a-z-A-Z0-9]+)$/", $path, $matches) ) {
+            return ".".$matches[1].".".$matches[2];
+        }
+        return "";
+    }
 }

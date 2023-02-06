@@ -1,8 +1,9 @@
 <?php
-use lib\App;
-use lib\classes\Language;
 
-$lang = App::getInstance(Language::class);
+use lib\App;
+use lib\core\classes\Language;
+
+$lang = App::getInstanceOf(Language::class);
 
 $this->set("title", "Zugriffsrechte");
 $routes = $this->get("routes");
@@ -13,6 +14,7 @@ $type_options = $this->get("type_options");
 <div class="container-fluid">
 	<h1>Zugriffsrechte</h1>
 	<form action="/restrictions" method="POST" class="needs-validation" style="width: 80%;" novalidate>
+        <?= $this->getCsrfToken() ?>
 		<div class="row g-2">
 			<div class="col-md">Bereich</div>
 			<div class="col-md-auto">
@@ -52,7 +54,7 @@ $type_options = $this->get("type_options");
 							<?php foreach( $role_options as $role ) {
 								$is_selected = ( $curr_role === $role->id ) ? ' selected' : '';
 								?>
-								<option value="<?= $role->id ?>"<?= $is_selected ?>><?= escaped_html($role->name) ?></option>
+								<option value="<?= $role->id ?>"<?= $is_selected ?>><?= escaped_string($role->name) ?></option>
 							<?php } ?>
 						</select>
 					</label>
@@ -64,7 +66,7 @@ $type_options = $this->get("type_options");
 							<?php foreach( $type_options as $type ) {
 								$is_selected = ( $curr_type === $type->id ) ? ' selected' : '';
 								?>
-								<option value="<?= $type->id ?>"<?= $is_selected ?>><?= escaped_html($type->name) ?></option>
+								<option value="<?= $type->id ?>"<?= $is_selected ?>><?= escaped_string($type->name) ?></option>
 							<?php } ?>
 						</select>
 					</label>
@@ -91,7 +93,7 @@ $type_options = $this->get("type_options");
 									<?php foreach( $role_options as $role ) {
 										$is_selected = ( $curr_role === $role->id ) ? ' selected' : '';
 										?>
-										<option value="<?= $role->id ?>"<?= $is_selected ?>><?= escaped_html($role->name) ?></option>
+										<option value="<?= $role->id ?>"<?= $is_selected ?>><?= escaped_string($role->name) ?></option>
 									<?php } ?>
 								</select>
 							</label>
@@ -103,7 +105,7 @@ $type_options = $this->get("type_options");
 									<?php foreach( $type_options as $type ) {
 										$is_selected = ( $curr_type === $type->id ) ? ' selected' : '';
 										?>
-										<option value="<?= $type->id ?>"<?= $is_selected ?>><?= escaped_html($type->name) ?></option>
+										<option value="<?= $type->id ?>"<?= $is_selected ?>><?= escaped_string($type->name) ?></option>
 									<?php } ?>
 								</select>
 							</label>
@@ -127,7 +129,7 @@ $type_options = $this->get("type_options");
 											<?php foreach( $role_options as $role ) {
 												$is_selected = ( $curr_role === $role->id ) ? ' selected' : '';
 												?>
-												<option value="<?= $role->id ?>"<?= $is_selected ?>><?= escaped_html($role->name) ?></option>
+												<option value="<?= $role->id ?>"<?= $is_selected ?>><?= escaped_string($role->name) ?></option>
 											<?php } ?>
 										</select>
 									</label>
@@ -139,7 +141,7 @@ $type_options = $this->get("type_options");
 											<?php foreach( $type_options as $type ) {
 												$is_selected = ( $curr_type === $type->id ) ? ' selected' : '';
 												?>
-												<option value="<?= $type->id ?>"<?= $is_selected ?>><?= escaped_html($type->name) ?></option>
+												<option value="<?= $type->id ?>"<?= $is_selected ?>><?= escaped_string($type->name) ?></option>
 											<?php } ?>
 										</select>
 									</label>

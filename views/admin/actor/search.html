@@ -1,22 +1,21 @@
 <?php
+
 use lib\App;
-use lib\classes\Language;
+use lib\core\classes\Language;
 use lib\helper\StringHelper;
 
-$lang = App::getInstance(Language::class);
-
-$search_string = $this->get("search_string");
-$actor_list = $this->get("result_list");
+$lang = App::getInstanceOf(Language::class);
 ?>
 <div class="container-fluid">
 	<form action="/actors/search" method="POST">
+        <?= $this->getCsrfToken() ?>
 		<div class="row">
 			<div class="col"></div>
 			<div class="col-3"><input type="text" name="search_string" value="" /></div>
 			<div class="col-auto"><input type="submit" name="" value="<?= $lang->getValue("translations","search") ?>" class="button button-default" /></div>
 		</div>
 	</form>
-	<h1>Suchergebnisse f&uuml;r: <?= escaped_html($search_string) ?></h1>
+	<h1>Suchergebnisse f&uuml;r: <?= escaped_string($search_string) ?></h1>
 	<table class="table table-dark table-striped">
 		<tr>
 			<th>ID</th>
@@ -26,12 +25,12 @@ $actor_list = $this->get("result_list");
 			<th class="col-md-3 text-end">Optionen</th>
 		</tr>
 		<?php foreach( $actor_list as $actor ):
-			$email = StringHelper::getHighlighted($search_string, escaped_html($actor->email));
-			$first_name = StringHelper::getHighlighted($search_string, escaped_html($actor->first_name));
-			$last_name = StringHelper::getHighlighted($search_string, escaped_html($actor->last_name));
+			$email = StringHelper::getHighlighted($search_string, escaped_string($actor->email));
+			$first_name = StringHelper::getHighlighted($search_string, escaped_string($actor->first_name));
+			$last_name = StringHelper::getHighlighted($search_string, escaped_string($actor->last_name));
 			?>
 			<tr>
-				<td><?= escaped_html($actor->id) ?></td>
+				<td><?= escaped_string($actor->id) ?></td>
 				<td><?= $email ?></td>
 				<td><?= $first_name ?></td>
 				<td><?= $last_name ?></td>
@@ -43,7 +42,7 @@ $actor_list = $this->get("result_list");
 			</tr>
 		<?php endforeach; ?>
 	</table>
-	<?php if( count($actor_list) === 0 ) { ?>
+	<?php if( count($actor_list) === 0 ): ?>
 		<h2>NO RESULTS FOUND</h2>
-	<?php } ?>
+	<?php endif; ?>
 </div>

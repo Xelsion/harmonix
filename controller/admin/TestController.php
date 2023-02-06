@@ -2,15 +2,14 @@
 namespace controller\admin;
 
 use lib\App;
-use lib\abstracts\AController;
-use lib\abstracts\AResponse;
-use lib\attributes\Route;
-use lib\classes\cache\ResponseCache;
-use lib\classes\responses\HtmlResponse;
 use lib\classes\Template;
+use lib\core\attributes\Route;
+use lib\core\blueprints\AController;
+use lib\core\blueprints\AResponse;
+use lib\core\cache\types\ResponseCache;
+use lib\core\exceptions\SystemException;
+use lib\core\response_types\HtmlResponse;
 use lib\core\Router;
-
-use lib\exceptions\SystemException;
 
 #[Route("tests")]
 class TestController Extends AController {
@@ -24,7 +23,7 @@ class TestController Extends AController {
      */
     #[Route("")]
     public function index(): AResponse {
-        $cache = App::getInstance(ResponseCache::class);
+        $cache = App::getInstanceOf(ResponseCache::class);
         $cache->initCacheFor(__METHOD__);
         $cache->addFileCheck(__FILE__);
         $cache->addFileCheck(PATH_VIEWS."template.html");
@@ -34,7 +33,7 @@ class TestController Extends AController {
             $content = $cache->getContent();
         } else {
             $all_routes = array();
-            App::getInstance(Router::class)->getAllRoutes( PATH_CONTROLLER_ROOT, $all_routes);
+            App::getInstanceOf(Router::class)->getAllRoutes( PATH_CONTROLLER_ROOT, $all_routes);
 
             $view = new Template(PATH_VIEWS."test/index.html");
             $view->set("routes_list", $all_routes);
@@ -46,8 +45,6 @@ class TestController Extends AController {
 
             $cache->saveContent($content);
         }
-
-
 
         return new HtmlResponse($content);
     }

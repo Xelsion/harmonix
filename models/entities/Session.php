@@ -1,15 +1,14 @@
 <?php
 namespace models\entities;
 
-use PDO;
-use lib\App;
-use lib\abstracts\AEntity;
-use lib\classes\Configuration;
-use lib\helper\StringHelper;
-use lib\manager\ConnectionManager;
-
 use Exception;
-use lib\exceptions\SystemException;
+use lib\App;
+use lib\core\blueprints\AEntity;
+use lib\core\classes\Configuration;
+use lib\core\ConnectionManager;
+use lib\core\exceptions\SystemException;
+use lib\helper\StringHelper;
+use PDO;
 
 /**
  * The SessionModel entity
@@ -49,11 +48,11 @@ class Session extends AEntity {
      *
      * @return void
      *
-     * @throws SystemException
+     * @throws \lib\core\exceptions\SystemException
      */
     public function init( string $session_id ): void {
         try {
-            $cm = App::getInstance(ConnectionManager::class);
+            $cm = App::getInstanceOf(ConnectionManager::class);
             $pdo = $cm->getConnection("mvc");
             $pdo->prepareQuery("SELECT * FROM sessions WHERE id=:id");
             $pdo->bindParam(":id", $session_id);
@@ -70,7 +69,7 @@ class Session extends AEntity {
      */
 	public function create(): void {
 		try {
-            $cm = App::getInstance(ConnectionManager::class);
+            $cm = App::getInstanceOf(ConnectionManager::class);
             $pdo = $cm->getConnection("mvc");
 			$sql = "INSERT INTO sessions (id, actor_id, ip, expired) VALUES (:id, :actor_id, :ip, :expired)";
 			$pdo->prepareQuery($sql);
@@ -93,7 +92,7 @@ class Session extends AEntity {
             if( $this->_rotate_session ) {
                 $this->id = StringHelper::getGuID();
             }
-            $cm = App::getInstance(ConnectionManager::class);
+            $cm = App::getInstanceOf(ConnectionManager::class);
             $pdo = $cm->getConnection("mvc");
 			$sql = "UPDATE sessions SET id=:id, actor_id=:actor_id, as_actor=:as_actor, ip=:ip, expired=:expired WHERE id=:curr_id";
 			$pdo->prepareQuery($sql);
@@ -115,7 +114,7 @@ class Session extends AEntity {
 	public function delete(): bool {
 		if( $this->id !== "" ) {
 			try {
-                $cm = App::getInstance(ConnectionManager::class);
+                $cm = App::getInstanceOf(ConnectionManager::class);
                 $pdo = $cm->getConnection("mvc");
 				$pdo->prepareQuery("DELETE FROM sessions WHERE id=:id");
 				$pdo->bindParam(":id", $this->id, PDO::PARAM_INT);

@@ -1,0 +1,58 @@
+<div class="container-fluid">
+    <h4>Chat</h4>
+    <div id="chat_content">
+
+    </div>
+    <form id="chat_form" action="/tests/chat/post" method="POST">
+        <?= $this->getCsrfToken() ?>
+        <div class="row">
+            <div class="col">
+                <label for="message">Nachricht</label>
+                <input id="message" type="text" name="msg" value="" />
+            </div>
+            <div class="col-1">
+                <input type="submit" value="Send" class="button button-positiv" />
+            </div>
+        </div>
+    </form>
+</div>
+<script type="text/javascript">
+
+    document.addEventListener("DOMContentLoaded", function() {
+        let eForm = document.querySelector('#chat_form');
+        let eInput = document.querySelector('#message');
+
+        eForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            let url = this.action;
+            let method = this.method;
+            let data = new FormData(this);
+            console.log(data);
+            if( eInput.value.length === 0 ) {
+                return;
+            }
+            fetch(url, {method: method, body: data})
+                .then( (response) => response.json() )
+                .then( (data) => {
+                    if( data.status === 'failed' ) {
+                        throw Error(data.message);
+                    }
+                    eInput.value = "";
+                })
+                .catch((error) => {
+                    eInput.value = "";
+                });
+        });
+
+        if( typeof(EventSource) !== "undefined" ) {
+            const source = new EventSource("/tests/chat/read");
+            source.addEventListener("newText", function(event){
+                let response = JSON.parse(event.data);
+                console.log(response);
+            });
+        } else {
+            alert("wrong browser");
+        }
+    });
+
+</script>

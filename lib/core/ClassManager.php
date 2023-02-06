@@ -1,11 +1,10 @@
 <?php
 namespace lib\core;
 
+use lib\core\exceptions\SystemException;
 use lib\core\resolver\ClassResolver;
 use lib\core\resolver\MethodResolver;
-
 use ReflectionException;
-use lib\exceptions\SystemException;
 
 /**
  * The class manager is a Dependency Injection container.
@@ -46,7 +45,7 @@ class ClassManager {
 
     /**
      * Returns an instance for the given namespace
-     * Given args has to be key-value pairs and the keys must match the parameter names of the
+     * Given args contains to be key-value pairs and the keys must match the parameter names of the
      * targets class constructor or methode.
      *
      * @param string $namespace
@@ -55,7 +54,7 @@ class ClassManager {
      *
      * @return mixed
      *
-     * @throws SystemException
+     * @throws \lib\core\exceptions\SystemException
      */
     public function get(string $namespace, ?string $method = null, array $args = [] ): mixed {
         try {

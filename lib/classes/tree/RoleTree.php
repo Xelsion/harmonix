@@ -1,9 +1,8 @@
 <?php
 namespace lib\classes\tree;
 
+use lib\core\exceptions\SystemException;
 use models\ActorRoleModel;
-
-use lib\exceptions\SystemException;
 
 /**
  * The RoleTree class extends TreeWalker

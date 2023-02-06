@@ -1,8 +1,9 @@
 <?php
-use lib\App;
-use lib\classes\Language;
 
-$lang = App::getInstance(Language::class);
+use lib\App;
+use lib\core\classes\Language;
+
+$lang = App::getInstanceOf(Language::class);
 
 $this->set("title", "Zugriffstypen");
 $type_list = $this->get("type_list");
@@ -20,11 +21,11 @@ $type_list = $this->get("type_list");
 		</tr>
 		<?php foreach( $type_list as $type ): ?>
 			<tr>
-				<td><?= escaped_html($type->id) ?></td>
-				<td><?= escaped_html($type->name) ?></td>
-				<td><?= escaped_html($type->include_siblings) ?></td>
-				<td><?= escaped_html($type->include_children) ?></td>
-				<td><?= escaped_html($type->include_descendants) ?></td>
+				<td><?= escaped_string($type->id) ?></td>
+				<td><?= escaped_string($type->name) ?></td>
+				<td><?= escaped_string($type->include_siblings) ?></td>
+				<td><?= escaped_string($type->include_children) ?></td>
+				<td><?= escaped_string($type->include_descendants) ?></td>
 				<td class="text-nowrap text-end">
 					<a href="/restrictions/types/<?= $type->id ?>" class="button button-default"><?= $lang->getValue("translations", "edit") ?></a>
 					<a href="/restrictions/types/delete/<?= $type->id ?>" class="button button-negativ"><?= $lang->getValue("translations", "delete") ?></a>

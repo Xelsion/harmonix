@@ -1,15 +1,17 @@
 <?php
-use lib\App;
-use lib\classes\Language;
 
-$lang = App::getInstance(Language::class);
+use lib\App;
+use lib\core\classes\Language;
+
+$lang = App::getInstanceOf(Language::class);
 
 $role = $this->get("role");
 ?>
 
 <form action="/actor-roles/delete/<?= $role->id ?>" method="POST">
+    <?= $this->getCsrfToken() ?>
 	<?php if( $role->is_protected ) { ?>
-		<div>Die Rolle <?= escaped_html($role->name) ?> ist gesch&uuml;tzt und kann nicht gel&ouml;scht werden!!!</div>
+		<div>Die Rolle <?= escaped_string($role->name) ?> ist gesch&uuml;tzt und kann nicht gel&ouml;scht werden!!!</div>
 		<div class="form-group row">
 			<div class="col-auto">
 				<button type="submit" name="cancel" class="button button-default"><?= $lang->getValue("translations", "cancel") ?></button>
@@ -18,7 +20,7 @@ $role = $this->get("role");
 			<div class="col-auto"> </div>
 		</div>
 	<?php } else { ?>
-		<div>Soll die Rolle <?= escaped_html($role->name) ?> wirklich gel&ouml&ouml;scht werden?</div>
+		<div>Soll die Rolle <?= escaped_string($role->name) ?> wirklich gel&ouml&ouml;scht werden?</div>
 		<div class="form-group row">
 			<div class="col-auto">
 				<button type="submit" name="cancel" class="button button-default"><?= $lang->getValue("translations", "cancel") ?></button>

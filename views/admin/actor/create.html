@@ -1,9 +1,10 @@
 <?php
-use lib\App;
-use lib\classes\Language;
-use lib\classes\Template;
 
-$lang = App::getInstance(Language::class);
+use lib\App;
+use lib\classes\Template;
+use lib\core\classes\Language;
+
+$lang = App::getInstanceOf(Language::class);
 
 $this->set("title", "Benutzer erstellen");
 $type_options = $this->get("type_options");
@@ -12,6 +13,7 @@ $snippet = new Template(PATH_VIEWS."snippets/access_permission.html");
 <div class="container-fluid">
 	<h1>Neuen Benutzer anlegen</h1>
 	<form action="/actors/create" method="POST" class="needs-validation" autocomplete="off" novalidate>
+        <?= $this->getCsrfToken() ?>
 		<div class="row">
 			<div class="col-4">
 				<h2>Benutzer</h2>
@@ -19,7 +21,7 @@ $snippet = new Template(PATH_VIEWS."snippets/access_permission.html");
 					<label for="type_id">Type</label>
 					<select id="type_id" name="type_id">
 						<?php foreach( $type_options as $option ) { ?>
-							<option value="<?= $option->id ?>"><?= escaped_html($option->name)  ?></option>
+							<option value="<?= $option->id ?>"><?= escaped_string($option->name)  ?></option>
 						<?php } ?>
 					</select>
 					<div class="invalid-feedback"><?= $lang->getValue("error-messages", "type") ?></div>

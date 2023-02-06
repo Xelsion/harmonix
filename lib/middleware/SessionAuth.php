@@ -2,12 +2,10 @@
 namespace lib\middleware;
 
 use lib\App;
-use lib\abstracts\AMiddleware;
+use lib\core\blueprints\AMiddleware;
 use lib\helper\StringHelper;
 use models\ActorModel;
 use models\SessionModel;
-
-use lib\exceptions\SystemException;
 
 /**
  * Class SessionAuth
@@ -15,10 +13,10 @@ use lib\exceptions\SystemException;
 class SessionAuth extends AMiddleware {
 
     /**
-     * @throws SystemException
+     * @throws \lib\core\exceptions\SystemException
      */
-    public static function proceed() {
-        $session = App::getInstance(SessionModel::class);
+    public function invoke(): void {
+        $session = App::getInstanceOf(SessionModel::class);
 
         if( isset($_COOKIE[$session->cookie_name]) ) {
             $session_id = ($session->encryption)
@@ -28,25 +26,23 @@ class SessionAuth extends AMiddleware {
         }
 
         // do we have a login attempt?
-        if( isset($_POST["login"], $_POST["email"], $_POST["password"]) ) {
-            $session->login($_POST["email"], $_POST["password"]);
+        if( App::$request->data->contains("login") && App::$request->data->contains("email") && App::$request->data->contains("password") ) {
+            $session->login(App::$request->data->get("email"), App::$request->data->get("password"));
         }
 
         // do we have a logout attempt?
-        if( isset($_POST["logout"]) ) {
+        if( App::$request->data->contains("logout") ) {
             $session->logout();
         }
 
         $actor = $session->getActor();
 
         // only developer can log in as any actor
-        if( ($session->as_actor > 0 || isset($_POST["login-as"], $_POST["actor_id"])) && ActorModel::isDeveloper($actor->id) ) {
-            if( isset($_POST["actor_id"]) ) {
-                $session->as_actor = (int)$_POST["actor_id"];
-                $session->update();
-                $session->writeCookie();
-            }
-            $actor = App::getInstance(ActorModel::class, null, ["id" => $session->as_actor]);
+        if( ActorModel::isDeveloper($actor->id) && ($session->as_actor > 0 || (App::$request->data->contains("login_as") && App::$request->data->contains("actor_id")))  ) {
+            $session->as_actor = (int)App::$request->data->get("actor_id");
+            $session->update();
+            $session->writeCookie();
+            $actor = App::getInstanceOf(ActorModel::class, null, ["id" => $session->as_actor]);
         }
         App::$curr_actor = $actor;
     }

@@ -34,7 +34,8 @@ $role_options = $this->get("role_options");
 </div>
 <?php foreach( $sorted_routes as $domain => $controllers ) {
 	$curr_role = $permissions[$domain][null][null] ?? 0;
-	$is_protected = ( $curr_actor_role->isDescendantOf(new ActorRoleModel($curr_role)) ) ? ' readonly' : '';
+    $actor_role = App::getInstanceOf(ActorRoleModel::class, null, ["id" => $curr_role]);
+	$is_protected = ( $curr_actor_role->isDescendantOf($actor_role) ) ? ' readonly' : '';
 	?>
 	<div class="row g-2 domain-selection">
 		<div class="col-auto" style="width: 20px;"></div>
@@ -47,10 +48,11 @@ $role_options = $this->get("role_options");
 				<select name="role[<?= $domain ?>][role]"<?= $is_protected ?>>
 					<option value=""<?= ( $is_protected ) ? ' disabled' : '' ?>>- keine -</option>
 					<?php foreach( $role_options as $role ) {
-						$is_selected = ( $curr_role === $role->id ) ? ' selected' : '';
-						$is_disabled = ( $curr_actor_role->isDescendantOf(new ActorRoleModel($curr_role)) && $curr_role !== $role->id ) ? ' disabled' : '';
+                        $actor_role = App::getInstanceOf(ActorRoleModel::class, null, ["id" => $curr_role]);
+ 						$is_selected = ( $curr_role === $role->id ) ? ' selected' : '';
+						$is_disabled = ( $curr_actor_role->isDescendantOf($actor_role) && $curr_role !== $role->id ) ? ' disabled' : '';
 						?>
-						<option value="<?= $role->id ?>"<?= $is_selected ?><?= $is_disabled ?>><?= escaped_html($role->name) ?></option>
+						<option value="<?= $role->id ?>"<?= $is_selected ?><?= $is_disabled ?>><?= escaped_string($role->name) ?></option>
 					<?php } ?>
 				</select>
 			</label>
@@ -59,7 +61,8 @@ $role_options = $this->get("role_options");
 	<div id="<?= $domain ?>" class="toggles" style="display: none;">
 		<?php foreach( $controllers as $controller => $methods ) {
 			$curr_role = $permissions[$domain][$controller][null] ?? 0;
-			$is_protected = ( $curr_actor_role->isDescendantOf(new ActorRoleModel($curr_role)) ) ? ' readonly' : '';
+            $actor_role = App::getInstanceOf(ActorRoleModel::class, null, ["id" => $curr_role]);
+			$is_protected = ( $curr_actor_role->isDescendantOf($actor_role) ) ? ' readonly' : '';
 			$controller_name = str_replace("\\", "-", $controller);
 			?>
 			<div class="row g-2">
@@ -78,7 +81,7 @@ $role_options = $this->get("role_options");
 								$is_selected = ( $curr_role === $role->id ) ? ' selected' : '';
 								$is_disabled = ( $curr_actor_role->isDescendantOf($role) && $curr_role !== $role->id ) ? ' disabled' : '';
 								?>
-								<option value="<?= $role->id ?>"<?= $is_selected ?><?= $is_disabled ?>><?= escaped_html($role->name) ?></option>
+								<option value="<?= $role->id ?>"<?= $is_selected ?><?= $is_disabled ?>><?= escaped_string($role->name) ?></option>
 							<?php } ?>
 						</select>
 					</label>
@@ -87,7 +90,8 @@ $role_options = $this->get("role_options");
 			<div id="<?= $domain."-".$controller_name ?>" class="method-toggle" style="display:none;">
 				<?php foreach( $methods as $method => $url ) {
 					$curr_role = $permissions[$domain][$controller][$method] ?? 0;
-					$is_protected = ( $curr_actor_role->isDescendantOf(new ActorRoleModel($curr_role)) ) ? ' readonly' : '';
+                    $actor_role = App::getInstanceOf(ActorRoleModel::class, null, ["id" => $curr_role]);
+					$is_protected = ( $curr_actor_role->isDescendantOf($actor_role) ) ? ' readonly' : '';
 					?>
 					<div class="row g-2">
 						<div class="col-auto" style="width: 20px;"></div>
@@ -102,7 +106,7 @@ $role_options = $this->get("role_options");
 										$is_selected = ( $curr_role === $role->id ) ? ' selected' : '';
 										$is_disabled = ( $curr_actor_role->isDescendantOf($role) && $curr_role !== $role->id ) ? ' disabled' : '';
 										?>
-										<option value="<?= $role->id ?>"<?= $is_selected ?><?= $is_disabled ?>><?= escaped_html($role->name) ?></option>
+										<option value="<?= $role->id ?>"<?= $is_selected ?><?= $is_disabled ?>><?= escaped_string($role->name) ?></option>
 									<?php } ?>
 								</select>
 							</label>

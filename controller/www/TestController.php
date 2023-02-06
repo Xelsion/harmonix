@@ -2,16 +2,15 @@
 namespace controller\www;
 
 use lib\App;
-use lib\abstracts\AController;
-use lib\abstracts\AResponse;
-use lib\attributes\Route;
-use lib\classes\cache\ResponseCache;
-use lib\classes\responses\HtmlResponse;
 use lib\classes\Template;
-use lib\helper\RequestHelper;
-use models\ActorModel;
-
-use lib\exceptions\SystemException;
+use lib\core\attributes\Route;
+use lib\core\blueprints\AController;
+use lib\core\blueprints\AResponse;
+use lib\core\ConnectionManager;
+use lib\core\exceptions\SystemException;
+use lib\core\response_types\HtmlResponse;
+use lib\core\response_types\JsonResponse;
+use PDO;
 
 #[Route("tests")]
 class TestController extends AController {
@@ -19,7 +18,7 @@ class TestController extends AController {
     /**
      * Shows the starting page of the test controller
      *
-     * @throws SystemException
+     * @throws \lib\core\exceptions\SystemException
      */
     #[Route("/")]
     public function index(): AResponse {
@@ -34,7 +33,7 @@ class TestController extends AController {
     /**
      * @return AResponse
      *
-     * @throws SystemException
+     * @throws \lib\core\exceptions\SystemException
      */
     #[Route("charts")]
     public function charts(): AResponse {
@@ -46,75 +45,14 @@ class TestController extends AController {
         return new HtmlResponse($template->parse());
     }
 
-    /**
-     *
-     * @return AResponse
-     *
-     * @throws SystemException
-     */
-    #[Route("actors")]
-    public function actors() : AResponse {
-        $params = RequestHelper::getPaginationParams();
-
-        $cache = App::getInstance(ResponseCache::class);
-        $cache->initCacheFor(__METHOD__, ...$params);
-        $cache->addFileCheck(__FILE__);
-        $cache->addFileCheck(PATH_VIEWS."template.html");
-        $cache->addFileCheck(PATH_VIEWS."tests/actors.html");
-        $cache->addDBCheck("mvc", "actors");
-        if( self::$caching && $cache->isUpToDate() ) {
-            $content = $cache->getContent();
-        } else {
-            $template = new Template(PATH_VIEWS . "template.html");
-            $template->set("actor_list", ActorModel::find());
-            $template->set("view", new Template(PATH_VIEWS . "tests/actors.html"));
-            $content = $template->parse();
-
-            // if caching is enabled write the generated output into the cache file
-            if(self::$caching) {
-                $cache->saveContent($content);
-            }
-        }
-
-        return new HtmlResponse($content);
-    }
-
-    /**
-     *
-     * @param int $actor_id
-     *
-     * @return AResponse
-     *
-     * @throws SystemException
-     */
-    #[Route("actors/{actor_id}")]
-    public function actorsDetail( int $actor_id ) : AResponse {
-        $results = ActorModel::find([["id", "=", $actor_id]]);
-        if( count($results) === 0 ) {
-            redirect("/error/404");
-        }
-
-        $view =  new Template(PATH_VIEWS."tests/actors_detail.html");
-
-        $template = new Template(PATH_VIEWS . "template.html");
-        $template->set("actor", $results[0]);
-        $template->set("view", $view->parse());
-
-        return new HtmlResponse($template->parse());
-    }
-
 	/**
      *
 	 * @return AResponse
      *
-	 * @throws SystemException
+	 * @throws \lib\core\exceptions\SystemException
 	 */
     #[Route("tinymce")]
     public function tinymce() : AResponse {
-		if( !empty($_POST) && isset($_POST["content"]) ) {
-			print_debug($_POST["content"]);
-		}
-
         $view = new Template(PATH_VIEWS . "tests/tinymce.html");
 
 		$template = new Template(PATH_VIEWS . "template.html");
@@ -122,5 +60,98 @@ class TestController extends AController {
 
 		return new HtmlResponse($template->parse());
 	}
+
+    /**
+     *
+     * @return AResponse
+     *
+     * @throws \lib\core\exceptions\SystemException
+     */
+    #[Route("validator")]
+    public function validator() : AResponse {
+        $view = new Template(PATH_VIEWS . "tests/validator.html");
+
+        $template = new Template(PATH_VIEWS . "template.html");
+        $template->set("view", $view->parse());
+
+        return new HtmlResponse($template->parse());
+    }
+
+    /**
+     * @return AResponse
+     * @throws \lib\core\exceptions\SystemException
+     */
+    #[Route("chat")]
+    public function chat() : AResponse {
+        $view = new Template(PATH_VIEWS . "tests/chat.html");
+
+        $template = new Template(PATH_VIEWS . "template.html");
+        $template->set("view", $view->parse());
+
+        return new HtmlResponse($template->parse());
+    }
+
+    /**
+     * @return AResponse
+     * @throws \lib\core\exceptions\SystemException
+     */
+    #[Route("chat/post")]
+    public function chatPost() : AResponse {
+        try {
+            $cm = App::getInstanceOf(ConnectionManager::class);
+            $pdo = $cm->getConnection("mvc");
+            $sql = "INSERT INTO chat (actor_id, message) VALUES (:actor_id, :message)";
+            $pdo->prepareQuery($sql);
+            $pdo->bindParam(':actor_id', App::$curr_actor->id, PDO::PARAM_INT);
+            $pdo->bindParam(':message', App::$request->data->get("msg"));
+            $pdo->execute();
+            $msg = array('status' => 'success', 'message' => 'Ok');
+            $response = new JsonResponse();
+            $response->setOutput($msg);
+            return $response;
+        } catch (\PDOException $e) {
+            $msg = array('status' => 'failed', 'message' => $e->getMessage());
+            $response = new JsonResponse();
+            $response->setOutput($msg);
+            return $response;
+        }
+    }
+
+    /**
+     * @return AResponse
+     * @throws \lib\core\exceptions\SystemException
+     */
+    #[Route("chat/read")]
+    public function chatRead() : AResponse {
+        $last_id = 0;
+        header("Content-Type: text:event-stream");
+        header("Cache-Control: no-cache, no-store, must-revalidate");
+        $cm = App::getInstanceOf(ConnectionManager::class);
+        $pdo = $cm->getConnection("mvc");
+        $sql = "SELECT * FROM chat WHERE created>=DATE_SUB(NOW(), INTERVAL 2 SECOND) AND id>:last_id";
+        while(true) {
+            $pdo->prepareQuery($sql);
+            $pdo->bindParam(':last_id', $last_id, PDO::PARAM_INT);
+            $results = $pdo->execute()->fetchAll();
+            $result_count = count($results);
+            ob_start();
+            if( $result_count > 0 ) {
+                echo "event: newText\n";
+                echo "data: ".json_encode($results);
+                echo "\n\n";
+                $last_id = $results[$result_count-1]["id"];
+            }
+            ob_end_flush();
+            flush();
+            session_write_close();
+
+            if( connection_aborted() ) {
+                break;
+            }
+            usleep(1000);
+        }
+
+        return new JsonResponse();
+    }
 
 }

@@ -1,8 +1,9 @@
 <?php
-use lib\App;
-use lib\classes\Language;
 
-$lang = App::getInstance(Language::class);
+use lib\App;
+use lib\core\classes\Language;
+
+$lang = App::getInstanceOf(Language::class);
 
 $this->set("title", "Benutzer-Typ bearbeiten");
 $actor_type = $this->get("actor_type");
@@ -13,9 +14,10 @@ $protected = ( $actor_type->is_protected && !$actor_role->canUpdateALl() );
 <h1>Rolle bearbeiten</h1>
 <div class="container-fluid">
 	<form action="/actor-types/<?= $actor_type->id ?>" method="POST" class="needs-validation" novalidate>
+        <?= $this->getCsrfToken() ?>
 		<div class="form-group row">
 			<label for="name">Name</label>
-			<input type="text" name="name" value="<?= escaped_html($actor_type->name) ?>" id="name"<?= ( $protected ) ? ' disabled' : '' ?> required />
+			<input type="text" name="name" value="<?= escaped_string($actor_type->name) ?>" id="name"<?= ( $protected ) ? ' disabled' : '' ?> required />
 			<div class="invalid-feedback"><?= $lang->getValue("error-messages", "name") ?></div>
 		</div>
 		<div class="form-group row">

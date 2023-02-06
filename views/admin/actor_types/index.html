@@ -1,8 +1,9 @@
 <?php
-use lib\App;
-use lib\classes\Language;
 
-$lang = App::getInstance(Language::class);
+use lib\App;
+use lib\core\classes\Language;
+
+$lang = App::getInstanceOf(Language::class);
 
 $this->set("title", "Rollen");
 
@@ -19,8 +20,8 @@ $role_list = $this->get("result_list");
 		</tr>
 		<?php foreach( $role_list as $type ): ?>
 			<tr>
-				<td><?= escaped_html($type->id) ?></td>
-				<td><?= escaped_html($type->name) ?></td>
+				<td><?= escaped_string($type->id) ?></td>
+				<td><?= escaped_string($type->name) ?></td>
 				<td><?= ($type->is_protected) ? "Ja" : "Nein" ?></td>
 				<td class="text-nowrap text-end">
 					<a href="/actor-types/<?= $type->id ?>" class="button button-default"><?= $lang->getValue("translations", "edit") ?></a>

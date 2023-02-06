@@ -2,14 +2,13 @@
 namespace models;
 
 use DateTime;
-use lib\App;
-use models\entities\Session;
-use lib\classes\Configuration;
-use lib\helper\StringHelper;
-use lib\manager\ConnectionManager;
-
 use Exception;
-use lib\exceptions\SystemException;
+use lib\App;
+use lib\core\classes\Configuration;
+use lib\core\ConnectionManager;
+use lib\core\exceptions\SystemException;
+use lib\helper\StringHelper;
+use models\entities\Session;
 
 /**
  * The SessionModel
@@ -29,7 +28,7 @@ class SessionModel extends Session {
     public string $cookie_path = "/";
 
     // The cookie domain
-    public string $cookie_domain = "";
+    public string $cookie_domain;
 
     // The cookie lifetime in hours
 	private int $cookie_lifetime = 2;
@@ -51,14 +50,22 @@ class SessionModel extends Session {
      */
     public function __construct( Configuration $config ) {
         parent::__construct($config);
+        $this->cookie_domain = StringHelper::getDomain();
 
         $cookie_settings = $config->getSection("cookie");
         if( !empty($cookie_settings) ) {
-            $this->cookie_name = $cookie_settings["name"];
-            $this->cookie_domain = $cookie_settings["domain"];
-            $this->cookie_lifetime = $cookie_settings["lifetime"];
-            $this->cookie_secure = $cookie_settings["secure"];
-            $this->cookie_same_site = $cookie_settings["same_site"];
+            if( isset($cookie_settings["name"]) ) {
+                $this->cookie_name = $cookie_settings["name"];
+            }
+            if( isset($cookie_settings["lifetime"]) ) {
+                $this->cookie_lifetime = (int)$cookie_settings["lifetime"];
+            }
+            if( isset($cookie_settings["secure"]) ) {
+                $this->cookie_secure = (int)$cookie_settings["secure"];
+            }
+            if( isset($cookie_settings["same_site"]) ) {
+                $this->cookie_same_site = $cookie_settings["same_site"];
+            }
         }
         $this->encryption = (bool)$config->getSectionValue("security", "encrypted_session");
     }
@@ -72,14 +79,14 @@ class SessionModel extends Session {
      */
 	public function getActor(): ActorModel {
         try {
-            $actor = App::getInstance(ActorModel::class);
+            $actor = App::getInstanceOf(ActorModel::class);
             // do we have an actor?
             if( $this->actor_id > 0 ) {
                 $date_time = new DateTime();
                 $date_time->modify("+".$this->cookie_lifetime." minutes");
                 $this->ip = $_SERVER["REMOTE_ADDR"];
                 $this->expired = $date_time->format("Y-m-d H:i:s");
-                $actor = App::getInstance(ActorModel::class, null, ["id" => $this->actor_id]);
+                $actor = App::getInstanceOf(ActorModel::class, null, ["id" => $this->actor_id]);
 
                 $this->update();
                 $this->writeCookie();
@@ -97,12 +104,12 @@ class SessionModel extends Session {
      * @param string $password
      * @return bool
      *
-     * @throws SystemException
+     * @throws \lib\core\exceptions\SystemException
      */
 	public function login( string $email, string $password ): bool {
         try {
             $permanent = ( array_key_exists("permanent_login", $_POST) && $_POST["permanent_login"] === "yes");
-            $cm = App::getInstance(ConnectionManager::class);
+            $cm = App::getInstanceOf(ConnectionManager::class);
             $pdo = $cm->getConnection("mvc");
             $pdo->prepareQuery("SELECT id, password FROM actors WHERE email=:email AND deleted IS NULL AND login_disabled=0");
             $pdo->bindParam(":email", $email);

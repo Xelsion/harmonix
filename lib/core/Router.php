@@ -1,18 +1,17 @@
 <?php
 namespace lib\core;
 
+use Exception;
+use lib\App;
+use lib\core\attributes\Route;
+use lib\core\blueprints\AController;
+use lib\core\exceptions\SystemException;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionMethod;
-use lib\App;
-use lib\abstracts\AController;
-use lib\attributes\Route;
-
-use Exception;
-use lib\exceptions\SystemException;
 
 /**
- * The Router Type setSingleton
+ * The Router Type setAsSingleton
  * Collect all the Controllers and returns the proper controller for the curren request
  *
  * @author Markus Schröder <xelsion@gmail.com>
@@ -27,7 +26,7 @@ class Router {
 
     /**
      * The class constructor
-     * will be called once by the static method getInstance()
+     * will be called once by the static method getInstanceOf()
      * calls the method initController()
      *
      * @throws SystemException|ReflectionException
@@ -44,28 +43,23 @@ class Router {
      * @return void
      *
      * @throws ReflectionException
-     * @throws SystemException
+     * @throws \lib\core\exceptions\SystemException
      */
     private function registerController( string $sub_domain, string $directory ): void {
         $path = $directory.$sub_domain.DIRECTORY_SEPARATOR;
         $files = scandir($path);
         foreach( $files as $file ) {
-            // do we have a file?
             if( !is_dir($path.$file) ) {
                 $class_file = $path.$file;
-                // Get the namespace of this path
                 $class = Path2Namespace($class_file);
-
-                // getInstance an instance of this class
-                $controller = App::getInstance($class);
+                $controller = App::getInstanceOf($class);
                 if( $controller instanceof AController ) {
-                    // It's a valid Controller so initialize its routes
                     $reflection = new ReflectionClass($controller::class);
                     $class_attributes = $reflection->getAttributes(Route::class);
                     $class_path = "";
                     if( !empty($class_attributes) ) {
                         foreach($class_attributes as $attr ) {
-                            $class_route = $attr->newInstance();
+                            $class_route =$attr->newInstance();
                             $class_path = $class_route->path;
                         }
                     }
@@ -76,7 +70,6 @@ class Router {
                             foreach( $method_attributes as $attr ) {
                                 $route = $attr->newInstance();
                                 $method_path = $route->path;
-
                                 $route->path = $this->getClearedRoutePath($class_path . "/" . $method_path);
                                 $this->addRoute($sub_domain, $route, $controller::class, $method->getName());
                             }
@@ -84,7 +77,7 @@ class Router {
                     }
                 }
             } else if( $file !== "." && $file !== ".." && is_dir($path.DIRECTORY_SEPARATOR.$file) ) {
-                // Let's go through this subdirectory
+                // Let's go recursively
                 $this->registerController( $sub_domain,$directory.$file.DIRECTORY_SEPARATOR);
             }
         }
@@ -120,7 +113,7 @@ class Router {
      * @param string $class
      * @param string|null $method
      *
-     * @throws SystemException
+     * @throws \lib\core\exceptions\SystemException
      */
 	public function addRoute( string $sub_domain, Route $route, string $class, ?string $method = null ): void {
 		if( !isset($this->routes[$sub_domain][$route->path]) ) {
@@ -201,7 +194,7 @@ class Router {
     }
 
     /**
-     * Parses the request parts to getInstance the controller and the wanted method
+     * Parses the request parts to getInstanceOf the controller and the wanted method
      *
      * @param string $request
      * @return array
@@ -213,7 +206,7 @@ class Router {
         // first check for static urls
         if( array_key_exists( addcslashes($request, "/"), $this->routes ) ) {
             $entry = $this->routes[SUB_DOMAIN][addcslashes($request, "/")];
-            $controller = App::getInstance($entry["controller"]);
+            $controller = App::getInstanceOf($entry["controller"]);
             $controller_method = $entry["method"];
             return array( "controller" => $controller, "method" => $controller_method, "params" => array() );
         }
@@ -223,7 +216,7 @@ class Router {
             $matches = array();
             if( preg_match("/^".$entry["regex"]."$/i", $request, $matches) ) {
                 array_shift($matches);
-                $controller = App::getInstance($entry["controller"]);
+                $controller = App::getInstanceOf($entry["controller"]);
                 $controller_method = $entry["method"];
                 $params = $this->getFormattedParameters($controller, $controller_method, $matches);
                 return array( "controller" => $controller, "method" => $controller_method, "params" => $params );
@@ -244,7 +237,7 @@ class Router {
         if( !str_starts_with($route_path, "/") ) {
             $route_path = "/".$route_path;
         }
-        if( str_ends_with($route_path, "/") && $route_path != "/" ) {
+        if( $route_path !== "/" && str_ends_with($route_path, "/") ) {
             $route_path = substr($route_path, 0, strlen($route_path) - 1);
         }
         return $route_path;
@@ -274,13 +267,11 @@ class Router {
         $args = $reflection->getParameters();
         $max_args = count($args);
         $min_args = 0;
-        // Go through all parameters of the requested method
         for( $i = 0; $i < $max_args; $i++ ) {
             $arg_name = $args[$i]->getName();
             $arg_type = (string)$args[$i]->getType();
-            $arg_optional = $args[$i]->isOptional();
             // If the parameter is not optional increase the number of required parameters
-            if( !$arg_optional ) {
+            if( !$args[$i]->isOptional() ) {
                 $min_args++;
             }
             if( isset($params[$i]) ) {
@@ -315,7 +306,8 @@ class Router {
                             if( $constructor_arg_type==="string" && !is_string($params[$i]) ) {
                                 throw new SystemException( __FILE__,__LINE__,"Router: Param type mismatch for method[".$controller."->".$method."]");
                             }
-                            $result[$arg_name] = new $arg_type($params[$i]);
+                            //$result[$arg_name] = new $arg_type($params[$i]);
+                            $result[$arg_name] = App::getInstanceOf($arg_type,null, [$arg_name => $params[$i]]);
                         } catch( Exception ) {
                             throw new SystemException( __FILE__,__LINE__,"Router: Param type mismatch for method[".$controller."->".$method."]");
                         }

@@ -1,8 +1,8 @@
 <?php
 
-use lib\classes\tree\Menu;
+use lib\App;
 
-$menu = new Menu();
+$menu = App::getInstanceOf(\lib\classes\tree\Menu::class);
 $menu->insertMenuItem(100, null, "Home", "/");
 
 $menu->insertMenuItem(200, null, "Benutzer", "/actors");

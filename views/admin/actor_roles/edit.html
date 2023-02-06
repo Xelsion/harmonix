@@ -1,9 +1,10 @@
 <?php
+
 use lib\App;
-use lib\classes\Language;
+use lib\core\classes\Language;
 use models\ActorRoleModel;
 
-$lang = App::getInstance(Language::class);
+$lang = App::getInstanceOf(Language::class);
 
 $this->set("title", "Rolle bearbeiten");
 $role = $this->get("role");
@@ -15,11 +16,12 @@ $protected = ( $role->is_protected && !$actor_role->canUpdateALl() );
 <h1>Rolle bearbeiten</h1>
 <div class="container-fluid">
 	<form action="/actor-roles/<?= $role->id ?>" method="POST" class="needs-validation" novalidate>
+        <?= $this->getCsrfToken() ?>
 		<div class="form-group">
 			<label for="name">Name</label>
-			<input type="text" name="name" value="<?= escaped_html($role->name) ?>"
+			<input type="text" name="name" value="<?= escaped_string($role->name) ?>"
 			       id="name"<?= ( $protected ) ? ' disabled' : '' ?> required />
-			<div class="invalid-feedback"><?= App::getInstance(Language::class)->getValue("error-messages", "name") ?></div>
+			<div class="invalid-feedback"><?= App::getInstanceOf(Language::class)->getValue("error-messages", "name") ?></div>
 		</div>
 		<div class="form-group">
 			<label for="child_of">Unterrolle von</label>
@@ -27,7 +29,7 @@ $protected = ( $role->is_protected && !$actor_role->canUpdateALl() );
 				<option value="">- keine -</option>
 				<?php foreach( $role_option as $parent ) { ?>
 					<?php if( !$role->isAncestorOf($parent) ) { ?>
-						<option value="<?= $parent->id ?>"<?= ( $role->child_of === $parent->id ) ? ' selected' : '' ?>><?= escaped_html($parent->name) ?></option>
+						<option value="<?= $parent->id ?>"<?= ( $role->child_of === $parent->id ) ? ' selected' : '' ?>><?= escaped_string($parent->name) ?></option>
 					<?php } ?>
 				<?php } ?>
 			</select>

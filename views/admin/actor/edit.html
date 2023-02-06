@@ -1,8 +1,9 @@
 <?php
-use lib\App;
-use lib\classes\Language;
 
-$lang = App::getInstance(Language::class);
+use lib\App;
+use lib\core\classes\Language;
+
+$lang = App::getInstanceOf(Language::class);
 
 $this->set("title", "Benutzer bearbeiten");
 $type_options = $this->get("type_options");
@@ -12,18 +13,19 @@ $actor = $this->get("actor");
 <div class="container-fluid">
 	<h1>Neuen Benutzer anlegen</h1>
 	<form action="/actors/<?= $actor->id ?>" method="POST" class="needs-validation" autocomplete="off" novalidate>
+        <?= $this->getCsrfToken() ?>
 		<div class="form-group row">
 			<label for="type_id">Type</label>
 			<select id="type_id" name="type_id">
-				<?php foreach( $type_options as $option ) { ?>
-					<option value="<?= $option->id ?>"<?= ( $option->id === $actor->type_id ) ? ' selected="selected"' : '' ?>><?= escaped_html($option->name)  ?></option>
-				<?php } ?>
+				<?php foreach( $type_options as $option ): ?>
+					<option value="<?= $option->id ?>"<?= ( $option->id === $actor->type_id ) ? ' selected="selected"' : '' ?>><?= escaped_string($option->name)  ?></option>
+				<?php endforeach; ?>
 			</select>
 			<div class="invalid-feedback"><?= $lang->getValue("error-messages", "type") ?></div>
 		</div>
 		<div class="form-group row">
 			<label for="email">E-Mail</label>
-			<input type="email" name="email" value="<?= escaped_html($actor->email) ?>" id="email" required />
+			<input type="email" name="email" value="<?= escaped_string($actor->email) ?>" id="email" required />
 			<div class="invalid-feedback"><?= $lang->getValue("error-messages", "email") ?></div>
 		</div>
 		<div class="form-group row">
@@ -38,12 +40,12 @@ $actor = $this->get("actor");
 		</div>
 		<div class="form-group row">
 			<label for="first_name">Vorname</label>
-			<input type="text" name="first_name" value="<?= escaped_html($actor->first_name) ?>" id="first_name" required />
+			<input type="text" name="first_name" value="<?= escaped_string($actor->first_name) ?>" id="first_name" required />
 			<div class="invalid-feedback"><?= $lang->getValue("error-messages", "first_name") ?></div>
 		</div>
 		<div class="form-group row">
 			<label for="last_name">Nachname</label>
-			<input type="text" name="last_name" value="<?= escaped_html($actor->last_name) ?>" id="last_name" required />
+			<input type="text" name="last_name" value="<?= escaped_string($actor->last_name) ?>" id="last_name" required />
 			<div class="invalid-feedback"><?= $lang->getValue("error-messages", "last_name") ?></div>
 		</div>
 		<div class="form-group row">
@@ -56,7 +58,7 @@ $actor = $this->get("actor");
 		</div>
 		<div class="form-group row">
 			<label for="login_fails">Login fails</label>
-			<input type="number" name="login_fails" value="<?= escaped_html($actor->login_fails) ?>" id="login_fails" required />
+			<input type="number" name="login_fails" value="<?= escaped_string($actor->login_fails) ?>" id="login_fails" required />
 		</div>
 
         <h4>Zusatz Daten</h4>
@@ -74,18 +76,18 @@ $actor = $this->get("actor");
                     <label for="data_connection_0">Daten Verbindung</label>
                     <select id="data_connection_0" name="actor_data[0][connection]">
                         <option value="">- keine -</option>
-                        <?php foreach( $connection_options as $option ) { ?>
+                        <?php foreach( $connection_options as $option ): ?>
                             <option value="<?= $option->id ?>"><?= $option->name ?></option>
-                        <?php } ?>
+                        <?php endforeach; ?>
                     </select>
                 </div>
             </div>
-            <?php foreach( $actor->data as $entry ) { ?>
+            <?php foreach( $actor->data as $entry ): ?>
                 <div class="row">
                     <div class="col-2"><?= $entry->data_key ?></div>
                     <div class="col-2"><?= $entry->data_value ?></div>
                 </div>
-            <?php } ?>
+            <?php endforeach; ?>
         </div>
 		<div class="form-group row clearfix">
 			<div class="col-auto">

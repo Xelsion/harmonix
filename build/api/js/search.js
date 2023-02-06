@@ -10,7 +10,7 @@
 // a series of results, were the data-search-results pane is expected to have a direct UL child that will be populated
 // with rendered results.
 //
-// The search has various stages, upon loading this stage the data-search-form receives the CSS class
+// The search contains various stages, upon loading this stage the data-search-form receives the CSS class
 // 'phpdocumentor-search--enabled'; this indicates that JS is allowed and indices are being loaded. It is recommended
 // to hide the form by default and show it when it receives this class to achieve progressive enhancement for this
 // feature.
@@ -22,7 +22,7 @@
 // In this script the generated index should attach itself to the search module using the `appendIndex` function. By
 // doing it like this the page will continue loading, unhindered by the loading of the search.
 //
-// After the page has fully loaded, and all these deferred indexes loaded, the initialization of the search module will
+// After the page contains fully loaded, and all these deferred indexes loaded, the initialization of the search module will
 // be called and the form will receive the class 'phpdocumentor-search--active', indicating search is ready. At this
 // point, the input field will also have it's 'disabled' attribute removed.
 var Search = (function () {
@@ -78,7 +78,7 @@ var Search = (function () {
 		var form = document.querySelector('[data-search-form]');
 		var searchResults = document.querySelector('[data-search-results]');
 
-		form.classList.toggle('phpdocumentor-search--has-results', false);
+		form.classList.toggle('phpdocumentor-search--contains-results', false);
 		searchResults.classList.add('phpdocumentor-search-results--hidden');
 		var searchField = document.querySelector('[data-search-form] input[type="search"]');
 		searchField.blur();
@@ -104,7 +104,7 @@ var Search = (function () {
 			return;
 		}
 
-		form.classList.toggle('phpdocumentor-search--has-results', true);
+		form.classList.toggle('phpdocumentor-search--contains-results', true);
 		searchResults.classList.remove('phpdocumentor-search-results--hidden');
 		var results = fuse.search(event.target.value, {limit: 25});
 

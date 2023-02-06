@@ -1,6 +1,8 @@
 <?php
 namespace lib\classes;
 
+use lib\core\classes\KeyValuePairs;
+
 /**
  * This class can hold key => value pairs that
  * will be shared by all used templates
@@ -9,6 +11,11 @@ namespace lib\classes;
  * @version 1.0.0;
  */
 class TemplateData {
+
+    protected static string $csrf = '';
+
+    // the data storage for the template
+    public static array $data = array();
 
     // scripts and css that will be added to html head section
     private static array $header = array(
@@ -21,8 +28,20 @@ class TemplateData {
         "script" => array()
     );
 
-	// the data storage for the template
-	private static array $data = array();
+    public function __construct() {
+        if( self::$csrf === "" ) {
+            self::$csrf = createCsrfToken();
+        }
+    }
+
+    /**
+     * Returns the current html form csrf protection element
+     *
+     * @return string
+     */
+    public function getCsrfToken(): string {
+        return self::$csrf;
+    }
 
 	/**
 	 * Adds a key => value pair to the data storage
@@ -87,7 +106,7 @@ class TemplateData {
      * @param string $value
      */
     public function addHeaderCss( string $value ): void {
-        if( !in_array($value, static::$header["css"], false) ) {
+        if( !in_array($value, static::$header["css"], true) ) {
             static::$header["css"][] = $value;
         }
     }
@@ -138,4 +157,5 @@ class TemplateData {
     public function getFooterScripts() : array {
         return static::$footer["script"];
     }
+
 }

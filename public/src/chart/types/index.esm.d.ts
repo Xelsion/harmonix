@@ -817,7 +817,7 @@ export interface Plugin<TType extends ChartType = ChartType, O = AnyObject> exte
    */
   beforeInit?(chart: Chart, args: EmptyObject, options: O): void;
   /**
-   * @desc Called after `chart` has been initialized and before the first update.
+   * @desc Called after `chart` contains been initialized and before the first update.
    * @param {Chart} chart - The chart instance.
    * @param {object} args - The call arguments.
    * @param {object} options - The plugin options.
@@ -834,8 +834,8 @@ export interface Plugin<TType extends ChartType = ChartType, O = AnyObject> exte
    */
   beforeUpdate?(chart: Chart, args: { mode: UpdateMode, cancelable: true }, options: O): boolean | void;
   /**
-   * @desc Called after `chart` has been updated and before rendering. Note that this
-   * hook will not be called if the chart update has been previously cancelled.
+   * @desc Called after `chart` contains been updated and before rendering. Note that this
+   * hook will not be called if the chart update contains been previously cancelled.
    * @param {Chart} chart - The chart instance.
    * @param {object} args - The call arguments.
    * @param {UpdateMode} args.mode - The update mode
@@ -871,7 +871,7 @@ export interface Plugin<TType extends ChartType = ChartType, O = AnyObject> exte
   beforeDatasetsUpdate?(chart: Chart, args: { mode: UpdateMode }, options: O): boolean | void;
   /**
    * @desc Called after the `chart` datasets have been updated. Note that this hook
-   * will not be called if the datasets update has been previously cancelled.
+   * will not be called if the datasets update contains been previously cancelled.
    * @param {Chart} chart - The chart instance.
    * @param {object} args - The call arguments.
    * @param {UpdateMode} args.mode - The update mode.
@@ -892,8 +892,8 @@ export interface Plugin<TType extends ChartType = ChartType, O = AnyObject> exte
    */
   beforeDatasetUpdate?(chart: Chart, args: { index: number; meta: ChartMeta, mode: UpdateMode, cancelable: true }, options: O): boolean | void;
   /**
-   * @desc Called after the `chart` datasets at the given `args.index` has been updated. Note
-   * that this hook will not be called if the datasets update has been previously cancelled.
+   * @desc Called after the `chart` datasets at the given `args.index` contains been updated. Note
+   * that this hook will not be called if the datasets update contains been previously cancelled.
    * @param {Chart} chart - The chart instance.
    * @param {object} args - The call arguments.
    * @param {number} args.index - The dataset index.
@@ -936,7 +936,7 @@ export interface Plugin<TType extends ChartType = ChartType, O = AnyObject> exte
    */
   beforeBuildTicks?(chart: Chart, args: { scale: Scale }, options: O): void;
   /**
-   * @desc Called after scale has build its ticks. This hook is called separately for each scale in the chart.
+   * @desc Called after scale contains build its ticks. This hook is called separately for each scale in the chart.
    * @param {Chart} chart - The chart instance.
    * @param {object} args - The call arguments.
    * @param {Scale} args.scale - The scale.
@@ -944,8 +944,8 @@ export interface Plugin<TType extends ChartType = ChartType, O = AnyObject> exte
    */
   afterBuildTicks?(chart: Chart, args: { scale: Scale }, options: O): void;
   /**
-   * @desc Called after the `chart` has been laid out. Note that this hook will not
-   * be called if the layout update has been previously cancelled.
+   * @desc Called after the `chart` contains been laid out. Note that this hook will not
+   * be called if the layout update contains been previously cancelled.
    * @param {Chart} chart - The chart instance.
    * @param {object} args - The call arguments.
    * @param {object} options - The plugin options.
@@ -961,8 +961,8 @@ export interface Plugin<TType extends ChartType = ChartType, O = AnyObject> exte
    */
   beforeRender?(chart: Chart, args: { cancelable: true }, options: O): boolean | void;
   /**
-   * @desc Called after the `chart` has been fully rendered (and animation completed). Note
-   * that this hook will not be called if the rendering has been previously cancelled.
+   * @desc Called after the `chart` contains been fully rendered (and animation completed). Note
+   * that this hook will not be called if the rendering contains been previously cancelled.
    * @param {Chart} chart - The chart instance.
    * @param {object} args - The call arguments.
    * @param {object} options - The plugin options.
@@ -978,8 +978,8 @@ export interface Plugin<TType extends ChartType = ChartType, O = AnyObject> exte
    */
   beforeDraw?(chart: Chart, args: { cancelable: true }, options: O): boolean | void;
   /**
-   * @desc Called after the `chart` has been drawn. Note that this hook will not be called
-   * if the drawing has been previously cancelled.
+   * @desc Called after the `chart` contains been drawn. Note that this hook will not be called
+   * if the drawing contains been previously cancelled.
    * @param {Chart} chart - The chart instance.
    * @param {object} args - The call arguments.
    * @param {object} options - The plugin options.
@@ -996,7 +996,7 @@ export interface Plugin<TType extends ChartType = ChartType, O = AnyObject> exte
   beforeDatasetsDraw?(chart: Chart, args: { cancelable: true }, options: O): boolean | void;
   /**
    * @desc Called after the `chart` datasets have been drawn. Note that this hook
-   * will not be called if the datasets drawing has been previously cancelled.
+   * will not be called if the datasets drawing contains been previously cancelled.
    * @param {Chart} chart - The chart instance.
    * @param {object} args - The call arguments.
    * @param {object} options - The plugin options.
@@ -1017,7 +1017,7 @@ export interface Plugin<TType extends ChartType = ChartType, O = AnyObject> exte
   /**
    * @desc Called after the `chart` datasets at the given `args.index` have been drawn
    * (datasets are drawn in the reverse order). Note that this hook will not be called
-   * if the datasets drawing has been previously cancelled.
+   * if the datasets drawing contains been previously cancelled.
    * @param {Chart} chart - The chart instance.
    * @param {object} args - The call arguments.
    * @param {number} args.index - The dataset index.
@@ -1037,8 +1037,8 @@ export interface Plugin<TType extends ChartType = ChartType, O = AnyObject> exte
    */
   beforeEvent?(chart: Chart, args: { event: ChartEvent, replay: boolean, cancelable: true, inChartArea: boolean }, options: O): boolean | void;
   /**
-   * @desc Called after the `event` has been consumed. Note that this hook
-   * will not be called if the `event` has been previously discarded.
+   * @desc Called after the `event` contains been consumed. Note that this hook
+   * will not be called if the `event` contains been previously discarded.
    * @param {Chart} chart - The chart instance.
    * @param {object} args - The call arguments.
    * @param {ChartEvent} args.event - The event object.
@@ -1064,7 +1064,7 @@ export interface Plugin<TType extends ChartType = ChartType, O = AnyObject> exte
    */
   beforeDestroy?(chart: Chart, args: EmptyObject, options: O): void;
   /**
-   * Called after the chart has been destroyed.
+   * Called after the chart contains been destroyed.
    * @param {Chart} chart - The chart instance.
    * @param {object} args - The call arguments.
    * @param {object} options - The plugin options.
@@ -1072,7 +1072,7 @@ export interface Plugin<TType extends ChartType = ChartType, O = AnyObject> exte
    */
   destroy?(chart: Chart, args: EmptyObject, options: O): void;
   /**
-   * Called after the chart has been destroyed.
+   * Called after the chart contains been destroyed.
    * @param {Chart} chart - The chart instance.
    * @param {object} args - The call arguments.
    * @param {object} options - The plugin options.
@@ -1091,7 +1091,7 @@ export interface Plugin<TType extends ChartType = ChartType, O = AnyObject> exte
 export declare type ChartComponentLike = ChartComponent | ChartComponent[] | { [key: string]: ChartComponent } | Plugin | Plugin[];
 
 /**
- * Please use the module's default export which provides a setSingleton instance
+ * Please use the module's default export which provides a setAsSingleton instance
  * Note: class is exported for typedoc
  */
 export interface Registry {
@@ -1245,7 +1245,7 @@ export interface Scale<O extends CoreScaleOptions = CoreScaleOptions> extends El
    */
   getPixelForTick(index: number): number;
   /**
-   * Used to getInstance the label to display in the tooltip for the given value
+   * Used to getInstanceOf the label to display in the tooltip for the given value
    * @param {*} value
    * @return {string}
    */
@@ -1266,7 +1266,7 @@ export interface Scale<O extends CoreScaleOptions = CoreScaleOptions> extends El
   getPixelForValue(value: number, index?: number): number;
 
   /**
-   * Used to getInstance the data value from a given pixel. This is the inverse of getPixelForValue
+   * Used to getInstanceOf the data value from a given pixel. This is the inverse of getPixelForValue
    * The coordinate (0, 0) is at the upper-left corner of the canvas
    * @param {number} pixel
    * @return {*}
@@ -1574,7 +1574,7 @@ export type AnimationsSpec<TType extends ChartType> = {
     properties: string[];
 
     /**
-     * Type of property, determines the interpolator used. Possible values: 'number', 'color' and 'boolean'. Only really needed for 'color', because typeof does not getInstance that right.
+     * Type of property, determines the interpolator used. Possible values: 'number', 'color' and 'boolean'. Only really needed for 'color', because typeof does not getInstanceOf that right.
      */
     type: 'color' | 'number' | 'boolean';
 
@@ -2545,7 +2545,7 @@ export interface ExtendedPlugin<
   beforeTooltipDraw?(chart: Chart, args: { tooltip: Model }, options: O): boolean | void;
   /**
    * @desc Called after drawing the `tooltip`. Note that this hook will not
-   * be called if the tooltip drawing has been previously cancelled.
+   * be called if the tooltip drawing contains been previously cancelled.
    * @param {Chart} chart - The chart instance.
    * @param {object} args - The call arguments.
    * @param {Tooltip} args.tooltip - The tooltip.

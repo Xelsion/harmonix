@@ -1,14 +1,13 @@
 <?php
 namespace models;
 
-use PDO;
-use lib\App;
-use lib\classes\Language;
-use lib\helper\SqlHelper;
-use lib\manager\ConnectionManager;
-
 use Exception;
-use lib\exceptions\SystemException;
+use lib\App;
+use lib\core\classes\Language;
+use lib\core\ConnectionManager;
+use lib\core\exceptions\SystemException;
+use lib\helper\MySqlHelper;
+use PDO;
 
 /**
  * The ActorModel Role
@@ -29,7 +28,7 @@ class ActorRoleModel extends entities\ActorRole {
      *
      * @param int $id
      *
-     * @throws SystemException
+     * @throws \lib\core\exceptions\SystemException
      */
 	public function __construct( int $id = 0 ) {
 		parent::__construct($id);
@@ -54,41 +53,30 @@ class ActorRoleModel extends entities\ActorRole {
      *
      * @return array
      *
-     * @throws SystemException
+     * @throws \lib\core\exceptions\SystemException
      */
     public static function find( array $conditions = array(), ?string $order = "", ?string $direction = "asc", int $limit = 0, int $page = 1 ) : array {
         try {
             $results = array();
-            $cm = App::getInstance(ConnectionManager::class);
+            $cm = App::getInstanceOf(ConnectionManager::class);
             $pdo = $cm->getConnection("mvc");
             if( !is_null($pdo) ) {
                 $params = array();
 
                 $query = "SELECT * FROM actor_roles";
                 if( !empty($conditions) ) {
-                    $columns = array();
-
-                    foreach( $conditions as $i => $condition ) {
-                        $columns[] = $condition[0] . $condition[1] . ":" . $i;
-                        $params[$i] = $condition[2];
-                    }
-                    $query .= " WHERE " . implode(" AND ", $columns);
+                    $params = MySqlHelper::addQueryConditions( $query, $conditions);
                 }
-
                 if( $order !== "" ) {
-                    $query .= " ORDER BY " . $order . " " . $direction;
+                    MySqlHelper::addQueryOrder( $query, $order, $direction);
                 }
-
                 if( $limit > 0 ) {
-                    $offset = $limit * ($page - 1);
-                    $query .= " LIMIT :limit OFFSET :offset";
-                    $params["limit"] = $limit;
-                    $params["offset"] = $offset;
+                    $params = array_merge($params, MySqlHelper::addQueryLimit( $query, $limit, $page));
                 }
 
                 $pdo->prepareQuery($query);
                 foreach( $params as $key => $value ) {
-                    $pdo->bindParam(":" . $key, $value, SqlHelper::getParamType($value));
+                    $pdo->bindParam(":" . $key, $value, MySqlHelper::getParamType($value));
                 }
                 $pdo->setFetchMode(PDO::FETCH_CLASS, __CLASS__);
                 $results = $pdo->execute()->fetchAll();
@@ -101,11 +89,11 @@ class ActorRoleModel extends entities\ActorRole {
     }
 
     /**
-     * Returns the parent of this role or null if it has no parent.
+     * Returns the parent of this role or null if it contains no parent.
      *
      * @return ActorRoleModel|null
      *
-     * @throws SystemException
+     * @throws \lib\core\exceptions\SystemException
      */
 	public function getParent(): ?ActorRoleModel {
 		if( $this->child_of !== null ) {
@@ -123,12 +111,12 @@ class ActorRoleModel extends entities\ActorRole {
      *
      * @return array
      *
-     * @throws SystemException
+     * @throws \lib\core\exceptions\SystemException
      */
 	public function getChildren(): array {
         try {
             $children = array();
-            $cm = App::getInstance(ConnectionManager::class);
+            $cm = App::getInstanceOf(ConnectionManager::class);
             $pdo = $cm->getConnection("mvc");
             $pdo->prepareQuery("SELECT * FROM actor_roles WHERE child_of=:id");
             $pdo->bindParam(":id", $this->id, PDO::PARAM_INT);
@@ -188,7 +176,7 @@ class ActorRoleModel extends entities\ActorRole {
      *
      * @return bool
      *
-     * @throws SystemException
+     * @throws \lib\core\exceptions\SystemException
      */
 	public function isAncestorOf( ActorRoleModel $role ): bool {
         try {
@@ -211,7 +199,7 @@ class ActorRoleModel extends entities\ActorRole {
      * @param ActorRoleModel $role
      * @return bool
      *
-     * @throws SystemException
+     * @throws \lib\core\exceptions\SystemException
      */
 	public function isDescendantOf( ActorRoleModel $role ): bool {
         try {
@@ -369,7 +357,7 @@ class ActorRoleModel extends entities\ActorRole {
      *
      * @return bool
      *
-     * @throws SystemException
+     * @throws \lib\core\exceptions\SystemException
      */
     public function canUpdate(int $owner_id): bool {
         try {
@@ -397,7 +385,7 @@ class ActorRoleModel extends entities\ActorRole {
      *
      * @return bool
      *
-     * @throws SystemException
+     * @throws \lib\core\exceptions\SystemException
      */
     public function canDelete(int $owner_id): bool {
         try {
@@ -426,7 +414,7 @@ class ActorRoleModel extends entities\ActorRole {
      *
      * @return array|array[]
      *
-     * @throws SystemException
+     * @throws \lib\core\exceptions\SystemException
      */
 	public function getStringArray(): array {
 		global $lang;
@@ -436,40 +424,40 @@ class ActorRoleModel extends entities\ActorRole {
 			"own"   => array(),
 		);
 		if( $this->canCreateAll() ) {
-			$rights["all"][] = App::getInstance(Language::class)->getValue("right-chars", "create");
+			$rights["all"][] = App::getInstanceOf(Language::class)->getValue("right-chars", "create");
 		}
 		if( $this->canReadAll() ) {
-			$rights["all"][] = App::getInstance(Language::class)->getValue("right-chars", "read");
+			$rights["all"][] = App::getInstanceOf(Language::class)->getValue("right-chars", "read");
 		}
 		if( $this->canUpdateAll() ) {
-			$rights["all"][] = App::getInstance(Language::class)->getValue("right-chars", "update");
+			$rights["all"][] = App::getInstanceOf(Language::class)->getValue("right-chars", "update");
 		}
 		if( $this->canDeleteAll() ) {
-			$rights["all"][] = App::getInstance(Language::class)->getValue("right-chars", "delete");
+			$rights["all"][] = App::getInstanceOf(Language::class)->getValue("right-chars", "delete");
 		}
 		if( $this->canCreateGroup() ) {
-			$rights["group"][] = App::getInstance(Language::class)->getValue("right-chars", "create");
+			$rights["group"][] = App::getInstanceOf(Language::class)->getValue("right-chars", "create");
 		}
 		if( $this->canReadGroup() ) {
-			$rights["group"][] = App::getInstance(Language::class)->getValue("right-chars", "read");
+			$rights["group"][] = App::getInstanceOf(Language::class)->getValue("right-chars", "read");
 		}
 		if( $this->canUpdateGroup() ) {
-			$rights["group"][] = App::getInstance(Language::class)->getValue("right-chars", "update");
+			$rights["group"][] = App::getInstanceOf(Language::class)->getValue("right-chars", "update");
 		}
 		if( $this->canDeleteGroup() ) {
-			$rights["group"][] = App::getInstance(Language::class)->getValue("right-chars", "delete");
+			$rights["group"][] = App::getInstanceOf(Language::class)->getValue("right-chars", "delete");
 		}
 		if( $this->canCreateOwn() ) {
-			$rights["own"][] = App::getInstance(Language::class)->getValue("right-chars", "create");
+			$rights["own"][] = App::getInstanceOf(Language::class)->getValue("right-chars", "create");
 		}
 		if( $this->canReadOwn() ) {
-			$rights["own"][] = App::getInstance(Language::class)->getValue("right-chars", "read");
+			$rights["own"][] = App::getInstanceOf(Language::class)->getValue("right-chars", "read");
 		}
 		if( $this->canUpdateOwn() ) {
-			$rights["own"][] = App::getInstance(Language::class)->getValue("right-chars", "update");
+			$rights["own"][] = App::getInstanceOf(Language::class)->getValue("right-chars", "update");
 		}
 		if( $this->canDeleteOwn() ) {
-			$rights["own"][] = App::getInstance(Language::class)->getValue("right-chars", "delete");
+			$rights["own"][] = App::getInstanceOf(Language::class)->getValue("right-chars", "delete");
 		}
 		return $rights;
 	}

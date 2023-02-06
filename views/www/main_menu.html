@@ -1,11 +1,12 @@
 <?php
 
-use lib\classes\tree\Menu;
+use lib\App;
 
-$menu = new Menu();
+$menu = App::getInstanceOf(\lib\classes\tree\Menu::class);
 $menu->insertMenuItem(100, null, "Home", "/");
 
 $menu->insertMenuItem(200, null, "Tests", "/tests");
 $menu->insertMenuItem(201, 200, "Charts", "/tests/charts");
-$menu->insertMenuItem(202, 200, "TinyMCE", "/tests/tinymce");
+$menu->insertMenuItem(203, 200, "Validator", "/tests/validator");
+$menu->insertMenuItem(204, 200, "Chat", "/tests/chat");
 echo $menu->getAsHtml();

@@ -1,8 +1,9 @@
 <?php
-use lib\App;
-use lib\classes\Language;
 
-$lang = App::getInstance(Language::class);
+use lib\App;
+use lib\core\classes\Language;
+
+$lang = App::getInstanceOf(Language::class);
 
 $this->set("title", "Daten Verbindung erstellen");
 $connections = $this->get("available_connections");
@@ -10,6 +11,7 @@ $connections = $this->get("available_connections");
 <div class="container-fluid">
 	<h1>Neue Verbindung anlegen</h1>
 	<form action="/data-connections/create" method="POST" class="needs-validation" novalidate>
+        <?= $this->getCsrfToken() ?>
 		<div class="form-group row">
             <div class="col-2">
                 <label for="name">Name</label>

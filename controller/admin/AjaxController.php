@@ -1,15 +1,14 @@
 <?php
 namespace controller\admin;
 
-use lib\App;
-use lib\abstracts\AController;
-use lib\abstracts\AResponse;
-use lib\attributes\Route;
-use lib\classes\responses\JsonResponse;
-use lib\manager\ConnectionManager;
-
 use Exception;
-use lib\exceptions\SystemException;
+use lib\App;
+use lib\core\attributes\Route;
+use lib\core\blueprints\AController;
+use lib\core\blueprints\AResponse;
+use lib\core\ConnectionManager;
+use lib\core\exceptions\SystemException;
+use lib\core\response_types\JsonResponse;
 
 #[Route("ajax")]
 class AjaxController extends AController {
@@ -21,11 +20,11 @@ class AjaxController extends AController {
      *
      * @throws SystemException
      */
-    #[Route("getInstance-tables/{db_name}")]
+    #[Route("getInstanceOf-tables/{db_name}")]
     public function getTables( string $db_name ): AResponse {
         $response = new JsonResponse();
         try {
-            $cm = App::getInstance(ConnectionManager::class);
+            $cm = App::getInstanceOf(ConnectionManager::class);
             $pdo = $cm->getConnection("mvc");
             $tables = $pdo->getTables();
             $response->setOutput($tables);
@@ -42,14 +41,14 @@ class AjaxController extends AController {
      *
      * @return AResponse
      *
-     * @throws SystemException
+     * @throws \lib\core\exceptions\SystemException
      */
-    #[Route("getInstance-table-key-columns/{db_name}/{table_name}")]
+    #[Route("getInstanceOf-table-key-columns/{db_name}/{table_name}")]
     public function getTableKeyColumns( string $db_name, string $table_name ): AResponse {
         $response = new JsonResponse();
 
         try {
-            $cm = App::getInstance(ConnectionManager::class);
+            $cm = App::getInstanceOf(ConnectionManager::class);
             $pdo = $cm->getConnection("mvc");
             $columns = $pdo->getTableKeyColumns( $table_name );
             $response->setOutput($columns);
@@ -65,14 +64,14 @@ class AjaxController extends AController {
      *
      * @return AResponse
      *
-     * @throws SystemException
+     * @throws \lib\core\exceptions\SystemException
      */
-    #[Route("getInstance-table-columns/{db_name}/{table_name}")]
+    #[Route("getInstanceOf-table-columns/{db_name}/{table_name}")]
     public function getTableColumns( string $db_name, string $table_name ): AResponse {
         $response = new JsonResponse();
 
         try {
-            $cm = App::getInstance(ConnectionManager::class);
+            $cm = App::getInstanceOf(ConnectionManager::class);
             $pdo = $cm->getConnection("mvc");
             $columns = $pdo->getTableColumns( $table_name );
             $response->setOutput($columns);

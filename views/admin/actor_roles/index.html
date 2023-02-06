@@ -1,8 +1,9 @@
 <?php
-use lib\App;
-use lib\classes\Language;
 
-$lang = App::getInstance(Language::class);
+use lib\App;
+use lib\core\classes\Language;
+
+$lang = App::getInstanceOf(Language::class);
 
 $this->set("title", "Rollen");
 $role_list = $this->get("result_list");
@@ -25,12 +26,12 @@ $role_list = $this->get("result_list");
 			$rights = $role->getStringArray();
 			?>
 			<tr>
-				<td><?= escaped_html($role->id) ?></td>
-				<td><?= escaped_html($role->name) ?></td>
-				<td><?= ( !is_null($parent) ) ? escaped_html($parent->name) : "- keine -" ?></td>
-				<td><?= escaped_html(implode(", ", $rights["all"])) ?></td>
-				<td><?= escaped_html(implode(", ", $rights["group"])) ?></td>
-				<td><?= escaped_html(implode(", ", $rights["own"])) ?></td>
+				<td><?= escaped_string($role->id) ?></td>
+				<td><?= escaped_string($role->name) ?></td>
+				<td><?= ( !is_null($parent) ) ? escaped_string($parent->name) : "- keine -" ?></td>
+				<td><?= escaped_string(implode(", ", $rights["all"])) ?></td>
+				<td><?= escaped_string(implode(", ", $rights["group"])) ?></td>
+				<td><?= escaped_string(implode(", ", $rights["own"])) ?></td>
 				<td><?= ($role->is_protected) ? "Ja" : "Nein" ?></td>
 				<td class="text-nowrap text-end">
 					<a href="/actor-roles/<?= $role->id ?>" class="button button-default"><?= $lang->getValue("translations", "edit") ?></a>

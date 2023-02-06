@@ -1,12 +1,12 @@
 <?php
 namespace controller\www;
 
-use lib\abstracts\AController;
-use lib\abstracts\AResponse;
-use lib\attributes\Route;
-use lib\classes\responses\HtmlResponse;
 use lib\classes\Template;
-use lib\exceptions\SystemException;
+use lib\core\attributes\Route;
+use lib\core\blueprints\AController;
+use lib\core\blueprints\AResponse;
+use lib\core\exceptions\SystemException;
+use lib\core\response_types\HtmlResponse;
 
 /**
  * @author Markus Schröder <xelsion@gmail.com>
@@ -18,7 +18,7 @@ class HomeController extends AController {
     /**
      * Shows the landing page
      *
-     * @return AResponse
+     * @return \lib\core\blueprints\AResponse
      *
      * @throws SystemException
      */

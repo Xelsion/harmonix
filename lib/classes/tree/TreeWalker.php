@@ -43,7 +43,7 @@ class TreeWalker {
 
     /**
      * Returns the parent node of the node with the given
-     * id or null if it has no parent
+     * id or null if it contains no parent
      *
      * @param int $node_id
      * @return TreeNode|null
@@ -67,7 +67,7 @@ class TreeWalker {
 
 	/**
 	 * Returns all child nodes of the node with the given id
-	 * or an empty array if it has none
+	 * or an empty array if it contains none
 	 *
 	 * @param int|null $node_id
 	 * @return array
@@ -103,7 +103,7 @@ class TreeWalker {
 
 	/**
 	 * Returns all ancestor nodes of the node with the given id
-	 * or an empty array if it has none
+	 * or an empty array if it contains none
 	 *
 	 * @param int $node_id
 	 * @return array
@@ -131,7 +131,7 @@ class TreeWalker {
 
     /**
      * Returns all descendant nodes of the node with the given id
-     * or an empty array if it has none
+     * or an empty array if it contains none
      *
      * @param int $node_id
      * @param array $results
@@ -167,7 +167,7 @@ class TreeWalker {
 
 	/**
 	 * Returns all sibling nodes of the node with the given id
-	 * or an empty array if it has none.
+	 * or an empty array if it contains none.
 	 * if exclude_self is true it will exclude itself else not
 	 *
 	 * @param int $node_id

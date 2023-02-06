@@ -12,7 +12,7 @@ use Exception;
  * @author Markus Schröder <xelsion@gmail.com>
  * @version 1.0.0;
  */
-class DateHelper {
+readonly class DateHelper {
 
 	/**
 	 * @throws Exception

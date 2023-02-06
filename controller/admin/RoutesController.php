@@ -2,14 +2,13 @@
 namespace controller\admin;
 
 use lib\App;
-use lib\abstracts\AController;
-use lib\abstracts\AResponse;
-use lib\attributes\Route;
-use lib\classes\responses\HtmlResponse;
 use lib\classes\Template;
+use lib\core\attributes\Route;
+use lib\core\blueprints\AController;
+use lib\core\blueprints\AResponse;
+use lib\core\exceptions\SystemException;
+use lib\core\response_types\HtmlResponse;
 use lib\core\Router;
-
-use lib\exceptions\SystemException;
 
 #[Route("routes")]
 class RoutesController Extends AController {
@@ -19,12 +18,12 @@ class RoutesController Extends AController {
      *
      * @return AResponse
      *
-     * @throws SystemException
+     * @throws \lib\core\exceptions\SystemException
      */
     #[Route("")]
     public function index(): AResponse {
         $view = new Template(PATH_VIEWS."routes/index.html");
-        $view->set("routes_list", App::getInstance(Router::class)->getSortedRoutes());
+        $view->set("routes_list", App::getInstanceOf(Router::class)->getSortedRoutes());
 
         $template = new Template(PATH_VIEWS."template.html");
         $template->set("view", $view->parse());

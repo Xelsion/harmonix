@@ -1,14 +1,14 @@
 <?php
 namespace models\entities;
 
-use PDO;
-use lib\App;
-use lib\abstracts\AEntity;
-use lib\helper\StringHelper;
-use lib\manager\ConnectionManager;
-
 use Exception;
-use lib\exceptions\SystemException;
+use lib\App;
+use lib\core\blueprints\AEntity;
+use lib\core\ConnectionManager;
+use lib\core\enums\ActorType;
+use lib\core\exceptions\SystemException;
+use lib\helper\StringHelper;
+use PDO;
 
 /**
  * The ActorModel entity
@@ -22,7 +22,7 @@ class Actor extends AEntity {
 	// the columns
 	public int $id = 0;
 
-    public int $type_id = 0;
+    public int $type_id = ActorType::User->value;
 
 	public string $email = "";
 
@@ -48,12 +48,12 @@ class Actor extends AEntity {
      *
      * @param int $id
      *
-     * @throws SystemException
+     * @throws \lib\core\exceptions\SystemException
      */
 	public function __construct( int $id = 0 ) {
 		if( $id > 0 ) {
             try {
-                $cm = App::getInstance(ConnectionManager::class);
+                $cm = App::getInstanceOf(ConnectionManager::class);
                 $pdo = $cm->getConnection("mvc");
                 $pdo->prepareQuery("SELECT * FROM actors WHERE id=:id");
                 $pdo->bindParam(":id", $id, PDO::PARAM_INT);
@@ -70,7 +70,7 @@ class Actor extends AEntity {
      */
 	public function create(): void {
         try {
-            $cm = App::getInstance(ConnectionManager::class);
+            $cm = App::getInstanceOf(ConnectionManager::class);
             $pdo = $cm->getConnection("mvc");
             $sql = "INSERT INTO actors (type_id, email, password, first_name, last_name, login_fails, login_disabled) VALUES (:type_id, :email, :password, :first_name, :last_name, :login_fails, :login_disabled)";
             $this->password = StringHelper::getBCrypt($this->password);
@@ -93,7 +93,7 @@ class Actor extends AEntity {
      * @inheritDoc
      */
 	public function update(): void {
-        $cm = App::getInstance(ConnectionManager::class);
+        $cm = App::getInstanceOf(ConnectionManager::class);
         $pdo = $cm->getConnection("mvc");
         $pdo->prepareQuery("SELECT password FROM actors WHERE id=:id");
         $pdo->bindParam(":id", $this->id, PDO::PARAM_INT);
@@ -127,7 +127,7 @@ class Actor extends AEntity {
 	public function delete(): bool {
 		if( $this->id > 0 ) {
             try {
-                $cm = App::getInstance(ConnectionManager::class);
+                $cm = App::getInstanceOf(ConnectionManager::class);
                 $pdo = $cm->getConnection("mvc");
                 $pdo->prepareQuery("DELETE FROM actors WHERE id=:id");
                 $pdo->bindParam("id", $this->id, PDO::PARAM_INT);

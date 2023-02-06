@@ -1,14 +1,13 @@
 <?php
 namespace models;
 
-use PDO;
-use lib\App;
-use lib\helper\SqlHelper;
-use lib\manager\ConnectionManager;
-use models\entities\ActorData;
-
 use Exception;
-use lib\exceptions\SystemException;
+use lib\App;
+use lib\core\ConnectionManager;
+use lib\core\exceptions\SystemException;
+use lib\helper\MySqlHelper;
+use models\entities\ActorData;
+use PDO;
 
 /**
  * The ActorModel
@@ -18,7 +17,7 @@ use lib\exceptions\SystemException;
  */
 class ActorModel extends entities\Actor {
 
-	// a collection of all permission this user has
+	// a collection of all permission this user contains
 	public array $permissions = array();
 
     public array $data = array();
@@ -31,7 +30,7 @@ class ActorModel extends entities\Actor {
      *
      * @param int $id
      *
-     * @throws SystemException
+     * @throws \lib\core\exceptions\SystemException
      */
 	public function __construct( int $id = 0 ) {
 		parent::__construct($id);
@@ -60,42 +59,32 @@ class ActorModel extends entities\Actor {
      *
      * @return array
      *
-     * @throws SystemException
+     * @throws \lib\core\exceptions\SystemException
      */
 	public static function find( array $conditions = array(), ?string $order = "", ?string $direction = "asc", int $limit = 0, int $page = 1 ): array {
         try {
             $results = array();
-            $cm = App::getInstance(ConnectionManager::class);
+            $cm = App::getInstanceOf(ConnectionManager::class);
             $pdo = $cm->getConnection("mvc");
             if( !is_null($pdo) ) {
                 $params = array();
 
                 $query = "SELECT * FROM actors";
                 if( !empty($conditions) ) {
-                    $columns = array();
-
-                    foreach( $conditions as $i => $condition ) {
-                        $columns[] = $condition[0] . $condition[1] . ":" . $i;
-                        $params[$i] = $condition[2];
-                    }
-                    $query .= " WHERE " . implode(" AND ", $columns);
+                    $params = MySqlHelper::addQueryConditions($query, $conditions);
                 }
-
                 if( $order !== "" ) {
-                    $query .= " ORDER BY " . $order . " " . $direction;
+                    MySqlHelper::addQueryOrder($query, $order, $direction);
                 }
-
                 if( $limit > 0 ) {
-                    $offset = $limit * ($page - 1);
-                    $query .= " LIMIT :limit OFFSET :offset";
-                    $params["limit"] = $limit;
-                    $params["offset"] = $offset;
+                    $params = array_merge($params, MySqlHelper::addQueryLimit($query, $limit, $page));
                 }
 
                 $pdo->prepareQuery($query);
                 foreach( $params as $key => $value ) {
-                    $pdo->bindParam(":" . $key, $value, SqlHelper::getParamType($value));
+                    $pdo->bindParam(":" . $key, $value, MySqlHelper::getParamType($value));
                 }
+
                 $pdo->setFetchMode(PDO::FETCH_CLASS, __CLASS__);
                 $results = $pdo->execute()->fetchAll();
             }
@@ -113,12 +102,12 @@ class ActorModel extends entities\Actor {
      *
      * @return bool
      *
-     * @throws SystemException
+     * @throws \lib\core\exceptions\SystemException
      */
     public static function isDeveloper( int $actor_id = 0 ): bool {
         try {
             if( $actor_id > 0 ) {
-                $actor = App::getInstance(ActorModel::class, null, ["id" => $actor_id]);
+                $actor = App::getInstanceOf(ActorModel::class, null, ["id" => $actor_id]);
                 return ($actor->type_id === 1);
             }
             if( App::$curr_actor->id > 0 ) {
@@ -136,11 +125,11 @@ class ActorModel extends entities\Actor {
      *
      * @return int
      *
-     * @throws SystemException
+     * @throws \lib\core\exceptions\SystemException
      */
     public static function getNumActors(): int {
         try {
-            $cm = App::getInstance(ConnectionManager::class);
+            $cm = App::getInstanceOf(ConnectionManager::class);
             $pdo = $cm->getConnection("mvc");
             return $pdo->getNumRowsOfTable("actors");
         } catch( Exception $e ) {
@@ -160,13 +149,13 @@ class ActorModel extends entities\Actor {
      *
      * @return ActorRoleModel
      *
-     * @throws SystemException
+     * @throws \lib\core\exceptions\SystemException
      */
 	public function getRole( string $controller, string $method, string $domain = SUB_DOMAIN ): ActorRoleModel {
         try {
             // do we have a loaded actor object?
             if( $this->id > 0 ) {
-                // no permission restriction is setClass?
+                // no permission restriction is set?
                 if( empty($this->permissions) ) {
                     $this->initPermission();
                 }
@@ -193,7 +182,7 @@ class ActorModel extends entities\Actor {
                 return $result[0];
             }
             // if no default actor role could be found return an empty actor role
-            return App::getInstance(ActorRoleModel::class);
+            return App::getInstanceOf(ActorRoleModel::class);
         } catch( Exception $e ) {
             throw new SystemException($e->getFile(), $e->getLine(), $e->getMessage(), $e->getCode(), $e->getPrevious());
         }
@@ -204,11 +193,11 @@ class ActorModel extends entities\Actor {
      *
      * @return bool
      *
-     * @throws SystemException
+     * @throws \lib\core\exceptions\SystemException
      */
     public function deletePermissions() : bool {
         try {
-            $cm = App::getInstance(ConnectionManager::class);
+            $cm = App::getInstanceOf(ConnectionManager::class);
             $pdo = $cm->getConnection("mvc");
             if( $this->id > 0 ) {
                 $pdo->prepareQuery("DELETE FROM access_permissions WHERE actor_id=:actor_id");
@@ -226,7 +215,7 @@ class ActorModel extends entities\Actor {
 	/**
 	 * Collects all permission for this user
      *
-     * @throws SystemException
+     * @throws \lib\core\exceptions\SystemException
 	 */
 	private function initPermission(): void {
         try {
@@ -244,18 +233,18 @@ class ActorModel extends entities\Actor {
      *
      * @return void
      *
-     * @throws SystemException
+     * @throws \lib\core\exceptions\SystemException
      */
     public function initData(): void {
         try {
-            $cm = App::getInstance(ConnectionManager::class);
+            $cm = App::getInstanceOf(ConnectionManager::class);
             $pdo = $cm->getConnection("mvc");
             $pdo->prepareQuery("SELECT * FROM actor_data WHERE actor_id=:id");
             $pdo->bindParam(":id", $this->id, PDO::PARAM_INT);
             $pdo->setFetchMode(PDO::FETCH_CLASS, ActorData::class);
             $this->data = $pdo->execute()->fetchAll();
             foreach($this->data as $data) {
-                if( $data->connection_id === 0 ) {
+                if( is_null($data->connection_id) ) {
                     continue;
                 }
                 $data_connection = new DataConnectionModel($data->connection_id);

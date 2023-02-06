@@ -1,13 +1,12 @@
 <?php
 namespace models;
 
-use PDO;
-use lib\App;
-use lib\helper\SqlHelper;
-use lib\manager\ConnectionManager;
-
 use Exception;
-use lib\exceptions\SystemException;
+use lib\App;
+use lib\core\ConnectionManager;
+use lib\core\exceptions\SystemException;
+use lib\helper\MySqlHelper;
+use PDO;
 
 /**
  * The AccessRestrictionTypeModel
@@ -53,36 +52,25 @@ class AccessRestrictionTypeModel extends entities\AccessRestrictionType {
     public static function find( array $conditions = array(), ?string $order = "", ?string $direction = "asc", int $limit = 0, int $page = 1 ) : ?array {
         try {
             $results = array();
-            $cm = App::getInstance(ConnectionManager::class);
+            $cm = App::getInstanceOf(ConnectionManager::class);
             $pdo = $cm->getConnection("mvc");
             if( !is_null($pdo) ) {
                 $params = array();
 
                 $query = "SELECT * FROM access_restriction_types";
                 if( !empty($conditions) ) {
-                    $columns = array();
-
-                    foreach( $conditions as $i => $condition ) {
-                        $columns[] = $condition[0] . $condition[1] . ":" . $i;
-                        $params[$i] = $condition[2];
-                    }
-                    $query .= " WHERE " . implode(" AND ", $columns);
+                    $params = MySqlHelper::addQueryConditions( $query, $conditions);
                 }
-
                 if( $order !== "" ) {
-                    $query .= " ORDER BY " . $order . " " . $direction;
+                    MySqlHelper::addQueryOrder( $query, $order, $direction);
                 }
-
                 if( $limit > 0 ) {
-                    $offset = $limit * ($page - 1);
-                    $query .= " LIMIT :limit OFFSET :offset";
-                    $params["limit"] = $limit;
-                    $params["offset"] = $offset;
+                    $params = array_merge($params, MySqlHelper::addQueryLimit( $query, $limit, $page));
                 }
 
                 $pdo->prepareQuery($query);
                 foreach( $params as $key => $value ) {
-                    $pdo->bindParam(":" . $key, $value, SqlHelper::getParamType($value));
+                    $pdo->bindParam(":" . $key, $value, MySqlHelper::getParamType($value));
                 }
                 $pdo->setFetchMode(PDO::FETCH_CLASS, __CLASS__);
                 $results = $pdo->execute()->fetchAll();

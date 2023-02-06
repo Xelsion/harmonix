@@ -2,14 +2,13 @@
 namespace controller\admin;
 
 use lib\App;
-use lib\abstracts\AController;
-use lib\abstracts\AResponse;
-use lib\attributes\Route;
-use lib\classes\responses\HtmlResponse;
 use lib\classes\Template;
+use lib\core\attributes\Route;
+use lib\core\blueprints\AController;
+use lib\core\blueprints\AResponse;
+use lib\core\exceptions\SystemException;
+use lib\core\response_types\HtmlResponse;
 use models\ActorTypeModel;
-
-use lib\exceptions\SystemException;
 
 #[Route("actor-types")]
 class ActorTypeController extends AController {
@@ -17,7 +16,7 @@ class ActorTypeController extends AController {
     /**
      * Get a list of all actor types
      *
-     * @return AResponse
+     * @return \lib\core\blueprints\AResponse
      *
      * @throws SystemException
      * @throws JsonException
@@ -34,9 +33,9 @@ class ActorTypeController extends AController {
     }
 
     /**
-     * @return AResponse
+     * @return \lib\core\blueprints\AResponse
      *
-     * @throws SystemException
+     * @throws \lib\core\exceptions\SystemException
      */
     #[Route("create")]
     public function create(): AResponse {
@@ -44,15 +43,15 @@ class ActorTypeController extends AController {
             redirect("/error/403");
         }
 
-        if( isset($_POST['cancel']) ) {
+        if( App::$request->data->contains('cancel') ) {
             redirect("/actor-types");
         }
 
-        if( isset($_POST['create']) ) {
+        if( App::$request->data->contains("create") ) {
             $is_valid = $this->postIsValid();
             if( $is_valid ) {
-                $actor_type = App::getInstance(ActorTypeModel::class);
-                $actor_type->name = $_POST["name"];
+                $actor_type = App::getInstanceOf(ActorTypeModel::class);
+                $actor_type->name = App::$request->data->get("name");
                 $actor_type->create();
                 redirect("/actor-types");
             }
@@ -73,7 +72,7 @@ class ActorTypeController extends AController {
      *
      * @return AResponse
      *
-     * @throws SystemException
+     * @throws \lib\core\exceptions\SystemException
      */
     #[Route("/{actor_type}")]
     public function update ( ActorTypeModel $actor_type): AResponse {
@@ -81,14 +80,14 @@ class ActorTypeController extends AController {
             redirect("/error/403");
         }
 
-        if( isset($_POST['cancel']) ) {
+        if( App::$request->data->contains('cancel') ) {
             redirect("/actor-types");
         }
 
-        if( isset($_POST['update']) ) {
+        if( App::$request->data->contains('update') ) {
             $is_valid = $this->postIsValid();
             if( $is_valid ) {
-                $actor_type->name = $_POST["name"];
+                $actor_type->name = App::$request->data->get('name');
                 $actor_type->update();
                 redirect("/actor-types");
             }
@@ -117,7 +116,7 @@ class ActorTypeController extends AController {
             redirect("/error/403");
         }
 
-        if( isset($_POST['cancel']) ) {
+        if( App::$request->data->contains('cancel') ) {
             redirect("/actors");
         }
 
@@ -132,7 +131,7 @@ class ActorTypeController extends AController {
      * @return bool
      */
     private function postIsValid(): bool {
-        if( !isset($_POST["name"]) || $_POST["name"] === "" ) {
+        if( !App::$request->data->contains('name') || App::$request->data->get('name') === "" ) {
             return false;
         }
         return true;

@@ -1,12 +1,11 @@
 <?php
 
 use lib\App;
-use lib\classes\Configuration;
 use lib\classes\Template;
-use lib\core\System;
+use lib\core\classes\Configuration;
 
 $actor = App::$curr_actor;
-$config = App::getInstance(Configuration::class);
+$config = App::getInstanceOf(Configuration::class);
 $view = $this->get("view");
 $view_content = ( $view instanceof Template) ? $view->parse() : $view;
 ?>
@@ -48,6 +47,7 @@ $view_content = ( $view instanceof Template) ? $view->parse() : $view;
 					<?php if( $actor->id === 0 ): ?>
 						<li>
 							<form action="<?= $_SERVER["REQUEST_URI"] ?>" method="POST">
+                                <?= $this->getCsrfToken() ?>
 								<div class="form-row">
 									<label>
 										<input type="email" name="email" value="" placeholder="E-Mail" />
@@ -74,7 +74,8 @@ $view_content = ( $view instanceof Template) ? $view->parse() : $view;
 							<a href="https://www.harmonix.de">www-Bereich</a>
 						</li>
 						<li>
-							<form action="<?= $_SERVER["REQUEST_URI"] ?>" method="POST">
+							<form action="/" method="POST">
+                                <?= $this->getCsrfToken() ?>
 								<button type="submit" name="logout" class="link">Logout</button>
 							</form>
 						</li>
@@ -87,7 +88,7 @@ $view_content = ( $view instanceof Template) ? $view->parse() : $view;
 </header>
 <main><?= $view_content ?></main>
 <div>
-	<?php if( App::$storage::get("debug_mode") ) {
+	<?php if( App::$storage->get("debug_mode") ) {
 		$debug = new Template(PATH_VIEWS_ROOT."snippets/debug.html");
 		$debug_content = $debug->parse();
 		echo $debug_content;
@@ -96,7 +97,7 @@ $view_content = ( $view instanceof Template) ? $view->parse() : $view;
 <footer>
 	<div class="row text-end" style="margin: 0;">
 		<div class="col"></div>
-		<div class="col-3">Harmonix by: <?= escaped_html(AUTHOR) ?> version: <?= escaped_html(MVC_VERSION) ?></div>
+		<div class="col-3">Harmonix by: <?= escaped_string(AUTHOR) ?> version: <?= escaped_string(MVC_VERSION) ?></div>
         <div class="col-1">Cached: {{is_cached}}</div>
 		<div class="col-1">build in: {{build_time}}</div>
 	</div>

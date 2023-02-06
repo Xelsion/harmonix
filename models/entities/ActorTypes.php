@@ -1,13 +1,12 @@
 <?php
 namespace models\entities;
 
-use PDO;
-use lib\App;
-use lib\abstracts\AEntity;
-use lib\manager\ConnectionManager;
-
 use Exception;
-use lib\exceptions\SystemException;
+use lib\App;
+use lib\core\blueprints\AEntity;
+use lib\core\ConnectionManager;
+use lib\core\exceptions\SystemException;
+use PDO;
 
 /**
  * The ActorTypes entity
@@ -36,7 +35,7 @@ class ActorTypes extends AEntity {
     public function __construct( int $id = 0 ) {
         if( $id > 0 ) {
             try {
-                $cm = App::getInstance(ConnectionManager::class);
+                $cm = App::getInstanceOf(ConnectionManager::class);
                 $pdo = $cm->getConnection("mvc");
                 $pdo->prepareQuery("SELECT * FROM actor_types WHERE id=:id");
                 $pdo->bindParam(":id", $id, PDO::PARAM_INT);
@@ -53,7 +52,7 @@ class ActorTypes extends AEntity {
      */
     public function create(): void {
         try {
-            $cm = App::getInstance(ConnectionManager::class);
+            $cm = App::getInstanceOf(ConnectionManager::class);
             $pdo = $cm->getConnection("mvc");
             $sql = "INSERT INTO actor_types (name) VALUES (:name)";
             $pdo->prepareQuery($sql);
@@ -71,7 +70,7 @@ class ActorTypes extends AEntity {
     public function update(): void {
         if( $this->id > 0 ) {
             try {
-                $cm = App::getInstance(ConnectionManager::class);
+                $cm = App::getInstanceOf(ConnectionManager::class);
                 $pdo = $cm->getConnection("mvc");
                 $sql = "UPDATE actor_types SET name=:name WHERE id=:id";
                 $pdo->prepareQuery($sql);
@@ -90,7 +89,7 @@ class ActorTypes extends AEntity {
     public function delete(): bool {
         if( $this->id > 0 && !$this->is_protected ) {
             try {
-                $cm = App::getInstance(ConnectionManager::class);
+                $cm = App::getInstanceOf(ConnectionManager::class);
                 $pdo = $cm->getConnection("mvc");
                 $pdo->prepareQuery("DELETE FROM actor_types WHERE id=:id");
                 $pdo->bindParam(':id', $this->id, PDO::PARAM_INT);

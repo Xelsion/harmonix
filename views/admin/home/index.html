@@ -1,6 +1,21 @@
 <?php
+use lib\App;
+
 $this->set("title", "Home");
+ob_start();
+phpinfo(INFO_GENERAL|INFO_MODULES);
+$html = ob_get_contents();
+ob_end_clean();
 ?>
 <div class="container-fluid">
 	<h1>Welcome!</h1>
+    <?php if( App::$curr_actor_role->canReadAll() ) { ?>
+        <iframe id="php_info" width="100%" sandbox="allow-same-origin" srcdoc="<?= htmlspecialchars($html) ?>"></iframe>
+        <script>
+            $(function() {
+                let iFrame = $("#php_info");
+                iFrame.height(iFrame.contents().height());
+            });
+        </script>
+    <?php } ?>
 </div>

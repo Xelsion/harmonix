@@ -1,10 +1,10 @@
 <?php
 namespace lib\classes\tree;
 
+use Exception;
 use lib\App;
+use lib\core\exceptions\SystemException;
 use lib\core\Router;
-
-use lib\exceptions\SystemException;
 
 /**
  * The Menu class extends TreeWalker
@@ -15,7 +15,11 @@ use lib\exceptions\SystemException;
  */
 class Menu extends TreeWalker {
 
-	/**
+    public function __construct( private readonly Router $router ) {
+        parent::__construct();
+    }
+
+    /**
 	 * Adds a MenuItem the tree structure
 	 *
 	 * @param MenuItem $item
@@ -38,11 +42,13 @@ class Menu extends TreeWalker {
 		$this->addMenuItem($item);
 	}
 
-	/**
-	 * Returns the menu as html <ul><li> string
-	 *
-	 * @return string
-	 */
+    /**
+     * Returns the menu as html <ul><li> string
+     *
+     * @return string
+     *
+     * @throws \lib\core\exceptions\SystemException
+     */
 	public function getAsHtml(): string {
 		$html = '';
 		$this->buildHtmlTree(null, $html);
@@ -54,28 +60,32 @@ class Menu extends TreeWalker {
      *
      * @param int|null $parent_id
      * @param $html
-     * @throws SystemException
+     * @throws \lib\core\exceptions\SystemException
      */
 	public function buildHtmlTree( ?int $parent_id, &$html ): void {
-		$children = $this->getChildrenOf($parent_id);
-		if( !empty($children) ) {
-            $router = App::getInstance(Router::class);
-			$html .= '<ul>';
-			foreach( $children as $child ) {
-                $route = $router->getRouteFor($child->target);
-                if( App::$auth_settings->hasAccessTo($route["controller"], $route["method"]) ) {
-                    $has_children = $this->hasChildren($child->id);
-                    $class = ( $has_children ) ? "has-children" : "";
-                    $html .= '<li class="'.$class.'">';
-                    $html .= $child->getLink();
-                    if( $has_children ) {
-                        $this->buildHtmlTree($child->id, $html);
+        try {
+            $children = $this->getChildrenOf($parent_id);
+            if( !empty($children) ) {
+                //$router = App::getInstanceOf(Router::class);
+                $html .= '<ul>';
+                foreach( $children as $child ) {
+                    $route = $this->router->getRouteFor($child->target);
+                    if( App::$auth->hasAccessTo($route["controller"], $route["method"]) ) {
+                        $has_children = $this->hasChildren($child->id);
+                        $class = ($has_children) ? "contains-children" : "";
+                        $html .= '<li class="' . $class . '">';
+                        $html .= $child->getLink();
+                        if( $has_children ) {
+                            $this->buildHtmlTree($child->id, $html);
+                        }
+                        $html .= '</li>';
                     }
-                    $html .= '</li>';
                 }
-			}
-			$html .= '</ul>';
-		}
+                $html .= '</ul>';
+            }
+        } catch( Exception $e ) {
+            throw new SystemException($e->getFile(), $e->getLine(), $e->getMessage(), $e->getCode(), $e->getPrevious());
+        }
 	}
 
 }

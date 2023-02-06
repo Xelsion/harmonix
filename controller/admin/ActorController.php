@@ -1,19 +1,18 @@
 <?php
 namespace controller\admin;
 
-use PDO;
 use DateTime;
 use lib\App;
-use lib\classes\cache\ResponseCache;
-use lib\classes\Configuration;
-use lib\core\Request;
-use lib\core\Router;
-use lib\manager\ConnectionManager;
-use lib\abstracts\AController;
-use lib\abstracts\AResponse;
-use lib\attributes\Route;
-use lib\classes\responses\HtmlResponse;
 use lib\classes\Template;
+use lib\core\attributes\Route;
+use lib\core\blueprints\AController;
+use lib\core\blueprints\AResponse;
+use lib\core\cache\types\ResponseCache;
+use lib\core\classes\Configuration;
+use lib\core\ConnectionManager;
+use lib\core\Request;
+use lib\core\response_types\HtmlResponse;
+use lib\core\Router;
 use lib\helper\HtmlHelper;
 use lib\helper\RequestHelper;
 use models\AccessPermissionModel;
@@ -22,11 +21,10 @@ use models\ActorRoleModel;
 use models\ActorTypeModel;
 use models\DataConnectionModel;
 use models\entities\ActorData;
-
-use lib\exceptions\SystemException;
+use PDO;
 
 /**
- * @see \lib\abstracts\AController
+ * @see \lib\core\blueprints\AController
  *
  * @author Markus Schröder <xelsion@gmail.com>
  * @version 1.0.0;
@@ -43,13 +41,13 @@ class ActorController extends AController {
      *
      * @return AResponse
      *
-     * @throws SystemException
+     * @throws \lib\core\exceptions\SystemException
      */
 	#[Route("")]
     public function index(): AResponse {
-        $params = App::getInstance(RequestHelper::class)->getPaginationParams();
+        $params = App::getInstanceOf(RequestHelper::class)->getPaginationParams();
 
-        $cache = App::getInstance(ResponseCache::class);
+        $cache = App::getInstanceOf(ResponseCache::class);
         $cache->initCacheFor(__METHOD__, ...$params);
         $cache->addFileCheck(__FILE__);
         $cache->addFileCheck(PATH_VIEWS."template.html");
@@ -61,7 +59,7 @@ class ActorController extends AController {
             HTMLHelper::getPagination( $params['page'],  ActorModel::getNumActors(), $params['limit'], $pagination);
 
             $view = new Template(PATH_VIEWS."actor/index.html");
-            $view->set("result_list", ActorModel::find(array(), $params['order'], $params['direction'], $params['limit'], $params['page']));
+            $view->set("actor_list", ActorModel::find(array(), $params['order'], $params['direction'], $params['limit'], $params['page']));
             $view->set("pagination", $pagination);
 
             $template = new Template(PATH_VIEWS."template.html");
@@ -82,16 +80,16 @@ class ActorController extends AController {
     /**
      * Searches the db for actors that mache the search string
      *
-     * @return AResponse
+     * @return \lib\core\blueprints\AResponse
      *
-     * @throws SystemException
+     * @throws \lib\core\exceptions\SystemException
      */
     #[Route("search")]
     public function search(): AResponse {
-        $search_string = $this->request->get("search_string");
+        $search_string = $this->request->data->get("search_string");
 
         $params = array($search_string);
-        $cache = App::getInstance(ResponseCache::class);
+        $cache = App::getInstanceOf(ResponseCache::class);
         $cache->initCacheFor(__METHOD__, ...$params);
         $cache->addFileCheck(__FILE__);
         $cache->addFileCheck(PATH_VIEWS."template.html");
@@ -102,17 +100,15 @@ class ActorController extends AController {
         } else {
             $results = array();
             if( $search_string !== null ) {
-                $cm = App::getInstance(ConnectionManager::class);
-                $pdo = $cm->getConnection("mvc");
-                $sql = "SELECT * FROM actors WHERE first_name LIKE :word OR last_name LIKE :word OR email LIKE :word";
-                $pdo->prepareQuery($sql);
-                $pdo->bindParam("word", "%".$search_string."%");
-                $pdo->setFetchMode(PDO::FETCH_CLASS, ActorModel::class );
-                $results = $pdo->execute()->fetchAll();
+                $results = ActorModel::find([
+                    ["first_name", "LIKE", '%'.$search_string.'%'],
+                    ["OR","last_name", "LIKE", '%'.$search_string.'%'],
+                    ["OR","email", "LIKE", '%'.$search_string.'%'],
+                ]);
             }
             $view = new Template(PATH_VIEWS."actor/search.html");
             $view->set("search_string", $search_string);
-            $view->set("result_list", $results);
+            $view->set("actor_list", $results);
 
             $template = new Template(PATH_VIEWS."template.html");
             $template->set("view", $view->parse());
@@ -120,7 +116,7 @@ class ActorController extends AController {
             $content = $template->parse();
 
             // if caching is enabled write the generated output into the cache file
-            if(self::$caching) {
+            if( self::$caching ) {
                 $cache->saveContent($content);
             }
         }
@@ -133,7 +129,7 @@ class ActorController extends AController {
      *
      * @return AResponse
      *
-     * @throws SystemException
+     * @throws \lib\core\exceptions\SystemException
      */
     #[Route("create")]
     public function create(): AResponse {
@@ -141,21 +137,18 @@ class ActorController extends AController {
 			redirect("/error/403");
 		}
 
-		if( isset($_POST['create']) ) {
+		if( App::$request->data->contains('create') ) {
 			$is_valid = $this->postIsValid();
 			if( $is_valid ) {
-				$actor = App::getInstance(ActorModel::class);
-				$actor->email = $_POST["email"];
-				$actor->password = $_POST["password"];
-				$actor->first_name = $_POST["first_name"];
-				$actor->last_name = $_POST["last_name"];
+				$actor = App::getInstanceOf(ActorModel::class);
+                $this->setActorParams($actor);
 				$actor->create();
 				$this->savePermissions($actor);
 				redirect("/actors");
 			}
 		}
 
-        $cache = App::getInstance(ResponseCache::class);
+        $cache = App::getInstanceOf(ResponseCache::class);
         $cache->initCacheFor(__METHOD__);
         $cache->addFileCheck(__FILE__);
         $cache->addFileCheck(PATH_VIEWS."template.html");
@@ -167,7 +160,7 @@ class ActorController extends AController {
         if( self::$caching && $cache->isUpToDate() ) {
             $content = $cache->getContent();
         } else {
-            $routes = App::getInstance(Router::class)->getSortedRoutes();
+            $routes = App::getInstanceOf(Router::class)->getSortedRoutes();
             $view = new Template(PATH_VIEWS."actor/create.html");
             $view->set("routes", $routes);
             $view->set("role_options", ActorRoleModel::find());
@@ -188,13 +181,12 @@ class ActorController extends AController {
 		return new HtmlResponse($content);
 	}
 
-
     /**
      * @param ActorModel $actor
      *
      * @return AResponse
      *
-     * @throws SystemException
+     * @throws \lib\core\exceptions\SystemException
      */
     #[Route("{actor}")]
     public function update( ActorModel $actor ): AResponse {
@@ -202,39 +194,35 @@ class ActorController extends AController {
 			redirect("/error/403");
 		}
 
-		if( isset($_POST['cancel']) ) {
+		if( App::$request->data->contains('cancel') ) {
 			redirect("/actors");
 		}
 
-		if( isset($_POST['update']) ) {
+		if( App::$request->data->contains('update') ) {
 			$is_valid = $this->postIsValid();
 			if( $is_valid ) {
-                $actor->type_id = (int)$_POST["type_id"];
-				$actor->email = $_POST["email"];
-				$actor->password = $_POST["password"];
-				$actor->first_name = $_POST["first_name"];
-				$actor->last_name = $_POST["last_name"];
-                $actor->login_fails = (int) $_POST["login_fails"];
-                $actor->login_disabled = (int) $_POST["login_disabled"];
+                $this->setActorParams($actor);
 				$actor->update();
-
-                foreach( $_POST["actor_data"] as $index => $entry ) {
+                $data = App::$request->data->get('actor_data');
+                foreach( $data as $index => $entry ) {
                     $key = $entry["key"];
                     $value = $entry["value"];
-                    $connection_id = intval($entry["connection"]);
-                    if( $index === 0 ) {
-                        $actor_data = new ActorData();
-                        $actor_data->actor_id = $actor->id;
-                        $actor_data->data_key = $key;
-                        $actor_data->data_value = $value;
-                        $actor_data->connection_id = $connection_id;
-                        $actor_data->create();
-                    } else {
-                        $actor_data = new ActorData($index);
-                        $actor_data->data_key = $key;
-                        $actor_data->data_value = $value;
-                        $actor_data->connection_id = $connection_id;
-                        $actor_data->update();
+                    if( strlen($key) > 0 && strlen($value) > 0 ) {
+                        $connection_id = ( intval($entry["connection"]) > 0 ) ? intval($entry["connection"]) : null;
+                        if( $index === 0 ) {
+                            $actor_data = App::getInstanceOf(ActorData::class);
+                            $actor_data->actor_id = $actor->id;
+                            $actor_data->data_key = $key;
+                            $actor_data->data_value = $value;
+                            $actor_data->connection_id = $connection_id;
+                            $actor_data->create();
+                        } else {
+                            $actor_data = App::getInstanceOf(ActorData::class, null, ["id" => $index]);
+                            $actor_data->data_key = $key;
+                            $actor_data->data_value = $value;
+                            $actor_data->connection_id = $connection_id;
+                            $actor_data->update();
+                        }
                     }
                 }
                 redirect("/actors");
@@ -258,9 +246,9 @@ class ActorController extends AController {
     /**
      * @param ActorModel $actor
      *
-     * @return AResponse
+     * @return \lib\core\blueprints\AResponse
      *
-     * @throws SystemException
+     * @throws \lib\core\exceptions\SystemException
      */
     #[Route("delete/{actor}")]
     public function delete( ActorModel $actor ): AResponse {
@@ -268,7 +256,7 @@ class ActorController extends AController {
             redirect("/error/403");
         }
 
-        if( isset($_POST['cancel']) ) {
+        if( App::$request->data->contains('cancel') ) {
             redirect("/actors");
         }
 
@@ -284,7 +272,7 @@ class ActorController extends AController {
      *
      * @return AResponse
      *
-     * @throws SystemException
+     * @throws \lib\core\exceptions\SystemException
      */
     #[Route("roles/{actor}")]
     public function roles( ActorModel $actor ): AResponse {
@@ -292,18 +280,18 @@ class ActorController extends AController {
 			redirect("/error/403");
 		}
 
-		if( isset($_POST['cancel']) ) {
+		if( App::$request->data->contains('cancel') ) {
 			redirect("/actors");
 		}
 
-		if( isset($_POST['update']) ) {
+		if( App::$request->data->contains('update') ) {
 			$this->savePermissions($actor);
 			redirect("/actors");
 		}
 
         $view = new Template(PATH_VIEWS."actor/roles.html");
         $view->set("actor", $actor);
-        $view->set("routes", App::getInstance(Router::class)->getSortedRoutes());
+        $view->set("routes", App::getInstanceOf(Router::class)->getSortedRoutes());
         $view->set("role_options", ActorRoleModel::find());
         $view->set("access_permissions", AccessPermissionModel::find(array(
             ["actor_id", "=", $actor->id]
@@ -321,23 +309,51 @@ class ActorController extends AController {
      * @return bool
      */
 	private function postIsValid(): bool {
-		if( !isset($_POST["email"]) || $_POST["email"] === "" ) {
+		if( !App::$request->data->contains('email') || App::$request->data->get('email') === "" ) {
 			return false;
 		}
-		if( !isset($_POST["password"]) || ( isset($_POST["create"]) && $_POST["password"] === '' ) ) {
+		if( !App::$request->data->contains('password') || ( App::$request->data->contains('create') && App::$request->data->get('password') === '' ) ) {
             return false;
 		}
-		if( !array_key_exists("password", $_POST) || !array_key_exists("password_verify", $_POST) || $_POST["password"] !== $_POST["password_verify"] ) {
+		if( !App::$request->data->contains('password') || !App::$request->data->contains('password_verify')
+            || App::$request->data->get('password') !== App::$request->data->get('password_verify')
+        ) {
             return false;
 		}
-		if( !isset($_POST["first_name"]) || $_POST["first_name"] === "" ) {
+		if( !App::$request->data->contains('first_name') || App::$request->data->get('first_name') === "" ) {
             return false;
 		}
-		if( !isset($_POST["last_name"]) || $_POST["last_name"] === "" ) {
+		if( !App::$request->data->contains('last_name') || App::$request->data->get('last_name') === "" ) {
             return false;
 		}
 		return true;
 	}
+
+    /**
+     * Updates the given actor object with the posted values from the request
+     *
+     * @param ActorModel $actor
+     *
+     * @return void
+     */
+    private function setActorParams( ActorModel $actor ): void {
+        $actor->type_id = (App::$request->data->contains('type_id'))
+            ? (int)App::$request->data->get('type_id')
+            : 0
+        ;
+        $actor->email = App::$request->data->get("email");
+        $actor->password = App::$request->data->get('password');
+        $actor->first_name = App::$request->data->get("first_name");
+        $actor->last_name = App::$request->data->get("last_name");
+        $actor->login_fails = (App::$request->data->contains('login_fails'))
+            ? (int)App::$request->data->get('login_fails')
+            : 0
+        ;
+        $actor->login_disabled = (App::$request->data->contains('login_disabled'))
+            ? (int)App::$request->data->get('login_disabled')
+            : 0
+        ;
+    }
 
     /**
      * Save the permissions for the given actor
@@ -346,14 +362,14 @@ class ActorController extends AController {
      *
      * @return void
      *
-     * @throws SystemException
+     * @throws \lib\core\exceptions\SystemException
      */
 	private function savePermissions( ActorModel $actor ): void {
 		if( $actor->id === 0 ) {
 			return;
 		}
 		$roles = array();
-		foreach( $_POST['role'] as $domain => $entry_domain ) {
+		foreach( App::$request->data->get('role') as $domain => $entry_domain ) {
 			if( (int)$entry_domain["role"] > 0 ) {
 				$roles[$domain][null][null] = $entry_domain["role"];
 			}

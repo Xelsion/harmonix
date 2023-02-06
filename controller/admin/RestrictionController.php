@@ -2,17 +2,16 @@
 namespace controller\admin;
 
 use lib\App;
-use lib\core\Router;
-use lib\abstracts\AController;
-use lib\abstracts\AResponse;
-use lib\attributes\Route;
-use lib\classes\responses\HtmlResponse;
 use lib\classes\Template;
+use lib\core\attributes\Route;
+use lib\core\blueprints\AController;
+use lib\core\blueprints\AResponse;
+use lib\core\exceptions\SystemException;
+use lib\core\response_types\HtmlResponse;
+use lib\core\Router;
 use models\AccessRestrictionModel;
 use models\AccessRestrictionTypeModel;
 use models\ActorRoleModel;
-
-use lib\exceptions\SystemException;
 
 #[Route("restrictions")]
 class RestrictionController extends AController {
@@ -20,9 +19,9 @@ class RestrictionController extends AController {
     /**
      * Get a list of all restrictions
      *
-     * @return AResponse
+     * @return \lib\core\blueprints\AResponse
      *
-     * @throws SystemException
+     * @throws \lib\core\exceptions\SystemException
      */
     #[Route("")]
     public function index(): AResponse {
@@ -40,7 +39,7 @@ class RestrictionController extends AController {
         }
 
         $view = new Template(PATH_VIEWS."restrictions/index.html");
-        $view->set("routes", App::getInstance(Router::class)->getSortedRoutes());
+        $view->set("routes", App::getInstanceOf(Router::class)->getSortedRoutes());
         $view->set("current_restrictions", $current_restrictions);
         $view->set("role_options", ActorRoleModel::find());
         $view->set("type_options", AccessRestrictionTypeModel::find());
@@ -52,7 +51,7 @@ class RestrictionController extends AController {
     }
 
     /**
-     * @return AResponse
+     * @return \lib\core\blueprints\AResponse
      *
      * @throws SystemException
      */
@@ -74,18 +73,18 @@ class RestrictionController extends AController {
      */
     #[Route("types/create")]
     public function typesCreate(): AResponse {
-        if( isset($_POST['cancel']) ) {
+        if( App::$request->data->contains("cancel") ) {
             redirect("/restrictions/types");
         }
 
-        if( isset($_POST['create']) ) {
+        if( App::$request->data->contains("create") ) {
             $is_valid = $this->postIsValid();
             if( $is_valid ) {
                 $type = new AccessRestrictionTypeModel();
-                $type->name = $_POST["name"];
-                $type->include_siblings = ($_POST["include_siblings"]) ? 1 :  0;
-                $type->include_children = ($_POST["include_children"]) ? 1 :  0;
-                $type->include_descendants = ($_POST["include_descendants"]) ? 1 :  0;
+                $type->name = App::$request->data->get("name");
+                $type->include_siblings = (App::$request->data->get("include_siblings")) ? 1 :  0;
+                $type->include_children = (App::$request->data->get("include_children")) ? 1 :  0;
+                $type->include_descendants = (App::$request->data->get("include_descendants")) ? 1 :  0;
                 $type->create();
                 redirect("/restrictions/types");
             }
@@ -102,23 +101,23 @@ class RestrictionController extends AController {
     /**
      * @param AccessRestrictionTypeModel $type
      *
-     * @return AResponse
+     * @return \lib\core\blueprints\AResponse
      *
      * @throws SystemException
      */
     #[Route("types/{type}")]
     public function typesUpdate( AccessRestrictionTypeModel $type ): AResponse {
-        if( isset($_POST['cancel']) ) {
+        if( App::$request->data->contains("cancel") ) {
             redirect("/restrictions/types");
         }
 
-        if( isset($_POST['update']) ) {
+        if( App::$request->data->contains("update") ) {
             $is_valid = $this->postIsValid();
             if( $is_valid ) {
-                $type->name = $_POST["name"];
-                $type->include_siblings = ($_POST["include_siblings"]) ? 1 :  0;
-                $type->include_children = ($_POST["include_children"]) ? 1 :  0;
-                $type->include_descendants = ($_POST["include_descendants"]) ? 1 :  0;
+                $type->name = App::$request->data->get("name");
+                $type->include_siblings = (App::$request->data->get("include_siblings")) ? 1 :  0;
+                $type->include_children = (App::$request->data->get("include_children")) ? 1 :  0;
+                $type->include_descendants = (App::$request->data->get("include_descendants")) ? 1 :  0;
                 $type->update();
                 redirect("/restrictions/types");
             }
@@ -183,7 +182,7 @@ class RestrictionController extends AController {
      */
     private function postIsValid(): bool {
         $is_valid = true;
-        if( !isset($_POST["name"]) || $_POST["name"] === "" ) {
+        if( !App::$request->data->contains("name") || App::$request->data->get("name") === "" ) {
             $is_valid = false;
         }
         return $is_valid;

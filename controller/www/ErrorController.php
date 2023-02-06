@@ -1,16 +1,15 @@
 <?php
 namespace controller\www;
 
-use lib\abstracts\AController;
-use lib\abstracts\AResponse;
-use lib\attributes\Route;
-use lib\classes\responses\HtmlResponse;
 use lib\classes\Template;
-
-use lib\exceptions\SystemException;
+use lib\core\attributes\Route;
+use lib\core\blueprints\AController;
+use lib\core\blueprints\AResponse;
+use lib\core\exceptions\SystemException;
+use lib\core\response_types\HtmlResponse;
 
 /**
- * @see \lib\abstracts\AController
+ * @see \lib\core\blueprints\AController
  *
  * @author Markus Schröder <xelsion@gmail.com>
  * @version 1.0.0;
@@ -25,7 +24,7 @@ class ErrorController extends AController {
      *
      * @param int $error_code
      *
-     * @return AResponse
+     * @return \lib\core\blueprints\AResponse
      *
      * @throws SystemException
      */

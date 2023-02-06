@@ -2,17 +2,16 @@
 namespace controller\admin;
 
 use lib\App;
-use lib\abstracts\AController;
-use lib\abstracts\AResponse;
-use lib\attributes\Route;
-use lib\classes\responses\HtmlResponse;
 use lib\classes\Template;
+use lib\core\attributes\Route;
+use lib\core\blueprints\AController;
+use lib\core\blueprints\AResponse;
+use lib\core\exceptions\SystemException;
+use lib\core\response_types\HtmlResponse;
 use models\ActorRoleModel;
 
-use lib\exceptions\SystemException;
-
 /**
- * @see \lib\abstracts\AController
+ * @see \lib\core\blueprints\AController
  *
  * @author Markus Schröder <xelsion@gmail.com>
  * @version 1.0.0;
@@ -25,7 +24,7 @@ class ActorRolesController extends AController {
      *
      * @return AResponse
      *
-     * @throws SystemException
+     * @throws \lib\core\exceptions\SystemException
      */
 	#[Route("")]
     public function index(): AResponse {
@@ -45,18 +44,11 @@ class ActorRolesController extends AController {
      */
     #[Route("create")]
     public function create(): AResponse {
-		if( isset($_POST['create']) ) {
+		if( App::$request->data->contains("create") ) {
 			$is_valid = $this->postIsValid();
 			if( $is_valid ) {
-				$all = ( isset($_POST["all"]) ) ? $this->getPermissions($_POST["all"]) : 0b000;
-				$group = ( isset($_POST["group"]) ) ? $this->getPermissions($_POST["group"]) : 0b000;
-				$own = ( isset($_POST["own"]) ) ? $this->getPermissions($_POST["own"]) : 0b000;
-				$role = App::getInstance(ActorRoleModel::class);
-				$role->name = $_POST["name"];
-				$role->child_of = ( (int)$_POST["child_of"] > 0 ) ? (int)$_POST["child_of"] : null;
-				$role->rights_all = $all;
-				$role->rights_group = $group;
-				$role->rights_own = $own;
+                $role = App::getInstanceOf(ActorRoleModel::class);
+                $this->setRoleParams($role);
 				$role->create();
 				redirect("/actor-roles");
 			}
@@ -75,25 +67,17 @@ class ActorRolesController extends AController {
      *
      * @return AResponse
      *
-     * @throws SystemException
+     * @throws \lib\core\exceptions\SystemException
      */
     #[Route("/{role}")]
     public function update( ActorRoleModel $role ): AResponse {
-		if( isset($_POST['cancel']) ) {
+		if( App::$request->data->contains("cancel") ) {
 			redirect("/actor-roles");
 		}
-		if( isset($_POST['update']) ) {
-
+		if( App::$request->data->contains("update") ) {
 			$is_valid = $this->postIsValid();
 			if( $is_valid ) {
-				$all = ( isset($_POST["all"]) ) ? $this->getPermissions($_POST["all"]) : 0b000;
-				$group = ( isset($_POST["group"]) ) ? $this->getPermissions($_POST["group"]) : 0b000;
-				$own = ( isset($_POST["own"]) ) ? $this->getPermissions($_POST["own"]) : 0b000;
-				$role->name = $_POST["name"];
-				$role->child_of = ( (int)$_POST["child_of"] > 0 ) ? (int)$_POST["child_of"] : null;
-				$role->rights_all = $all;
-				$role->rights_group = $group;
-				$role->rights_own = $own;
+                $this->setRoleParams($role);
 				$role->update();
 				redirect("/actor-roles");
 			}
@@ -114,14 +98,14 @@ class ActorRolesController extends AController {
      *
      * @return AResponse
      *
-     * @throws SystemException
+     * @throws \lib\core\exceptions\SystemException
      */
-    #[Route("delete")]
+    #[Route("delete/{role}")]
     public function delete( ActorRoleModel $role ) : AResponse {
-        if( isset($_POST['cancel']) ) {
+        if( App::$request->data->contains("cancel") ) {
             redirect("/actor-roles");
         }
-        if( isset($_POST['delete']) ) {
+        if( App::$request->data->contains("delete") ) {
             $role->delete();
             redirect("/actor-roles");
         }
@@ -160,10 +144,36 @@ class ActorRolesController extends AController {
      * @return bool
      */
 	private function postIsValid(): bool {
-		$is_valid = true;
-		if( !isset($_POST["name"]) || $_POST["name"] === "" ) {
-			$is_valid = false;
+		if( !App::$request->data->contains("name") || App::$request->data->get("name") === "" ) {
+			return false;
 		}
-		return $is_valid;
+		return true;
 	}
+
+    /**
+     * Sets the actor role parameters of the given role
+     *
+     * @param ActorRoleModel $role
+     *
+     * @return void
+     */
+    private function setRoleParams(ActorRoleModel &$role): void {
+        $role->name = App::$request->data->get("name");
+        $role->child_of = ( App::$request->data->contains("child_of") && intval(App::$request->data->get("child_of")) > 0 )
+            ? intval(App::$request->data->get("child_of"))
+            : null
+        ;
+        $role->rights_all = ( App::$request->data->contains("all") )
+            ? $this->getPermissions(App::$request->data->get("all"))
+            : 0b000
+        ;
+        $role->rights_group = ( App::$request->data->contains("group") )
+            ? $this->getPermissions(App::$request->data->get("group"))
+            : 0b000
+        ;
+        $role->rights_own = ( App::$request->data->contains("own") )
+            ? $this->getPermissions(App::$request->data->get("own"))
+            : 0b000
+        ;;
+    }
 }

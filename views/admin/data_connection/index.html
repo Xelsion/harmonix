@@ -1,8 +1,9 @@
 <?php
-use lib\App;
-use lib\classes\Language;
 
-$lang = App::getInstance(Language::class);
+use lib\App;
+use lib\core\classes\Language;
+
+$lang = App::getInstanceOf(Language::class);
 
 $this->set("title", "Daten Verbindungen");
 
@@ -21,10 +22,10 @@ $pagination = $this->get("pagination");
 		</tr>
 		<?php foreach( $result_list as $entry ): ?>
 			<tr>
-				<td><?= escaped_html($entry->id) ?></td>
-				<td><?= escaped_html($entry->db_name) ?></td>
-				<td><?= escaped_html($entry->table_name) ?></td>
-				<td><?= escaped_html($entry->table_col) ?></td>
+				<td><?= escaped_string($entry->id) ?></td>
+				<td><?= escaped_string($entry->db_name) ?></td>
+				<td><?= escaped_string($entry->table_name) ?></td>
+				<td><?= escaped_string($entry->table_col) ?></td>
 				<td class="text-nowrap text-end">
 					<a href="/actors/roles/<?= $entry->id ?>" class="button button-default"><?= $lang->getValue("translations", "roles") ?></a>
 					<a href="/actors/<?= $entry->id ?>" class="button button-default"><?= $lang->getValue("translations", "edit") ?></a>

@@ -2,7 +2,7 @@
 namespace lib\core\resolver;
 
 use lib\core\ClassManager;
-use lib\exceptions\SystemException;
+use lib\core\exceptions\SystemException;
 use ReflectionException;
 use ReflectionParameter;
 

@@ -1,11 +1,10 @@
 <?php
 namespace lib\helper;
 
+use lib\core\exceptions\SystemException;
 use models\ActorRoleModel;
 
-use lib\exceptions\SystemException;
-
-class HtmlHelper {
+readonly class HtmlHelper {
 
     /**
      * @param ActorRoleModel $curr_role
@@ -14,10 +13,10 @@ class HtmlHelper {
      *
      * @return void
      *
-     * @throws SystemException
+     * @throws \lib\core\exceptions\SystemException
      */
     public static function getRoleOptions( ActorRoleModel $curr_role, int $selected, string &$output ) : void {
-        $output .= '<option value="'. $curr_role->id.'"'. (($curr_role->id === $selected) ? ' selected="selected"' : '') .'>'. escaped_html($curr_role->name).'</option>';
+        $output .= '<option value="'. $curr_role->id.'"'. (($curr_role->id === $selected) ? ' selected="selected"' : '') .'>'. escaped_string($curr_role->name).'</option>';
         $children = $curr_role->getChildren();
         foreach( $children as $child ) {
             static::getRoleOptions($child, $selected, $output);

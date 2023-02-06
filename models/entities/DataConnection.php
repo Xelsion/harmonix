@@ -1,13 +1,12 @@
 <?php
 namespace models\entities;
 
-use PDO;
-use lib\App;
-use lib\abstracts\AEntity;
-use lib\manager\ConnectionManager;
-
 use Exception;
-use lib\exceptions\SystemException;
+use lib\App;
+use lib\core\blueprints\AEntity;
+use lib\core\ConnectionManager;
+use lib\core\exceptions\SystemException;
+use PDO;
 
 /**
  * The DataConnection entity
@@ -37,12 +36,12 @@ class DataConnection extends AEntity {
     /**
      * @param int $id
      *
-     * @throws SystemException
+     * @throws \lib\core\exceptions\SystemException
      */
     public function __construct( int $id = 0 ) {
         if( $id > 0 ) {
             try {
-                $cm = App::getInstance(ConnectionManager::class);
+                $cm = App::getInstanceOf(ConnectionManager::class);
                 $pdo = $cm->getConnection("mvc");
                 $pdo->prepareQuery("SELECT * FROM data_connections WHERE id=:id");
                 $pdo->bindParam(":id", $id, PDO::PARAM_INT);
@@ -59,7 +58,7 @@ class DataConnection extends AEntity {
      */
     public function create(): void {
         try {
-            $cm = App::getInstance(ConnectionManager::class);
+            $cm = App::getInstanceOf(ConnectionManager::class);
             $pdo = $cm->getConnection("mvc");
             $pdo->prepareQuery("INSERT INTO data_connections (name, db_name, table_name, table_col) VALUES (:name, :db_name, :table_name, :table_col)");
             $pdo->bindParam(":name", $this->name, PDO::PARAM_STR);
@@ -78,7 +77,7 @@ class DataConnection extends AEntity {
      */
     public function update(): void {
         try {
-            $cm = App::getInstance(ConnectionManager::class);
+            $cm = App::getInstanceOf(ConnectionManager::class);
             $pdo = $cm->getConnection("mvc");
             $pdo->prepareQuery("UPDATE data_connections SET name=:name, db_name=:db_name, table_name=:table_name, table_col=:table_col WHERE id=:id");
             $pdo->bindParam(":name", $this->name, PDO::PARAM_STR);
@@ -98,7 +97,7 @@ class DataConnection extends AEntity {
     public function delete(): bool {
         if( $this->id > 0 ) {
             try {
-                $cm = App::getInstance(ConnectionManager::class);
+                $cm = App::getInstanceOf(ConnectionManager::class);
                 $pdo = $cm->getConnection("mvc");
                 $pdo->prepareQuery("DELETE FROM data_connections WHERE id=:id");
                 $pdo->bindParam(":id", $this->id, PDO::PARAM_INT);

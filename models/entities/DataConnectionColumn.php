@@ -1,13 +1,12 @@
 <?php
 namespace models\entities;
 
-use PDO;
-use lib\App;
-use lib\abstracts\AEntity;
-use lib\manager\ConnectionManager;
-
 use Exception;
-use lib\exceptions\SystemException;
+use lib\App;
+use lib\core\blueprints\AEntity;
+use lib\core\ConnectionManager;
+use lib\core\exceptions\SystemException;
+use PDO;
 
 /**
  * The DataConnectionColumn entity
@@ -33,12 +32,12 @@ class DataConnectionColumn extends AEntity {
     /**
      * @param int $id
      *
-     * @throws SystemException
+     * @throws \lib\core\exceptions\SystemException
      */
     public function __construct( int $id = 0 ) {
         if( $id > 0 ) {
             try {
-                $cm = App::getInstance(ConnectionManager::class);
+                $cm = App::getInstanceOf(ConnectionManager::class);
                 $pdo = $cm->getConnection("mvc");
                 $pdo->prepareQuery("SELECT * FROM data_connection_columns WHERE id=:id");
                 $pdo->bindParam(":id", $id, PDO::PARAM_INT);
@@ -55,7 +54,7 @@ class DataConnectionColumn extends AEntity {
      */
     public function create(): void {
         try {
-            $cm = App::getInstance(ConnectionManager::class);
+            $cm = App::getInstanceOf(ConnectionManager::class);
             $pdo = $cm->getConnection("mvc");
             $pdo->prepareQuery("INSERT INTO data_connection_columns (connection_id, column_name) VALUES (:connection_id, :column_name)");
             $pdo->bindParam(":connection_id", $this->connection_id, PDO::PARAM_INT);
@@ -72,7 +71,7 @@ class DataConnectionColumn extends AEntity {
      */
     public function update(): void {
         try {
-            $cm = App::getInstance(ConnectionManager::class);
+            $cm = App::getInstanceOf(ConnectionManager::class);
             $pdo = $cm->getConnection("mvc");
             $pdo->prepareQuery("UPDATE data_connection_columns SET connection_id=:connection_id, column_name=:column_name WHERE id=:id");
             $pdo->bindParam(":connection_id", $this->connection_id, PDO::PARAM_INT);
@@ -90,7 +89,7 @@ class DataConnectionColumn extends AEntity {
     public function delete(): bool {
         if( $this->id > 0 ) {
             try {
-                $cm = App::getInstance(ConnectionManager::class);
+                $cm = App::getInstanceOf(ConnectionManager::class);
                 $pdo = $cm->getConnection("mvc");
                 $pdo->prepareQuery("DELETE FROM data_connection_columns WHERE id=:id");
                 $pdo->bindParam(":id", $this->id, PDO::PARAM_INT);

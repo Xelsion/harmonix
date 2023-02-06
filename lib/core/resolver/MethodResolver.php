@@ -2,7 +2,7 @@
 namespace lib\core\resolver;
 
 use lib\core\ClassManager;
-use lib\exceptions\SystemException;
+use lib\core\exceptions\SystemException;
 use ReflectionException;
 use ReflectionMethod;
 
@@ -35,7 +35,7 @@ class MethodResolver {
      * @throws SystemException
      */
     public function getValue(): mixed {
-        // getInstance the class method reflection class
+        // getInstanceOf the class method reflection class
         $method = new ReflectionMethod($this->instance, $this->method);
         // find and resolve the method arguments
         $argumentResolver = new ParameterResolver($this->cm, $method->getParameters(), $this->args);
