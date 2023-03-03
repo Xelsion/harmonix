@@ -2,6 +2,7 @@
 
 use lib\App;
 use lib\core\classes\Language;
+use lib\helper\HtmlHelper;
 
 $lang = App::getInstanceOf(Language::class);
 
@@ -12,7 +13,7 @@ $role_option = $this->get("option_list");
 <div class="container-fluid">
 	<h1>Neue Rolle anlegen</h1>
 	<form action="/actor-roles/create" method="POST" class="needs-validation" novalidate>
-        <?= $this->getCsrfToken() ?>
+        <?= HtmlHelper::generateFormToken() ?>
 		<div class="form-group">
 			<label for="name">Name</label>
 			<input type="text" name="name" value="" id="name" required />

@@ -2,6 +2,7 @@
 
 use lib\App;
 use lib\core\classes\Language;
+use lib\helper\HtmlHelper;
 use models\ActorRoleModel;
 
 $lang = App::getInstanceOf(Language::class);
@@ -16,7 +17,7 @@ $protected = ( $role->is_protected && !$actor_role->canUpdateALl() );
 <h1>Rolle bearbeiten</h1>
 <div class="container-fluid">
 	<form action="/actor-roles/<?= $role->id ?>" method="POST" class="needs-validation" novalidate>
-        <?= $this->getCsrfToken() ?>
+        <?= HtmlHelper::generateFormToken() ?>
 		<div class="form-group">
 			<label for="name">Name</label>
 			<input type="text" name="name" value="<?= escaped_string($role->name) ?>"

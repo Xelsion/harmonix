@@ -3,6 +3,7 @@
 use lib\App;
 use lib\classes\Template;
 use lib\core\classes\Configuration;
+use lib\helper\HtmlHelper;
 
 $actor = App::$curr_actor;
 $actor_role = App::$curr_actor_role;
@@ -15,6 +16,7 @@ $view_content = ( $view instanceof Template) ? $view->parse() : $view;
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 	<title><?= $this->get("title") ?? "Home" ?></title>
 	<link rel="stylesheet" href="<?= PATH_SRC ?>bootstrap-5.2.2/css/bootstrap.min.css" />
 	<link rel="stylesheet" href="<?= PATH_CSS ?>main.css" />
@@ -48,7 +50,7 @@ $view_content = ( $view instanceof Template) ? $view->parse() : $view;
 						<?php if( $actor->id === 0 ): ?>
 							<li>
 								<form action="<?= $_SERVER["REQUEST_URI"] ?>" method="POST">
-                                    <?= $this->getCsrfToken() ?>
+                                    <?= HtmlHelper::generateFormToken() ?>
 									<div class="form-row">
 										<label>
 											<input type="email" name="email" value="" placeholder="E-Mail" />
@@ -79,7 +81,7 @@ $view_content = ( $view instanceof Template) ? $view->parse() : $view;
 							<?php } ?>
 							<li>
 								<form action="/" method="POST">
-                                    <?= $this->getCsrfToken() ?>
+                                    <?= HtmlHelper::generateFormToken() ?>
 									<button type="submit" name="logout" class="link">Logout</button>
 								</form>
 							</li>

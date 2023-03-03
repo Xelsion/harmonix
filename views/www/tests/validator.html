@@ -1,10 +1,12 @@
 <?php
+
+use lib\helper\HtmlHelper;
 use lib\helper\ValidationHelper;
 $value = $_POST['value']??'';
 ?>
 <div class="container-fluid">
     <form action="\tests/validator" method="POST">
-        <?= $this->getCsrfToken() ?>
+        <?= HtmlHelper::generateFormToken() ?>
         <div class="row">
             <div class="col">
                 <label for="input">Input</label>

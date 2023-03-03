@@ -2,6 +2,7 @@
 
 use lib\App;
 use lib\core\classes\Language;
+use lib\helper\HtmlHelper;
 
 $lang = App::getInstanceOf(Language::class);
 
@@ -9,7 +10,7 @@ $role = $this->get("role");
 ?>
 
 <form action="/actor-roles/delete/<?= $role->id ?>" method="POST">
-    <?= $this->getCsrfToken() ?>
+    <?= HtmlHelper::generateFormToken() ?>
 	<?php if( $role->is_protected ) { ?>
 		<div>Die Rolle <?= escaped_string($role->name) ?> ist gesch&uuml;tzt und kann nicht gel&ouml;scht werden!!!</div>
 		<div class="form-group row">

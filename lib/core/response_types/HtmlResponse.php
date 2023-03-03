@@ -20,7 +20,7 @@ class HtmlResponse extends AResponse {
      * @param string $content
      */
     public function __construct( string $content = "" ) {
-        if( $content != "" ) {
+        if( $content !== "" ) {
             $this->setOutput($content);
         }
     }

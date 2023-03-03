@@ -306,8 +306,7 @@ class Router {
                             if( $constructor_arg_type==="string" && !is_string($params[$i]) ) {
                                 throw new SystemException( __FILE__,__LINE__,"Router: Param type mismatch for method[".$controller."->".$method."]");
                             }
-                            //$result[$arg_name] = new $arg_type($params[$i]);
-                            $result[$arg_name] = App::getInstanceOf($arg_type,null, [$arg_name => $params[$i]]);
+                            $result[$arg_name] = App::getInstanceOf($arg_type,null, ["id" => $params[$i]]);
                         } catch( Exception ) {
                             throw new SystemException( __FILE__,__LINE__,"Router: Param type mismatch for method[".$controller."->".$method."]");
                         }

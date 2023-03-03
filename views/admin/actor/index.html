@@ -2,6 +2,7 @@
 
 use lib\App;
 use lib\core\classes\Language;
+use lib\helper\HtmlHelper;
 
 $lang = App::getInstanceOf(Language::class);
 $this->set("title", "Benutzer");
@@ -9,7 +10,7 @@ $this->set("title", "Benutzer");
 ?>
 <div class="container-fluid">
 	<form action="/actors/search" method="POST">
-        <?= $this->getCsrfToken() ?>
+        <?= HtmlHelper::generateFormToken() ?>
 		<div class="row">
 			<div class="col text-end pt-2">Suchbegriff</div>
 			<div class="col-3"><input type="text" name="search_string" value="" /></div>
@@ -46,7 +47,7 @@ $this->set("title", "Benutzer");
 		<?php endforeach; ?>
 	</table>
 	<form action="/actors" method="POST" style="padding-bottom: 15px;">
-        <?= $this->getCsrfToken() ?>
+        <?= HtmlHelper::generateFormToken() ?>
 		<?= $pagination ?>
 	</form>
 </div>

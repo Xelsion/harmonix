@@ -2,13 +2,14 @@
 
 use lib\App;
 use lib\core\classes\Language;
+use lib\helper\HtmlHelper;
 use lib\helper\StringHelper;
 
 $lang = App::getInstanceOf(Language::class);
 ?>
 <div class="container-fluid">
 	<form action="/actors/search" method="POST">
-        <?= $this->getCsrfToken() ?>
+        <?= HtmlHelper::generateFormToken() ?>
 		<div class="row">
 			<div class="col"></div>
 			<div class="col-3"><input type="text" name="search_string" value="" /></div>

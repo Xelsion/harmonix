@@ -40,13 +40,14 @@ class FileResponse extends AResponse {
             "jpeg", "jpg" => "image/jpg",
             default => "application/octet-stream",
         };
+
         header("Pragma: public");
         header("Expires: 0");
         header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
         header("Cache-Control: private",false);
-        header("Content-Type: $file_type");
         header("Content-Disposition: attachment; filename=\"".basename($this->file_path)."\";" );
         header("Content-Transfer-Encoding: binary");
+        header("Content-Type: $file_type");
         header("Content-Length: ".filesize($this->file_path));
 
         switch( $this->status_code ) {

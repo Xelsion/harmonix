@@ -31,6 +31,7 @@ readonly class GarbageCollector {
      */
     public function clean() : void {
         $this->clearSessions();
+        $this->clearTokens();
     }
 
     /**
@@ -45,6 +46,25 @@ readonly class GarbageCollector {
         try {
             $pdo = $this->connectionManager->getConnection("mvc");
             $pdo->prepareQuery("DELETE FROM sessions WHERE expired<:date");
+            $pdo->bindParam("date", $today->format("Y-m-d H:i:s"));
+            $pdo->execute();
+        } catch( Exception $e ) {
+            throw new SystemException($e->getFile(), $e->getLine(), $e->getMessage(), $e->getCode(), $e->getPrevious());
+        }
+    }
+
+    /**
+     * Deletes all expired tokens from the database
+     *
+     * @return void
+     *
+     * @throws SystemException
+     */
+    private function clearTokens() : void {
+        $today = new DateTime();
+        try {
+            $pdo = $this->connectionManager->getConnection("mvc");
+            $pdo->prepareQuery("DELETE FROM tokens WHERE expired<:date");
             $pdo->bindParam("date", $today->format("Y-m-d H:i:s"));
             $pdo->execute();
         } catch( Exception $e ) {

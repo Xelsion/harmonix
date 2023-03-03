@@ -2,6 +2,7 @@
 
 use lib\App;
 use lib\core\classes\Language;
+use lib\helper\HtmlHelper;
 
 $lang = App::getInstanceOf(Language::class);
 
@@ -10,7 +11,7 @@ $this->set("title", "Benutzer-Typ erstellen");
 <div class="container-fluid">
 	<h1>Neue Rolle anlegen</h1>
 	<form action="/actor-types/create" method="POST" class="needs-validation" novalidate>
-        <?= $this->getCsrfToken() ?>
+        <?= HtmlHelper::generateFormToken() ?>
 		<div class="form-group row">
 			<label for="name">Name</label>
 			<input type="text" name="name" value="" id="name" required />

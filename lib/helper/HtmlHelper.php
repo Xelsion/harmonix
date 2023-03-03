@@ -1,8 +1,11 @@
 <?php
 namespace lib\helper;
 
+use DateTime;
+use Exception;
 use lib\core\exceptions\SystemException;
 use models\ActorRoleModel;
+use models\entities\Token;
 
 readonly class HtmlHelper {
 
@@ -100,6 +103,36 @@ readonly class HtmlHelper {
         }
 
         $output .= '</ul>';
+    }
+
+    /**
+     * @return string
+     */
+    public static function generateFormToken(): string {
+        try {
+            $token = new Token();
+            $token->id = StringHelper::getGuID();
+            $token->expired = (new DateTime())->modify("+2 hours")->format("Y-m-d H:i:s");
+            $token->create();
+            return '<input type="hidden" name="csrf_token" value="'.$token->id.'" />';
+        } catch( Exception ) {
+            return "";
+        }
+    }
+
+    /**
+     * @param string $id
+     * @return bool
+     *
+     * @throws SystemException
+     */
+    public static function validateFormToken( string $id ): bool {
+        $token = new Token($id);
+        if( $token->id !== "" ) {
+            $token->delete();
+            return true;
+        }
+        return false;
     }
 
 }

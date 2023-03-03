@@ -2,6 +2,7 @@
 
 use lib\App;
 use lib\core\classes\Language;
+use lib\helper\HtmlHelper;
 
 $lang = App::getInstanceOf(Language::class);
 
@@ -13,7 +14,7 @@ $actor = $this->get("actor");
 <div class="container-fluid">
 	<h1>Neuen Benutzer anlegen</h1>
 	<form action="/actors/<?= $actor->id ?>" method="POST" class="needs-validation" autocomplete="off" novalidate>
-        <?= $this->getCsrfToken() ?>
+        <?= HtmlHelper::generateFormToken() ?>
 		<div class="form-group row">
 			<label for="type_id">Type</label>
 			<select id="type_id" name="type_id">

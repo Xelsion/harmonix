@@ -2,6 +2,7 @@
 
 use lib\App;
 use lib\core\classes\Language;
+use lib\helper\HtmlHelper;
 
 $lang = App::getInstanceOf(Language::class);
 
@@ -11,7 +12,7 @@ $type = $this->get("type");
 <div class="container-fluid">
 	<h1>Zugriffstype bearbeiten</h1>
 	<form action="/restrictions/types/<?= $type->id ?>" method="POST" class="needs-validation" autocomplete="off" novalidate>
-        <?= $this->getCsrfToken() ?>
+        <?= HtmlHelper::generateFormToken() ?>
 		<div class="form-group row">
 			<label for="email">Name</label>
 			<input type="text" name="name" value="<?= escaped_string($type->name) ?>" id="email" required />

@@ -26,6 +26,8 @@ require_once( "../functions.php" );
 ini_set('session.cookie_domain', StringHelper::getDomain());
 session_start();
 
+mb_detect_order(["UTF-8", "ISO-8859-1", "ASCII"]);
+
 $runtime_logger = new Logger("runtime");
 
 try {

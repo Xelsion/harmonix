@@ -2,6 +2,7 @@
 
 use lib\App;
 use lib\core\classes\Language;
+use lib\helper\HtmlHelper;
 
 $lang = App::getInstanceOf(Language::class);
 
@@ -14,7 +15,7 @@ $type_options = $this->get("type_options");
 <div class="container-fluid">
 	<h1>Zugriffsrechte</h1>
 	<form action="/restrictions" method="POST" class="needs-validation" style="width: 80%;" novalidate>
-        <?= $this->getCsrfToken() ?>
+        <?= HtmlHelper::generateFormToken() ?>
 		<div class="row g-2">
 			<div class="col-md">Bereich</div>
 			<div class="col-md-auto">

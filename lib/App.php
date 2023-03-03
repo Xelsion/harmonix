@@ -74,6 +74,9 @@ class App {
      */
 	public function __construct() {
         self::$class_manager = new ClassManager();
+        self::$analyser = self::getInstanceOf(Analyser::class);
+        self::$storage = self::getInstanceOf(KeyValuePairs::class);
+
         $this->setAsSingleton(Configuration::class, new Configuration(PATH_ROOT."application.ini"));
         $this->setAsSingleton(ConnectionManager::class, self::getInstanceOf(ConnectionManager::class));
         $this->setAsSingleton(Request::class, self::getInstanceOf(Request::class));
@@ -83,9 +86,6 @@ class App {
         self::$request = self::getInstanceOf(Request::class);
         self::$curr_actor = self::getInstanceOf(ActorModel::class);
         self::$curr_actor_role = self::getInstanceOf(ActorRoleModel::class);
-        self::$analyser = self::getInstanceOf(Analyser::class);
-        self::$storage = self::getInstanceOf(KeyValuePairs::class);
-
 	}
 
     /**
@@ -121,27 +121,6 @@ class App {
         $timer = self::getInstanceOf(Timer::class, null, ["label" => "harmonix-total"]);
         $timer->start();
         self::$analyser->addTimer($timer);
-
-        // Initiate database connections
-        $cm = self::getInstanceOf(ConnectionManager::class);
-        $connections =  $config->getSection("connections");
-        foreach( $connections as $conn ) {
-            $connection = match ( $conn["type"] ) {
-                "postgres" => new PostgresConnection(),
-                "mssql" => new MsSqlConnection(),
-                "mysql" => new MySqlConnection(),
-                default => null
-            };
-
-            if( $connection instanceof ADBConnection ) {
-                $connection->host = $conn["host"];
-                $connection->port = (int) $conn["port"];
-                $connection->dbname = $conn["dbname"];
-                $connection->user = $conn["user"];
-                $connection->pass = $conn["password"];
-                $cm->addConnection($connection);
-            }
-        }
 
         // some classes need db connections to be initialized, we do them now
         $this->setAsSingleton(RoleTree::class, RoleTree::getInstance());

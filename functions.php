@@ -48,6 +48,8 @@ function Path2Namespace( string $path ): string {
 }
 
 /**
+ * Escapes the given string and converts it to UTF-8
+ *
  * @param string|null $string
  * @return string|null
  */
@@ -58,12 +60,14 @@ function escaped_string( ?string $string ): ?string {
     if( $string === "" ) {
         return $string;
     }
-    if( mb_detect_encoding($string) === "UTF-8") {
-        $string = mb_convert_encoding($string, "UTF-8", "ISO-8859-1");
+
+    $encoding = mb_detect_encoding($string);
+    if( $encoding !== "UTF-8" ) {
+        $string = iconv($encoding, "UTF-8", $string);
     }
-    $string = mb_convert_encoding($string, "ISO-8859-1", "UTF-8");
     return htmlentities($string, ENT_HTML5, "UTF-8");
 }
+
 
 /**
  * @param string $url
