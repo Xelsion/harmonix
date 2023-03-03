@@ -12,8 +12,6 @@ use lib\core\classes\KeyValuePairs;
  */
 class TemplateData {
 
-    protected static string $csrf = '';
-
     // the data storage for the template
     public static array $data = array();
 
@@ -29,18 +27,7 @@ class TemplateData {
     );
 
     public function __construct() {
-        if( self::$csrf === "" ) {
-            self::$csrf = createCsrfToken();
-        }
-    }
 
-    /**
-     * Returns the current html form csrf protection element
-     *
-     * @return string
-     */
-    public function getCsrfToken(): string {
-        return self::$csrf;
     }
 
 	/**
