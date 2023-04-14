@@ -8,7 +8,7 @@ class Route {
 
     public string $method;
 
-    public function __construct( string $path, string $method = "GET") {
+    public function __construct( string $path, string $method = "ALL") {
         $this->path = $path;
         $this->method = $method;
     }

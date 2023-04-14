@@ -2,6 +2,7 @@
 namespace lib\core\database\connections;
 
 use lib\core\blueprints\ADBConnection;
+use lib\core\enums\DbType;
 use PDO;
 
 /**
@@ -34,5 +35,12 @@ class MySqlConnection extends ADBConnection {
      */
     public function getConnectionOptions(): array {
         return $this->_options;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getType(): DbType {
+        return DbType::MySQL;
     }
 }

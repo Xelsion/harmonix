@@ -6,38 +6,45 @@ use lib\core\classes\Language;
 $lang = App::getInstanceOf(Language::class);
 
 $this->set("title", "Rollen");
-$role_list = $this->get("result_list");
+$role_tree = $this->get("role_tree");
+$tree_array = [];
+$role_tree->getRolesAsArray(0, $tree_array);
+
+$html = "";
+$role_tree->buildHtmlTree(0, $html);
+$first = true;
 ?>
 <div class="container-fluid">
 	<h1>Rollen</h1>
-	<table class="table table-dark table-striped">
-		<tr>
-			<th>ID</th>
-			<th class="col-md-2">Name</th>
-			<th>Unterrolle von</th>
-			<th>Rechte: Alle</th>
-			<th>Rechte: Gruppe</th>
-			<th>Rechte: Eigene</th>
-			<th>Gesch&uuml;tzt</th>
-			<th class="col-md-2 text-end">Optionen</th>
-		</tr>
-		<?php foreach( $role_list as $role ):
-			$parent = $role->getParent();
-			$rights = $role->getStringArray();
-			?>
-			<tr>
-				<td><?= escaped_string($role->id) ?></td>
-				<td><?= escaped_string($role->name) ?></td>
-				<td><?= ( !is_null($parent) ) ? escaped_string($parent->name) : "- keine -" ?></td>
-				<td><?= escaped_string(implode(", ", $rights["all"])) ?></td>
-				<td><?= escaped_string(implode(", ", $rights["group"])) ?></td>
-				<td><?= escaped_string(implode(", ", $rights["own"])) ?></td>
-				<td><?= ($role->is_protected) ? "Ja" : "Nein" ?></td>
-				<td class="text-nowrap text-end">
-					<a href="/actor-roles/<?= $role->id ?>" class="button button-default"><?= $lang->getValue("translations", "edit") ?></a>
-					<a href="/actor-roles/delete/<?= $role->id ?>" class="button button-negativ"><?= $lang->getValue("translations", "delete") ?></a>
-				</td>
-			</tr>
-		<?php endforeach; ?>
-	</table>
+    <table class="table table-dark table-striped">
+        <tr>
+            <th>ID</th>
+            <th class="col-md-2">Name</th>
+            <th>Rechte: Alle</th>
+            <th>Rechte: Gruppe</th>
+            <th>Rechte: Eigene</th>
+            <th>Gesch&uuml;tzt</th>
+            <th class="col-md-2 text-end">Optionen</th>
+        </tr>
+        <?php foreach( $tree_array as $actor_role ):
+            $rights = $actor_role->getStringArray();
+            ?>
+            <tr>
+                <td><?= escaped_string($actor_role->id) ?></td>
+                <?php if( $first ):
+                    $first = false;
+                    ?>
+                    <td rowspan="100%" class="tree-table"><?= $html ?></td>
+                <?php endif; ?>
+                <td><?= escaped_string(implode(", ", $rights["all"])) ?></td>
+                <td><?= escaped_string(implode(", ", $rights["group"])) ?></td>
+                <td><?= escaped_string(implode(", ", $rights["own"])) ?></td>
+                <td><?= ($actor_role->is_protected) ? "Ja" : "Nein" ?></td>
+                <td class="text-nowrap text-end">
+                    <a href="/actor-roles/<?= $actor_role->id ?>" class="button button-default"><?= $lang->getValue("translations", "edit") ?></a>
+                    <a href="/actor-roles/delete/<?= $actor_role->id ?>" class="button button-negativ"><?= $lang->getValue("translations", "delete") ?></a>
+                </td>
+            </tr>
+        <?php endforeach; ?>
+    </table>
 </div>

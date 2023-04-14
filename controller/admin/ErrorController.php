@@ -1,10 +1,10 @@
 <?php
 namespace controller\admin;
 
-use lib\classes\Template;
 use lib\core\attributes\Route;
 use lib\core\blueprints\AController;
 use lib\core\blueprints\AResponse;
+use lib\core\classes\Template;
 use lib\core\exceptions\SystemException;
 use lib\core\response_types\HtmlResponse;
 

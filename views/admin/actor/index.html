@@ -6,7 +6,8 @@ use lib\helper\HtmlHelper;
 
 $lang = App::getInstanceOf(Language::class);
 $this->set("title", "Benutzer");
-
+$actor_list = $this->get("actor_list");
+$pagination = $this->get("pagination");
 ?>
 <div class="container-fluid">
 	<form action="/actors/search" method="POST">
@@ -37,7 +38,7 @@ $this->set("title", "Benutzer");
 				<td class="text-nowrap text-end">
 					<form action="https://www.harmonix.de" target="_blank" method="POST" class="minimized">
 						<input type="hidden" name="actor_id" value="<?= $actor->id ?>" />
-						<button type="submit" name="login-as" class="button button-default"><?= $lang->getValue("phrases", "login_as") ?></button>
+						<button type="submit" name="login_as" class="button button-default"><?= $lang->getValue("phrases", "login_as") ?></button>
 					</form>
 					<a href="/actors/roles/<?= $actor->id ?>" class="button button-default"><?= $lang->getValue("translations", "roles") ?></a>
 					<a href="/actors/<?= $actor->id ?>" class="button button-default"><?= $lang->getValue("translations", "edit") ?></a>

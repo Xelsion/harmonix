@@ -3,11 +3,11 @@ namespace models;
 
 use Exception;
 use lib\App;
-use lib\core\ConnectionManager;
+use lib\core\enums\ActorType;
 use lib\core\exceptions\SystemException;
-use lib\helper\MySqlHelper;
-use models\entities\ActorData;
-use PDO;
+use repositories\AccessPermissionRepository;
+use repositories\ActorRepository;
+use repositories\ActorRoleRepository;
 
 /**
  * The ActorModel
@@ -17,12 +17,16 @@ use PDO;
  */
 class ActorModel extends entities\Actor {
 
+    private readonly ActorRepository $actor_repository;
+
+    private readonly ActorRoleRepository $role_repository;
+
+    private readonly AccessPermissionRepository $permission_repository;
+
 	// a collection of all permission this user contains
 	public array $permissions = array();
 
     public array $data = array();
-
-    public array $ext_data = array();
 
     /**
      * The class constructor
@@ -33,65 +37,31 @@ class ActorModel extends entities\Actor {
      * @throws \lib\core\exceptions\SystemException
      */
 	public function __construct( int $id = 0 ) {
-		parent::__construct($id);
+        $this->actor_repository = App::getInstanceOf(ActorRepository::class);
+        $this->role_repository = App::getInstanceOf(ActorRoleRepository::class);
+        $this->permission_repository = App::getInstanceOf(AccessPermissionRepository::class);
+
         if( $id > 0 ) {
-            $this->initPermission();
-            $this->initData();
-        }
-	}
-
-    /**
-     * Returns all actors that mach the given conditions,
-     * The condition array is build like this:
-     * <p>
-     * array {
-     *    array { col, condition, value },
-     *    ...
-     * }
-     * </p>
-     * All conditions are AND related
-     *
-     * @param array $conditions
-     * @param string|null $order
-     * @param string|null $direction
-     * @param int $limit
-     * @param int $page
-     *
-     * @return array
-     *
-     * @throws \lib\core\exceptions\SystemException
-     */
-	public static function find( array $conditions = array(), ?string $order = "", ?string $direction = "asc", int $limit = 0, int $page = 1 ): array {
-        try {
-            $results = array();
-            $cm = App::getInstanceOf(ConnectionManager::class);
-            $pdo = $cm->getConnection("mvc");
-            if( !is_null($pdo) ) {
-                $params = array();
-
-                $query = "SELECT * FROM actors";
-                if( !empty($conditions) ) {
-                    $params = MySqlHelper::addQueryConditions($query, $conditions);
-                }
-                if( $order !== "" ) {
-                    MySqlHelper::addQueryOrder($query, $order, $direction);
-                }
-                if( $limit > 0 ) {
-                    $params = array_merge($params, MySqlHelper::addQueryLimit($query, $limit, $page));
+            try {
+                $actor_data = $this->actor_repository->getAsArray($id);
+                if( !empty($actor_data) ) {
+                    $this->id = (int)$actor_data["id"];
+                    $this->type_id = (int)$actor_data["type_id"];
+                    $this->first_name = $actor_data["first_name"];
+                    $this->last_name = $actor_data["last_name"];
+                    $this->email = $actor_data["email"];
+                    $this->password = $actor_data["password"];
+                    $this->login_fails = (int)$actor_data["login_fails"];
+                    $this->login_disabled = (bool)$actor_data["login_disabled"];
+                    $this->created = $actor_data["created"];
+                    $this->updated = ( $actor_data["updated"] !== "" ) ? $actor_data["updated"] : null;
+                    $this->deleted = ( $actor_data["deleted"] !== "" ) ? $actor_data["deleted"] : null;
+                    $this->initPermission();
                 }
 
-                $pdo->prepareQuery($query);
-                foreach( $params as $key => $value ) {
-                    $pdo->bindParam(":" . $key, $value, MySqlHelper::getParamType($value));
-                }
-
-                $pdo->setFetchMode(PDO::FETCH_CLASS, __CLASS__);
-                $results = $pdo->execute()->fetchAll();
+            } catch( Exception $e ) {
+                throw new SystemException(__FILE__, __LINE__, $e->getMessage());
             }
-
-            return $results;
-        } catch( Exception $e ) {
-            throw new SystemException($e->getFile(), $e->getLine(), $e->getMessage(), $e->getCode(), $e->getPrevious());
         }
 	}
 
@@ -104,37 +74,8 @@ class ActorModel extends entities\Actor {
      *
      * @throws \lib\core\exceptions\SystemException
      */
-    public static function isDeveloper( int $actor_id = 0 ): bool {
-        try {
-            if( $actor_id > 0 ) {
-                $actor = App::getInstanceOf(ActorModel::class, null, ["id" => $actor_id]);
-                return ($actor->type_id === 1);
-            }
-            if( App::$curr_actor->id > 0 ) {
-                return (App::$curr_actor->type_id === 1);
-            }
-        } catch( Exception $e ) {
-            throw new SystemException($e->getFile(), $e->getLine(), $e->getMessage(), $e->getCode(), $e->getPrevious());
-        }
-        return false;
-    }
-
-
-    /**
-     * Returns the number of total actors
-     *
-     * @return int
-     *
-     * @throws \lib\core\exceptions\SystemException
-     */
-    public static function getNumActors(): int {
-        try {
-            $cm = App::getInstanceOf(ConnectionManager::class);
-            $pdo = $cm->getConnection("mvc");
-            return $pdo->getNumRowsOfTable("actors");
-        } catch( Exception $e ) {
-            throw new SystemException($e->getFile(), $e->getLine(), $e->getMessage(), $e->getCode(), $e->getPrevious());
-        }
+    public function isDeveloper(): bool {
+        return ($this->type_id === ActorType::Developer->value);
     }
 
     /**
@@ -177,7 +118,7 @@ class ActorModel extends entities\Actor {
             }
 
             // actor object is not loaded, so we return the default actor role
-            $result = ActorRoleModel::find(array(array("is_default", "=", 1)));
+            $result = $this->role_repository->find([["is_default", "=", 1]]);
             if( count($result) === 1 ) {
                 return $result[0];
             }
@@ -196,21 +137,12 @@ class ActorModel extends entities\Actor {
      * @throws \lib\core\exceptions\SystemException
      */
     public function deletePermissions() : bool {
-        try {
-            $cm = App::getInstanceOf(ConnectionManager::class);
-            $pdo = $cm->getConnection("mvc");
-            if( $this->id > 0 ) {
-                $pdo->prepareQuery("DELETE FROM access_permissions WHERE actor_id=:actor_id");
-                $pdo->bindParam(':actor_id', $this->id, PDO::PARAM_INT);
-                $pdo->execute();
-                return true;
-            }
-        } catch( Exception $e ) {
-            throw new SystemException($e->getFile(), $e->getLine(), $e->getMessage(), $e->getCode(), $e->getPrevious());
+        if( $this->id > 0 ) {
+            $this->permission_repository->deleteAccessPermissionFor($this);
+            return true;
         }
         return false;
     }
-
 
 	/**
 	 * Collects all permission for this user
@@ -219,7 +151,7 @@ class ActorModel extends entities\Actor {
 	 */
 	private function initPermission(): void {
         try {
-            $permissions = AccessPermissionModel::find(array(["actor_id", "=", $this->id]));
+            $permissions = $this->permission_repository->getAccessPermissionFor($this);
             foreach( $permissions as $permission ) {
                 $this->permissions[$permission->domain][$permission->controller][$permission->method] = $permission->getRole();
             }
@@ -227,45 +159,5 @@ class ActorModel extends entities\Actor {
             throw new SystemException(__FILE__, __LINE__, $e->getMessage(), $e->getCode(), $e->getPrevious());
         }
 	}
-
-    /**
-     * Collects all data from external sources setClass by the data collections
-     *
-     * @return void
-     *
-     * @throws \lib\core\exceptions\SystemException
-     */
-    public function initData(): void {
-        try {
-            $cm = App::getInstanceOf(ConnectionManager::class);
-            $pdo = $cm->getConnection("mvc");
-            $pdo->prepareQuery("SELECT * FROM actor_data WHERE actor_id=:id");
-            $pdo->bindParam(":id", $this->id, PDO::PARAM_INT);
-            $pdo->setFetchMode(PDO::FETCH_CLASS, ActorData::class);
-            $this->data = $pdo->execute()->fetchAll();
-            foreach($this->data as $data) {
-                if( is_null($data->connection_id) ) {
-                    continue;
-                }
-                $data_connection = new DataConnectionModel($data->connection_id);
-                $ext_db = $data_connection->db_name;
-                $ext_table = $data_connection->table_name;
-                $ext_col = $data_connection->table_col;
-
-                $pdo_ext = $cm->getConnection($ext_db);
-                $sql = "SELECT ". implode(", ", $data_connection->columns)
-                    ." FROM ". $ext_table
-                    ." WHERE ". $ext_col ."=:value";
-                $pdo_ext->prepareQuery($sql);
-                $pdo_ext->bindParam("value", $data->data_value, PDO::PARAM_INT);
-                $result = $pdo_ext->execute()->fetch();
-                foreach( $result as $key => $value ) {
-                    $this->ext_data[$ext_db][$key] = $value;
-                }
-            }
-        } catch( Exception $e ) {
-            throw new SystemException(__FILE__, __LINE__, $e->getMessage(), $e->getCode(), $e->getPrevious());
-        }
-    }
 
 }

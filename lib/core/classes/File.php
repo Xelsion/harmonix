@@ -13,6 +13,7 @@ class File {
 
 	// The file path
 	protected ?string $file_path = null;
+
 	// The file content
 	protected ?string $content = null;
 
@@ -145,6 +146,8 @@ class File {
 	}
 
     /**
+     * Returns the timestamp of the last file change
+     *
      * @return int
      */
     public function getLastModified(): int {

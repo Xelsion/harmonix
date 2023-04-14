@@ -1,8 +1,8 @@
 <?php
 
 use lib\App;
-use lib\classes\Template;
 use lib\core\classes\Configuration;
+use lib\core\classes\Template;
 use lib\helper\HtmlHelper;
 
 $actor = App::$curr_actor;
@@ -49,7 +49,7 @@ $view_content = ( $view instanceof Template) ? $view->parse() : $view;
 					<menu>
 						<?php if( $actor->id === 0 ): ?>
 							<li>
-								<form action="<?= $_SERVER["REQUEST_URI"] ?>" method="POST">
+								<form action="<?= App::$request->getRequestUri() ?>" method="POST">
                                     <?= HtmlHelper::generateFormToken() ?>
 									<div class="form-row">
 										<label>
@@ -76,7 +76,7 @@ $view_content = ( $view instanceof Template) ? $view->parse() : $view;
 						<?php else: ?>
 							<?php if( App::$auth->hasAccessTo(controller\admin\HomeController::class, "index", "admin") ) { ?>
 								<li>
-									<a href="https://admin.harmonix.de">Admin-Bereich</a>
+									<a href="https://admin.<?= App::$config->getSectionValue("system", "domain_name") ?>">Admin-Bereich</a>
 								</li>
 							<?php } ?>
 							<li>
@@ -95,11 +95,9 @@ $view_content = ( $view instanceof Template) ? $view->parse() : $view;
 	<main><?= $view_content ?></main>
 	<?php if( App::$storage->get("debug_mode") ) {
 		$debug = new Template(PATH_VIEWS_ROOT."snippets/debug.html");
-		$debug_content = $debug->parse();
-		echo $debug_content;
 		?>
 		<div id="debug_infos">
-			<?= $debug_content ?>
+			<?= $debug->parse() ?>
 		</div>
 	<?php } ?>
 	<footer>

@@ -10,8 +10,8 @@ use lib\core\classes\Configuration;
  * Alle methods registered as a route must return a Response
  *
  * @see \lib\core\Router
- * @see \lib\classes\tree\Menu
- * @see \lib\classes\tree\MenuItem
+ * @see \lib\core\tree\Menu
+ * @see \lib\core\tree\MenuItem
  *
  * @author Markus Schröder <xelsion@gmail.com>
  * @version 1.0.0;
@@ -20,6 +20,11 @@ abstract class AController {
 
     protected static ?bool $caching = null;
 
+    /**
+     * The class constructor
+     *
+     * @param Configuration $config
+     */
     public function __construct(Configuration $config) {
         if( self::$caching === null ) {
             $environment = $config->getSectionValue("system", "environment");

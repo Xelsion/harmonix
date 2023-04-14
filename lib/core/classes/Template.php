@@ -1,5 +1,5 @@
 <?php
-namespace lib\classes;
+namespace lib\core\classes;
 
 use lib\core\exceptions\SystemException;
 
@@ -45,8 +45,6 @@ class Template extends TemplateData {
 	 * @return string
 	 */
 	public function parse(): string {
-        extract($this::$data);
-
 		ob_start();
 		require( $this->file_path );
 		return ob_get_clean();

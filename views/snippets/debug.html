@@ -7,6 +7,8 @@ if( is_array($debug_messages) ) {
 		print_debug($msg);
 	}
 }
+
+$analyser_entries = App::$analyser->getEntries();
 ?>
 <div class="container-fluid">
     <table class="table table-dark table-striped">
@@ -15,24 +17,17 @@ if( is_array($debug_messages) ) {
             <th>Backtrace</th>
             <th>Needed Time</th>
         </tr>
-        <?php foreach(App::$analyser->getTimers() as $timer) {
-            if( $timer->getLabel() === "total" ) continue;
-            $elapsed_time = $timer->getElapsedTime();
-            $elapsed_time = round($elapsed_time * 1000, 2);
-            $backtrace = $timer->getTrace();
-            ?>
+        <?php foreach( $analyser_entries as $entry): ?>
             <tr>
-                <td><?= $timer->getLabel() ?></td>
+                <td><?= $entry["info"] ?></td>
                 <td>
-                    <?php
-                    //foreach($backtrace as $trace) {
-                    //    echo ($trace["class"]??'')."->".$trace["function"]."<br />";
-                    //}
-                    ?>
+                    <?php foreach($entry["backtrace"] as $trace): ?>
+                        <div><?= ($trace["class"]??'')."->".$trace["function"] ?></div>
+                    <?php endforeach; ?>
                 </td>
-                <td class="col-1"><?= $elapsed_time ?>ms</td>
+                <td class="col-1"><?= $entry["time"] ?></td>
             </tr>
-        <?php } ?>
+        <?php endforeach; ?>
     </table>
 </div>
 

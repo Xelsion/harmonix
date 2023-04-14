@@ -9,7 +9,7 @@ ob_end_clean();
 ?>
 <div class="container-fluid">
 	<h1>Welcome!</h1>
-    <?php if( App::$curr_actor_role->canReadAll() ) { ?>
+    <?php if( App::$curr_actor->isDeveloper() ) { ?>
         <iframe id="php_info" width="100%" sandbox="allow-same-origin" srcdoc="<?= htmlspecialchars($html) ?>"></iframe>
         <script>
             $(function() {

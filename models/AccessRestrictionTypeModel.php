@@ -4,9 +4,11 @@ namespace models;
 use Exception;
 use lib\App;
 use lib\core\ConnectionManager;
+use lib\core\database\QueryBuilder;
 use lib\core\exceptions\SystemException;
 use lib\helper\MySqlHelper;
 use PDO;
+use repositories\AccessRestrictionTypeRepository;
 
 /**
  * The AccessRestrictionTypeModel
@@ -15,6 +17,8 @@ use PDO;
  * @version 1.0.0;
  */
 class AccessRestrictionTypeModel extends entities\AccessRestrictionType {
+
+    private readonly AccessRestrictionTypeRepository $restriction_type_repository;
 
     /**
      * The class constructor
@@ -25,60 +29,24 @@ class AccessRestrictionTypeModel extends entities\AccessRestrictionType {
      * @throws SystemException
      */
     public function __construct( int $id = 0 ) {
-        parent::__construct($id);
-    }
+        $this->restriction_type_repository = App::getInstanceOf(AccessRestrictionTypeRepository::class);
 
-    /**
-     * Returns all actors permissions that mach the given conditions,
-     * The condition array is build like this:
-     * <p>
-     * array {
-     *    array { col, condition, value },
-     *    ...
-     * }
-     * </p>
-     * All conditions are AND related
-     *
-     * @param array $conditions
-     * @param string|null $order
-     * @param string|null $direction
-     * @param int $limit
-     * @param int $page
-     *
-     * @return array|null
-     *
-     * @throws SystemException
-     */
-    public static function find( array $conditions = array(), ?string $order = "", ?string $direction = "asc", int $limit = 0, int $page = 1 ) : ?array {
-        try {
-            $results = array();
-            $cm = App::getInstanceOf(ConnectionManager::class);
-            $pdo = $cm->getConnection("mvc");
-            if( !is_null($pdo) ) {
-                $params = array();
-
-                $query = "SELECT * FROM access_restriction_types";
-                if( !empty($conditions) ) {
-                    $params = MySqlHelper::addQueryConditions( $query, $conditions);
+        if( $id > 0 ) {
+            try {
+                $restriction_type_data = $this->restriction_type_repository->getAsArray($id);
+                if( !empty($restriction_type_data) ) {
+                    $this->id = (int)$restriction_type_data["id"];
+                    $this->name = $restriction_type_data["name"];
+                    $this->include_siblings = (int)$restriction_type_data["include_siblings"];
+                    $this->include_children = (int)$restriction_type_data["include_children"];
+                    $this->include_descendants = (int)$restriction_type_data["include_descendants"];
+                    $this->created = $restriction_type_data["created"];
+                    $this->updated = ( $restriction_type_data["updated"] !== "" ) ? $restriction_type_data["updated"] : null;
+                    $this->deleted = ( $restriction_type_data["deleted"] !== "" ) ? $restriction_type_data["deleted"] : null;
                 }
-                if( $order !== "" ) {
-                    MySqlHelper::addQueryOrder( $query, $order, $direction);
-                }
-                if( $limit > 0 ) {
-                    $params = array_merge($params, MySqlHelper::addQueryLimit( $query, $limit, $page));
-                }
-
-                $pdo->prepareQuery($query);
-                foreach( $params as $key => $value ) {
-                    $pdo->bindParam(":" . $key, $value, MySqlHelper::getParamType($value));
-                }
-                $pdo->setFetchMode(PDO::FETCH_CLASS, __CLASS__);
-                $results = $pdo->execute()->fetchAll();
+            } catch( Exception $e ) {
+                throw new SystemException(__FILE__, __LINE__, $e->getMessage(), $e->getCode(), $e->getPrevious());
             }
-
-            return $results;
-        } catch( Exception $e ) {
-            throw new SystemException($e->getFile(), $e->getLine(), $e->getMessage(), $e->getCode(), $e->getPrevious());
         }
     }
 

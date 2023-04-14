@@ -1,11 +1,9 @@
 <?php
 namespace lib\helper;
 
-use DateTime;
 use Exception;
-use lib\core\exceptions\SystemException;
 use models\ActorRoleModel;
-use models\entities\Token;
+
 
 readonly class HtmlHelper {
 
@@ -110,29 +108,33 @@ readonly class HtmlHelper {
      */
     public static function generateFormToken(): string {
         try {
-            $token = new Token();
-            $token->id = StringHelper::getGuID();
-            $token->expired = (new DateTime())->modify("+2 hours")->format("Y-m-d H:i:s");
-            $token->create();
-            return '<input type="hidden" name="csrf_token" value="'.$token->id.'" />';
+            if( !isset($_SESSION["form_token"]) ) {
+                $token = StringHelper::getGuID();
+                $_SESSION["form_token"] = $token;
+            } else {
+                $token = $_SESSION["form_token"];
+            }
+            return '<input type="hidden" name="csrf_token" value="'.$token.'" />';
         } catch( Exception ) {
             return "";
         }
     }
 
     /**
+     * @return void
+     */
+    public static function deleteFormToken(): void {
+        if( isset($_SESSION["form_token"]) ) {
+            unset($_SESSION["form_token"]);
+        }
+    }
+
+    /**
      * @param string $id
      * @return bool
-     *
-     * @throws SystemException
      */
     public static function validateFormToken( string $id ): bool {
-        $token = new Token($id);
-        if( $token->id !== "" ) {
-            $token->delete();
-            return true;
-        }
-        return false;
+        return (isset($_SESSION["form_token"]) && $id === $_SESSION["form_token"]);
     }
 
 }

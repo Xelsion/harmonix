@@ -1,5 +1,5 @@
 <?php
-namespace lib\classes\tree;
+namespace lib\core\tree;
 
 /**
  * The TreeWalker class
@@ -11,7 +11,7 @@ namespace lib\classes\tree;
 class TreeWalker {
 
 	// all nodes of the tree
-	private array $nodes = array();
+	protected array $nodes = array();
 
 	/**
 	 * The constructor
@@ -75,7 +75,7 @@ class TreeWalker {
 	public function getChildrenOf( ?int $node_id ): array {
 		$children = array();
 		foreach( $this->nodes as $id => $current_node ) {
-			if( $current_node->child_of === $node_id ) {
+			if( (int)$current_node->child_of === (int)$node_id ) {
 				$children[$id] = $current_node;
 			}
 		}

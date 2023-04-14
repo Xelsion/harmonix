@@ -2,7 +2,7 @@
 
 use lib\App;
 
-$menu = App::getInstanceOf(\lib\classes\tree\Menu::class);
+$menu = App::getInstanceOf(\lib\core\tree\Menu::class);
 $menu->insertMenuItem(100, null, "Home", "/");
 
 $menu->insertMenuItem(200, null, "Tests", "/tests");

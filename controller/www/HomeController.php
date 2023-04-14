@@ -1,12 +1,15 @@
 <?php
 namespace controller\www;
 
-use lib\classes\Template;
+use lib\App;
+use lib\core\attributes\HttpPost;
 use lib\core\attributes\Route;
 use lib\core\blueprints\AController;
 use lib\core\blueprints\AResponse;
+use lib\core\classes\Template;
 use lib\core\exceptions\SystemException;
 use lib\core\response_types\HtmlResponse;
+use repositories\ActorRepository;
 
 /**
  * @author Markus Schröder <xelsion@gmail.com>
@@ -31,16 +34,5 @@ class HomeController extends AController {
 
 		return new HtmlResponse($template->parse());
 	}
-
-
-    #[Route("//test/")]
-    public function test() {
-
-    }
-
-	public function __toString(): string {
-		return __CLASS__;
-	}
-
 
 }

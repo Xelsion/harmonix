@@ -8,6 +8,7 @@
       <sourceFolder url="file://$MODULE_DIR$/controller" isTestSource="false" packagePrefix="controller\" />
       <sourceFolder url="file://$MODULE_DIR$/lib" isTestSource="false" packagePrefix="lib\" />
       <sourceFolder url="file://$MODULE_DIR$/models" isTestSource="false" packagePrefix="models\" />
+      <sourceFolder url="file://$MODULE_DIR$/repositories" isTestSource="false" packagePrefix="repositories\" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

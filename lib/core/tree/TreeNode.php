@@ -1,5 +1,5 @@
 <?php
-namespace lib\classes\tree;
+namespace lib\core\tree;
 
 /**
  * The TreeNode class

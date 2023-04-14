@@ -1,13 +1,13 @@
 <?php
 namespace models;
 
+use PDO;
 use Exception;
 use lib\App;
 use lib\core\classes\Language;
 use lib\core\ConnectionManager;
 use lib\core\exceptions\SystemException;
-use lib\helper\MySqlHelper;
-use PDO;
+use repositories\ActorRoleRepository;
 
 /**
  * The ActorModel Role
@@ -17,10 +17,15 @@ use PDO;
  */
 class ActorRoleModel extends entities\ActorRole {
 
+    private readonly ActorRoleRepository $role_repository;
+
 	public static int $CAN_READ = 0b1000;
-	public static int $CAN_CREATE = 0b0100;
-	public static int $CAN_UPDATE = 0b0010;
-	public static int $CAN_DELETE = 0b0001;
+
+    public static int $CAN_CREATE = 0b0100;
+
+    public static int $CAN_UPDATE = 0b0010;
+
+    public static int $CAN_DELETE = 0b0001;
 
     /**
      * The class constructor
@@ -28,77 +33,44 @@ class ActorRoleModel extends entities\ActorRole {
      *
      * @param int $id
      *
-     * @throws \lib\core\exceptions\SystemException
+     * @throws SystemException
      */
 	public function __construct( int $id = 0 ) {
-		parent::__construct($id);
+        $this->role_repository = App::getInstanceOf(ActorRoleRepository::class);
+        if( $id > 0 ) {
+            try {
+                $role_data = $this->role_repository->getAsArray($id);
+                if( !empty($role_data) ) {
+                    $this->id = (int)$role_data["id"];
+                    $this->child_of = (is_numeric($role_data["child_of"])) ? (int)$role_data["child_of"] : null;
+                    $this->name = $role_data["name"];
+                    $this->rights_all = (int)$role_data["rights_all"];
+                    $this->rights_group = (int)$role_data["rights_group"];
+                    $this->rights_own = (int)$role_data["rights_own"];
+                    $this->is_default = (bool)$role_data["is_default"];
+                    $this->is_protected = (bool)$role_data["is_protected"];
+                    $this->created = $role_data["created"];
+                    $this->updated = ( $role_data["updated"] !== "" ) ? $role_data["updated"] : null;
+                    $this->deleted = ( $role_data["deleted"] !== "" ) ? $role_data["deleted"] : null;
+                }
+            } catch( Exception $e ) {
+                throw new SystemException(__FILE__, __LINE__, $e->getMessage(), $e->getCode(), $e->getPrevious());
+            }
+        }
 	}
 
-    /**
-     * Returns all actor roles that mach the given conditions,
-     * The condition array is build like this:
-     * <p>
-     * array {
-     *    array { col, condition, value },
-     *    ...
-     * }
-     * </p>
-     * All conditions are AND related
-     *
-     * @param array $conditions
-     * @param string|null $order
-     * @param string|null $direction
-     * @param int $limit
-     * @param int $page
-     *
-     * @return array
-     *
-     * @throws \lib\core\exceptions\SystemException
-     */
-    public static function find( array $conditions = array(), ?string $order = "", ?string $direction = "asc", int $limit = 0, int $page = 1 ) : array {
-        try {
-            $results = array();
-            $cm = App::getInstanceOf(ConnectionManager::class);
-            $pdo = $cm->getConnection("mvc");
-            if( !is_null($pdo) ) {
-                $params = array();
-
-                $query = "SELECT * FROM actor_roles";
-                if( !empty($conditions) ) {
-                    $params = MySqlHelper::addQueryConditions( $query, $conditions);
-                }
-                if( $order !== "" ) {
-                    MySqlHelper::addQueryOrder( $query, $order, $direction);
-                }
-                if( $limit > 0 ) {
-                    $params = array_merge($params, MySqlHelper::addQueryLimit( $query, $limit, $page));
-                }
-
-                $pdo->prepareQuery($query);
-                foreach( $params as $key => $value ) {
-                    $pdo->bindParam(":" . $key, $value, MySqlHelper::getParamType($value));
-                }
-                $pdo->setFetchMode(PDO::FETCH_CLASS, __CLASS__);
-                $results = $pdo->execute()->fetchAll();
-            }
-
-            return $results;
-        } catch( Exception $e ) {
-            throw new SystemException($e->getFile(), $e->getLine(), $e->getMessage(), $e->getCode(), $e->getPrevious());
-        }
-    }
 
     /**
      * Returns the parent of this role or null if it contains no parent.
      *
      * @return ActorRoleModel|null
      *
-     * @throws \lib\core\exceptions\SystemException
+     * @throws SystemException
      */
 	public function getParent(): ?ActorRoleModel {
-		if( $this->child_of !== null ) {
+		if( $this->child_of !== null && $this->child_of > 0 ) {
             try {
-                return new ActorRoleModel($this->child_of);
+                return App::getInstanceOf(__CLASS__, null, ["id" => $this->child_of]);
             } catch( Exception $e ) {
                 throw new SystemException($e->getFile(), $e->getLine(), $e->getMessage(), $e->getCode(), $e->getPrevious());
             }
@@ -111,20 +83,11 @@ class ActorRoleModel extends entities\ActorRole {
      *
      * @return array
      *
-     * @throws \lib\core\exceptions\SystemException
+     * @throws SystemException
      */
 	public function getChildren(): array {
         try {
-            $children = array();
-            $cm = App::getInstanceOf(ConnectionManager::class);
-            $pdo = $cm->getConnection("mvc");
-            $pdo->prepareQuery("SELECT * FROM actor_roles WHERE child_of=:id");
-            $pdo->bindParam(":id", $this->id, PDO::PARAM_INT);
-            $results = $pdo->execute()->fetchAll(PDO::FETCH_CLASS, __CLASS__);
-            foreach( $results as $child ) {
-                $children[] = $child;
-            }
-            return $children;
+            return $this->role_repository->find([["child_of", "=", $this->id]]);
         } catch( Exception $e ) {
             throw new SystemException($e->getFile(), $e->getLine(), $e->getMessage(), $e->getCode(), $e->getPrevious());
         }
@@ -176,7 +139,7 @@ class ActorRoleModel extends entities\ActorRole {
      *
      * @return bool
      *
-     * @throws \lib\core\exceptions\SystemException
+     * @throws SystemException
      */
 	public function isAncestorOf( ActorRoleModel $role ): bool {
         try {
@@ -199,7 +162,7 @@ class ActorRoleModel extends entities\ActorRole {
      * @param ActorRoleModel $role
      * @return bool
      *
-     * @throws \lib\core\exceptions\SystemException
+     * @throws SystemException
      */
 	public function isDescendantOf( ActorRoleModel $role ): bool {
         try {
@@ -357,7 +320,7 @@ class ActorRoleModel extends entities\ActorRole {
      *
      * @return bool
      *
-     * @throws \lib\core\exceptions\SystemException
+     * @throws SystemException
      */
     public function canUpdate(int $owner_id): bool {
         try {
@@ -368,7 +331,7 @@ class ActorRoleModel extends entities\ActorRole {
             if( $this->canUpdateAll() ) {
                 return true;
             }
-            if( (App::$curr_actor_role->isAncestorOf($owner_role) || $this->isGuest($owner_role)) && $this->canUpdateGroup() ) {
+            if( $this->canUpdateGroup() && (App::$curr_actor_role->isAncestorOf($owner_role) || $this->isGuest($owner_role)) ) {
                 return true;
             }
             if( App::$curr_actor->id === $owner_id && $this->canUpdateOwn() ) {
@@ -385,7 +348,7 @@ class ActorRoleModel extends entities\ActorRole {
      *
      * @return bool
      *
-     * @throws \lib\core\exceptions\SystemException
+     * @throws SystemException
      */
     public function canDelete(int $owner_id): bool {
         try {
@@ -396,7 +359,7 @@ class ActorRoleModel extends entities\ActorRole {
             if( $this->canDeleteAll() ) {
                 return true;
             }
-            if( (App::$curr_actor_role->isAncestorOf($owner_role) || $this->isGuest($owner_role) ) && $this->canDeleteGroup() ) {
+            if( $this->canDeleteGroup() && (App::$curr_actor_role->isAncestorOf($owner_role) || $this->isGuest($owner_role)) ) {
                 return true;
             }
             if( App::$curr_actor->id === $owner_id && $this->canDeleteOwn() ) {
@@ -414,7 +377,7 @@ class ActorRoleModel extends entities\ActorRole {
      *
      * @return array|array[]
      *
-     * @throws \lib\core\exceptions\SystemException
+     * @throws SystemException
      */
 	public function getStringArray(): array {
 		global $lang;

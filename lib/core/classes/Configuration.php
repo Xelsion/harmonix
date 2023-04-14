@@ -10,7 +10,6 @@ namespace lib\core\classes;
  */
 class Configuration {
 
-
 	// an array holding all configurations
 	private array $config;
 

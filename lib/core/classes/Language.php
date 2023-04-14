@@ -14,6 +14,11 @@ class Language {
 
     private array $lang;
 
+    /**
+     * The class constructor
+     *
+     * @param $lang
+     */
     private function __construct( $lang = "de" ) {
         $this->lang = parse_ini_file(PATH_ROOT."lang-".$lang.".ini", true);
     }

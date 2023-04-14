@@ -1,16 +1,18 @@
 <?php
 
 use lib\App;
-use lib\classes\Template;
 use lib\core\classes\Language;
+use lib\core\classes\Template;
 use lib\helper\HtmlHelper;
 
 $lang = App::getInstanceOf(Language::class);
 
+$actor = $this->get('actor');
+
 $snippet = new Template(PATH_VIEWS."snippets/access_permission.html");
 ?>
 <div class="container-fluid">
-	<h1>Benutzer Rollen</h1>
+	<h1>Benutzer Rollen f&uuml;r: <?= $actor->first_name . " " . $actor->last_name ?></h1>
 	<form action="/actors/roles/<?= $actor->id ?>" method="POST" class="needs-validation" style="width: 80%;" novalidate>
         <?= HtmlHelper::generateFormToken() ?>
 		<?= $snippet->parse() ?>

@@ -2,19 +2,39 @@
 namespace controller\admin;
 
 use lib\App;
-use lib\classes\Template;
 use lib\core\attributes\Route;
 use lib\core\blueprints\AController;
 use lib\core\blueprints\AResponse;
+use lib\core\classes\Configuration;
+use lib\core\classes\Template;
 use lib\core\exceptions\SystemException;
 use lib\core\response_types\HtmlResponse;
 use lib\core\Router;
 use models\AccessRestrictionModel;
 use models\AccessRestrictionTypeModel;
-use models\ActorRoleModel;
+use repositories\AccessRestrictionRepository;
+use repositories\AccessRestrictionTypeRepository;
+use repositories\ActorRoleRepository;
 
 #[Route("restrictions")]
 class RestrictionController extends AController {
+
+    private readonly AccessRestrictionRepository $restriction_repository;
+
+    private readonly AccessRestrictionTypeRepository $restriction_type_repository;
+
+    private readonly ActorRoleRepository $role_repository;
+
+    public function __construct(AccessRestrictionRepository $restriction_repository,
+                                AccessRestrictionTypeRepository $restriction_type_repository,
+                                ActorRoleRepository         $role_repository,
+                                Configuration               $config
+    ) {
+        parent::__construct($config);
+        $this->restriction_repository = $restriction_repository;
+        $this->restriction_type_repository = $restriction_type_repository;
+        $this->role_repository = $role_repository;
+    }
 
     /**
      * Get a list of all restrictions
@@ -29,7 +49,7 @@ class RestrictionController extends AController {
             $this->saveRestrictions();
         }
 
-        $access_restrictions = AccessRestrictionModel::find();
+        $access_restrictions = $this->restriction_repository->getAll();
         $current_restrictions = array();
         foreach( $access_restrictions as $restriction ) {
             $current_restrictions[$restriction->domain][$restriction->controller][$restriction->method] = array(
@@ -41,8 +61,8 @@ class RestrictionController extends AController {
         $view = new Template(PATH_VIEWS."restrictions/index.html");
         $view->set("routes", App::getInstanceOf(Router::class)->getSortedRoutes());
         $view->set("current_restrictions", $current_restrictions);
-        $view->set("role_options", ActorRoleModel::find());
-        $view->set("type_options", AccessRestrictionTypeModel::find());
+        $view->set("role_options", $this->role_repository->getAll());
+        $view->set("type_options", $this->restriction_type_repository->getAll());
 
         $template = new Template(PATH_VIEWS."template.html");
         $template->set("view", $view->parse());
@@ -58,7 +78,7 @@ class RestrictionController extends AController {
     #[Route("types")]
     public function types(): AResponse {
         $view = new Template(PATH_VIEWS."restrictions/types.html");
-        $view->set("type_list", AccessRestrictionTypeModel::find());
+        $view->set("type_list", $this->restriction_type_repository->getAll());
 
         $template = new Template(PATH_VIEWS."template.html");
         $template->set("view", $view->parse());
@@ -73,19 +93,19 @@ class RestrictionController extends AController {
      */
     #[Route("types/create")]
     public function typesCreate(): AResponse {
-        if( App::$request->data->contains("cancel") ) {
+        if( App::$request->contains("cancel") ) {
             redirect("/restrictions/types");
         }
 
-        if( App::$request->data->contains("create") ) {
+        if( App::$request->contains("create") ) {
             $is_valid = $this->postIsValid();
             if( $is_valid ) {
                 $type = new AccessRestrictionTypeModel();
-                $type->name = App::$request->data->get("name");
-                $type->include_siblings = (App::$request->data->get("include_siblings")) ? 1 :  0;
-                $type->include_children = (App::$request->data->get("include_children")) ? 1 :  0;
-                $type->include_descendants = (App::$request->data->get("include_descendants")) ? 1 :  0;
-                $type->create();
+                $type->name = App::$request->get("name");
+                $type->include_siblings = (App::$request->get("include_siblings")) ? 1 :  0;
+                $type->include_children = (App::$request->get("include_children")) ? 1 :  0;
+                $type->include_descendants = (App::$request->get("include_descendants")) ? 1 :  0;
+                $this->restriction_type_repository->createObject($type);
                 redirect("/restrictions/types");
             }
         }
@@ -107,18 +127,18 @@ class RestrictionController extends AController {
      */
     #[Route("types/{type}")]
     public function typesUpdate( AccessRestrictionTypeModel $type ): AResponse {
-        if( App::$request->data->contains("cancel") ) {
+        if( App::$request->contains("cancel") ) {
             redirect("/restrictions/types");
         }
 
-        if( App::$request->data->contains("update") ) {
+        if( App::$request->contains("update") ) {
             $is_valid = $this->postIsValid();
             if( $is_valid ) {
-                $type->name = App::$request->data->get("name");
-                $type->include_siblings = (App::$request->data->get("include_siblings")) ? 1 :  0;
-                $type->include_children = (App::$request->data->get("include_children")) ? 1 :  0;
-                $type->include_descendants = (App::$request->data->get("include_descendants")) ? 1 :  0;
-                $type->update();
+                $type->name = App::$request->get("name");
+                $type->include_siblings = (App::$request->get("include_siblings")) ? 1 :  0;
+                $type->include_children = (App::$request->get("include_children")) ? 1 :  0;
+                $type->include_descendants = (App::$request->get("include_descendants")) ? 1 :  0;
+                $this->restriction_type_repository->updateObject($type);
                 redirect("/restrictions/types");
             }
         }
@@ -159,7 +179,7 @@ class RestrictionController extends AController {
             }
         }
 
-        AccessRestrictionModel::deleteAll();
+        $this->restriction_repository->deleteAll();
         foreach($restrictions as $domain => $controllers) {
             foreach( $controllers as $controller => $methods ) {
                 foreach( $methods as $method => $entry ) {
@@ -169,7 +189,7 @@ class RestrictionController extends AController {
                     $restriction->method = ( $method !== "") ? $method : null;
                     $restriction->role_id = $entry[0];
                     $restriction->restriction_type = $entry[1];
-                    $restriction->create();
+                    $this->restriction_repository->createObject($restriction);
                 }
             }
         }
@@ -182,7 +202,7 @@ class RestrictionController extends AController {
      */
     private function postIsValid(): bool {
         $is_valid = true;
-        if( !App::$request->data->contains("name") || App::$request->data->get("name") === "" ) {
+        if( !App::$request->contains("name") || App::$request->get("name") === "" ) {
             $is_valid = false;
         }
         return $is_valid;

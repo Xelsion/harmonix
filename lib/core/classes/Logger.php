@@ -48,13 +48,15 @@ class Logger extends File {
 			foreach( $backtrace as $trace ) {
 				$args = array();
 				// Go through all arguments and getInstanceOf a representable string for it
-				foreach( $trace["args"] as $arg ) {
-					if( is_object($arg) ) {
-						$args[] = get_class($arg);
-					} else {
-						$args[] = $arg;
-					}
-				}
+                if( isset($trace["args"]) ) {
+                    foreach( $trace["args"] as $arg ) {
+                        if( is_object($arg) ) {
+                            $args[] = get_class($arg);
+                        } else {
+                            $args[] = $arg;
+                        }
+                    }
+                }
                 $string_args = "";
                 if( !empty($args) ) {
                     try {

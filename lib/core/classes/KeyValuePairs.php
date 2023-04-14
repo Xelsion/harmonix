@@ -2,10 +2,17 @@
 
 namespace lib\core\classes;
 
+/**
+ * The KeyValuePairs class
+ * provides base functionality for key/value pair array in an object-oriented way
+ *
+ * @author Markus Schröder <xelsion@gmail.com>
+ * @version 1.0.0;
+ */
 class KeyValuePairs {
 
     // an array for key => value pairs
-    private array $entries = array();
+    protected array $entries = array();
 
     /**
      * Sets the value for the specified key.

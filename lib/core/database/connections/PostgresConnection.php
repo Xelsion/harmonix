@@ -2,6 +2,7 @@
 namespace lib\core\database\connections;
 
 use lib\core\blueprints\ADBConnection;
+use lib\core\enums\DbType;
 use PDO;
 
 /**
@@ -14,7 +15,7 @@ class PostgresConnection extends ADBConnection {
 
     private array $_options = array(
         PDO::ATTR_PERSISTENT         => true,
-        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_KEY_PAIR,
+        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
         PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION
     );
 
@@ -34,5 +35,12 @@ class PostgresConnection extends ADBConnection {
      */
     public function getConnectionOptions(): array {
         return $this->_options;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getType(): DbType {
+        return DbType::Postgres;
     }
 }

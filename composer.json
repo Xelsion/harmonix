@@ -3,7 +3,8 @@
         "psr-4": {
             "lib\\": "lib",
             "models\\": "models",
-            "controller\\" : "controller"
+            "controller\\" : "controller",
+            "repositories\\" : "repositories"
         }
     },
     "authors": [

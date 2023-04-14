@@ -1,5 +1,5 @@
 <?php
-namespace lib\classes\tree;
+namespace lib\core\tree;
 
 /**
  * The MenuItem class extends the TreeNode
@@ -32,7 +32,7 @@ class MenuItem extends TreeNode {
 	 * @param string $class
 	 * @return string
 	 */
-	public function getLink( string $class = "" ) {
+	public function getLink( string $class = "" ): string {
 		return sprintf('<a href="%s" class="%s">%s</a>', $this->target, $class, $this->name);
 	}
 

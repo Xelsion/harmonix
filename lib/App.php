@@ -2,11 +2,10 @@
 namespace lib;
 
 use Exception;
-use lib\classes\tree\RoleTree;
 use lib\core\blueprints\AController;
-use lib\core\blueprints\ADBConnection;
 use lib\core\blueprints\AMiddleware;
 use lib\core\blueprints\AResponse;
+use lib\core\cache\ObjectCache;
 use lib\core\classes\Analyser;
 use lib\core\classes\Auth;
 use lib\core\classes\Configuration;
@@ -16,13 +15,11 @@ use lib\core\classes\Language;
 use lib\core\classes\Timer;
 use lib\core\ClassManager;
 use lib\core\ConnectionManager;
-use lib\core\database\connections\MsSqlConnection;
-use lib\core\database\connections\MySqlConnection;
-use lib\core\database\connections\PostgresConnection;
 use lib\core\exceptions\SystemException;
 use lib\core\Request;
 use lib\core\Router;
 use lib\core\Storage;
+use lib\core\tree\RoleTree;
 use lib\helper\StringHelper;
 use models\ActorModel;
 use models\ActorRoleModel;
@@ -36,6 +33,10 @@ use models\ActorRoleModel;
  * @version 1.0.0;
  */
 class App {
+
+    private static ObjectCache $ob_cache;
+
+    public static Configuration $config;
 
     // The class manager with dependency injection
     private static ClassManager $class_manager;
@@ -55,13 +56,11 @@ class App {
     // The Auth depending on the current actor role and the current request restrictions
     public static Auth $auth;
 
-    // The analyser contains timers that measures aspects of the framework
+    // The analyser contains entries witch time measured aspects of the framework
     public static Analyser $analyser;
 
     // The global accessible key=>value storage for the application
     public static KeyValuePairs $storage;
-
-    public static array $object_cache = array();
 
     // An array of instances running as middleware
     private array $middleware = array();
@@ -73,11 +72,13 @@ class App {
      * @throws SystemException
      */
 	public function __construct() {
+        self::$ob_cache = new ObjectCache();
         self::$class_manager = new ClassManager();
+        self::$config = new Configuration(PATH_ROOT."application.ini");
         self::$analyser = self::getInstanceOf(Analyser::class);
         self::$storage = self::getInstanceOf(KeyValuePairs::class);
 
-        $this->setAsSingleton(Configuration::class, new Configuration(PATH_ROOT."application.ini"));
+        $this->setAsSingleton(Configuration::class, self::$config);
         $this->setAsSingleton(ConnectionManager::class, self::getInstanceOf(ConnectionManager::class));
         $this->setAsSingleton(Request::class, self::getInstanceOf(Request::class));
         $this->setAsSingleton(Router::class, Router::getInstance());
@@ -118,9 +119,7 @@ class App {
         self::$storage->set("debug_mode", (bool)$debug);
         self::$storage->set("is_cached", false);
 
-        $timer = self::getInstanceOf(Timer::class, null, ["label" => "harmonix-total"]);
-        $timer->start();
-        self::$analyser->addTimer($timer);
+        self::$analyser->start();
 
         // some classes need db connections to be initialized, we do them now
         $this->setAsSingleton(RoleTree::class, RoleTree::getInstance());
@@ -173,7 +172,7 @@ class App {
             }
         } else {
             // No valid controller found
-            throw new SystemException(__FILE__, __LINE__, "Controller for request ".self::getInstanceOf(Request::class)->getRequestUri()." cant be found!");
+            throw new SystemException(__FILE__, __LINE__, "Controller for request ".self::$request->getRequestUri()." cant be found!");
         }
 
 	}
@@ -185,15 +184,8 @@ class App {
 	 */
     public function getResult(): string {
         $output = $this::$response->getOutput();
-        $timer = self::$analyser->getTimerByLabel("harmonix-total");
-        if( !is_null($timer) ) {
-            $timer->stop();
-            $elapsed_time = $timer->getElapsedTime();
-            $elapsed_time = round($elapsed_time * 1000, 2);
-            $output = str_replace("{{build_time}}", $elapsed_time."ms",$output);
-        } else {
-            $output = str_replace("{{build_time}}", "N/A",$output);
-        }
+        $elapsed_time = self::$analyser->getElapsedTime()->format("ms", 2);
+        $output = str_replace("{{build_time}}", $elapsed_time, $output);
         $is_cached = ( self::$storage->get("is_cached") ) ? "true" : "false";
         return str_replace("{{is_cached}}", $is_cached, $output);
 	}
@@ -237,44 +229,14 @@ class App {
     public static function getInstanceOf(string $namespace, ?string $method = null, array $args = []): mixed {
         if( isset($args["id"]) && is_numeric($args["id"]) && count($args) === 1 ) {
             $id = (int)$args["id"];
-            if( isset(self::$object_cache[$namespace][$id]) ) {
-                $obj = self::$object_cache[$namespace][$id];
-            } else {
+            $obj = self::$ob_cache->get($namespace, $id);
+            if( is_null($obj) ) {
                 $obj = self::$class_manager->get($namespace, $method, $args);
-                self::$object_cache[$namespace][$id] = $obj;
+                self::$ob_cache->set($namespace, $id, $obj);
             }
             return $obj;
         }
         return self::$class_manager->get($namespace, $method, $args);
-    }
-
-    /**
-     * @return void
-     */
-    public function generateTestData():void {
-        for( $i=0; $i<10000; $i++) {
-            try {
-                $actor = self::getInstanceOf(ActorModel::class);
-                $actor->first_name = "TEST_". StringHelper::getRandomString(6);
-                $actor->last_name = StringHelper::getRandomString(8);
-                $actor->email = StringHelper::getRandomString();
-                $actor->password = StringHelper::getRandomPassword();
-                $actor->create();
-            } catch( Exception $e ) {
-                die($e->getMessage());
-            }
-        }
-    }
-
-    private function deleteTestData(): void {
-        try {
-            $cm = self::getInstanceOf(ConnectionManager::class);
-            $pdo = $cm->getConnection("mvc");
-            $pdo->run("DELETE FROM actors WHERE first_name LIKE 'TEST_%'");
-            $pdo->run("ALTER TABLE actors AUTO_INCREMENT=4");
-        } catch( Exception $e ) {
-            die($e->getMessage());
-        }
     }
 
 }

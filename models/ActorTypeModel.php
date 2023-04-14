@@ -4,9 +4,11 @@ namespace models;
 use Exception;
 use lib\App;
 use lib\core\ConnectionManager;
+use lib\core\database\QueryBuilder;
 use lib\core\exceptions\SystemException;
 use lib\helper\MySqlHelper;
 use PDO;
+use repositories\ActorTypeRepository;
 
 /**
  * The ActorTypeModel
@@ -14,73 +16,34 @@ use PDO;
  * @author Markus Schröder <xelsion@gmail.com>
  * @version 1.0.0;
  */
-class ActorTypeModel extends entities\ActorTypes {
+class ActorTypeModel extends entities\ActorType {
+
+    private readonly ActorTypeRepository $type_repository;
 
     /**
      * The class constructor
-     * If id is 0 it will return an empty actor
      *
      * @param int $id
      *
      * @throws SystemException
      */
     public function __construct( int $id = 0 ) {
-        parent::__construct($id);
-    }
-
-    /**
-     * Returns all actor roles that mach the given conditions,
-     * The condition array is build like this:
-     * <p>
-     * array {
-     *    array { col, condition, value },
-     *    ...
-     * }
-     * </p>
-     * All conditions are AND related
-     *
-     * @param array $conditions default array()
-     * @param string|null $order default ""
-     * @param string|null $direction default ""
-     * @param int $limit default 0
-     * @param int $page default 1
-     *
-     * @return array
-     *
-     * @throws SystemException
-     */
-    public static function find( array $conditions = array(), ?string $order = "", ?string $direction = "asc", int $limit = 0, int $page = 1 ) : array {
-        try {
-            $results = array();
-            $cm = App::getInstanceOf(ConnectionManager::class);
-            $pdo = $cm->getConnection("mvc");
-            if( !is_null($pdo) ) {
-                $params = array();
-
-                $query = "SELECT * FROM actor_types";
-                if( !empty($conditions) ) {
-                    $params = MySqlHelper::addQueryConditions( $query, $conditions);
+        $this->type_repository = App::getInstanceOf(ActorTypeRepository::class);
+        if( $id > 0 ) {
+            try {
+                $type_data = $this->type_repository->getAsArray($id);
+                if( !empty($type_data) ) {
+                    $this->id = (int)$type_data["id"];
+                    $this->name = $type_data["name"];
+                    $this->is_protected = (bool)$type_data["is_protected"];
+                    $this->created = $type_data["created"];
+                    $this->updated = ( $type_data["updated"] !== "" ) ? $type_data["updated"] : null;
+                    $this->deleted = ( $type_data["deleted"] !== "" ) ? $type_data["deleted"] : null;
                 }
-                if( $order !== "" ) {
-                    MySqlHelper::addQueryOrder( $query, $order, $direction);
-                }
-                if( $limit > 0 ) {
-                    $params = array_merge($params, MySqlHelper::addQueryLimit( $query, $limit, $page));
-                }
-
-                $pdo->prepareQuery($query);
-                foreach( $params as $key => $value ) {
-                    $pdo->bindParam(":" . $key, $value, MySqlHelper::getParamType($value));
-                }
-                $pdo->setFetchMode(PDO::FETCH_CLASS, __CLASS__);
-                $results = $pdo->execute()->fetchAll();
+            } catch( Exception $e ) {
+                throw new SystemException(__FILE__, __LINE__, $e->getMessage(), $e->getCode(), $e->getPrevious());
             }
-
-            return $results;
-        } catch( Exception $e ) {
-            throw new SystemException($e->getFile(), $e->getLine(), $e->getMessage(), $e->getCode(), $e->getPrevious());
         }
     }
-
 
 }

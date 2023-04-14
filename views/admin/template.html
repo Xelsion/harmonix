@@ -1,8 +1,8 @@
 <?php
 
 use lib\App;
-use lib\classes\Template;
 use lib\core\classes\Configuration;
+use lib\core\classes\Template;
 use lib\helper\HtmlHelper;
 
 $actor = App::$curr_actor;
@@ -73,7 +73,7 @@ $view_content = ( $view instanceof Template) ? $view->parse() : $view;
 						</li>
 					<?php else: ?>
 						<li>
-							<a href="https://www.harmonix.de">www-Bereich</a>
+							<a href="https://www.<?= App::$config->getSectionValue("system", "domain_name") ?>">www-Bereich</a>
 						</li>
 						<li>
 							<form action="/" method="POST">

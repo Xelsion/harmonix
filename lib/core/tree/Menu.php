@@ -1,5 +1,5 @@
 <?php
-namespace lib\classes\tree;
+namespace lib\core\tree;
 
 use Exception;
 use lib\App;
@@ -66,11 +66,10 @@ class Menu extends TreeWalker {
         try {
             $children = $this->getChildrenOf($parent_id);
             if( !empty($children) ) {
-                //$router = App::getInstanceOf(Router::class);
                 $html .= '<ul>';
                 foreach( $children as $child ) {
                     $route = $this->router->getRouteFor($child->target);
-                    if( App::$auth->hasAccessTo($route["controller"], $route["method"]) ) {
+                    if( isset($route["controller"], $route["method"]) && App::$auth->hasAccessTo($route["controller"], $route["method"]) ) {
                         $has_children = $this->hasChildren($child->id);
                         $class = ($has_children) ? "contains-children" : "";
                         $html .= '<li class="' . $class . '">';

@@ -6,9 +6,12 @@ use Exception;
 use lib\App;
 use lib\core\classes\Configuration;
 use lib\core\ConnectionManager;
+use lib\core\database\QueryBuilder;
 use lib\core\exceptions\SystemException;
 use lib\helper\StringHelper;
 use models\entities\Session;
+use repositories\ActorRepository;
+use repositories\MVCRepository;
 
 /**
  * The SessionModel
@@ -17,6 +20,10 @@ use models\entities\Session;
  * @version 1.0.0;
  */
 class SessionModel extends Session {
+
+    private readonly MVCRepository $mvc_repository;
+
+    public bool $_rotate_session = false;
 
     // Defines if the cookie will be encrypted or not
     public bool $encryption = false;
@@ -47,12 +54,18 @@ class SessionModel extends Session {
      * Initializes the cookie settings from the configuration
      *
      * @param Configuration $config
+     * @throws SystemException
      */
     public function __construct( Configuration $config ) {
-        parent::__construct($config);
-        $this->cookie_domain = StringHelper::getDomain();
+        $this->mvc_repository = App::getInstanceOf(MVCRepository::class);
 
         $cookie_settings = $config->getSection("cookie");
+        $rotate_session = $config->getSectionValue("security", "rotate_session");
+        if( !is_null($rotate_session) ) {
+            $this->_rotate_session = (bool)$rotate_session;
+        }
+
+        $this->cookie_domain = StringHelper::getDomain();
         if( !empty($cookie_settings) ) {
             if( isset($cookie_settings["name"]) ) {
                 $this->cookie_name = $cookie_settings["name"];
@@ -68,6 +81,32 @@ class SessionModel extends Session {
             }
         }
         $this->encryption = (bool)$config->getSectionValue("security", "encrypted_session");
+    }
+
+    /**
+     * @param string $session_id
+     * @return void
+     * @throws SystemException
+     */
+    public function init( string $session_id ): void {
+        if( $session_id === "" ) {
+            return;
+        }
+
+        try {
+            $session_data = $this->mvc_repository->getSessionAsArray($session_id);
+            if( !empty($session_data) ) {
+                $this->id = $session_data["id"];
+                $this->actor_id = (int)$session_data["actor_id"];
+                $this->as_actor = (int)$session_data["as_actor"];
+                $this->ip = $session_data["ip"];
+                $this->expired = $session_data["expired"];
+                $this->created = $session_data["created"];
+                $this->updated = ( $session_data["updated"] !== "" ) ? $session_data["updated"] : null;
+            }
+        } catch( Exception $e ) {
+            throw new SystemException(__FILE__, __LINE__, $e->getMessage(), $e->getCode(), $e->getPrevious());
+        }
     }
 
     /**
@@ -87,8 +126,7 @@ class SessionModel extends Session {
                 $this->ip = $_SERVER["REMOTE_ADDR"];
                 $this->expired = $date_time->format("Y-m-d H:i:s");
                 $actor = App::getInstanceOf(ActorModel::class, null, ["id" => $this->actor_id]);
-
-                $this->update();
+                $this->mvc_repository->updateSession($this);
                 $this->writeCookie();
             }
             return $actor;
@@ -107,31 +145,25 @@ class SessionModel extends Session {
      * @throws \lib\core\exceptions\SystemException
      */
 	public function login( string $email, string $password ): bool {
+        $permanent = (App::$request->contains("permanent_login") && App::$request->get("permanent_login") === "yes");
         try {
-            $permanent = ( array_key_exists("permanent_login", $_POST) && $_POST["permanent_login"] === "yes");
-            $cm = App::getInstanceOf(ConnectionManager::class);
-            $pdo = $cm->getConnection("mvc");
-            $pdo->prepareQuery("SELECT id, password FROM actors WHERE email=:email AND deleted IS NULL AND login_disabled=0");
-            $pdo->bindParam(":email", $email);
-            $stmt = $pdo->execute();
-            if( $stmt->rowCount() === 1 ) {
-                $result = $stmt->fetch();
-                if( password_verify($password, $result["password"]) ) {
-                    $session_id = StringHelper::getGuID();
-                    $date_time = new DateTime();
-                    if( $permanent ) {
-                        $date_time->modify("+".$this->cookie_lifetime." minutes");
-                    } else {
-                        $date_time->modify("+1 year");
-                    }
-                    $this->id = $session_id;
-                    $this->actor_id = (int)$result["id"];
-                    $this->ip = $_SERVER["REMOTE_ADDR"];
-                    $this->expired = $date_time->format("Y-m-d H:i:s");
-                    $this->create();
-                    $this->writeCookie();
-                    return true;
+            $actor_repository = App::getInstanceOf(ActorRepository::class);
+            $actor = $actor_repository->getByLogin($email);
+            if( $actor->id > 0 && password_verify($password, $actor->password) ) {
+                $session_id = StringHelper::getGuID();
+                $date_time = new DateTime();
+                if( $permanent ) {
+                    $date_time->modify("+".$this->cookie_lifetime." minutes");
+                } else {
+                    $date_time->modify("+1 year");
                 }
+                $this->id = $session_id;
+                $this->actor_id = $actor->id;
+                $this->ip = $_SERVER["REMOTE_ADDR"];
+                $this->expired = $date_time->format("Y-m-d H:i:s");
+                $this->mvc_repository->createSession($this);
+                $this->writeCookie();
+                return true;
             }
             $this->error = "E-Mail/Password is incorrect!";
             return false;
@@ -151,16 +183,17 @@ class SessionModel extends Session {
         try {
             if( $this->as_actor > 0 ) {
                 $this->as_actor = 0;
-                $this->update();
+                $this->mvc_repository->updateSession($this);
                 $this->writeCookie();
             } else {
-                $session_id = ($this->encryption)
+                $session_id = ( $this->encryption )
                     ? StringHelper::decrypt($_COOKIE[$this->cookie_name])
-                    : $_COOKIE[$this->cookie_name];
+                    : $_COOKIE[$this->cookie_name]
+                ;
                 if( isset($_COOKIE[$this->cookie_name]) && $session_id === $this->id ) {
                     $date_time = new DateTime();
                     $date_time->setTimestamp(time() - 3600);
-                    $this->delete();
+                    $this->mvc_repository->deleteSession($this);
                     $this->actor_id = 0;
                     $this->expired = $date_time->format('Y-m-d H:i:s');
                     $this->writeCookie();
@@ -179,9 +212,10 @@ class SessionModel extends Session {
      */
     public function writeCookie(): void {
         $date_time = DateTime::createFromFormat("Y-m-d H:i:s", $this->expired);
-        $session_id = ($this->encryption)
+        $session_id = ( $this->encryption )
             ? StringHelper::encrypt($this->id)
-            : $this->id;
+            : $this->id
+        ;
         $cookie_options = array(
             'expires' => $date_time->getTimestamp(),
             'path'    => $this->cookie_path,

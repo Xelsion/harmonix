@@ -3,6 +3,7 @@ namespace lib\core;
 
 use lib\core\classes\KeyValuePairs;
 use lib\core\exceptions\SystemException;
+use lib\helper\HtmlHelper;
 
 /**
  * The Request Type setAsSingleton
@@ -11,12 +12,11 @@ use lib\core\exceptions\SystemException;
  * @author Markus Schröder <xelsion@gmail.com>
  * @version 1.0.0;
  */
-class Request {
+class Request extends KeyValuePairs {
 
     private string $request_uri;
     private string $request_method;
-	// GET, POST & FILES data from the request
-	private array $form;
+
     private array $files;
 
     /**
@@ -25,26 +25,28 @@ class Request {
      * calls the method initController()
      * @throws \lib\core\exceptions\SystemException
      */
-	public function __construct( public KeyValuePairs $data ) {
-        //$this->data = App::getInstanceOf(KeyValuePairs::class);
+	public function __construct() {
 
         $this->request_uri = $_SERVER["REQUEST_URI"]??"";
         $this->request_method = $_SERVER['REQUEST_METHOD']??"";
 
-        if( isset($_SESSION["csrf_token"]) && isset($_POST['csrf_token']) ) {
-            if( $_POST['csrf_token'] && $_SESSION["csrf_token"] ) {
-                foreach( $_GET as $key => $value ) {
-                    $this->form[$key] = $value;
-                    $this->data->set($key, $value);
-                }
-                foreach( $_POST as $key => $value ) {
-                    $this->form[$key] = $value;
-                    $this->data->set($key, $value);
-                }
-                foreach( $_FILES as $key => $value ) {
-                    $this->files[$key] = $value;
-                    $this->data->set($key, $value);
-                }
+        $accept_input = true;
+        if( isset($_POST['csrf_token']) ) {
+            if( !HtmlHelper::validateFormToken($_POST['csrf_token'])) {
+                $accept_input = false;
+            }
+            HtmlHelper::deleteFormToken();
+        }
+
+        if( $accept_input ) {
+            foreach( $_GET as $key => $value ) {
+                $this->set($key, $value);
+            }
+            foreach( $_POST as $key => $value ) {
+                $this->set($key, $value);
+            }
+            foreach( $_FILES as $key => $value ) {
+                $this->set($key, $value);
             }
         }
 	}
@@ -85,47 +87,6 @@ class Request {
 	public function getRemoteIP(): string {
 		return $_SERVER["REMOTE_ADDR"];
 	}
-
-	/**
-	 * Returns all submitted key => value pairs
-	 *
-	 * @return array
-	 */
-	public function getPosts(): array {
-		return $this->form;
-	}
-
-    /**
-     * Returns all submitted key => value pairs
-     *
-     * @return array
-     */
-    public function getFiles(): array {
-        return $this->files;
-    }
-
-    /**
-     * Returns the value from the submitted pairs
-     * by its key
-     *
-     * @param string $key
-     *
-     * @return mixed
-     */
-	public function get( string $key ): mixed {
-		return $this->form[$key] ?? null;
-	}
-
-    /**
-     * Returns if a key exists in the form data
-     *
-     * @param string $key
-     *
-     * @return bool
-     */
-    public function has( string $key ): bool {
-        return isset($this->form[$key]);
-    }
 
 	/**
 	 * Split the requested uri into parts and

@@ -2,15 +2,13 @@
 
 use lib\App;
 
-$menu = App::getInstanceOf(\lib\classes\tree\Menu::class);
+$menu = App::getInstanceOf(\lib\core\tree\Menu::class);
 $menu->insertMenuItem(100, null, "Home", "/");
 
 $menu->insertMenuItem(200, null, "Benutzer", "/actors");
 $menu->insertMenuItem(201, 200, "Benutzer erstellen", "/actors/create");
 $menu->insertMenuItem(210, 200, "Benutzer-Typen", "/actor-types");
 $menu->insertMenuItem(211, 210, "Benutzer-Typ erstellen", "/actor-types/create");
-$menu->insertMenuItem(220, 200, "Verbindungen", "/data-connections");
-$menu->insertMenuItem(221, 220, "Verbindungen erstellen", "/data-connections/create");
 
 $menu->insertMenuItem(300, null, "Rollen", "/actor-roles");
 $menu->insertMenuItem(310, 300, "Rolle erstellen", "/actor-roles/create");

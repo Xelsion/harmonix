@@ -1,7 +1,5 @@
 <?php
-namespace lib\classes;
-
-use lib\core\classes\KeyValuePairs;
+namespace lib\core\classes;
 
 /**
  * This class can hold key => value pairs that
@@ -26,6 +24,10 @@ class TemplateData {
         "script" => array()
     );
 
+    /**
+     * The class constructor
+     *
+     */
     public function __construct() {
 
     }

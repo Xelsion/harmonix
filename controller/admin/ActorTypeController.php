@@ -2,16 +2,32 @@
 namespace controller\admin;
 
 use lib\App;
-use lib\classes\Template;
 use lib\core\attributes\Route;
 use lib\core\blueprints\AController;
 use lib\core\blueprints\AResponse;
+use lib\core\classes\Configuration;
+use lib\core\classes\Template;
 use lib\core\exceptions\SystemException;
 use lib\core\response_types\HtmlResponse;
 use models\ActorTypeModel;
+use repositories\ActorTypeRepository;
 
 #[Route("actor-types")]
 class ActorTypeController extends AController {
+
+
+    private readonly ActorTypeRepository $type_repository;
+
+    /**
+     * @param ActorTypeRepository $type_repository
+     * @param Configuration $config
+     */
+    public function __construct(ActorTypeRepository $type_repository,
+                                Configuration       $config
+    ) {
+        parent::__construct($config);
+        $this->type_repository = $type_repository;
+    }
 
     /**
      * Get a list of all actor types
@@ -24,7 +40,7 @@ class ActorTypeController extends AController {
     #[Route("")]
     public function index(): AResponse {
         $view = new Template(PATH_VIEWS."actor_types/index.html");
-        $view->set('result_list', ActorTypeModel::find());
+        $view->set('result_list', $this->type_repository->getAll());
 
         $template = new Template(PATH_VIEWS."template.html");
         $template->set("view", $view->parse());
@@ -43,16 +59,16 @@ class ActorTypeController extends AController {
             redirect("/error/403");
         }
 
-        if( App::$request->data->contains('cancel') ) {
+        if( App::$request->contains('cancel') ) {
             redirect("/actor-types");
         }
 
-        if( App::$request->data->contains("create") ) {
+        if( App::$request->contains("create") ) {
             $is_valid = $this->postIsValid();
             if( $is_valid ) {
                 $actor_type = App::getInstanceOf(ActorTypeModel::class);
-                $actor_type->name = App::$request->data->get("name");
-                $actor_type->create();
+                $actor_type->name = App::$request->get("name");
+                $this->type_repository->createObject($actor_type);
                 redirect("/actor-types");
             }
         }
@@ -80,15 +96,15 @@ class ActorTypeController extends AController {
             redirect("/error/403");
         }
 
-        if( App::$request->data->contains('cancel') ) {
+        if( App::$request->contains('cancel') ) {
             redirect("/actor-types");
         }
 
-        if( App::$request->data->contains('update') ) {
+        if( App::$request->contains('update') ) {
             $is_valid = $this->postIsValid();
             if( $is_valid ) {
-                $actor_type->name = App::$request->data->get('name');
-                $actor_type->update();
+                $actor_type->name = App::$request->get('name');
+                $this->type_repository->updateObject($actor_type);
                 redirect("/actor-types");
             }
         }
@@ -116,11 +132,10 @@ class ActorTypeController extends AController {
             redirect("/error/403");
         }
 
-        if( App::$request->data->contains('cancel') ) {
+        if( App::$request->contains('cancel') ) {
             redirect("/actors");
         }
-
-        $actor_type->delete();
+        $this->type_repository->deleteObject($actor_type);
         redirect("/actor-types");
         return new HtmlResponse();
     }
@@ -131,7 +146,7 @@ class ActorTypeController extends AController {
      * @return bool
      */
     private function postIsValid(): bool {
-        if( !App::$request->data->contains('name') || App::$request->data->get('name') === "" ) {
+        if( !App::$request->contains('name') || App::$request->get('name') === "" ) {
             return false;
         }
         return true;

@@ -8,55 +8,36 @@ namespace lib\core\classes;
  * @author Markus Schröder <xelsion@gmail.com>
  * @version 1.0.0;
  */
-class Analyser {
+class Analyser extends StopWatch {
 
     /* The timers */
-    private array $timers = array();
-
-    /**
-     * The class constructor
-     */
-    public function __construct() {
-
-    }
+    private array $entries = [];
 
     /**
      * Adds a time for the given key with the given label
      *
-     * @param string $key
-     * @param string $label
-     *
-     * @return void
+     * @param string $info
+     * @return Analyser
      */
-    public function addTimer(Timer $timer): void {
-        $this->timers[] = $timer;
-    }
-
-    /**
-     * Returns the timer for the given label or NULL
-     *
-     * @param string $label
-     *
-     * @return Timer|null
-     */
-    public function getTimerByLabel(string $label): ?Timer {
-        foreach( $this->timers as $timer ) {
-            if( $timer->getLabel() === $label ) {
-                return $timer;
-            }
+    public function add(string $info): Analyser {
+        if( $this->is_running ) {
+            $this->stop();
         }
-        return null;
+        $this->entries[] = [
+            "time" => $this->getMeasuredTime()->format("ms", 4),
+            "info" => $info,
+            "backtrace" => debug_backtrace()
+        ];
+        return $this;
     }
 
     /**
-     * Returns the timer for the given key or NULL
+     * Returns the entries
      *
-     * @param string $key
-     *
-     * @return Timer|null
+     * @return array
      */
-    public function getTimers(): array {
-        return $this->timers;
+    public function getEntries(): array {
+        return $this->entries;
     }
 
 }

@@ -26,20 +26,23 @@ class SessionAuth extends AMiddleware {
         }
 
         // do we have a login attempt?
-        if( App::$request->data->contains("login") && App::$request->data->contains("email") && App::$request->data->contains("password") ) {
-            $session->login(App::$request->data->get("email"), App::$request->data->get("password"));
+        if( App::$request->contains("login") && App::$request->contains("email") && App::$request->contains("password") ) {
+            $session->login(App::$request->get("email"), App::$request->get("password"));
         }
 
         // do we have a logout attempt?
-        if( App::$request->data->contains("logout") ) {
+        if( App::$request->contains("logout") ) {
             $session->logout();
         }
 
         $actor = $session->getActor();
 
         // only developer can log in as any actor
-        if( ActorModel::isDeveloper($actor->id) && ($session->as_actor > 0 || (App::$request->data->contains("login_as") && App::$request->data->contains("actor_id")))  ) {
-            $session->as_actor = (int)App::$request->data->get("actor_id");
+        if( $actor->isDeveloper() && ($session->as_actor > 0 || (App::$request->contains("login_as") && App::$request->contains("actor_id")))  ) {
+            $session->as_actor = ( App::$request->contains("login_as") )
+                ? (int)App::$request->get("actor_id")
+                : $session->as_actor
+            ;
             $session->update();
             $session->writeCookie();
             $actor = App::getInstanceOf(ActorModel::class, null, ["id" => $session->as_actor]);

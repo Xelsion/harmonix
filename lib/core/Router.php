@@ -6,6 +6,7 @@ use lib\App;
 use lib\core\attributes\Route;
 use lib\core\blueprints\AController;
 use lib\core\exceptions\SystemException;
+use ReflectionAttribute;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionMethod;
@@ -21,6 +22,7 @@ class Router {
 
 	// the instance of this class
 	private static ?Router $instance = null;
+
 	// the collection of the collected controllers
 	private array $routes = array();
 
@@ -55,7 +57,7 @@ class Router {
                 $controller = App::getInstanceOf($class);
                 if( $controller instanceof AController ) {
                     $reflection = new ReflectionClass($controller::class);
-                    $class_attributes = $reflection->getAttributes(Route::class);
+                    $class_attributes = $reflection->getAttributes(Route::class, ReflectionAttribute::IS_INSTANCEOF);
                     $class_path = "";
                     if( !empty($class_attributes) ) {
                         foreach($class_attributes as $attr ) {
@@ -65,13 +67,13 @@ class Router {
                     }
 
                     foreach( $reflection->getMethods() as $method) {
-                        $method_attributes = $method->getAttributes(Route::class);
+                        $method_attributes = $method->getAttributes(Route::class, ReflectionAttribute::IS_INSTANCEOF);
                         if( !empty($method_attributes) ) {
                             foreach( $method_attributes as $attr ) {
                                 $route = $attr->newInstance();
                                 $method_path = $route->path;
                                 $route->path = $this->getClearedRoutePath($class_path . "/" . $method_path);
-                                $this->addRoute($sub_domain, $route, $controller::class, $method->getName());
+                                $this->addRoute( $sub_domain, $route, $controller::class, $method->getName() );
                             }
                         }
                     }
@@ -116,13 +118,18 @@ class Router {
      * @throws \lib\core\exceptions\SystemException
      */
 	public function addRoute( string $sub_domain, Route $route, string $class, ?string $method = null ): void {
-		if( !isset($this->routes[$sub_domain][$route->path]) ) {
+		if( !isset($this->routes[$sub_domain][$route->method][$route->path]) ) {
 			if( is_null($method) ) {
 				$method = "index";
 			}
             $regex = str_replace("/" , "\/", $route->path);
             $regex = preg_replace("/{[a-zA-Z|_-]+}/", "([\w|0-9]+)", $regex);
-			$this->routes[$sub_domain][$route->path] = array( "controller" => $class, 'method' => $method, 'regex' => $regex );
+            if( $route->method === "ALL"){
+                $this->routes[$sub_domain]["GET"][$route->path] = array( "controller" => $class, 'method' => $method, 'regex' => $regex );
+                $this->routes[$sub_domain]["POST"][$route->path] = array( "controller" => $class, 'method' => $method, 'regex' => $regex );
+            } else {
+                $this->routes[$sub_domain][$route->method][$route->path] = array( "controller" => $class, 'method' => $method, 'regex' => $regex );
+            }
 		} else {
 			throw new SystemException(__FILE__, __LINE__,"Router: The route [".$route->path."] is already taken");
 		}
@@ -137,7 +144,7 @@ class Router {
      */
 	public function hasRoute( string $path ): bool {
         $request_method = App::$request->getRequestMethod();
-		if( isset($this->routes[SUB_DOMAIN][$path]) ) {
+		if( isset($this->routes[SUB_DOMAIN][$request_method][$path]) ) {
 			return true;
 		}
 		$matches = preg_grep("/^".preg_quote($path, '/')."/i", array_keys($this->routes[SUB_DOMAIN][$request_method]));
@@ -157,7 +164,7 @@ class Router {
      * @throws SystemException
      */
 	public function getRoute( Request $request ): ?array {
-        return $this->getRouteArray($request->getRequestUri());
+        return $this->getRouteArray($request->getRequestUri(), $request->getRequestMethod());
 	}
 
     /**
@@ -183,11 +190,18 @@ class Router {
      */
     public function getSortedRoutes(): array {
         $sorted_routes = array();
-        foreach( $this->routes as $domain => $methods) {
-            foreach( $methods as $path => $settings) {
-                $controller = $settings["controller"];
-                $controller_method = $settings["method"];
-                $sorted_routes[$domain][$controller][$controller_method] = $path;
+        foreach( $this->routes as $domain => $request_methods) {
+            foreach( $request_methods as $request_method => $paths) {
+                foreach( $paths as $path => $settings ) {
+                    $controller = $settings["controller"];
+                    $controller_method = $settings["method"];
+                    if( isset($sorted_routes[$domain][$controller][$controller_method]) ) {
+                        $sorted_routes[$domain][$controller][$controller_method] = "[" . $request_method . "]" . $sorted_routes[$domain][$controller][$controller_method];
+                    } else {
+                        $sorted_routes[$domain][$controller][$controller_method] = "[" . $request_method . "] " . $path;
+                    }
+
+                }
             }
         }
         return $sorted_routes;
@@ -202,17 +216,21 @@ class Router {
      * @throws ReflectionException
      * @throws SystemException
      */
-    private function getRouteArray( string $request ): array {
+    private function getRouteArray( string $request, string $request_method = "GET"): array {
+        if( !isset($this->routes[SUB_DOMAIN][$request_method]) ) {
+            return array();
+        }
+
         // first check for static urls
-        if( array_key_exists( addcslashes($request, "/"), $this->routes ) ) {
-            $entry = $this->routes[SUB_DOMAIN][addcslashes($request, "/")];
+        if( array_key_exists( addcslashes($request, "/"), $this->routes[SUB_DOMAIN][$request_method] ) ) {
+            $entry = $this->routes[SUB_DOMAIN][$request_method][addcslashes($request, "/")];
             $controller = App::getInstanceOf($entry["controller"]);
             $controller_method = $entry["method"];
             return array( "controller" => $controller, "method" => $controller_method, "params" => array() );
         }
 
         // then check for dynamic urls
-        foreach( $this->routes[SUB_DOMAIN] as $path => $entry ) {
+        foreach( $this->routes[SUB_DOMAIN][$request_method] as $path => $entry ) {
             $matches = array();
             if( preg_match("/^".$entry["regex"]."$/i", $request, $matches) ) {
                 array_shift($matches);
@@ -226,7 +244,8 @@ class Router {
     }
 
     /**
-     * Clears the given path string from any unwanted characters and returns the cleared string
+     * formats the given path string to a valid route string and returns the cleared string
+     * Removes any unwanted characters like "//" or ending slashes or Add a starting slash if non exists
      *
      * @param string $path
      *
@@ -242,7 +261,6 @@ class Router {
         }
         return $route_path;
     }
-
 
     /**
      * Checks if the needed parameters of the controller method
@@ -313,7 +331,6 @@ class Router {
                 }
             }
         }
-
 
         // Check if we have a valid number of parameters.
         // If so return them

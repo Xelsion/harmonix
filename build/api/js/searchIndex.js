@@ -441,177 +441,177 @@ Search.appendIndex(
 		"summary": "",
 		"url": "classes/core-classes-Router.html#property__routes"
 	}, {
-		"fqsen": "\\lib\\classes\\Template",
+		"fqsen": "\\lib\\core\\classes\\Template",
 		"name": "Template",
 		"summary": "The\u0020Template\u0020class",
 		"url": "classes/core-classes-Template.html"
 	}, {
-		"fqsen": "\\lib\\classes\\Template\u003A\u003A__construct\u0028\u0029",
+		"fqsen": "\\lib\\core\\classes\\Template\u003A\u003A__construct\u0028\u0029",
 		"name": "__construct",
 		"summary": "The\u0020constructor\nSets\u0020the\u0020file\u0020path\u0020of\u0020the\u0020template\nThrows\u0020an\u0020exception\u0020if\u0020the\u0020file\u0020was\u0020not\u0020found",
 		"url": "classes/core-classes-Template.html#method___construct"
 	}, {
-		"fqsen": "\\lib\\classes\\Template\u003A\u003Aparse\u0028\u0029",
+		"fqsen": "\\lib\\core\\classes\\Template\u003A\u003Aparse\u0028\u0029",
 		"name": "parse",
 		"summary": "Includes\u0020the\u0020template\u0020file\u0020and\u0020returns\u0020its\u0020output",
 		"url": "classes/core-classes-Template.html#method_parse"
 	}, {
-		"fqsen": "\\lib\\classes\\Template\u003A\u003A\u0024_file_path",
+		"fqsen": "\\lib\\core\\classes\\Template\u003A\u003A\u0024_file_path",
 		"name": "_file_path",
 		"summary": "",
 		"url": "classes/core-classes-Template.html#property__file_path"
 	}, {
-		"fqsen": "\\lib\\classes\\TemplateData",
+		"fqsen": "\\lib\\core\\classes\\TemplateData",
 		"name": "TemplateData",
 		"summary": "This\u0020class\u0020can\u0020hold\u0020key\u0020\u003D\u003E\u0020value\u0020pairs\u0020that\nwill\u0020be\u0020shared\u0020by\u0020all\u0020used\u0020templates",
 		"url": "classes/core-classes-TemplateData.html"
 	}, {
-		"fqsen": "\\lib\\classes\\TemplateData\u003A\u003Aset\u0028\u0029",
+		"fqsen": "\\lib\\core\\classes\\TemplateData\u003A\u003Aset\u0028\u0029",
 		"name": "set",
 		"summary": "Adds\u0020a\u0020key\u0020\u003D\u003E\u0020value\u0020pair\u0020to\u0020the\u0020data\u0020storage",
 		"url": "classes/core-classes-TemplateData.html#method_set"
 	}, {
-		"fqsen": "\\lib\\classes\\TemplateData\u003A\u003Aget\u0028\u0029",
+		"fqsen": "\\lib\\core\\classes\\TemplateData\u003A\u003Aget\u0028\u0029",
 		"name": "get",
 		"summary": "Returns\u0020the\u0020value\u0020vom\u0020the\u0020data\u0020storage\u0020by\u0020the\u0020given\u0020key\nor\u0020null\u0020if\u0020the\u0020key\u0020was\u0020not\u0020found.",
 		"url": "classes/core-classes-TemplateData.html#method_get"
 	}, {
-		"fqsen": "\\lib\\classes\\TemplateData\u003A\u003AtoArray\u0028\u0029",
+		"fqsen": "\\lib\\core\\classes\\TemplateData\u003A\u003AtoArray\u0028\u0029",
 		"name": "toArray",
 		"summary": "Adds\u0020the\u0020value\u0020to\u0020an\u0020array\u0020the\u0020array\u0020\u0024name\u0020at\u0020\u0024index\u0020to\u0020the\u0020data\u0020storage",
 		"url": "classes/core-classes-TemplateData.html#method_toArray"
 	}, {
-		"fqsen": "\\lib\\classes\\TemplateData\u003A\u003AfromArray\u0028\u0029",
+		"fqsen": "\\lib\\core\\classes\\TemplateData\u003A\u003AfromArray\u0028\u0029",
 		"name": "fromArray",
 		"summary": "Returns\u0020the\u0020value\u0020from\u0020an\u0020array\u0020in\u0020the\u0020data\u0020storage\u0020by\u0020the\u0020given\u0020\u0024name\nand\u0020\u0024index\u0020or\u0020null\u0020if\u0020the\u0020key\u0020was\u0020not\u0020found.",
 		"url": "classes/core-classes-TemplateData.html#method_fromArray"
 	}, {
-		"fqsen": "\\lib\\classes\\TemplateData\u003A\u003A\u0024_data",
+		"fqsen": "\\lib\\core\\classes\\TemplateData\u003A\u003A\u0024_data",
 		"name": "_data",
 		"summary": "",
 		"url": "classes/core-classes-TemplateData.html#property__data"
 	}, {
-		"fqsen": "\\lib\\classes\\tree\\Menu",
+		"fqsen": "\\lib\\core\\tree\\Menu",
 		"name": "Menu",
 		"summary": "The\u0020Menu\u0020class\u0020extends\u0020Walker\nRepresents\u0020a\u0020tree\u0020structured\u0020Menu",
 		"url": "classes/core-classes-tree-Menu.html"
 	}, {
-		"fqsen": "\\lib\\classes\\tree\\Menu\u003A\u003AaddMenuItem\u0028\u0029",
+		"fqsen": "\\lib\\core\\tree\\Menu\u003A\u003AaddMenuItem\u0028\u0029",
 		"name": "addMenuItem",
 		"summary": "Adds\u0020a\u0020MenuItem\u0020the\u0020tree\u0020structure",
 		"url": "classes/core-classes-tree-Menu.html#method_addMenuItem"
 	}, {
-		"fqsen": "\\lib\\classes\\tree\\Menu\u003A\u003AinsertMenuItem\u0028\u0029",
+		"fqsen": "\\lib\\core\\tree\\Menu\u003A\u003AinsertMenuItem\u0028\u0029",
 		"name": "insertMenuItem",
 		"summary": "Created\u0020a\u0020new\u0020MenuItem\u0020and\u0020adds\u0020it\u0020to\u0020the\ntree\u0020structure",
 		"url": "classes/core-classes-tree-Menu.html#method_insertMenuItem"
 	}, {
-		"fqsen": "\\lib\\classes\\tree\\Menu\u003A\u003AgetAsHtml\u0028\u0029",
+		"fqsen": "\\lib\\core\\tree\\Menu\u003A\u003AgetAsHtml\u0028\u0029",
 		"name": "getAsHtml",
 		"summary": "Returns\u0020the\u0020menu\u0020as\u0020html\u0020\u003Cul\u003E\u003Cli\u003E\u0020string",
 		"url": "classes/core-classes-tree-Menu.html#method_getAsHtml"
 	}, {
-		"fqsen": "\\lib\\classes\\tree\\Menu\u003A\u003AbuildHtmlTree\u0028\u0029",
+		"fqsen": "\\lib\\core\\tree\\Menu\u003A\u003AbuildHtmlTree\u0028\u0029",
 		"name": "buildHtmlTree",
 		"summary": "builds\u0020the\u0020\u003Cul\u003E\u003Cli\u003E\u0020structure\u0020from\u0020the\u0020menu\u0020as\u0020tree",
 		"url": "classes/core-classes-tree-Menu.html#method_buildHtmlTree"
 	}, {
-		"fqsen": "\\lib\\classes\\tree\\MenuItem",
+		"fqsen": "\\lib\\core\\tree\\MenuItem",
 		"name": "MenuItem",
 		"summary": "The\u0020MenuItem\u0020class\u0020extends\u0020the\u0020Node\nCan\u0020be\u0020added\u0020to\u0020the\u0020Menu",
 		"url": "classes/core-classes-tree-MenuItem.html"
 	}, {
-		"fqsen": "\\lib\\classes\\tree\\MenuItem\u003A\u003A__construct\u0028\u0029",
+		"fqsen": "\\lib\\core\\tree\\MenuItem\u003A\u003A__construct\u0028\u0029",
 		"name": "__construct",
 		"summary": "The\u0020constructor\u0020creates\u0020a\u0020MenuItem",
 		"url": "classes/core-classes-tree-MenuItem.html#method___construct"
 	}, {
-		"fqsen": "\\lib\\classes\\tree\\MenuItem\u003A\u003AgetLink\u0028\u0029",
+		"fqsen": "\\lib\\core\\tree\\MenuItem\u003A\u003AgetLink\u0028\u0029",
 		"name": "getLink",
 		"summary": "Returns\u0020the\u0020target\u0020url\u0020in\u0020a\u0020html\u0020\u003Ca\u003E\u0020tag",
 		"url": "classes/core-classes-tree-MenuItem.html#method_getLink"
 	}, {
-		"fqsen": "\\lib\\classes\\tree\\MenuItem\u003A\u003A\u0024_target",
+		"fqsen": "\\lib\\core\\tree\\MenuItem\u003A\u003A\u0024_target",
 		"name": "_target",
 		"summary": "",
 		"url": "classes/core-classes-tree-MenuItem.html#property__target"
 	}, {
-		"fqsen": "\\lib\\classes\\tree\\TreeNode",
+		"fqsen": "\\lib\\core\\tree\\TreeNode",
 		"name": "Node",
 		"summary": "The\u0020Node\u0020class\nCan\u0020be\u0020added\u0020to\u0020the\u0020Tree\u0020Walker",
 		"url": "classes/core-classes-tree-Node.html"
 	}, {
-		"fqsen": "\\lib\\classes\\tree\\TreeNode\u003A\u003A__construct\u0028\u0029",
+		"fqsen": "\\lib\\core\\tree\\TreeNode\u003A\u003A__construct\u0028\u0029",
 		"name": "__construct",
 		"summary": "The\u0020constructor\u0020creates\u0020a\u0020Node",
 		"url": "classes/core-classes-tree-Node.html#method___construct"
 	}, {
-		"fqsen": "\\lib\\classes\\tree\\TreeNode\u003A\u003A\u0024_id",
+		"fqsen": "\\lib\\core\\tree\\TreeNode\u003A\u003A\u0024_id",
 		"name": "_id",
 		"summary": "",
 		"url": "classes/core-classes-tree-Node.html#property__id"
 	}, {
-		"fqsen": "\\lib\\classes\\tree\\TreeNode\u003A\u003A\u0024_child_of",
+		"fqsen": "\\lib\\core\\tree\\TreeNode\u003A\u003A\u0024_child_of",
 		"name": "_child_of",
 		"summary": "",
 		"url": "classes/core-classes-tree-Node.html#property__child_of"
 	}, {
-		"fqsen": "\\lib\\classes\\tree\\TreeNode\u003A\u003A\u0024_name",
+		"fqsen": "\\lib\\core\\tree\\TreeNode\u003A\u003A\u0024_name",
 		"name": "_name",
 		"summary": "",
 		"url": "classes/core-classes-tree-Node.html#property__name"
 	}, {
-		"fqsen": "\\lib\\classes\\tree\\TreeWalker",
+		"fqsen": "\\lib\\core\\tree\\TreeWalker",
 		"name": "Walker",
 		"summary": "The\u0020Walker\u0020class\nAllows\u0020to\u0020navigate\u0020to\u0020a\u0020Tree\u0020structure\u0020represented\u0020by\u0020an\u0020array",
 		"url": "classes/core-classes-tree-Walker.html"
 	}, {
-		"fqsen": "\\lib\\classes\\tree\\TreeWalker\u003A\u003A__construct\u0028\u0029",
+		"fqsen": "\\lib\\core\\tree\\TreeWalker\u003A\u003A__construct\u0028\u0029",
 		"name": "__construct",
 		"summary": "The\u0020constructor",
 		"url": "classes/core-classes-tree-Walker.html#method___construct"
 	}, {
-		"fqsen": "\\lib\\classes\\tree\\TreeWalker\u003A\u003AaddNode\u0028\u0029",
+		"fqsen": "\\lib\\core\\tree\\TreeWalker\u003A\u003AaddNode\u0028\u0029",
 		"name": "addNode",
 		"summary": "Adds\u0020a\u0020Node\u0020to\u0020the\u0020Tree\u0020structure",
 		"url": "classes/core-classes-tree-Walker.html#method_addNode"
 	}, {
-		"fqsen": "\\lib\\classes\\tree\\TreeWalker\u003A\u003AgetNode\u0028\u0029",
+		"fqsen": "\\lib\\core\\tree\\TreeWalker\u003A\u003AgetNode\u0028\u0029",
 		"name": "getNode",
 		"summary": "Returns\u0020a\u0020node\u0020by\u0020the\u0020given\u0020id\u0020or\u0020null\u0020if\nthe\u0020node\u0020was\u0020not\u0020found",
 		"url": "classes/core-classes-tree-Walker.html#method_getNode"
 	}, {
-		"fqsen": "\\lib\\classes\\tree\\TreeWalker\u003A\u003AhasChildren\u0028\u0029",
+		"fqsen": "\\lib\\core\\tree\\TreeWalker\u003A\u003AhasChildren\u0028\u0029",
 		"name": "hasChildren",
 		"summary": "Returns\u0020true\u0020id\u0020the\u0020node\u0020by\u0020the\u0020given\u0020id\u0020das\nany\u0020child\u0020nodes",
 		"url": "classes/core-classes-tree-Walker.html#method_hasChildren"
 	}, {
-		"fqsen": "\\lib\\classes\\tree\\TreeWalker\u003A\u003AgetParentOf\u0028\u0029",
+		"fqsen": "\\lib\\core\\tree\\TreeWalker\u003A\u003AgetParentOf\u0028\u0029",
 		"name": "getParentOf",
 		"summary": "Returns\u0020the\u0020parent\u0020node\u0020of\u0020the\u0020node\u0020with\u0020the\u0020given\nid\u0020or\u0020null\u0020if\u0020it\u0020has\u0020no\u0020parent",
 		"url": "classes/core-classes-tree-Walker.html#method_getParentOf"
 	}, {
-		"fqsen": "\\lib\\classes\\tree\\TreeWalker\u003A\u003AgetChildrenOf\u0028\u0029",
+		"fqsen": "\\lib\\core\\tree\\TreeWalker\u003A\u003AgetChildrenOf\u0028\u0029",
 		"name": "getChildrenOf",
 		"summary": "Returns\u0020all\u0020child\u0020nodes\u0020of\u0020the\u0020node\u0020with\u0020the\u0020given\u0020id\nor\u0020an\u0020empty\u0020array\u0020if\u0020it\u0020has\u0020none",
 		"url": "classes/core-classes-tree-Walker.html#method_getChildrenOf"
 	}, {
-		"fqsen": "\\lib\\classes\\tree\\TreeWalker\u003A\u003AgetAncestorsOf\u0028\u0029",
+		"fqsen": "\\lib\\core\\tree\\TreeWalker\u003A\u003AgetAncestorsOf\u0028\u0029",
 		"name": "getAncestorsOf",
 		"summary": "Returns\u0020all\u0020ancestor\u0020nodes\u0020of\u0020the\u0020node\u0020with\u0020the\u0020given\u0020id\nor\u0020an\u0020empty\u0020array\u0020if\u0020it\u0020has\u0020none",
 		"url": "classes/core-classes-tree-Walker.html#method_getAncestorsOf"
 	}, {
-		"fqsen": "\\lib\\classes\\tree\\TreeWalker\u003A\u003AgetSiblingsOf\u0028\u0029",
+		"fqsen": "\\lib\\core\\tree\\TreeWalker\u003A\u003AgetSiblingsOf\u0028\u0029",
 		"name": "getSiblingsOf",
 		"summary": "Returns\u0020all\u0020sibling\u0020nodes\u0020of\u0020the\u0020node\u0020with\u0020the\u0020given\u0020id\nor\u0020an\u0020empty\u0020array\u0020if\u0020it\u0020has\u0020none.",
 		"url": "classes/core-classes-tree-Walker.html#method_getSiblingsOf"
 	}, {
-		"fqsen": "\\lib\\classes\\tree\\TreeWalker\u003A\u003AgetDescendantsOf\u0028\u0029",
+		"fqsen": "\\lib\\core\\tree\\TreeWalker\u003A\u003AgetDescendantsOf\u0028\u0029",
 		"name": "getDescendantsOf",
 		"summary": "Returns\u0020all\u0020descendant\u0020nodes\u0020of\u0020the\u0020node\u0020with\u0020the\u0020given\u0020id\nor\u0020an\u0020empty\u0020array\u0020if\u0020it\u0020has\u0020none",
 		"url": "classes/core-classes-tree-Walker.html#method_getDescendantsOf"
 	}, {
-		"fqsen": "\\lib\\classes\\tree\\TreeWalker\u003A\u003A\u0024_nodes",
+		"fqsen": "\\lib\\core\\tree\\TreeWalker\u003A\u003A\u0024_nodes",
 		"name": "_nodes",
 		"summary": "",
 		"url": "classes/core-classes-tree-Walker.html#property__nodes"
@@ -806,10 +806,10 @@ Search.appendIndex(
 		"summary": "Returns\u0020all\u0020actors\u0020that\u0020mach\u0020the\u0020conditions",
 		"url": "classes/models-Actor.html#method_find"
 	}, {
-		"fqsen": "\\models\\Actor\u003A\u003AfindAll\u0028\u0029",
-		"name": "findAll",
+		"fqsen": "\\models\\Actor\u003A\u003Afind\u0028\u0029",
+		"name": "find",
 		"summary": "Returns\u0020all\u0020actors",
-		"url": "classes/models-Actor.html#method_findAll"
+		"url": "classes/models-Actor.html#method_find"
 	}, {
 		"fqsen": "\\models\\Actor\u003A\u003AgetRole\u0028\u0029",
 		"name": "getRole",
@@ -846,10 +846,10 @@ Search.appendIndex(
 		"summary": "",
 		"url": "classes/models-ActorPermission.html#method_find"
 	}, {
-		"fqsen": "\\models\\ActorPermission\u003A\u003AfindAll\u0028\u0029",
-		"name": "findAll",
+		"fqsen": "\\models\\ActorPermission\u003A\u003Afind\u0028\u0029",
+		"name": "find",
 		"summary": "",
-		"url": "classes/models-ActorPermission.html#method_findAll"
+		"url": "classes/models-ActorPermission.html#method_find"
 	}, {
 		"fqsen": "\\models\\ActorPermission\u003A\u003AgetRole\u0028\u0029",
 		"name": "getRole",
@@ -876,10 +876,10 @@ Search.appendIndex(
 		"summary": "",
 		"url": "classes/models-ActorRole.html#method_find"
 	}, {
-		"fqsen": "\\models\\ActorRole\u003A\u003AfindAll\u0028\u0029",
-		"name": "findAll",
+		"fqsen": "\\models\\ActorRole\u003A\u003Afind\u0028\u0029",
+		"name": "find",
 		"summary": "",
-		"url": "classes/models-ActorRole.html#method_findAll"
+		"url": "classes/models-ActorRole.html#method_find"
 	}, {
 		"fqsen": "\\models\\ActorRole\u003A\u003AgetParent\u0028\u0029",
 		"name": "getParent",

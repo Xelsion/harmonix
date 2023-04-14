@@ -95,9 +95,17 @@ class StringHelper {
 		return $result;
 	}
 
-    public static function getHighlighted( string $hl_part, string $string ): string {
+    /**
+     * Puts a <span> arround the given $needle in the given string and returns the
+     * result
+     *
+     * @param string $needle
+     * @param string $string
+     * @return string
+     */
+    public static function getHighlighted( string $needle, string $string ): string {
         $matches = array();
-        preg_match("/".$hl_part."/i", $string, $matches);
+        preg_match("/".$needle."/i", $string, $matches);
         if( empty($matches) ) {
             return $string;
         }
