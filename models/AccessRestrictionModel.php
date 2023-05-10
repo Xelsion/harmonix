@@ -3,11 +3,7 @@ namespace models;
 
 use Exception;
 use lib\App;
-use lib\core\ConnectionManager;
-use lib\core\database\QueryBuilder;
 use lib\core\exceptions\SystemException;
-use lib\helper\MySqlHelper;
-use PDO;
 use repositories\AccessRestrictionRepository;
 
 /**
@@ -43,7 +39,7 @@ class AccessRestrictionModel extends entities\AccessRestriction {
                     $this->deleted = ( $restriction_data["deleted"] !== "" ) ? $restriction_data["deleted"] : null;
                 }
             } catch ( Exception $e ) {
-                throw new SystemException($e->getFile(), $e->getLine(), $e->getMessage(), $e->getCode(), $e->getPrevious());
+                throw new SystemException(__FILE__, __LINE__, $e->getMessage(), $e->getCode(), $e->getPrevious());
             }
         }
     }

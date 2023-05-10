@@ -5,8 +5,6 @@ use DateTime;
 use Exception;
 use lib\App;
 use lib\core\classes\Configuration;
-use lib\core\ConnectionManager;
-use lib\core\database\QueryBuilder;
 use lib\core\exceptions\SystemException;
 use lib\helper\StringHelper;
 use models\entities\Session;
@@ -131,7 +129,7 @@ class SessionModel extends Session {
             }
             return $actor;
         } catch( Exception $e ) {
-            throw new SystemException($e->getFile(), $e->getLine(), $e->getMessage(), $e->getCode(), $e->getPrevious());
+            throw new SystemException(__FILE__, __LINE__, $e->getMessage(), $e->getCode(), $e->getPrevious());
         }
 	}
 
@@ -168,7 +166,7 @@ class SessionModel extends Session {
             $this->error = "E-Mail/Password is incorrect!";
             return false;
         } catch( Exception $e ) {
-            throw new SystemException($e->getFile(), $e->getLine(), $e->getMessage(), $e->getCode(), $e->getPrevious());
+            throw new SystemException(__FILE__, __LINE__, $e->getMessage(), $e->getCode(), $e->getPrevious());
         }
 	}
 
@@ -201,7 +199,7 @@ class SessionModel extends Session {
             }
             redirect("/");
         } catch( Exception $e ) {
-            throw new SystemException($e->getFile(), $e->getLine(), $e->getMessage(), $e->getCode(), $e->getPrevious());
+            throw new SystemException(__FILE__, __LINE__, $e->getMessage(), $e->getCode(), $e->getPrevious());
         }
 	}
 

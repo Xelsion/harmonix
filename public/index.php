@@ -17,7 +17,6 @@ use lib\middleware\SessionAuth;
 
 define("SUB_DOMAIN", explode(".", $_SERVER["HTTP_HOST"])[0]);
 const PATH_ROOT = "..".DIRECTORY_SEPARATOR;
-require_once(PATH_ROOT."vendor".DIRECTORY_SEPARATOR."autoload.php");
 
 require_once( "../constants.php" );
 require_once( "../functions.php" );
@@ -40,7 +39,7 @@ try {
     $app->run();
 
     // write the process results to the output buffer
-	echo $app->getResult();
+	echo $app->getResponseOutput();
 
     // print the output buffer and empty it
 	ob_end_flush();

@@ -7,7 +7,6 @@ use Exception;
 use lib\App;
 use lib\core\blueprints\ARepository;
 use lib\core\ConnectionManager;
-use lib\core\database\QueryBuilder;
 use lib\core\exceptions\SystemException;
 use lib\helper\StringHelper;
 use models\entities\Session;
@@ -21,7 +20,6 @@ use models\SessionModel;
  * @version 1.0.0
  */
 class MVCRepository extends ARepository {
-    private QueryBuilder $query_builder;
 
     /**
      * @throws SystemException
@@ -29,7 +27,6 @@ class MVCRepository extends ARepository {
     public function __construct() {
         $cm = App::getInstanceOf(ConnectionManager::class);
         $this->pdo = $cm->getConnection("mvc");
-        $this->query_builder = App::getInstanceOf(QueryBuilder::class, null, ["pdo" => $this->pdo]);
     }
 
     /**
@@ -39,14 +36,19 @@ class MVCRepository extends ARepository {
      */
     public function getSession( string $id ): SessionModel {
         try {
-            $this->query_builder->Select()
+            $session = $this->pdo->Select()
                 ->From("sessions")
                 ->Where("id=:id")
+                ->prepareStatement()
+                    ->withParam(':id', $id)
+                ->fetchMode(PDO::FETCH_CLASS, SessionModel::class)
+                ->execute()
+                ->fetch()
             ;
-            $this->pdo->useQuerybuilder($this->query_builder);
-            $this->pdo->bindParam(':id', $id);
-            $this->pdo->setFetchMode(PDO::FETCH_CLASS, SessionModel::class);
-            return $this->pdo->execute()->fetch();
+            if( !$session ) {
+                $session = new SessionModel( App::$config );
+            }
+            return $session;
         } catch( Exception $e ) {
             throw new SystemException(__FILE__, __LINE__, $e->getMessage(), $e->getCode(), $e->getPrevious());
         }
@@ -59,13 +61,18 @@ class MVCRepository extends ARepository {
      */
     public function getSessionAsArray( string $id ): array {
         try {
-            $this->query_builder->Select()
+            $result = $this->pdo->Select()
                 ->From("sessions")
                 ->Where("id=:id")
+                ->prepareStatement()
+                    ->withParam(':id', $id)
+                ->execute()
+                ->fetch()
             ;
-            $this->pdo->useQuerybuilder($this->query_builder);
-            $this->pdo->bindParam(':id', $id);
-            return $this->pdo->execute()->fetch();
+            if( !$result ) {
+                return array();
+            }
+            return $result;
         } catch( Exception $e ) {
             throw new SystemException(__FILE__, __LINE__, $e->getMessage(), $e->getCode(), $e->getPrevious());
         }
@@ -79,14 +86,15 @@ class MVCRepository extends ARepository {
      */
     public function createSession( SessionModel $session ): void {
         try {
-            $this->query_builder->Insert("sessions")
-                ->Columns(["id", "actor_id", "ip", "expired"]);
-            $this->pdo->useQuerybuilder($this->query_builder);
-            $this->pdo->bindParam(':id', $session->id);
-            $this->pdo->bindParam(':actor_id', $session->actor_id, PDO::PARAM_INT);
-            $this->pdo->bindParam(':ip', $session->ip);
-            $this->pdo->bindParam(':expired', $session->expired);
-            $this->pdo->execute();
+            $this->pdo->Insert("sessions")
+                ->Columns(["id", "actor_id", "ip", "expired"])
+                ->prepareStatement()
+                    ->withParam(':id', $session->id)
+                    ->withParam(':actor_id', $session->actor_id, PDO::PARAM_INT)
+                    ->withParam(':ip', $session->ip)
+                    ->withParam(':expired', $session->expired)
+                ->execute()
+            ;
         } catch( Exception $e ) {
             throw new SystemException(__FILE__, __LINE__, $e->getMessage(), $e->getCode(), $e->getPrevious());
         }
@@ -107,18 +115,18 @@ class MVCRepository extends ARepository {
             if( $session->_rotate_session ) {
                 $session->id = StringHelper::getGuID();
             }
-            $this->query_builder->Update("sessions")
+            $this->pdo->Update("sessions")
                 ->Set(["id", "actor_id", "as_actor", "ip", "expired"])
                 ->Where("id=:curr_id")
+                ->prepareStatement()
+                    ->withParam(':id', $session->id)
+                    ->withParam(':curr_id', $curr_id)
+                    ->withParam(':actor_id', $session->actor_id, PDO::PARAM_INT)
+                    ->withParam(':as_actor', $session->as_actor, PDO::PARAM_INT)
+                    ->withParam(':ip', $session->ip)
+                    ->withParam(':expired', $session->expired)
+                ->execute()
             ;
-            $this->pdo->useQuerybuilder($this->query_builder);
-            $this->pdo->bindParam(':id', $session->id);
-            $this->pdo->bindParam(':curr_id', $curr_id);
-            $this->pdo->bindParam(':actor_id', $session->actor_id, PDO::PARAM_INT);
-            $this->pdo->bindParam(':as_actor', $session->as_actor, PDO::PARAM_INT);
-            $this->pdo->bindParam(':ip', $session->ip);
-            $this->pdo->bindParam(':expired', $session->expired);
-            $this->pdo->execute();
         } catch( Exception $e ) {
             throw new SystemException(__FILE__, __LINE__, $e->getMessage(), $e->getCode(), $e->getPrevious());
         }
@@ -135,11 +143,13 @@ class MVCRepository extends ARepository {
         }
 
         try {
-            $this->query_builder->Delete("sessions")
-                ->Where("id=:id");
-            $this->pdo->useQuerybuilder($this->query_builder);
-            $this->pdo->bindParam(":id", $session->id, PDO::PARAM_INT);
-            $this->pdo->execute();
+            $this->pdo->Delete("sessions")
+                ->Where("id=:id")
+                ->prepareStatement()
+                    ->withParam(":id", $session->id)
+                ->fetchMode(PDO::FETCH_CLASS, Token::class)
+                ->execute()
+            ;
         } catch( Exception $e ) {
             throw new SystemException(__FILE__, __LINE__, $e->getMessage(), $e->getCode(), $e->getPrevious());
         }
@@ -152,14 +162,14 @@ class MVCRepository extends ARepository {
      */
     public function getToken( string $id ): Token {
         try {
-            $this->query_builder->Select()
+            return $this->pdo->Select()
                 ->From("tokens")
                 ->Where("id=:id")
+                ->prepareStatement()
+                    ->withParam(":id", $id)
+                ->fetchMode(PDO::FETCH_CLASS, Token::class)
+                ->execute()
             ;
-            $this->pdo->useQuerybuilder($this->query_builder);
-            $this->pdo->bindParam(":id", $id);
-            $this->pdo->setFetchMode(PDO::FETCH_CLASS, Token::class);
-            return $this->pdo->execute();
         } catch( Exception $e ) {
             throw new SystemException(__FILE__, __LINE__, $e->getMessage(), $e->getCode(), $e->getPrevious());
         }
@@ -172,13 +182,13 @@ class MVCRepository extends ARepository {
      */
     public function getTokenAsArray( string $id ): array {
         try {
-            $this->query_builder->Select()
+            return $this->pdo->Select()
                 ->From("tokens")
                 ->Where("id=:id")
+                ->prepareStatement()
+                    ->withParam(":id", $id)
+                ->execute()
             ;
-            $this->pdo->useQuerybuilder($this->query_builder);
-            $this->pdo->bindParam(":id", $id);
-            return $this->pdo->execute();
         } catch( Exception $e ) {
             throw new SystemException(__FILE__, __LINE__, $e->getMessage(), $e->getCode(), $e->getPrevious());
         }
@@ -191,13 +201,13 @@ class MVCRepository extends ARepository {
      */
     public function createToken( Token $token): void {
         try {
-            $this->query_builder->Insert("tokens")
+            $this->pdo->Insert("tokens")
                 ->Columns(["id", "expired"])
+                ->prepareStatement()
+                    ->withParam(":id", $token->id)
+                    ->withParam(":expired", $token->expired)
+                ->execute()
             ;
-            $this->pdo->useQuerybuilder($this->query_builder);
-            $this->pdo->bindParam(":id", $token->id);
-            $this->pdo->bindParam(":expired", $token->expired);
-            $this->pdo->execute();
         } catch( Exception $e ) {
             throw new SystemException(__FILE__, __LINE__, $e->getMessage(), $e->getCode(), $e->getPrevious());
         }
@@ -214,14 +224,14 @@ class MVCRepository extends ARepository {
         }
 
         try {
-            $this->query_builder->Update("tokens")
+            $this->pdo->Update("tokens")
                 ->Set(["expired"])
                 ->Where("id=:id")
+                ->prepareStatement()
+                    ->withParam(":id", $token->id)
+                    ->withParam(":expired", $token->expired)
+                ->execute()
             ;
-            $this->pdo->useQuerybuilder($this->query_builder);
-            $this->pdo->bindParam(":id", $token->id);
-            $this->pdo->bindParam(":expired", $token->expired);
-            $this->pdo->execute();
         } catch( Exception $e ) {
             throw new SystemException(__FILE__, __LINE__, $e->getMessage(), $e->getCode(), $e->getPrevious());
         }
@@ -238,12 +248,12 @@ class MVCRepository extends ARepository {
         }
 
         try {
-            $this->query_builder->Delete("tokens")
+            $this->pdo->Delete("tokens")
                 ->Where("id=:id")
+                ->prepareStatement()
+                    ->withParam(":id", $token->id)
+                ->execute()
             ;
-            $this->pdo->useQuerybuilder($this->query_builder);
-            $this->pdo->bindParam(":id", $token->id);
-            $this->pdo->execute();
         } catch( Exception $e ) {
             throw new SystemException(__FILE__, __LINE__, $e->getMessage(), $e->getCode(), $e->getPrevious());
         }

@@ -6,7 +6,6 @@ use Exception;
 use lib\App;
 use lib\core\blueprints\ARepository;
 use lib\core\ConnectionManager;
-use lib\core\database\QueryBuilder;
 use lib\core\exceptions\SystemException;
 use models\ActorRoleModel;
 use models\entities\ActorRole;
@@ -20,15 +19,12 @@ use PDO;
  */
 class ActorRoleRepository extends ARepository {
 
-    private QueryBuilder $query_builder;
-
     /**
      * @throws SystemException
      */
     public function __construct() {
         $cm = App::getInstanceOf(ConnectionManager::class);
         $this->pdo = $cm->getConnection("mvc");
-        $this->query_builder = App::getInstanceOf(QueryBuilder::class, null, ["pdo" => $this->pdo]);
     }
 
     /**
@@ -38,14 +34,19 @@ class ActorRoleRepository extends ARepository {
      */
     public function get(int $id ): ActorRoleModel {
         try {
-            $this->query_builder->Select()
+            $actor_role = $this->pdo->Select()
                 ->From("actor_roles")
                 ->Where("id=:id")
+                ->prepareStatement()
+                    ->withParam(":id", $id, PDO::PARAM_INT)
+                ->fetchMode(PDO::FETCH_CLASS, ActorRoleModel::class)
+                ->execute()
+                ->fetch()
             ;
-            $this->pdo->useQueryBuilder($this->query_builder);
-            $this->pdo->bindParam(":id", $id);
-            $this->pdo->setFetchMode(PDO::FETCH_CLASS, ActorRoleModel::class);
-            return $this->pdo->execute()->fetch();
+            if( !$actor_role ) {
+                $actor_role = new ActorRoleModel();
+            }
+            return $actor_role;
         } catch( Exception $e ) {
             throw new SystemException($e->getFile(), $e->getLine(), $e->getMessage(), $e->getCode(), $e->getPrevious());
         }
@@ -58,13 +59,18 @@ class ActorRoleRepository extends ARepository {
      */
     public function getAsArray(int $id ): array {
         try {
-            $this->query_builder->Select()
+            $actor_role = $this->pdo->Select()
                 ->From("actor_roles")
                 ->Where("id=:id")
+                ->prepareStatement()
+                    ->withParam(":id", $id, PDO::PARAM_INT)
+                ->execute()
+                ->fetch()
             ;
-            $this->pdo->useQueryBuilder($this->query_builder);
-            $this->pdo->bindParam(":id", $id);
-            return $this->pdo->execute()->fetch();
+            if( !$actor_role ) {
+                $actor_role = array();
+            }
+            return $actor_role;
         } catch( Exception $e ) {
             throw new SystemException($e->getFile(), $e->getLine(), $e->getMessage(), $e->getCode(), $e->getPrevious());
         }
@@ -76,11 +82,13 @@ class ActorRoleRepository extends ARepository {
      */
     public function getAll(): array {
         try {
-            $this->query_builder->Select()
-                ->From("actor_roles");
-            $this->pdo->useQueryBuilder($this->query_builder);
-            $this->pdo->setFetchMode(PDO::FETCH_CLASS, ActorRoleModel::class);
-            return $this->pdo->execute()->fetchAll();
+            return $this->pdo->Select()
+                ->From("actor_roles")
+                ->prepareStatement()
+                ->fetchMode(PDO::FETCH_CLASS, ActorRoleModel::class)
+                ->execute()
+                ->fetchAll()
+            ;
         } catch( Exception $e ) {
             throw new SystemException($e->getFile(), $e->getLine(), $e->getMessage(), $e->getCode(), $e->getPrevious());
         }
@@ -106,10 +114,12 @@ class ActorRoleRepository extends ARepository {
      * @throws SystemException
      */
     public function getNumRows(): int {
-        $this->query_builder->Select("COUNT(DISTINCT id)")->As("num_count")
-            ->From("actor_roles");
-        $this->pdo->useQueryBuilder($this->query_builder);
-        $result = $this->pdo->execute()->fetch();
+        $result = $this->pdo->Select("COUNT(DISTINCT id)")->As("num_count")
+            ->From("actor_roles")
+            ->prepareStatement()
+            ->execute()
+            ->fetch()
+        ;
         return (int)$result["num_count"];
     }
 
@@ -120,15 +130,16 @@ class ActorRoleRepository extends ARepository {
      */
     public function createObject(ActorRole $role ): void {
         try {
-            $this->query_builder->Insert("actor_roles")
-                ->Columns(["child_of", "name", "rights_all", "rights_group", "rights_own"]);
-            $this->pdo->useQueryBuilder($this->query_builder);
-            $this->pdo->bindParam(':child_of', $role->child_of, PDO::PARAM_INT);
-            $this->pdo->bindParam(':name', $role->name);
-            $this->pdo->bindParam(':rights_all', $role->rights_all, PDO::PARAM_INT);
-            $this->pdo->bindParam(':rights_group', $role->rights_group, PDO::PARAM_INT);
-            $this->pdo->bindParam(':rights_own', $role->rights_own, PDO::PARAM_INT);
-            $this->pdo->execute();
+            $this->pdo->Insert("actor_roles")
+                ->Columns(["child_of", "name", "rights_all", "rights_group", "rights_own"])
+                ->prepareStatement()
+                    ->withParam(':child_of', $role->child_of, PDO::PARAM_INT)
+                    ->withParam(':name', $role->name)
+                    ->withParam(':rights_all', $role->rights_all, PDO::PARAM_INT)
+                    ->withParam(':rights_group', $role->rights_group, PDO::PARAM_INT)
+                    ->withParam(':rights_own', $role->rights_own, PDO::PARAM_INT)
+                ->execute()
+            ;
             $role->id = $this->pdo->lastInsertId();
         } catch( Exception $e ) {
             throw new SystemException(__FILE__, __LINE__, $e->getMessage(), $e->getCode(), $e->getPrevious());
@@ -146,16 +157,18 @@ class ActorRoleRepository extends ARepository {
         }
 
         try {
-            $this->query_builder->Update("actor_roles")
-                ->Set(["child_of", "name", "rights_all", "rights_group", "rights_own"])->Where("id=:id");
-            $this->pdo->useQueryBuilder($this->query_builder);
-            $this->pdo->bindParam(':id', $role->id, PDO::PARAM_INT);
-            $this->pdo->bindParam(':child_of', $role->child_of, PDO::PARAM_INT);
-            $this->pdo->bindParam(':name', $role->name);
-            $this->pdo->bindParam(':rights_all', $role->rights_all, PDO::PARAM_INT);
-            $this->pdo->bindParam(':rights_group', $role->rights_group, PDO::PARAM_INT);
-            $this->pdo->bindParam(':rights_own', $role->rights_own, PDO::PARAM_INT);
-            $this->pdo->execute();
+            $this->pdo->Update("actor_roles")
+                ->Set(["child_of", "name", "rights_all", "rights_group", "rights_own"])
+                ->Where("id=:id")
+                ->prepareStatement()
+                    ->withParam(':id', $role->id, PDO::PARAM_INT)
+                    ->withParam(':child_of', $role->child_of, PDO::PARAM_INT)
+                    ->withParam(':name', $role->name)
+                    ->withParam(':rights_all', $role->rights_all, PDO::PARAM_INT)
+                    ->withParam(':rights_group', $role->rights_group, PDO::PARAM_INT)
+                    ->withParam(':rights_own', $role->rights_own, PDO::PARAM_INT)
+                ->execute()
+            ;
         } catch( Exception $e ) {
             throw new SystemException(__FILE__, __LINE__, $e->getMessage(), $e->getCode(), $e->getPrevious());
         }
@@ -172,11 +185,12 @@ class ActorRoleRepository extends ARepository {
         }
 
         try {
-            $this->query_builder->Delete("actor_roles")
-                ->Where("id=:id");
-            $this->pdo->useQueryBuilder($this->query_builder);
-            $this->pdo->bindParam(':id', $role->id, PDO::PARAM_INT);
-            $this->pdo->execute();
+            $this->pdo->Delete("actor_roles")
+                ->Where("id=:id")
+                ->prepareStatement()
+                    ->withParam(':id', $role->id, PDO::PARAM_INT)
+                ->execute()
+            ;
         } catch( Exception $e ) {
             throw new SystemException(__FILE__, __LINE__, $e->getMessage(), $e->getCode(), $e->getPrevious());
         }

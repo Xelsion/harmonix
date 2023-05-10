@@ -65,7 +65,6 @@ class Router {
                             $class_path = $class_route->path;
                         }
                     }
-
                     foreach( $reflection->getMethods() as $method) {
                         $method_attributes = $method->getAttributes(Route::class, ReflectionAttribute::IS_INSTANCEOF);
                         if( !empty($method_attributes) ) {
@@ -200,7 +199,6 @@ class Router {
                     } else {
                         $sorted_routes[$domain][$controller][$controller_method] = "[" . $request_method . "] " . $path;
                     }
-
                 }
             }
         }
@@ -257,7 +255,7 @@ class Router {
             $route_path = "/".$route_path;
         }
         if( $route_path !== "/" && str_ends_with($route_path, "/") ) {
-            $route_path = substr($route_path, 0, strlen($route_path) - 1);
+            $route_path = substr($route_path, 0, -1);
         }
         return $route_path;
     }
@@ -321,7 +319,7 @@ class Router {
                             if( $constructor_arg_type === "int" && !is_numeric($params[$i]) ) {
                                 throw new SystemException( __FILE__,__LINE__,"Router: Param type mismatch for method[".$controller."->".$method."]");
                             }
-                            if( $constructor_arg_type==="string" && !is_string($params[$i]) ) {
+                            if( $constructor_arg_type === "string" && !is_string($params[$i]) ) {
                                 throw new SystemException( __FILE__,__LINE__,"Router: Param type mismatch for method[".$controller."->".$method."]");
                             }
                             $result[$arg_name] = App::getInstanceOf($arg_type,null, ["id" => $params[$i]]);

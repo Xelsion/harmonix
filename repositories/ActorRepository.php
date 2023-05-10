@@ -8,7 +8,6 @@ use Exception;
 use lib\App;
 use lib\core\blueprints\ARepository;
 use lib\core\ConnectionManager;
-use lib\core\database\QueryBuilder;
 use lib\core\exceptions\SystemException;
 use lib\helper\StringHelper;
 use models\entities\Actor;
@@ -26,15 +25,12 @@ use models\ActorTypeModel;
  */
 class ActorRepository extends ARepository {
 
-    private QueryBuilder $query_builder;
-
     /**
      * @throws SystemException
      */
     public function __construct() {
         $cm = App::getInstanceOf(ConnectionManager::class);
         $this->pdo = $cm->getConnection("mvc");
-        $this->query_builder = App::getInstanceOf(QueryBuilder::class, null, ["pdo" => $this->pdo]);
     }
 
     /**
@@ -44,14 +40,19 @@ class ActorRepository extends ARepository {
      */
     public function get( int $id ) : ActorModel {
         try {
-            $this->query_builder->Select()
+            $actor = $this->pdo->Select()
                 ->From("actors")
                 ->Where("id=:id")
+                ->prepareStatement()
+                    ->withParam(":id", $id, PDO::PARAM_INT)
+                ->fetchMode(PDO::FETCH_INTO, App::getInstanceOf(ActorModel::class))
+                ->execute()
+                ->fetch()
             ;
-            $this->pdo->useQueryBuilder($this->query_builder);
-            $this->pdo->bindParam(":id", $id, PDO::PARAM_INT);
-            $this->pdo->setFetchMode(PDO::FETCH_INTO, App::getInstanceOf(ActorModel::class));
-            return $this->pdo->execute()->fetch();
+            if( !$actor ) {
+                $actor = new ActorModel();
+            }
+            return $actor;
         } catch ( Exception $e ) {
             throw new SystemException(__FILE__, __LINE__, $e->getMessage(), $e->getCode(), $e->getPrevious());
         }
@@ -64,13 +65,18 @@ class ActorRepository extends ARepository {
      */
     public function getAsArray( int $id ) : array {
         try {
-            $this->query_builder->Select()
+            $actor = $this->pdo->Select()
                 ->From("actors")
                 ->Where("id=:id")
+                ->prepareStatement()
+                    ->withParam(":id", $id, PDO::PARAM_INT)
+                ->execute()
+                ->fetch()
             ;
-            $this->pdo->useQueryBuilder($this->query_builder);
-            $this->pdo->bindParam(":id", $id, PDO::PARAM_INT);
-            return $this->pdo->execute()->fetch();
+            if( !$actor ) {
+                $actor = array();
+            }
+            return $actor;
         } catch ( Exception $e ) {
             throw new SystemException(__FILE__, __LINE__, $e->getMessage(), $e->getCode(), $e->getPrevious());
         }
@@ -83,16 +89,21 @@ class ActorRepository extends ARepository {
      */
     public function getByLogin( string $email ) : ActorModel {
         try {
-            $this->query_builder->Select()
+            $actor = $this->pdo->Select()
                 ->From("actors")
                 ->Where("email=:email")
                     ->And("login_disabled=0")
                     ->And("deleted")->isNull()
+                ->prepareStatement()
+                    ->withParam(":email", $email)
+                ->fetchMode(PDO::FETCH_CLASS, ActorModel::class)
+                ->execute()
+                ->fetch()
             ;
-            $this->pdo->useQueryBuilder($this->query_builder);
-            $this->pdo->bindParam(":email", $email);
-            $this->pdo->setFetchMode(PDO::FETCH_CLASS, ActorModel::class);
-            return $this->pdo->execute()->fetch();
+            if( !$actor ) {
+                $actor = new ActorModel();
+            }
+            return $actor;
         } catch ( Exception $e ) {
             throw new SystemException(__FILE__, __LINE__, $e->getMessage(), $e->getCode(), $e->getPrevious());
         }
@@ -106,12 +117,13 @@ class ActorRepository extends ARepository {
      */
     public function getAll(): array {
         try {
-            $this->query_builder->Select()
+            return $this->pdo->Select()
                 ->From("actors")
+                ->prepareStatement()
+                ->fetchMode(PDO::FETCH_CLASS, ActorModel::class)
+                ->execute()
+                ->fetchAll()
             ;
-            $this->pdo->useQueryBuilder($this->query_builder);
-            $this->pdo->setFetchMode(PDO::FETCH_CLASS, ActorModel::class);
-            return $this->pdo->execute()->fetchAll();
         } catch ( Exception $e ) {
             throw new SystemException(__FILE__, __LINE__, $e->getMessage(), $e->getCode(), $e->getPrevious());
         }
@@ -159,63 +171,66 @@ class ActorRepository extends ARepository {
             // do we have a loaded actor object?
             if( $actor->id > 0 ) {
                 // check role for the given domain, controller and method
-                $this->query_builder->Select("role_id")
+                $result = $this->pdo->Select("role_id")
                     ->From("access_permissions")
                     ->Where("actor_id=:actor_id")
                         ->And("domain=:domain")
                         ->And("controller=:controller")
                         ->And("method=:method=:method")
+                    ->prepareStatement()
+                        ->withParam(":actor_id", $actor->id, PDO::PARAM_INT)
+                        ->withParam(":domain", $domain)
+                        ->withParam(":controller", $controller)
+                        ->withParam(":method", $method)
+                    ->execute()
+                    ->fetch()
                 ;
-                $this->pdo->useQueryBuilder($this->query_builder);
-                $this->pdo->bindParam(":actor_id", $actor->id, PDO::PARAM_INT);
-                $this->pdo->bindParam(":domain", $domain);
-                $this->pdo->bindParam(":controller", $controller);
-                $this->pdo->bindParam(":method", $method);
-                $result = $this->pdo->execute()->fetch();
                 if( $result ) {
                     return App::getInstanceOf(ActorRoleModel::class, NULL, ["id" => (int)$result["role_id"]]);
                 }
 
                 // check role for the given domain and controller
-                $this->query_builder->Select("role_id")
+                $result = $this->pdo->Select("role_id")
                     ->From("access_permissions")
                     ->Where("actor_id=:actor_id")
                         ->And("domain=:domain")
                         ->And("controller=:controller")
+                    ->prepareStatement()
+                        ->withParam(":actor_id", $actor->id, PDO::PARAM_INT)
+                        ->withParam(":domain", $domain)
+                        ->withParam(":controller", $controller)
+                    ->execute()
+                    ->fetch()
                 ;
-                $this->pdo->useQueryBuilder($this->query_builder);
-                $this->pdo->bindParam(":actor_id", $actor->id, PDO::PARAM_INT);
-                $this->pdo->bindParam(":domain", $domain);
-                $this->pdo->bindParam(":controller", $controller);
-                $result = $this->pdo->execute()->fetch();
                 if( $result ) {
                     return App::getInstanceOf(ActorRoleModel::class, NULL, ["id" => (int)$result["role_id"]]);
                 }
 
                 // check role for the given domain
-                $this->query_builder->Select("role_id")
+                $result = $this->pdo->Select("role_id")
                     ->From("access_permissions")
                     ->Where("actor_id=:actor_id")
                         ->And("domain=:domain")
+                    ->prepareStatement()
+                        ->withParam(":actor_id", $actor->id, PDO::PARAM_INT)
+                        ->withParam(":domain", $domain)
+                    ->execute()
+                    ->fetch()
                 ;
-                $this->pdo->useQueryBuilder($this->query_builder);
-                $this->pdo->bindParam(":actor_id", $actor->id, PDO::PARAM_INT);
-                $this->pdo->bindParam(":domain", $domain);
-                $result = $this->pdo->execute()->fetch();
                 if( $result ) {
                     return App::getInstanceOf(ActorRoleModel::class, NULL, ["id" => (int)$result["role_id"]]);
                 }
-            }
-
-            // check for the default role
-            $this->query_builder->Select("id")
-                ->From("actor_roles")
-                ->Where("is_default=1")
-            ;
-            $this->pdo->useQueryBuilder($this->query_builder);
-            $result = $this->pdo->execute()->fetch();
-            if( $result ) {
-                return App::getInstanceOf(ActorRoleModel::class, NULL, ["id" => (int)$result["id"]]);
+            } else {
+                $result = $this->pdo->Select("id")
+                    ->From("actor_roles")
+                    ->Where("is_default=1")
+                    ->prepareStatement()
+                    ->execute()
+                    ->fetch()
+                ;
+                if( $result ) {
+                    return App::getInstanceOf(ActorRoleModel::class, NULL, ["id" => (int)$result["id"]]);
+                }
             }
 
             return App::getInstanceOf(ActorRoleModel::class);
@@ -234,14 +249,15 @@ class ActorRepository extends ARepository {
      */
     public function getActorPermissions( ActorModel $actor ): array {
         try {
-            $this->query_builder->Select()
+            return $this->pdo->Select()
                 ->From("access_permissions")
                 ->Where("actor_id=:actor_id")
+                ->prepareStatement()
+                    ->withParam(":actor_id", $actor->id, PDO::PARAM_INT)
+                ->fetchMode(PDO::FETCH_CLASS, AccessPermissionModel::class)
+                ->execute()
+                ->fetchAll()
             ;
-            $this->pdo->useQueryBuilder($this->query_builder);
-            $this->pdo->bindParam(":actor_id", $actor->id, PDO::PARAM_INT);
-            $this->pdo->setFetchMode(PDO::FETCH_CLASS, AccessPermissionModel::class);
-            return $this->pdo->execute()->fetchAll();
         } catch ( Exception $e ) {
             throw new SystemException(__FILE__, __LINE__, $e->getMessage(), $e->getCode(), $e->getPrevious());
         }
@@ -254,11 +270,12 @@ class ActorRepository extends ARepository {
      * @throws SystemException
      */
     public function getNumRows(): int {
-        $this->query_builder->Select("COUNT(DISTINCT id)")->As("num_count")
+        $result = $this->pdo->Select("COUNT(DISTINCT id)")->As("num_count")
             ->From("actors")
+            ->prepareStatement()
+            ->execute()
+            ->fetch()
         ;
-        $this->pdo->useQueryBuilder($this->query_builder);
-        $result = $this->pdo->execute()->fetch();
         return (int)$result["num_count"];
     }
 
@@ -271,18 +288,18 @@ class ActorRepository extends ARepository {
         try {
             $actor->password = StringHelper::getBCrypt($actor->password);
 
-            $this->query_builder->Insert("actors")
+            $this->pdo->Insert("actors")
                 ->Columns(["type_id", "email", "password", "first_name", "last_name", "login_fails", "login_disabled"])
+                ->prepareStatement()
+                    ->withParam(':type_id', $actor->type_id)
+                    ->withParam(':email', $actor->email)
+                    ->withParam(':password', $actor->password)
+                    ->withParam(':first_name', $actor->first_name)
+                    ->withParam(':last_name', $actor->last_name)
+                    ->withParam(':login_fails', $actor->login_fails, PDO::PARAM_INT)
+                    ->withParam(':login_disabled', $actor->login_disabled, PDO::PARAM_INT)
+                ->execute()
             ;
-            $this->pdo->useQueryBuilder($this->query_builder);
-            $this->pdo->bindParam(':type_id', $actor->type_id);
-            $this->pdo->bindParam(':email', $actor->email);
-            $this->pdo->bindParam(':password', $actor->password);
-            $this->pdo->bindParam(':first_name', $actor->first_name);
-            $this->pdo->bindParam(':last_name', $actor->last_name);
-            $this->pdo->bindParam(':login_fails', $actor->login_fails, PDO::PARAM_INT);
-            $this->pdo->bindParam(':login_disabled', $actor->login_disabled, PDO::PARAM_INT);
-            $this->pdo->execute();
             $actor->id = $this->pdo->lastInsertId();
         } catch( Exception $e ) {
             throw new SystemException(__FILE__, __LINE__, $e->getMessage(), $e->getCode(), $e->getPrevious());
@@ -296,33 +313,34 @@ class ActorRepository extends ARepository {
      */
     public function updateObject( Actor $actor ): void {
         try {
-            $this->query_builder->Select("password")
+            $row = $this->pdo->Select("password")
                 ->From("actors")
                 ->Where("id=:id")
+                ->prepareStatement()
+                    ->withParam(':id', $actor->id, PDO::PARAM_INT)
+                ->execute()
+                ->fetch()
             ;
-            $this->pdo->useQueryBuilder($this->query_builder);
-            $this->pdo->bindParam(":id", $actor->id, PDO::PARAM_INT);
-            $row = $this->pdo->execute()->fetch();
             if( !empty($row) ) {
                 if( $actor->password !== '' && $row["password"] !== $actor->password ) {
                     $actor->password = StringHelper::getBCrypt($actor->password);
                 } else {
                     $actor->password = $row["password"];
                 }
-                $this->query_builder->Update("actors")
+                $this->pdo->Update("actors")
                     ->Set(["email", "password", "first_name", "last_name", "login_fails", "login_disabled", "deleted"])
                     ->Where("id=:id")
+                    ->prepareStatement()
+                        ->withParam(':id', $actor->id, PDO::PARAM_INT)
+                        ->withParam(':email', $actor->email)
+                        ->withParam(':password', $actor->password)
+                        ->withParam(':first_name', $actor->first_name)
+                        ->withParam(':last_name', $actor->last_name)
+                        ->withParam(':login_fails', $actor->login_fails, PDO::PARAM_INT)
+                        ->withParam(':login_disabled', $actor->login_disabled, PDO::PARAM_INT)
+                        ->withParam(':deleted', $actor->deleted)
+                    ->execute()
                 ;
-                $this->pdo->useQueryBuilder($this->query_builder);
-                $this->pdo->bindParam(':id', $actor->id, PDO::PARAM_INT);
-                $this->pdo->bindParam(':email', $actor->email);
-                $this->pdo->bindParam(':password', $actor->password);
-                $this->pdo->bindParam(':first_name', $actor->first_name);
-                $this->pdo->bindParam(':last_name', $actor->last_name);
-                $this->pdo->bindParam(':login_fails', $actor->login_fails, PDO::PARAM_INT);
-                $this->pdo->bindParam(':login_disabled', $actor->login_disabled, PDO::PARAM_INT);
-                $this->pdo->bindParam(':deleted', $actor->deleted);
-                $this->pdo->execute();
             }
         } catch( Exception $e ) {
             throw new SystemException(__FILE__, __LINE__, $e->getMessage(), $e->getCode(), $e->getPrevious());
@@ -338,15 +356,15 @@ class ActorRepository extends ARepository {
     public function deleteObject( Actor $actor ): void {
         if( $actor->id > 0 ) {
             try {
-                $this->query_builder->Update("actors")
+                $this->pdo->Update("actors")
                     ->Set(["deleted", "login_disabled"])
                     ->Where("id=:id")
+                    ->prepareStatement()
+                        ->withParam(':id', $actor->id, PDO::PARAM_INT)
+                        ->withParam(':login_disabled', 1, PDO::PARAM_INT)
+                    ->withParam(':deleted', (new DateTime())->format("Y-m-d H:i:s"))
+                    ->execute()
                 ;
-                $this->pdo->useQueryBuilder($this->query_builder);
-                $this->pdo->bindParam("id", $actor->id, PDO::PARAM_INT);
-                $this->pdo->bindParam("login_disabled", true);
-                $this->pdo->bindParam("deleted", (new DateTime())->format("Y-m-d H:i:s"));
-                $this->pdo->execute();
                 $actor = new ActorModel();
             } catch( Exception $e ) {
                 throw new SystemException(__FILE__, __LINE__, $e->getMessage(), $e->getCode(), $e->getPrevious());

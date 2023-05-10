@@ -1,0 +1,50 @@
+<?php
+
+use lib\helper\HtmlHelper;
+$distance = $this->get('distance');
+?>
+<div class="container-fluid">
+    <h1>Math Helper</h1>
+    <div class="row">
+        <div class="col-4">
+            <h2>Entfernungs-Berechnung</h2>
+            <form action="\tests/math" method="POST">
+                <?php //HtmlHelper::generateFormToken() ?>
+                <div class="row">
+                    <div class="col">Coordinate 1</div>
+                    <div class="col">
+                        <label for="long_1">Longitude</label>
+                        <input id="long_1" type="text" name="coord[0][long]" value="" required="required" />
+                    </div>
+                    <div class="col">
+                        <label for="lat_1">Latitude</label>
+                        <input id="lat_1" type="text" name="coord[0][lat]" value="" required="required" />
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">Coordinate 2</div>
+                    <div class="col">
+                        <label for="long_2">Longitude</label>
+                        <input id="long_2" type="text" name="coord[1][long]" value="" required="required" />
+                    </div>
+                    <div class="col">
+                        <label for="lat_2">Latitude</label>
+                        <input id="lat_2" type="text" name="coord[1][lat]" value="" required="required" />
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">Distance</div>
+                    <div class="col"><?= $distance ?></div>
+                </div>
+                <div>
+                    <div class="col" style="padding-top: 21px;">
+                        <input type="submit" name="distance" value="Berechnen" />
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="col-4"></div>
+        <div class="col-4"></div>
+    </div>
+
+</div>

@@ -6,7 +6,6 @@ use Exception;
 use lib\App;
 use lib\core\blueprints\ARepository;
 use lib\core\ConnectionManager;
-use lib\core\database\QueryBuilder;
 use lib\core\exceptions\SystemException;
 use models\entities\ActorType;
 use models\ActorTypeModel;
@@ -20,15 +19,12 @@ use PDO;
  */
 class ActorTypeRepository extends ARepository {
 
-    private QueryBuilder $query_builder;
-
     /**
      * @throws SystemException
      */
     public function __construct() {
         $cm = App::getInstanceOf(ConnectionManager::class);
         $this->pdo = $cm->getConnection("mvc");
-        $this->query_builder = App::getInstanceOf(QueryBuilder::class, null, ["pdo" => $this->pdo]);
     }
 
     /**
@@ -38,14 +34,19 @@ class ActorTypeRepository extends ARepository {
      */
     public function get(int $id ): ActorTypeModel {
         try {
-            $this->query_builder->Select()
+            $actor_type = $this->pdo->Select()
                 ->From("actor_types")
                 ->Where("id=:id")
+                ->prepareStatement()
+                    ->withParam(":id", $id)
+                ->fetchMode(PDO::FETCH_CLASS, ActorTypeModel::class)
+                ->execute()
+                ->fetch()
             ;
-            $this->pdo->useQueryBuilder($this->query_builder);
-            $this->pdo->bindParam(":id", $id);
-            $this->pdo->setFetchMode(PDO::FETCH_CLASS, ActorTypeModel::class);
-            return $this->pdo->execute()->fetch();
+            if( !$actor_type ) {
+                $actor_type = new ActorTypeModel();
+            }
+            return $actor_type;
         } catch( Exception $e ) {
             throw new SystemException($e->getFile(), $e->getLine(), $e->getMessage(), $e->getCode(), $e->getPrevious());
         }
@@ -53,18 +54,23 @@ class ActorTypeRepository extends ARepository {
 
     /**
      * @param int $id
-     * @return mixed
+     * @return array
      * @throws SystemException
      */
-    public function getAsArray(int $id ): ActorTypeModel {
+    public function getAsArray(int $id ): array {
         try {
-            $this->query_builder->Select()
+            $actor_type = $this->pdo->Select()
                 ->From("actor_types")
                 ->Where("id=:id")
+                ->prepareStatement()
+                    ->withParam(":id", $id)
+                ->execute()
+                ->fetch()
             ;
-            $this->pdo->useQueryBuilder($this->query_builder);
-            $this->pdo->bindParam(":id", $id);
-            return $this->pdo->execute()->fetch();
+            if( !$actor_type ) {
+                $actor_type = array();
+            }
+            return $actor_type;
         } catch( Exception $e ) {
             throw new SystemException($e->getFile(), $e->getLine(), $e->getMessage(), $e->getCode(), $e->getPrevious());
         }
@@ -76,12 +82,13 @@ class ActorTypeRepository extends ARepository {
      */
     public function getAll(): array {
         try {
-            $this->query_builder->Select()
+            return $this->pdo->Select()
                 ->From("actor_types")
+                ->prepareStatement()
+                ->fetchMode(PDO::FETCH_CLASS, ActorTypeModel::class)
+                ->execute()
+                ->fetchAll()
             ;
-            $this->pdo->useQueryBuilder($this->query_builder);
-            $this->pdo->setFetchMode(PDO::FETCH_CLASS, ActorTypeModel::class);
-            return $this->pdo->execute()->fetchAll();
         } catch( Exception $e ) {
             throw new SystemException($e->getFile(), $e->getLine(), $e->getMessage(), $e->getCode(), $e->getPrevious());
         }
@@ -107,11 +114,12 @@ class ActorTypeRepository extends ARepository {
      * @throws SystemException
      */
     public function getNumRows(): int {
-        $this->query_builder->Select("COUNT(DISTINCT id)")->As("num_count")
+        $result = $this->pdo->Select("COUNT(DISTINCT id)")->As("num_count")
             ->From("actor_types")
+            ->prepareStatement()
+            ->execute()
+            ->fetch()
         ;
-        $this->pdo->useQueryBuilder($this->query_builder);
-        $result = $this->pdo->execute()->fetch();
         return (int)$result["num_count"];
     }
 
@@ -122,12 +130,12 @@ class ActorTypeRepository extends ARepository {
      */
     public function createObject(ActorType $type ): void {
         try {
-            $this->query_builder->Insert("actor_types")
+            $this->pdo->Insert("actor_types")
                 ->Columns(["name"])
+                ->prepareStatement()
+                    ->withParam(':name', $type->name)
+                ->execute()
             ;
-            $this->pdo->useQueryBuilder($this->query_builder);
-            $this->pdo->bindParam(':name', $type->name);
-            $this->pdo->execute();
             $type->id = $this->pdo->lastInsertId();
         } catch( Exception $e ) {
             throw new SystemException(__FILE__, __LINE__, $e->getMessage(), $e->getCode(), $e->getPrevious());
@@ -144,14 +152,14 @@ class ActorTypeRepository extends ARepository {
             return;
         }
         try {
-            $this->query_builder->Update("actor_types")
+            $this->pdo->Update("actor_types")
                 ->Columns(["name"])
                 ->Where("id=:id")
+                ->prepareStatement()
+                    ->withParam(':id', $type->id, PDO::PARAM_INT)
+                    ->withParam(':name', $type->name)
+                ->execute()
             ;
-            $this->pdo->useQueryBuilder($this->query_builder);
-            $this->pdo->bindParam(':id', $type->id, PDO::PARAM_INT);
-            $this->pdo->bindParam(':name', $type->name);
-            $this->pdo->execute();
         } catch( Exception $e ) {
             throw new SystemException(__FILE__, __LINE__, $e->getMessage(), $e->getCode(), $e->getPrevious());
         }
@@ -168,12 +176,12 @@ class ActorTypeRepository extends ARepository {
         }
 
         try {
-            $this->query_builder->Delete("actor_types")
+            $this->pdo->Delete("actor_types")
                 ->Where("id=:id")
+                ->prepareStatement()
+                    ->withParam(':id', $type->id, PDO::PARAM_INT)
+                ->execute()
             ;
-            $this->pdo->useQueryBuilder($this->query_builder);
-            $this->pdo->bindParam(':id', $type->id, PDO::PARAM_INT);
-            $this->pdo->execute();
         } catch( Exception $e ) {
             throw new SystemException(__FILE__, __LINE__, $e->getMessage(), $e->getCode(), $e->getPrevious());
         }

@@ -44,7 +44,9 @@ class ActorModel extends entities\Actor {
         if( $id > 0 ) {
             try {
                 $actor_data = $this->actor_repository->getAsArray($id);
+
                 if( !empty($actor_data) ) {
+
                     $this->id = (int)$actor_data["id"];
                     $this->type_id = (int)$actor_data["type_id"];
                     $this->first_name = $actor_data["first_name"];
@@ -58,9 +60,8 @@ class ActorModel extends entities\Actor {
                     $this->deleted = ( $actor_data["deleted"] !== "" ) ? $actor_data["deleted"] : null;
                     $this->initPermission();
                 }
-
             } catch( Exception $e ) {
-                throw new SystemException(__FILE__, __LINE__, $e->getMessage());
+                throw new SystemException(__FILE__, __LINE__, $e->getMessage(), $e->getCode(), $e->getPrevious());
             }
         }
 	}
@@ -125,7 +126,7 @@ class ActorModel extends entities\Actor {
             // if no default actor role could be found return an empty actor role
             return App::getInstanceOf(ActorRoleModel::class);
         } catch( Exception $e ) {
-            throw new SystemException($e->getFile(), $e->getLine(), $e->getMessage(), $e->getCode(), $e->getPrevious());
+            throw new SystemException(__FILE__, __LINE__, $e->getMessage(), $e->getCode(), $e->getPrevious());
         }
 	}
 

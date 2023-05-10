@@ -1,14 +1,19 @@
 <?php
-//spl_autoload_register(static function($class_name ) {
-//	$file_name = Namespace2Path($class_name);
-//    if( file_exists(PATH_ROOT . $file_name. ".php") ) {
-//        require_once PATH_ROOT . $file_name . ".php";
-//    } else {
-//        //echo "failed to find class[".$class_name."] file: ".$file_name."<br />";
-//    }
-//}, true, true);
-
 use lib\helper\StringHelper;
+
+/**
+ * The class autoloader function
+ * Includes the class file of a requested class if it's not loaded.
+ * The class file must be in the same directory structure as the namespace is set.
+ */
+spl_autoload_register(static function($class_name) {
+	$file_name = Namespace2Path($class_name);
+    if( file_exists(PATH_ROOT . $file_name. ".php") ) {
+        require_once PATH_ROOT . $file_name . ".php";
+    } else {
+        echo "failed to find class[{$class_name}] file: {$file_name}<br />";
+    }
+}, true, true);
 
 /**
  * Generates a token and saves it into the session

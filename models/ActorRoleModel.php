@@ -1,11 +1,9 @@
 <?php
 namespace models;
 
-use PDO;
 use Exception;
 use lib\App;
 use lib\core\classes\Language;
-use lib\core\ConnectionManager;
 use lib\core\exceptions\SystemException;
 use repositories\ActorRoleRepository;
 
@@ -72,7 +70,7 @@ class ActorRoleModel extends entities\ActorRole {
             try {
                 return App::getInstanceOf(__CLASS__, null, ["id" => $this->child_of]);
             } catch( Exception $e ) {
-                throw new SystemException($e->getFile(), $e->getLine(), $e->getMessage(), $e->getCode(), $e->getPrevious());
+                throw new SystemException(__FILE__, __LINE__, $e->getMessage(), $e->getCode(), $e->getPrevious());
             }
 		}
 		return null;
@@ -89,7 +87,7 @@ class ActorRoleModel extends entities\ActorRole {
         try {
             return $this->role_repository->find([["child_of", "=", $this->id]]);
         } catch( Exception $e ) {
-            throw new SystemException($e->getFile(), $e->getLine(), $e->getMessage(), $e->getCode(), $e->getPrevious());
+            throw new SystemException(__FILE__, __LINE__, $e->getMessage(), $e->getCode(), $e->getPrevious());
         }
 	}
 
@@ -152,7 +150,7 @@ class ActorRoleModel extends entities\ActorRole {
             }
             return false;
         } catch( Exception $e ) {
-            throw new SystemException($e->getFile(), $e->getLine(), $e->getMessage(), $e->getCode(), $e->getPrevious());
+            throw new SystemException(__FILE__, __LINE__, $e->getMessage(), $e->getCode(), $e->getPrevious());
         }
 	}
 
@@ -175,7 +173,7 @@ class ActorRoleModel extends entities\ActorRole {
             }
             return false;
         } catch( Exception $e ) {
-            throw new SystemException($e->getFile(), $e->getLine(), $e->getMessage(), $e->getCode(), $e->getPrevious());
+            throw new SystemException(__FILE__, __LINE__, $e->getMessage(), $e->getCode(), $e->getPrevious());
         }
 	}
 
@@ -339,7 +337,7 @@ class ActorRoleModel extends entities\ActorRole {
             }
             return false;
         } catch( Exception $e ) {
-            throw new SystemException($e->getFile(), $e->getLine(), $e->getMessage(), $e->getCode(), $e->getPrevious());
+            throw new SystemException(__FILE__, __LINE__, $e->getMessage(), $e->getCode(), $e->getPrevious());
         }
     }
 
@@ -367,7 +365,7 @@ class ActorRoleModel extends entities\ActorRole {
             }
             return false;
         } catch( Exception $e ) {
-            throw new SystemException($e->getFile(), $e->getLine(), $e->getMessage(), $e->getCode(), $e->getPrevious());
+            throw new SystemException(__FILE__, __LINE__, $e->getMessage(), $e->getCode(), $e->getPrevious());
         }
     }
 

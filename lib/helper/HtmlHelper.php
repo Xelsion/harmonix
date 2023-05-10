@@ -4,7 +4,6 @@ namespace lib\helper;
 use Exception;
 use models\ActorRoleModel;
 
-
 readonly class HtmlHelper {
 
     /**

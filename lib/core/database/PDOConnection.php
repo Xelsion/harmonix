@@ -35,6 +35,8 @@ class PDOConnection extends QB {
 
     protected int $db_version;
 
+    private bool $is_prepared = false;
+
     /**
      * @param ADBConnection $conn
      *
@@ -91,10 +93,11 @@ class PDOConnection extends QB {
      *
      * @return PDOConnection
      */
-    public function prepareSQL( array $options = [] ): PDOConnection {
+    public function prepareStatement(array $options = [] ): PDOConnection {
         $this->used_query = "";
         $this->used_params = array();
         $this->stmt = $this->prepare($this->sql, $options);
+        $this->is_prepared = true;
         $this->used_query = $this->sql;
         return $this;
     }
@@ -108,7 +111,11 @@ class PDOConnection extends QB {
      *
      * @return PDOConnection
      */
-    public function setParam( string $key, mixed $value, int $type = PDO::PARAM_STR ): PDOConnection {
+    public function withParam(string $key, mixed $value, int $type = PDO::PARAM_STR ): PDOConnection {
+        if( !$this->is_prepared && $this->sql !== "" ) {
+            $this->prepareStatement();
+        }
+
         $this->used_params[$key] = $value;
         if( $type !== PDO::PARAM_STR) {
             $this->stmt->bindValue($key, $value, $type);
@@ -119,8 +126,24 @@ class PDOConnection extends QB {
     }
 
     public function fetchMode( int $mode = PDO::PARAM_STR, mixed $type = null ): PDOConnection {
+        if( !$this->is_prepared && $this->sql !== "" ) {
+            $this->prepareStatement();
+        }
         $this->setFetchMode($mode, $type );
         return $this;
+    }
+
+    /**
+     * Sets the Fetch mode for the current query
+     *
+     * @param int $mode
+     * @param $class
+     */
+    public function setFetchMode( int $mode, $class ): void {
+        if( !$this->is_prepared && $this->sql !== "" ) {
+            $this->prepareStatement();
+        }
+        $this->stmt->setFetchMode($mode, $class);
     }
 
 	/**
@@ -169,15 +192,7 @@ class PDOConnection extends QB {
         return preg_replace($keys, $values, $this->used_query, 1);
     }
 
-	/**
-     * Sets the Fetch mode for the current query
-     *
-	 * @param int $mode
-	 * @param $class
-	 */
-	public function setFetchMode( int $mode, $class ): void {
-		$this->stmt->setFetchMode($mode, $class);
-	}
+
 
 	/**
      * Returns the number of Entries of the current statement
@@ -207,9 +222,12 @@ class PDOConnection extends QB {
      * @throws JsonException
      * @throws SystemException
      */
-	public function execute(): PDOStatement {
+	public function execute( array $options = [] ): PDOStatement {
         App::$analyser->start();
-		try {
+        if( !$this->is_prepared && $this->sql !== "" ) {
+            $this->prepareStatement();
+        }
+    	try {
 			$this->stmt->execute();
 		} catch( PDOException $e ) {
 			$this->logger->log($e->getFile(), $e->getLine(), $e->getMessage()."\n\t=>\t[SQL] ".$this->stmt->queryString, $e->getTrace());

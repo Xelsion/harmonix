@@ -3,11 +3,7 @@ namespace models;
 
 use Exception;
 use lib\App;
-use lib\core\ConnectionManager;
-use lib\core\database\QueryBuilder;
 use lib\core\exceptions\SystemException;
-use lib\helper\MySqlHelper;
-use PDO;
 use repositories\AccessRestrictionTypeRepository;
 
 /**

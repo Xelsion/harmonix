@@ -12,7 +12,6 @@ namespace models\entities;
 class Token {
 
     public string $id = "";
-
     public string $expired = "";
 
 }

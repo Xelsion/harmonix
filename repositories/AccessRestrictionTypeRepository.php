@@ -28,7 +28,6 @@ class AccessRestrictionTypeRepository extends ARepository {
     public function __construct() {
         $cm = App::getInstanceOf(ConnectionManager::class);
         $this->pdo = $cm->getConnection("mvc");
-        $this->query_builder = App::getInstanceOf(QueryBuilder::class, null, ["pdo" => $this->pdo]);
     }
 
     /**
@@ -38,14 +37,19 @@ class AccessRestrictionTypeRepository extends ARepository {
      */
     public function get( int $id): AccessRestrictionTypeModel {
         try {
-            $this->query_builder->Select()
+            $restriction_type = $this->pdo->Select()
                 ->From("access_restriction_types")
                 ->Where("id=:id")
+                ->prepareStatement()
+                    ->withParam(":id", $id)
+                ->fetchMode(PDO::FETCH_CLASS, AccessRestrictionTypeModel::class)
+                ->execute()
+                ->fetch()
             ;
-            $this->pdo->useQueryBuilder($this->query_builder);
-            $this->pdo->bindParam(":id", $id);
-            $this->pdo->setFetchMode(PDO::FETCH_CLASS, AccessRestrictionTypeModel::class);
-            return $this->pdo->execute()->fetch();
+            if( !$restriction_type ) {
+                $restriction_type = new AccessRestrictionTypeModel();
+            }
+            return $restriction_type;
         } catch( Exception $e ) {
             throw new SystemException($e->getFile(), $e->getLine(), $e->getMessage(), $e->getCode(), $e->getPrevious());
         }
@@ -58,13 +62,18 @@ class AccessRestrictionTypeRepository extends ARepository {
      */
     public function getAsArray( int $id): array {
         try {
-            $this->query_builder->Select()
+            $restriction_type = $this->pdo->Select()
                 ->From("access_restriction_types")
                 ->Where("id=:id")
+                ->prepareStatement()
+                    ->withParam(":id", $id)
+                ->execute()
+                ->fetch()
             ;
-            $this->pdo->useQueryBuilder($this->query_builder);
-            $this->pdo->bindParam(":id", $id);
-            return $this->pdo->execute()->fetch();
+            if( !$restriction_type ) {
+                $restriction_type = array();
+            }
+            return $restriction_type;
         } catch( Exception $e ) {
             throw new SystemException($e->getFile(), $e->getLine(), $e->getMessage(), $e->getCode(), $e->getPrevious());
         }
@@ -76,11 +85,13 @@ class AccessRestrictionTypeRepository extends ARepository {
      */
     public function getAll(): array {
         try {
-            $this->query_builder->Select()
-                ->From("access_restriction_types");
-            $this->pdo->useQueryBuilder($this->query_builder);
-            $this->pdo->setFetchMode(PDO::FETCH_CLASS, AccessRestrictionTypeModel::class);
-            return $this->pdo->execute()->fetchAll();
+            return $this->pdo->Select()
+                ->From("access_restriction_types")
+                ->prepareStatement()
+                ->fetchMode(PDO::FETCH_CLASS, AccessRestrictionTypeModel::class)
+                ->execute()
+                ->fetchAll()
+            ;
         } catch( Exception $e ) {
             throw new SystemException($e->getFile(), $e->getLine(), $e->getMessage(), $e->getCode(), $e->getPrevious());
         }
@@ -106,10 +117,12 @@ class AccessRestrictionTypeRepository extends ARepository {
      * @throws SystemException
      */
     public function getNumRows(): int {
-        $this->query_builder->Select("COUNT(DISTINCT id)")->As("num_count")
-            ->From("access_restriction_types");
-        $this->pdo->useQueryBuilder($this->query_builder);
-        $result = $this->pdo->execute()->fetch();
+        $result = $this->pdo->Select("COUNT(DISTINCT id)")->As("num_count")
+            ->From("access_restriction_types")
+            ->prepareStatement()
+            ->execute()
+            ->fetch()
+        ;
         return (int)$result["num_count"];
     }
 
@@ -121,15 +134,15 @@ class AccessRestrictionTypeRepository extends ARepository {
      */
     public function createObject(AccessRestrictionType $restriction_type ): void {
         try {
-            $this->query_builder->Insert("access_restriction_types")
+            $this->pdo->Insert("access_restriction_types")
                 ->Columns(["name", "include_siblings", "include_children", "include_descendants"])
+                ->prepareStatement()
+                    ->withParam(':name', $restriction_type->name)
+                    ->withParam(':include_siblings', $restriction_type->include_siblings, PDO::PARAM_INT)
+                    ->withParam(':include_children', $restriction_type->include_children, PDO::PARAM_INT)
+                    ->withParam(':include_descendants', $restriction_type->include_descendants, PDO::PARAM_INT)
+                ->execute()
             ;
-            $this->pdo->useQueryBuilder($this->query_builder);
-            $this->pdo->bindParam(':name', $restriction_type->name);
-            $this->pdo->bindParam(':include_siblings', $restriction_type->include_siblings, PDO::PARAM_INT);
-            $this->pdo->bindParam(':include_children', $restriction_type->include_children, PDO::PARAM_INT);
-            $this->pdo->bindParam(':include_descendants', $restriction_type->include_descendants, PDO::PARAM_INT);
-            $this->pdo->execute();
             $restriction_type->id = $this->pdo->lastInsertId();
         } catch( Exception $e ) {
             throw new SystemException(__FILE__, __LINE__, $e->getMessage(), $e->getCode(), $e->getPrevious());
@@ -143,17 +156,17 @@ class AccessRestrictionTypeRepository extends ARepository {
      */
     public function updateObject(AccessRestrictionType $restriction_type ): void {
         try {
-            $this->query_builder->Update("access_restriction_types")
+            $this->pdo->Update("access_restriction_types")
                 ->Set(["name", "include_siblings", "include_children", "include_descendants"])
                 ->Where("id=:id")
+                ->prepareStatement()
+                    ->withParam(':id', $restriction_type->id, PDO::PARAM_INT)
+                    ->withParam(':name', $restriction_type->name)
+                    ->withParam(':include_siblings', $restriction_type->include_siblings, PDO::PARAM_INT)
+                    ->withParam(':include_children', $restriction_type->include_children, PDO::PARAM_INT)
+                    ->withParam(':include_descendants', $restriction_type->include_descendants, PDO::PARAM_INT)
+                ->execute()
             ;
-            $this->pdo->useQueryBuilder($this->query_builder);
-            $this->pdo->bindParam(':id', $restriction_type->id, PDO::PARAM_INT);
-            $this->pdo->bindParam(':name', $restriction_type->name);
-            $this->pdo->bindParam(':include_siblings', $restriction_type->include_siblings, PDO::PARAM_INT);
-            $this->pdo->bindParam(':include_children', $restriction_type->include_children, PDO::PARAM_INT);
-            $this->pdo->bindParam(':include_descendants', $restriction_type->include_descendants, PDO::PARAM_INT);
-            $this->pdo->execute();
         } catch( Exception $e ) {
             throw new SystemException(__FILE__, __LINE__, $e->getMessage(), $e->getCode(), $e->getPrevious());
         }
@@ -166,10 +179,12 @@ class AccessRestrictionTypeRepository extends ARepository {
      */
     public function deleteObject(AccessRestrictionType $restriction_type ): void {
         try {
-            $this->query_builder->Delete("access_restriction_types")->Where("id=:id");
-            $this->pdo->useQueryBuilder($this->query_builder);
-            $this->pdo->bindParam("id", $restriction_type->id, PDO::PARAM_INT);
-            $this->pdo->execute();
+            $this->pdo->Delete("access_restriction_types")
+                ->Where("id=:id")
+                ->prepareStatement()
+                    ->withParam(':id', $restriction_type->id, PDO::PARAM_INT)
+                ->execute()
+            ;
         } catch( Exception $e ) {
             throw new SystemException(__FILE__, __LINE__, $e->getMessage(), $e->getCode(), $e->getPrevious());
         }

@@ -3,10 +3,7 @@ namespace models;
 
 use Exception;
 use lib\App;
-use lib\core\ConnectionManager;
 use lib\core\exceptions\SystemException;
-use lib\helper\MySqlHelper;
-use PDO;
 
 /**
  * The ActorModel Permissions
@@ -29,7 +26,7 @@ class AccessPermissionModel extends entities\AccessPermission {
             try {
                 $this->role = App::getInstanceOf(ActorRoleModel::class, null, ["id" => $this->role_id]);
             } catch( Exception $e ) {
-                throw new SystemException($e->getFile(), $e->getLine(), $e->getMessage(), $e->getCode(), $e->getPrevious());
+                throw new SystemException(__FILE__, __LINE__, $e->getMessage(), $e->getCode(), $e->getPrevious());
             }
 		}
 	}

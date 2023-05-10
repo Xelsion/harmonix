@@ -2,7 +2,6 @@
 namespace lib\core;
 
 use lib\core\classes\KeyValuePairs;
-use lib\core\exceptions\SystemException;
 use lib\helper\HtmlHelper;
 
 /**
@@ -16,7 +15,6 @@ class Request extends KeyValuePairs {
 
     private string $request_uri;
     private string $request_method;
-
     private array $files;
 
     /**
@@ -26,7 +24,6 @@ class Request extends KeyValuePairs {
      * @throws \lib\core\exceptions\SystemException
      */
 	public function __construct() {
-
         $this->request_uri = $_SERVER["REQUEST_URI"]??"";
         $this->request_method = $_SERVER['REQUEST_METHOD']??"";
 

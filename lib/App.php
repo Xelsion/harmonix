@@ -12,15 +12,12 @@ use lib\core\classes\Configuration;
 use lib\core\classes\GarbageCollector;
 use lib\core\classes\KeyValuePairs;
 use lib\core\classes\Language;
-use lib\core\classes\Timer;
 use lib\core\ClassManager;
 use lib\core\ConnectionManager;
 use lib\core\exceptions\SystemException;
 use lib\core\Request;
 use lib\core\Router;
-use lib\core\Storage;
 use lib\core\tree\RoleTree;
-use lib\helper\StringHelper;
 use models\ActorModel;
 use models\ActorRoleModel;
 
@@ -113,9 +110,8 @@ class App {
      */
 	public function run(): void {
         // Initiate general settings
-        $config = self::getInstanceOf(Configuration::class);
-        $environment = $config->getSectionValue("system", "environment");
-        $debug = $config->getSectionValue($environment, "debug");
+        $environment = self::$config->getSectionValue("system", "environment");
+        $debug = self::$config->getSectionValue($environment, "debug");
         self::$storage->set("debug_mode", (bool)$debug);
         self::$storage->set("is_cached", false);
 
@@ -174,7 +170,6 @@ class App {
             // No valid controller found
             throw new SystemException(__FILE__, __LINE__, "Controller for request ".self::$request->getRequestUri()." cant be found!");
         }
-
 	}
 
 	/**
@@ -182,7 +177,7 @@ class App {
 	 *
 	 * @return string
 	 */
-    public function getResult(): string {
+    public function getResponseOutput(): string {
         $output = $this::$response->getOutput();
         $elapsed_time = self::$analyser->getElapsedTime()->format("ms", 2);
         $output = str_replace("{{build_time}}", $elapsed_time, $output);
