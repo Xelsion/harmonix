@@ -1,0 +1,115 @@
+/* START dd-menu logic */
+#navigation {
+	position : relative;
+	z-index  : 100;
+
+	a {
+		position     : relative;
+		display      : inline-block;
+		white-space  : nowrap;
+		margin-right : 10px;
+	}
+
+	ul {
+		width   : fit-content;
+		margin  : 0;
+		padding : 0;
+	}
+
+	li {
+		position   : relative;
+		width      : fit-content;
+		list-style : none;
+		margin     : 0;
+		padding    : 0;
+
+		&:hover > ul {
+			display : block;
+		}
+	}
+
+	li > ul {
+		display  : none;
+		position : absolute;
+
+		> li > ul {
+			top  : -1px;
+			left : 100%;
+		}
+	}
+
+	> ul > li {
+		float : left;
+		width : fit-content;
+
+		&.has-children::after {
+			@extend .slide-down;
+			right : 10px !important;
+		}
+
+		> ul {
+			top  : 100%;
+			left : 0;
+		}
+	}
+
+	* ul > li {
+		width : 100%;
+
+		&.has-children::after {
+			@extend .slide-right;
+			right : 10px;
+			top   : calc(50% - 4px) !important;
+		}
+
+		> a {
+			display : block;
+		}
+	}
+}
+
+/* END dd-menu logic */
+
+/* START dd-menu styling */
+#navigation {
+	background : linear-gradient(to bottom, $menu-bg-from-color, $menu-bg-to-color);
+
+	a {
+		color           : $text-color;
+		text-decoration : none;
+
+		&:hover {
+			color : $text-hover-color;
+		}
+	}
+
+	li > ul {
+		background-color : $menu-bg-to-color;
+		border           : 1px solid $menu-submenu-border-color;
+
+		> li > a {
+			font-size : 0.8em;
+			padding   : 8px 20px;
+		}
+	}
+
+	> ul > li {
+		border-right : 1px solid $menu-border-color;
+
+		> a {
+			font-size : 1.0em;
+			padding   : 10px 20px;
+		}
+	}
+
+	* ul > li {
+		display       : block;
+		border-bottom : 1px solid $menu-submenu-border-color;
+
+		&:last-child {
+			border-bottom : 0;
+		}
+	}
+}
+
+/* END dd-menu styling */

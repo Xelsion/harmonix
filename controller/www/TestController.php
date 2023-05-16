@@ -1,6 +1,9 @@
 <?php
+
 namespace controller\www;
 
+use DateTime;
+use Exception;
 use lib\App;
 use lib\classes\GeoCoordinate;
 use lib\core\attributes\HttpGet;
@@ -23,7 +26,7 @@ class TestController extends AController {
      */
     #[HttpGet("/")]
     public function index(): AResponse {
-        $view = new Template(PATH_VIEWS."tests/index.html");
+        $view = new Template(PATH_VIEWS . "tests/index.html");
 
         $template = new Template(PATH_VIEWS . "template.html");
         $template->set("view", $view->parse());
@@ -38,10 +41,10 @@ class TestController extends AController {
      */
     #[HttpGet("charts")]
     public function charts(): AResponse {
-        $view = new Template(PATH_VIEWS."tests/charts.html");
+        $view = new Template(PATH_VIEWS . "tests/charts.html");
 
         $template = new Template(PATH_VIEWS . "template.html");
-        $template->set("view", $view->parse() );
+        $template->set("view", $view->parse());
 
         return new HtmlResponse($template->parse());
     }
@@ -52,8 +55,8 @@ class TestController extends AController {
      *
      * @throws SystemException
      */
-    #[HttpGet("validator")]
-    public function validator() : AResponse {
+    #[Route("validator")]
+    public function validator(): AResponse {
         $view = new Template(PATH_VIEWS . "tests/validator.html");
 
         $template = new Template(PATH_VIEWS . "template.html");
@@ -69,7 +72,7 @@ class TestController extends AController {
      * @throws SystemException
      */
     #[Route("math")]
-    public function math() : AResponse {
+    public function math(): AResponse {
         $distance = null;
         if( App::$request->contains("distance") ) {
             $coords = App::$request->get("coord");
@@ -81,8 +84,20 @@ class TestController extends AController {
             $distance = MathHelper::getFormattedDistance($distance);
         }
 
+        $timespan = null;
+        if( App::$request->contains("timespan") ) {
+            try {
+                $start_date = new DateTime(App::$request->get("start_date"));
+                $end_date = new DateTime(App::$request->get("end_date"));
+                $timespan = MathHelper::getTimeBetween($start_date, $end_date);
+            } catch( Exception $e ) {
+                throw new SystemException($e->getFile(), $e->getLine(), $e->getMessage(), $e->getCode(), $e->getPrevious());
+            }
+        }
+
         $view = new Template(PATH_VIEWS . "tests/math.html");
         $view->set("distance", $distance);
+        $view->set("timespan", $timespan);
 
         $template = new Template(PATH_VIEWS . "template.html");
         $template->set("view", $view->parse());

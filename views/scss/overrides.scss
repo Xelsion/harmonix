@@ -1,0 +1,21 @@
+.pagination {
+	width  : fit-content;
+	margin : 0 auto;
+}
+
+.list-group-item {
+	color               : $text-color;
+	background-color    : $bg-color;
+	border-bottom-color : $input-border-color;
+
+	&.active {
+		background     : linear-gradient(to bottom, $button-default-from-color, $button-default-to-color);
+		border-color   : $input-border-color;
+		text-transform : uppercase;
+	}
+}
+
+.modal-content {
+	background-color : $bg-color;
+	border           : 1px solid $input-border-color;
+}

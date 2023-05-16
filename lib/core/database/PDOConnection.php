@@ -19,22 +19,15 @@ use PDOStatement;
  * @author Markus Schröder <xelsion@gmail.com>
  * @version 1.0.0;
  */
-class PDOConnection extends QB {
+class PDOConnection extends QueryBuilder {
 
 	private ?Logger $logger;
-
     private ADBConnection $conn;
-
     private array $table_infos = array();
-
     private string $used_query = "";
-
     private array $used_params = array();
-
     protected DbType $db_type;
-
     protected int $db_version;
-
     private bool $is_prepared = false;
 
     /**
@@ -49,29 +42,13 @@ class PDOConnection extends QB {
 		$this->stmt = new PDOStatement();
 		$this->logger = App::getInstanceOf(Logger::class, null, ["log_type" => "database"]);
 
-
         $this->db_type = $this->getType();
         $version_info = $this->getVersion();
         $this->db_version = $version_info['base'];
         if( $this->db_type === DbType::MsSQL && $this->db_version < 2012 ) {
             throw new SystemException(__FILE__, __LINE__ ,"QueryBuilder: does not support MsSQL version " . $this->db_version, "");
         }
-
-        $this->setModificationTimes();
 	}
-
-    /**
-     * Prepares the given query with the given options
-     *
-     * @param QueryBuilder $builder
-     * @param array $options
-     */
-    public function useQueryBuilder( QueryBuilder $builder, array $options = [] ): void {
-        $this->used_query = "";
-        $this->used_params = array();
-        $this->stmt = $this->prepare($builder->getQuery(), $options);
-        $this->used_query = $builder->getQuery();
-    }
 
 	/**
      * Prepares the given query with the given options
@@ -93,7 +70,7 @@ class PDOConnection extends QB {
      *
      * @return PDOConnection
      */
-    public function prepareStatement(array $options = [] ): PDOConnection {
+    public function prepareStatement( array $options = [] ): PDOConnection {
         $this->used_query = "";
         $this->used_params = array();
         $this->stmt = $this->prepare($this->sql, $options);
@@ -111,13 +88,13 @@ class PDOConnection extends QB {
      *
      * @return PDOConnection
      */
-    public function withParam(string $key, mixed $value, int $type = PDO::PARAM_STR ): PDOConnection {
+    public function withParam( string $key, mixed $value, int $type = PDO::PARAM_STR ): PDOConnection {
         if( !$this->is_prepared && $this->sql !== "" ) {
             $this->prepareStatement();
         }
 
         $this->used_params[$key] = $value;
-        if( $type !== PDO::PARAM_STR) {
+        if( $type !== PDO::PARAM_STR ) {
             $this->stmt->bindValue($key, $value, $type);
         } else {
             $this->stmt->bindValue($key, $value);
@@ -125,11 +102,18 @@ class PDOConnection extends QB {
         return $this;
     }
 
+    /**
+     * Set the fetch mode for the current query
+     *
+     * @param int $mode
+     * @param mixed|null $type
+     * @return $this
+     */
     public function fetchMode( int $mode = PDO::PARAM_STR, mixed $type = null ): PDOConnection {
         if( !$this->is_prepared && $this->sql !== "" ) {
             $this->prepareStatement();
         }
-        $this->setFetchMode($mode, $type );
+        $this->setFetchMode($mode, $type);
         return $this;
     }
 
@@ -157,13 +141,11 @@ class PDOConnection extends QB {
 	 */
 	public function bindParam( string $key, mixed $value, int $type = PDO::PARAM_STR ): bool {
         $this->used_params[$key] = $value;
-        if( $type !== PDO::PARAM_STR) {
+        if( $type !== PDO::PARAM_STR ) {
 		    return $this->stmt->bindValue($key, $value, $type);
         }
         return $this->stmt->bindValue($key, $value);
     }
-
-
 
     /**
      * Returns the query that is sent to the database
@@ -177,7 +159,7 @@ class PDOConnection extends QB {
         # build a regular expression for each parameter
         foreach( $this->used_params as $key => $value ) {
             if( is_string($key) ) {
-                $keys[] = '/:'.$key.'/';
+                $keys[] = '/:' . $key . '/';
             } else {
                 $keys[] = '/:[?]/';
             }
@@ -191,8 +173,6 @@ class PDOConnection extends QB {
 
         return preg_replace($keys, $values, $this->used_query, 1);
     }
-
-
 
 	/**
      * Returns the number of Entries of the current statement
@@ -251,18 +231,25 @@ class PDOConnection extends QB {
     }
 
     /**
-     * Returns the number or rows in that table
+     * Returns the number of rows in a table or -1 if that table does not exist
      *
      * @param string $table_name
      * @return int
      */
     public function getNumRowsOfTable( string $table_name ): int {
-        if( array_key_exists($table_name, $this->table_infos) ) {
-            return $this->table_infos[$table_name]["num_rows"];
+        try {
+            $result = $this->run("SELECT COUNT(*) AS num_rows FROM " . $table_name)->fetch();
+            return (int)$result["num_rows"];
+        } catch( Exception ) {
+            return -1;
         }
-        return 0;
     }
 
+    /**
+     * Returns the database type
+     *
+     * @return DbType
+     */
     public function getType(): DbType {
         return $this->conn->getType();
     }
@@ -281,13 +268,13 @@ class PDOConnection extends QB {
             case DbType::MsSQL: $sql = "SELECT @@VERSION as version"; break;
         }
         if( $sql === "" ) {
-            return [ "base" => 0, "full" => "could not get server version" ];
+            return ["base" => 0, "full" => "could not get server version"];
         }
         $result = $this->run($sql)->fetch();
         switch( $type ) {
             case DbType::Postgres:
                 if( preg_match('/\s*PostgreSQL\s*((\d+)[0-9|.]+)\s*/i', $result["version"], $matches) ) {
-                    return [ "base" => (int) $matches[1], "full" => $matches[2]];
+                    return ["base" => (int) $matches[1], "full" => $matches[2]];
                 }
                 break;
             case DbType::MySQL:
@@ -302,113 +289,6 @@ class PDOConnection extends QB {
                 break;
         }
         return ["base" => 0, "full" => "unknown"];
-    }
-
-    /**
-     * Returns all table name in the current db
-     *
-     * @return array
-     *
-     * @throws JsonException
-     * @throws SystemException
-     */
-    public function getTables(): array {
-        if( $this->getType() === DbType::MySQL ) {
-            $this->prepareQuery("SELECT table_name FROM information_schema.tables WHERE table_schema=:db");
-            $this->bindParam("db", $this->conn->dbname);
-            return $this->execute()->fetchAll();
-        }
-        return [];
-    }
-
-    /**
-     * Returns the names of the tables unique columns such as primary keys or uniques
-     *
-     * @param string $table_name
-     *
-     * @return array
-     *
-     * @throws JsonException
-     * @throws SystemException
-     */
-    public function getTableKeyColumns( string $table_name ): array {
-        if( $this->getType() === DbType::MySQL ) {
-            $this->prepareQuery("SELECT column_name FROM information_schema.columns WHERE table_schema=:db AND table_name=:table_name AND column_key IN('PRI','UNI')");
-            $this->bindParam("db", $this->conn->dbname);
-            $this->bindParam("table_name", $table_name);
-            return $this->execute()->fetchAll();
-        }
-        return [];
-    }
-
-    /**
-     * Returns the names of the tables columns
-     *
-     * @param string $table_name
-     *
-     * @return array
-     *
-     * @throws JsonException
-     * @throws SystemException
-     */
-    public function getTableColumns( string $table_name ): array {
-        if( $this->getType() === DbType::MySQL ) {
-            $this->prepareQuery("SELECT column_name FROM information_schema.columns WHERE table_schema=:db AND table_name=:table_name");
-            $this->bindParam("db", $this->conn->dbname);
-            $this->bindParam("table_name", $table_name);
-            return $this->execute()->fetchAll();
-        }
-        return [];
-    }
-
-    /**
-     * Gets the last Modification time of each mysql of the current database
-     * and stores them into an array
-     *
-     * @return void
-     *
-     * @throws JsonException
-     * @throws SystemException
-     * @throws Exception
-     */
-    private function setModificationTimes(): void {
-        if( $this->getType() === DbType::MySQL ) {
-            $this->prepareQuery("SELECT table_name, table_rows, create_time, update_time FROM information_schema.tables WHERE table_schema=:db");
-            $this->bindParam("db", $this->conn->dbname);
-            $results = $this->execute()->fetchAll();
-            foreach( $results as $row ) {
-                $create_date = new DateTime($row["create_time"] ?? '1970-01-01 00:00:00');
-                $update_date = new DateTime($row["update_time"] ?? '1970-01-01 00:00:00');
-
-                $modification_time = ( $update_date > $create_date )
-                    ? $update_date->getTimestamp()
-                    : $create_date->getTimestamp()
-                ;
-                $this->table_infos[$row["table_name"]] = array(
-                    "num_rows" => $row["table_rows"],
-                    "modified" => $modification_time
-                );
-            }
-        }
-    }
-
-    /**
-     * Checks if the table with the given name exists or not
-     *
-     * @return bool
-     */
-    private function schemaIsCompatible(): bool {
-        try {
-            $this->prepareQuery("SELECT table_schema, table_name, table_rows, create_time, update_time FROM information_schema.tables");
-            $results_tables = $this->execute();
-
-            $this->prepareQuery("SELECT column_name, table_name, table_schema FROM information_schema.columns");
-            $results_columns = $this->execute();
-
-            return true;
-        } catch( Exception ) {
-            return false;
-        }
     }
 
 }

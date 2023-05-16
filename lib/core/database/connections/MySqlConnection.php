@@ -14,10 +14,10 @@ use PDO;
 class MySqlConnection extends ADBConnection {
 
     private array $_options = array(
-        PDO::ATTR_PERSISTENT         => true,
-        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-        PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
-        PDO::MYSQL_ATTR_FOUND_ROWS => true
+        PDO::ATTR_PERSISTENT            => true,
+        PDO::ATTR_DEFAULT_FETCH_MODE    => PDO::FETCH_ASSOC,
+        PDO::ATTR_ERRMODE               => PDO::ERRMODE_EXCEPTION,
+        PDO::MYSQL_ATTR_FOUND_ROWS      => true
     );
 
     /**

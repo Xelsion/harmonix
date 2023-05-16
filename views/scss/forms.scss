@@ -1,0 +1,89 @@
+/* START formular styles */
+form {
+	background-color : $container-bg-color;
+	padding          : 15px 40px 5px 40px;
+	width            : 100%;
+	margin           : 0 auto;
+	border-radius    : 10px;
+
+	&.minimized {
+		display : inline-block;
+		width   : fit-content !important;
+		height  : fit-content;
+		padding : 0 !important;
+		margin  : 0 !important;
+		border  : 0 !important;
+	}
+
+	&.was-validated {
+		select, input {
+			padding-right       : calc(1.5em + .75rem);
+			background-repeat   : no-repeat;
+			background-position : right calc(.375em + .1875rem) center;
+			background-size     : calc(.75em + .375rem) calc(.75em + .375rem);
+
+			&:invalid {
+				background-image : url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23dc3545'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23dc3545' stroke='none'/%3e%3c/svg%3e");
+				border-color     : $input-invalid-color;
+			}
+
+			&:valid {
+				background-image : url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%23198754' d='M2.3 6.73L.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z'/%3e%3c/svg%3e");
+				border-color     : $input-valid-color;
+			}
+		}
+	}
+
+	div {
+		&.row {
+			margin-bottom : 10px;
+
+			> div.table-col {
+				padding : 4px 0;
+			}
+		}
+	}
+
+	label {
+		display : block;
+	}
+
+	input {
+		color            : $text-color;
+		background-color : $input-bg-color;
+		border           : 1px solid $input-border-color;
+		border-radius    : 2px;
+		padding          : 5px;
+		width            : 100%;
+
+		&[type=checkbox] {
+			margin-right : 10px;
+		}
+
+		&[type=submit] {
+			padding : 6px 5px;
+		}
+
+		&:disabled {
+			color            : $input-disabled-text-color;
+			background-color : $input-disabled-bg-color;
+		}
+	}
+
+	select {
+		color            : $text-color;
+		background-color : $input-bg-color;
+		border           : 1px solid $input-border-color;
+		border-radius    : 2px;
+		padding          : 9px 5px;
+		width            : 100%;
+
+		&:disabled {
+			color            : $input-disabled-text-color;
+			background-color : $input-disabled-bg-color;
+		}
+	}
+
+}
+
+/* END formular styles */

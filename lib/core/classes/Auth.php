@@ -34,11 +34,11 @@ class Auth {
      */
     public function __construct( protected readonly Request $request ) {
         $this->actor_role = App::$curr_actor_role;
+        $this->initRestrictions();
         $route = App::getInstanceOf(Router::class)->getRoute($request);
         $restriction = $this->getRestriction(get_class($route["controller"]), $route["method"]);
         $this->restriction_role = $restriction["role"];
         $this->restriction_type = $restriction["type"];
-        $this->initRestrictions();
     }
 
     /**

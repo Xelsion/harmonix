@@ -2,7 +2,8 @@
 
 use lib\helper\HtmlHelper;
 use lib\helper\ValidationHelper;
-$value = $_POST['value']??'';
+
+$value = $_POST['value'] ?? '';
 ?>
 <div class="container-fluid">
     <form action="\tests/validator" method="POST">
@@ -10,10 +11,10 @@ $value = $_POST['value']??'';
         <div class="row">
             <div class="col">
                 <label for="input">Input</label>
-                <input id="input" type="text" name="value" value="<?= escaped_string($value) ?>" />
+                <input id="input" type="text" name="value" value="<?= escaped_string($value) ?>"/>
             </div>
             <div class="col-1" style="padding-top: 21px;">
-                <input type="submit" name="check" value="check" />
+                <input type="submit" name="check" value="check" class="button-default"/>
             </div>
         </div>
     </form>
@@ -36,7 +37,8 @@ $value = $_POST['value']??'';
             <?php foreach( $check as $key => $result ) { ?>
                 <tr>
                     <td><?= $key ?></td>
-                    <td class="col-1" style="color: <?= ($result) ? 'green' : 'red' ?>;"><?php print_debug($result) ?></td>
+                    <td class="col-1"
+                        style="color: <?= ($result) ? 'green' : 'red' ?>;"><?php print_debug($result) ?></td>
                 </tr>
             <?php } ?>
         </table>

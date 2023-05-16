@@ -1,0 +1,90 @@
+@font-face {
+	font-family : "Comfortaa";
+	src         : url("../../fonts/Comfortaa-Regular.ttf") format("truetype")
+}
+
+@font-face {
+	font-family : "Comfortaa-Light";
+	src         : url("../../fonts/Comfortaa-Light.ttf") format("truetype")
+}
+
+@font-face {
+	font-family : "Comfortaa-Bold";
+	src         : url("../../fonts/Comfortaa-Bold.ttf") format("truetype")
+}
+
+@font-face {
+	font-family : "FiraCode";
+	src         : url("../../fonts/FiraCode-Regular.ttf") format("truetype")
+}
+
+@font-face {
+	font-family : "FiraCode-Light";
+	src         : url("../../fonts/FiraCode-Light.ttf") format("truetype")
+}
+
+@font-face {
+	font-family : "FiraCode-Bold";
+	src         : url("../../fonts/FiraCode-Bold.ttf") format("truetype")
+}
+
+* {
+	box-sizing : border-box;
+}
+
+html {
+	min-width : 758px !important;
+}
+
+body {
+	background-color : $bg-color;
+	color            : $text-color;
+	margin-bottom    : 40px;
+	font-family      : Comfortaa, sans-serif;
+	font-size        : 0.9em;
+}
+
+main {
+	padding : 20px 10px;
+}
+
+footer {
+	position   : fixed;
+	z-index    : 999;
+	width      : 100%;
+	bottom     : 0;
+	padding    : 10px;
+	font-size  : 0.8em;
+	border-top : 1px solid $menu-border-color;
+	color      : #1cb5f1;
+	background : linear-gradient(to bottom, $menu-bg-from-color, $menu-bg-to-color);
+}
+
+.content-block {
+	padding          : 20px;
+	background-color : $container-bg-color;
+	border-radius    : 8px;
+}
+
+.cleaner {
+	clear    : both;
+	width    : 0;
+	height   : 0;
+	overflow : hidden;
+}
+
+h1 {
+	color     : $header-color;
+	font-size : 1.6em;
+	padding   : 10px 15px;
+}
+
+h2 {
+	color     : $header-color;
+	font-size : 1.4em;
+	padding   : 10px 15px;
+}
+
+.hl {
+	color : $header-color;
+}

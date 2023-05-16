@@ -1,49 +1,76 @@
 <?php
 
 use lib\helper\HtmlHelper;
+
 $distance = $this->get('distance');
+$timespan = $this->get('timespan');
+
 ?>
 <div class="container-fluid">
     <h1>Math Helper</h1>
     <div class="row">
         <div class="col-4">
             <h2>Entfernungs-Berechnung</h2>
-            <form action="\tests/math" method="POST">
+            <form action="/tests/math" method="POST">
                 <?php //HtmlHelper::generateFormToken() ?>
+                <div>Coordinate 1</div>
                 <div class="row">
-                    <div class="col">Coordinate 1</div>
                     <div class="col">
                         <label for="long_1">Longitude</label>
-                        <input id="long_1" type="text" name="coord[0][long]" value="" required="required" />
+                        <input id="long_1" type="text" name="coord[0][long]" value="" required="required"/>
                     </div>
                     <div class="col">
                         <label for="lat_1">Latitude</label>
-                        <input id="lat_1" type="text" name="coord[0][lat]" value="" required="required" />
+                        <input id="lat_1" type="text" name="coord[0][lat]" value="" required="required"/>
                     </div>
                 </div>
+
+                <div>Coordinate 2</div>
                 <div class="row">
-                    <div class="col">Coordinate 2</div>
                     <div class="col">
                         <label for="long_2">Longitude</label>
-                        <input id="long_2" type="text" name="coord[1][long]" value="" required="required" />
+                        <input id="long_2" type="text" name="coord[1][long]" value="" required="required"/>
                     </div>
                     <div class="col">
                         <label for="lat_2">Latitude</label>
-                        <input id="lat_2" type="text" name="coord[1][lat]" value="" required="required" />
+                        <input id="lat_2" type="text" name="coord[1][lat]" value="" required="required"/>
                     </div>
                 </div>
+
                 <div class="row">
                     <div class="col">Distance</div>
                     <div class="col"><?= $distance ?></div>
                 </div>
                 <div>
                     <div class="col" style="padding-top: 21px;">
-                        <input type="submit" name="distance" value="Berechnen" />
+                        <input type="submit" name="distance" value="Berechnen" class="button-default"/>
                     </div>
                 </div>
             </form>
         </div>
-        <div class="col-4"></div>
+        <div class="col-4">
+            <h2>Zeit-Berechnung</h2>
+            <form action="/tests/math" method="POST">
+                <?php HtmlHelper::generateFormToken() ?>
+                <div class="row">
+                    <label for="start_date">Start Datum</label>
+                    <input id="start_date" type="date" name="start_date" value="" required="required"/>
+                </div>
+                <div class="row">
+                    <label for="end_date">End Datum</label>
+                    <input id="end_date" type="date" name="end_date" value="" required="required"/>
+                </div>
+                <div class="row row">
+                    <div class="col">Zeitraum</div>
+                    <div class="col"><?= ($timespan === null) ? "" : $timespan->y ?></div>
+                </div>
+                <div>
+                    <div class="col" style="padding-top: 21px;">
+                        <input type="submit" name="timespan" value="Berechnen" class="button-default"/>
+                    </div>
+                </div>
+            </form>
+        </div>
         <div class="col-4"></div>
     </div>
 

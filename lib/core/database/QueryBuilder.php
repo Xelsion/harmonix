@@ -2,8 +2,11 @@
 
 namespace lib\core\database;
 
+use lib\core\blueprints\ADBConnection;
 use lib\core\enums\DbType;
 use lib\core\exceptions\SystemException;
+use PDO;
+use PDOStatement;
 
 /**
  * Class QueryBuilder
@@ -12,26 +15,18 @@ use lib\core\exceptions\SystemException;
  * @author Markus Schröder <xelsion@gmail.com>
  * @version 1.0.0;
  */
-class QueryBuilder {
-    private DbType $db_type;
-
-    private int $db_version;
-
-    private string $query_type = "";
-
-    private string $sql = "";
+class QueryBuilder extends PDO {
+    protected PDOStatement $stmt;
+    protected string $query_type = "";
+    protected string $sql = "";
 
     /**
-     * @param PDOConnection $pdo
-     * @throws SystemException
+     * The class constructor
+     *
+     * @param ADBConnection $conn
      */
-    public function __construct( PDOConnection $pdo ) {
-        $this->db_type = $pdo->getType();
-        $version_info = $pdo->getVersion();
-        $this->db_version = $version_info['base'];
-        if( $this->db_type === DbType::MsSQL && $this->db_version < 2012 ) {
-            throw new SystemException(__FILE__, __LINE__ ,"QueryBuilder: does not support MsSQL version " . $this->db_version, "");
-        }
+    public function __construct( ADBConnection $conn ) {
+        parent::__construct($conn->getConnectionString(), $conn->user, $conn->pass, $conn->getConnectionOptions());
     }
 
     /**
@@ -46,9 +41,9 @@ class QueryBuilder {
         if( is_null($columns) ) {
             $this->sql = "SELECT *";
         } elseif( is_array($columns) ) {
-            $this->sql = "SELECT ". implode(", ", $columns);
+            $this->sql = "SELECT " . implode(", ", $columns);
         } else {
-            $this->sql = "SELECT ". $columns;
+            $this->sql = "SELECT " . $columns;
         }
         $this->query_type = "select";
         return $this;
@@ -61,7 +56,7 @@ class QueryBuilder {
      * @return $this
      */
     public function Insert( string $table ): QueryBuilder {
-        $this->sql = "INSERT INTO ". $table;
+        $this->sql = "INSERT INTO " . $table;
         $this->query_type = "insert";
         return $this;
     }
@@ -73,7 +68,7 @@ class QueryBuilder {
      * @return $this
      */
     public function Update( string $table ): QueryBuilder {
-        $this->sql = "UPDATE ". $table;
+        $this->sql = "UPDATE " . $table;
         $this->query_type = "update";
         return $this;
     }
@@ -85,7 +80,8 @@ class QueryBuilder {
      * @return $this
      */
     public function Delete( string $table ): QueryBuilder {
-        $this->sql = "DELETE FROM ". $table;
+        $this->sql = "DELETE FROM " . $table;
+        $this->query_type = "delete";
         return $this;
     }
 
@@ -96,75 +92,7 @@ class QueryBuilder {
      * @return $this
      */
     public function Truncate( string $table ): QueryBuilder {
-        $this->sql = "TRUNCATE ". $table;
-        return $this;
-    }
-
-    /**
-     * Adds "SET $column[0]=$value[0], $column[n]=$value[n]" to the query
-     * if no values are given it will use placeholder as values
-     * the placeholder name will de the same as the column name with a leading ":"
-     *
-     * @param array $columns
-     * @param array $values optional
-     * @return $this
-     * @throws SystemException
-     */
-    public function Set( array $columns, array $values = [] ): QueryBuilder {
-        if( $this->query_type !== "update" ) {
-            throw new SystemException(__FILE__, __LINE__, "The query type is not update");
-        }
-        if( $this->sql === "" ) {
-            throw new SystemException(__FILE__, __LINE__, "Error in query Syntax");
-        }
-        if( !empty($values) && count($columns) !== count($values) ) {
-            throw new \InvalidArgumentException('The number of columns and values must be the same.');
-        }
-        $this->sql .= " SET";
-        $is_first = true;
-        if( empty($values) ) {
-            foreach( $columns as $col ) {
-                $this->sql .= (($is_first)?" ":", ") . $col . "=:". $col;
-                $is_first = false;
-            }
-        } else {
-            $formatted_values = $this->getFormattedValues($values);
-            $num_cols = count($columns);
-            for( $i = 0; $i < $num_cols; $i++) {
-                $this->sql .= (($is_first)?" ":", ") . $columns[$i] . "=". $formatted_values[$i];
-                $is_first = false;
-            }
-        }
-        return $this;
-    }
-
-    /**
-     * Adds "($columns[0], $columns[n]) VALUES ($values[0],$values[n])" to the current point of the query
-     * if $values is not set or empty it will use placeholder as values.
-     * the placeholder name will de the same as the column name with a leading ":"
-     *
-     * @param array $columns
-     * @param array $values
-     * @return $this
-     * @throws SystemException
-     */
-    public function Columns( array $columns, array $values = [] ): QueryBuilder {
-        if( $this->query_type !== "insert" ) {
-            throw new SystemException(__FILE__, __LINE__, "The query type is not insert");
-        }
-        if( $this->sql === "" ) {
-            throw new SystemException(__FILE__, __LINE__, "Error in query Syntax");
-        }
-        if( !empty($values) && count($columns) !== count($values) ) {
-            throw new \InvalidArgumentException('The number of columns and values must be the same.');
-        }
-        $this->sql .= " (". implode(", ", $columns).") VALUES";
-        if( empty($values) ) {
-            $this->sql .= " (:".implode(", :", $columns).")";
-        } else {
-            $formatted_values = $this->getFormattedValues($values);
-            $this->sql .= " (".implode(", ", $formatted_values).")";
-        }
+        $this->sql = "TRUNCATE " . $table;
         return $this;
     }
 
@@ -185,9 +113,9 @@ class QueryBuilder {
         if( is_null($tables) ) {
             $this->sql .= " FROM";
         } elseif( is_array($tables) ) {
-            $this->sql .= " FROM ". implode( ", ", $tables );
+            $this->sql .= " FROM " . implode(", ", $tables);
         } else {
-            $this->sql .= " FROM ". $tables;
+            $this->sql .= " FROM " . $tables;
         }
         return $this;
     }
@@ -250,9 +178,76 @@ class QueryBuilder {
             throw new SystemException(__FILE__, __LINE__, "Error in query Syntax");
         }
         if( is_array($conditions) ) {
-            $this->sql .= " ON ". implode( ", ", $conditions );
+            $this->sql .= " ON " . implode(", ", $conditions);
         } else {
-            $this->sql .= " ON ". $conditions;
+            $this->sql .= " ON " . $conditions;
+        }
+        return $this;
+    }
+
+    /**
+     * Adds "SET $column[0]=$value[0], $column[n]=$value[n]" to the query
+     * if no values are given it will use placeholder as values
+     * the placeholder name will de the same as the column name with a leading ":"
+     * @param array $columns
+     * @param array $values optional
+     * @return $this
+     * @throws SystemException
+     */
+    public function Set( array $columns, array $values = [] ): QueryBuilder {
+        if( $this->query_type !== "update" ) {
+            throw new SystemException(__FILE__, __LINE__, "The query type is not update");
+        }
+        if( $this->sql === "" ) {
+            throw new SystemException(__FILE__, __LINE__, "Error in query Syntax");
+        }
+        if( !empty($values) && count($columns) !== count($values) ) {
+            throw new \InvalidArgumentException('The number of columns and values must be the same.');
+        }
+        $this->sql .= " SET";
+        $is_first = true;
+        if( empty($values) ) {
+            foreach( $columns as $col ) {
+                $this->sql .= (($is_first)?" ":", ") . $col . "=:" . $col;
+                $is_first = false;
+            }
+        } else {
+            $formatted_values = $this->getFormattedValues($values);
+            $num_cols = count($columns);
+            for( $i = 0; $i < $num_cols; $i++ ) {
+                $this->sql .= (($is_first)?" ":", ") . $columns[$i] . "=" . $formatted_values[$i];
+                $is_first = false;
+            }
+        }
+        return $this;
+    }
+
+    /**
+     * Adds "($columns[0], $columns[n]) VALUES ($values[0],$values[n])" to the current point of the query
+     * if $values is not set or empty it will use placeholder as values.
+     * the placeholder name will de the same as the column name with a leading ":"
+     *
+     * @param array $columns
+     * @param array $values
+     * @return $this
+     * @throws SystemException
+     */
+    public function Columns( array $columns, array $values = [] ): QueryBuilder {
+        if( $this->query_type !== "insert" ) {
+            throw new SystemException(__FILE__, __LINE__, "The query type is not insert");
+        }
+        if( $this->sql === "" ) {
+            throw new SystemException(__FILE__, __LINE__, "Error in query Syntax");
+        }
+        if( !empty($values) && count($columns) !== count($values) ) {
+            throw new \InvalidArgumentException('The number of columns and values must be the same.');
+        }
+        $this->sql .= " (" . implode(", ", $columns) . ") VALUES";
+        if( empty($values) ) {
+            $this->sql .= " (:" . implode(", :", $columns) . ")";
+        } else {
+            $formatted_values = $this->getFormattedValues($values);
+            $this->sql .= " (" . implode(", ", $formatted_values) . ")";
         }
         return $this;
     }
@@ -277,7 +272,7 @@ class QueryBuilder {
         }
         $this->sql .= " (";
         if( is_array($conditions) ) {
-            $this->sql .= implode( " ".$operator." ", $conditions) . ")";
+            $this->sql .= implode(" " . $operator . " ", $conditions) . ")";
         } else {
             $this->sql .= $conditions;
         }
@@ -345,7 +340,7 @@ class QueryBuilder {
         }
         $this->sql .= " OR";
         if( $condition !== "" ) {
-            $this->sql .= " ". $condition;
+            $this->sql .= " " . $condition;
         }
 
         return $this;
@@ -362,7 +357,7 @@ class QueryBuilder {
         if( $this->sql === "" ) {
             throw new SystemException(__FILE__, __LINE__, "Error in query Syntax");
         }
-        $this->sql .= " LIKE ".$condition;
+        $this->sql .= " LIKE " . $condition;
         return $this;
     }
 
@@ -377,7 +372,7 @@ class QueryBuilder {
         if( $this->sql === "" ) {
             throw new SystemException(__FILE__, __LINE__, "Error in query Syntax");
         }
-        $this->sql .= " NOT LIKE ".$condition;
+        $this->sql .= " NOT LIKE " . $condition;
         return $this;
     }
 
@@ -393,7 +388,7 @@ class QueryBuilder {
         if( $this->sql === "" ) {
             throw new SystemException(__FILE__, __LINE__, "Error in query Syntax");
         }
-        $this->sql .= " IN(". implode( ", ", $values ). ")";
+        $this->sql .= " IN(" . implode(", ", $values) . ")";
         return $this;
     }
 
@@ -409,7 +404,7 @@ class QueryBuilder {
         if( $this->sql === "" ) {
             throw new SystemException(__FILE__, __LINE__, "Error in query Syntax");
         }
-        $this->sql .= " NOT IN(". implode( ", ", $values ). ")";
+        $this->sql .= " NOT IN(" . implode(", ", $values ) . ")";
         return $this;
     }
 
@@ -425,7 +420,7 @@ class QueryBuilder {
         if( $this->sql === "" ) {
             throw new SystemException(__FILE__, __LINE__, "Error in query Syntax");
         }
-        $this->sql .= " BETWEEN ". $condition1 . " AND " . $condition2;
+        $this->sql .= " BETWEEN " . $condition1 . " AND " . $condition2;
         return $this;
     }
 
@@ -441,7 +436,7 @@ class QueryBuilder {
         if( $this->sql === "" ) {
             throw new SystemException(__FILE__, __LINE__, "Error in query Syntax");
         }
-        $this->sql .= " NOT BETWEEN ". $condition1 . " AND " . $condition2;
+        $this->sql .= " NOT BETWEEN " . $condition1 . " AND " . $condition2;
         return $this;
     }
 
@@ -482,16 +477,16 @@ class QueryBuilder {
      * @return $this
      * @throws SystemException
      */
-    public function SubQuery(QueryBuilder $builder, string $alias = "", string $condition = ""): QueryBuilder {
+    public function SubQuery( QueryBuilder $builder, string $alias = "", string $condition = "" ): QueryBuilder {
         if( $this->sql === "" ) {
             throw new SystemException(__FILE__, __LINE__, "Error in query Syntax");
         }
-        $this->sql .= " (". $builder->sql .")";
+        $this->sql .= " (" . $builder->sql . ")";
         if( $alias !== "" ) {
-            $this->sql .= " AS ".$alias;
+            $this->sql .= " AS " . $alias;
         }
         if( $condition !== "" ) {
-            $this->sql .= " ". $condition;
+            $this->sql .= " " . $condition;
         }
         return $this;
     }
@@ -528,11 +523,11 @@ class QueryBuilder {
         if( is_array($columns) ) {
             $is_first = true;
             foreach($columns as $col => $direction) {
-                $this->sql.= (($is_first) ? " " : ", ").$col." ".$direction;
+                $this->sql.= (($is_first) ? " " : ", ") . $col . " " . $direction;
                 $is_first = false;
             }
         } else {
-            $this->sql.= " ". $columns. " ". $order;
+            $this->sql.= " " . $columns . " " . $order;
         }
         return $this;
     }
@@ -551,13 +546,13 @@ class QueryBuilder {
         }
         switch( $this->db_type ) {
             case DbType::MySQL:
-                $this->sql .= " LIMIT ". $limit . " OFFSET " .$offset;
+                $this->sql .= " LIMIT " . $limit . " OFFSET " . $offset;
                 break;
             case DbType::MsSQL:
-                $this->sql .= " OFFSET " . $offset . " ROWS FETCH NEXT ". $limit ." ROWS ONLY";
+                $this->sql .= " OFFSET " . $offset . " ROWS FETCH NEXT " . $limit . " ROWS ONLY";
                 break;
             case DbType::Postgres:
-                $this->sql .= " OFFSET " .$offset . " LIMIT ". $limit;
+                $this->sql .= " OFFSET " . $offset . " LIMIT " . $limit;
                 break;
         }
     }
@@ -575,9 +570,9 @@ class QueryBuilder {
             throw new SystemException(__FILE__, __LINE__, "Error in query Syntax");
         }
         if( is_array($columns) ) {
-            $this->sql.= " GROUP BY ". implode( ", ", $columns );
+            $this->sql.= " GROUP BY " . implode(", ", $columns);
         } else {
-            $this->sql.= " GROUP BY ". $columns;
+            $this->sql.= " GROUP BY " . $columns;
         }
 
         return $this;
@@ -606,7 +601,7 @@ class QueryBuilder {
      * @return string|int
      */
     private function getFormattedValue( mixed $value ): string|int {
-        return ( is_int($value) ) ? (int)$value : "'". $value. "'";
+        return ( is_int($value) ) ? $value : "'" . $value . "'";
     }
 
     /**
@@ -627,7 +622,7 @@ class QueryBuilder {
     private function getFormattedValues( array $values ): array {
         $formatted_values = [];
         foreach($values as $value) {
-            $formatted_values[] = ( is_int($value) ) ? $value : "'". $value. "'";
+            $formatted_values[] = ( is_int($value) ) ? $value : "'" . $value . "'";
         }
         return $formatted_values;
     }

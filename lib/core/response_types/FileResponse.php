@@ -30,7 +30,6 @@ class FileResponse extends AResponse {
         $file_extension = strtolower(substr(strrchr($this->file_path,"."),1));
         $file_type = match ( $file_extension ) {
             "pdf" => "application/pdf",
-            "exe" => "application/octet-stream",
             "zip" => "application/zip",
             "doc" => "application/msword",
             "xls" => "application/vnd.ms-excel",

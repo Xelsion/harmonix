@@ -6,7 +6,6 @@ use Exception;
 use lib\App;
 use lib\core\blueprints\ARepository;
 use lib\core\ConnectionManager;
-use lib\core\database\QueryBuilder;
 use lib\core\exceptions\SystemException;
 use models\AccessRestrictionTypeModel;
 use models\entities\AccessRestrictionType;
@@ -19,8 +18,6 @@ use PDO;
  * @version 1.0.0
  */
 class AccessRestrictionTypeRepository extends ARepository {
-
-    private QueryBuilder $query_builder;
 
     /**
      * @throws SystemException

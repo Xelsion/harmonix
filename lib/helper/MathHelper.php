@@ -2,10 +2,43 @@
 
 namespace lib\helper;
 
+use DateInterval;
+use DateTime;
 use lib\classes\GeoCoordinate;
 
 class MathHelper {
 
+    public static function getBlaBla(): float {
+        return 0.0;
+    }
+
+
+    /**
+     * Calculates the time between two dates
+     *
+     * @param DateTime $date_1
+     * @param DateTime $date_2
+     * @return DateInterval
+     */
+    public static function getTimeBetween( DateTime $date_1, DateTime $date_2 ): DateInterval {
+        if( $date_1 <= $date_2 ) {
+            $date_start = $date_1;
+            $date_end = $date_2;
+        } else {
+            $date_start = $date_2;
+            $date_end = $date_1;
+        }
+        return $date_start->diff( $date_end );
+    }
+
+    /**
+     * Calculates the distance between two geo-coordinates in kilometers
+     *
+     * @param GeoCoordinate $coordinate1
+     * @param GeoCoordinate $coordinate2
+     * @param $format
+     * @return float
+     */
     public static function getDistanceBetween( GeoCoordinate $coordinate1, GeoCoordinate $coordinate2, $format = "K" ): float {
         $earth_radius = 6378.388;
         $sin_lat = sin($coordinate1->latitude) * sin($coordinate2->latitude);

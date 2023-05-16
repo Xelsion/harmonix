@@ -19,7 +19,6 @@ class SystemException extends ALoggableException {
         parent::__construct($file, $line, $message, $code, $previous);
     }
 
-
     /**
      * @inheritDoc
      */

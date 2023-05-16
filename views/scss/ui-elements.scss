@@ -1,0 +1,97 @@
+/* START ui-elements */
+%slider {
+	position     : absolute;
+	content      : "";
+	top          : 50%;
+	width        : 0;
+	height       : 0;
+	border-color : $text-color;
+}
+
+.slide-down {
+	@extend %slider;
+	border-left  : 4px solid transparent;
+	border-right : 4px solid transparent;
+	border-top   : 4px solid;
+}
+
+.slide-up {
+	@extend %slider;
+	border-left   : 4px solid transparent;
+	border-right  : 4px solid transparent;
+	border-bottom : 4px solid;
+}
+
+.slide-right {
+	@extend %slider;
+	border-top    : 4px solid transparent;
+	border-bottom : 4px solid transparent;
+	border-left   : 4px solid;
+}
+
+.slide-left {
+	@extend %slider;
+	border-top    : 4px solid transparent;
+	border-bottom : 4px solid transparent;
+	border-right  : 4px solid;
+}
+
+/* END ui-elements */
+
+/* START clickable */
+a,
+a:visited,
+a:hover {
+	color           : $text-color;
+	text-decoration : none;
+}
+
+%button {
+	font-family   : Comfortaa, Helvetica, sans-serif;
+	font-size     : 0.9em;
+	padding       : 4px 15px;
+	color         : $text-color;
+	border        : 1px solid $button-border-color;
+	border-radius : 4px;
+}
+
+.button-default {
+	@extend %button;
+	background : linear-gradient(to bottom, $button-default-from-color, $button-default-to-color);
+
+	&:hover {
+		background : linear-gradient(to bottom, $button-default-to-color, $button-default-from-color);
+	}
+
+	&:disabled {
+		color : $button-disabled-text-color !important;
+	}
+}
+
+.button-positiv {
+	@extend %button;
+	background : linear-gradient(to bottom, $button-positiv-from-color, $button-positiv-to-color);
+
+	&:hover {
+		background : linear-gradient(to bottom, $button-positiv-to-color, $button-positiv-from-color);
+	}
+
+	&:disabled {
+		color : $button-disabled-text-color !important;
+	}
+}
+
+.button-negativ {
+	@extend %button;
+	background : linear-gradient(to bottom, $button-negativ-from-color, $button-negativ-to-color);
+
+	&:hover {
+		background : linear-gradient(to bottom, $button-negativ-to-color, $button-negativ-from-color);
+	}
+
+	&:disabled {
+		color : $button-disabled-text-color !important;
+	}
+}
+
+/* END clickable */
