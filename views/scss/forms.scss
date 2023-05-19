@@ -56,10 +56,6 @@ form {
 		padding          : 5px;
 		width            : 100%;
 
-		&[type=checkbox] {
-			margin-right : 10px;
-		}
-
 		&[type=submit] {
 			padding : 6px 5px;
 		}
@@ -68,6 +64,13 @@ form {
 			color            : $input-disabled-text-color;
 			background-color : $input-disabled-bg-color;
 		}
+	}
+
+	input[type=checkbox] {
+		color            : $text-color;
+		background-color : $input-bg-color;
+		border           : 1px solid $input-border-color;
+		margin-right     : 10px;
 	}
 
 	select {

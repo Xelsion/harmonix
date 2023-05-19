@@ -28,39 +28,6 @@
 		margin           : 0;
 	}
 
-	input {
-		color            : $text-color;
-		background-color : $input-bg-color;
-		border           : 1px solid $menu-border-color;
-		border-radius    : 2px;
-	}
-
-	button {
-		width            : 100%;
-		text-align       : center;
-		color            : $text-color;
-		background-color : $button-positiv-color;
-		border           : 1px solid $menu-border-color;
-		border-radius    : 4px;
-
-		&:hover {
-			background-color : $button-positiv-hover-color;
-		}
-
-		&.link {
-			display          : inline-block !important;
-			text-align       : left !important;
-			padding          : 0 !important;
-			margin           : 0 !important;
-			background-color : transparent !important;
-			border           : 0 !important;
-
-			&:hover {
-				color : $text-hover-color;
-			}
-		}
-	}
-
 	.menu-item {
 		position        : relative;
 		display         : inline-block;

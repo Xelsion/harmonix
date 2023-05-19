@@ -41,7 +41,7 @@ $view_content = ($view instanceof Template) ? $view->parse() : $view;
         <div id="actor-menu">
             <div class="has-children">
                 <span onclick="$('#actor-menu-dropdown').toggle();"
-                      class="menu-item"><?= ($actor->id > 0) ? $actor->first_name . " " . $actor->last_name : "Profile" ?></span>
+                    class="menu-item"><?= ($actor->id > 0) ? $actor->first_name . " " . $actor->last_name : "Profile" ?></span>
             </div>
             <div id="actor-menu-dropdown" style="">
                 <menu>
@@ -56,21 +56,18 @@ $view_content = ($view instanceof Template) ? $view->parse() : $view;
                                 </div>
                                 <div class="form-row">
                                     <label>
-                                        <input type="password" name="password" value="" placeholder="Password"
-                                               autocomplete="new-password"/>
+                                        <input type="password" name="password" value="" placeholder="Password" autocomplete="new-password"/>
                                     </label>
                                 </div>
                                 <?php if( $config->getSectionValue("security", "permanent_login") ) { ?>
                                     <div class="form-row form-check">
-                                        <input id="perma_login" class="form-check-input" type="checkbox"
-                                               name="permanent_login" value="yes"/>
-                                        <label for="perma_login" class="form-check-label font-monospace">eingeloggt
-                                            bleiben?</label>
+                                        <input id="perma_login" class="form-check-input" type="checkbox" name="permanent_login" value="yes"/>
+                                        <label for="perma_login" class="form-check-label font-monospace">eingeloggt bleiben?</label>
                                     </div>
                                 <?php } ?>
                                 <div><a href="" class="font-monospace">Passwort vergessen?</a></div>
                                 <div class="form-row">
-                                    <button type="submit" name="login">Login</button>
+                                    <button type="submit" name="login" class="button-positiv-flat">Login</button>
                                 </div>
                             </form>
                         </li>
@@ -83,7 +80,7 @@ $view_content = ($view instanceof Template) ? $view->parse() : $view;
                         <li>
                             <form action="/" method="POST">
                                 <?= HtmlHelper::generateFormToken() ?>
-                                <button type="submit" name="logout" class="link">Logout</button>
+                                <button type="submit" name="logout" class="button-link">Logout</button>
                             </form>
                         </li>
                     <?php endif; ?>

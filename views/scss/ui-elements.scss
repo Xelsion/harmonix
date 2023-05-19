@@ -1,8 +1,19 @@
 /* START ui-elements */
+
+
 %slider {
 	position     : absolute;
 	content      : "";
 	top          : 50%;
+	width        : 0;
+	height       : 0;
+	border-color : $text-color;
+}
+
+%slider-inline {
+	position     : relative;
+	content      : "";
+	top          : calc(50% - 0.3em);
 	width        : 0;
 	height       : 0;
 	border-color : $text-color;
@@ -36,6 +47,34 @@
 	border-right  : 4px solid;
 }
 
+.slide-down-inline {
+	@extend %slider-inline;
+	border-left  : 4px solid transparent;
+	border-right : 4px solid transparent;
+	border-top   : 4px solid;
+}
+
+.slide-up-inline {
+	@extend %slider-inline;
+	border-left   : 4px solid transparent;
+	border-right  : 4px solid transparent;
+	border-bottom : 4px solid;
+}
+
+.slide-right-inline {
+	@extend %slider-inline;
+	border-top    : 4px solid transparent;
+	border-bottom : 4px solid transparent;
+	border-left   : 4px solid;
+}
+
+.slide-left-inline {
+	@extend %slider-inline;
+	border-top    : 4px solid transparent;
+	border-bottom : 4px solid transparent;
+	border-right  : 4px solid;
+}
+
 /* END ui-elements */
 
 /* START clickable */
@@ -46,17 +85,33 @@ a:hover {
 	text-decoration : none;
 }
 
+.button-link {
+	display          : inline-block !important;
+	color            : $text-color;
+	text-align       : left !important;
+	padding          : 0 !important;
+	margin           : 0 !important;
+	background-color : transparent !important;
+	border           : 0 !important;
+
+	&:hover {
+		color : $text-hover-color;
+	}
+}
+
+
 %button {
 	font-family   : Comfortaa, Helvetica, sans-serif;
+	display       : inline-block;
 	font-size     : 0.9em;
 	padding       : 4px 15px;
-	color         : $text-color;
-	border        : 1px solid $button-border-color;
 	border-radius : 4px;
 }
 
 .button-default {
 	@extend %button;
+	color      : $button-default-text-color;
+	border     : 1px solid $button-default-border-color;
 	background : linear-gradient(to bottom, $button-default-from-color, $button-default-to-color);
 
 	&:hover {
@@ -64,12 +119,30 @@ a:hover {
 	}
 
 	&:disabled {
-		color : $button-disabled-text-color !important;
+		color : $button-default-disabled-text-color !important;
+	}
+}
+
+.button-default-flat {
+	@extend %button;
+	color            : $button-default-text-color;
+	border           : 1px solid $button-default-border-color;
+	background-color : $button-default-bg-color;
+
+	&:hover {
+		background-color : $button-default-hover-color;
+	}
+
+	&:disabled {
+		color            : $button-default-disabled-text-color !important;
+		background-color : $button-default-disabled-bg-color !important;
 	}
 }
 
 .button-positiv {
 	@extend %button;
+	color      : $button-positiv-text-color;
+	border     : 1px solid $button-positiv-border-color;
 	background : linear-gradient(to bottom, $button-positiv-from-color, $button-positiv-to-color);
 
 	&:hover {
@@ -77,12 +150,30 @@ a:hover {
 	}
 
 	&:disabled {
-		color : $button-disabled-text-color !important;
+		color : $button-positiv-disabled-text-color !important;
+	}
+}
+
+.button-positiv-flat {
+	@extend %button;
+	color            : $button-positiv-text-color;
+	border           : 1px solid $button-positiv-border-color;
+	background-color : $button-positiv-bg-color;
+
+	&:hover {
+		background-color : $button-positiv-hover-color;
+	}
+
+	&:disabled {
+		color            : $button-positiv-disabled-text-color !important;
+		background-color : $button-positiv-disabled-bg-color !important;
 	}
 }
 
 .button-negativ {
 	@extend %button;
+	color      : $button-negativ-text-color;
+	border     : 1px solid $button-negativ-border-color;
 	background : linear-gradient(to bottom, $button-negativ-from-color, $button-negativ-to-color);
 
 	&:hover {
@@ -90,7 +181,23 @@ a:hover {
 	}
 
 	&:disabled {
-		color : $button-disabled-text-color !important;
+		color : $button-negativ-disabled-text-color !important;
+	}
+}
+
+.button-negativ-flat {
+	@extend %button;
+	color            : $button-negativ-text-color;
+	border           : 1px solid $button-negativ-border-color;
+	background-color : $button-negativ-bg-color;
+
+	&:hover {
+		background-color : $button-negativ-hover-color;
+	}
+
+	&:disabled {
+		color            : $button-negativ-disabled-text-color !important;
+		background-color : $button-negativ-disabled-bg-color !important;
 	}
 }
 

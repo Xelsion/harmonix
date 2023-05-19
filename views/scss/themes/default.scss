@@ -5,6 +5,7 @@ $header-color                       : #1cb5f1;
 $border-color                       : #555555;
 $container-bg-color                 : #cccccc;
 
+/* input field colors */
 $input-bg-color                     : #efefef;
 $input-border-color                 : #555555;
 $input-disabled-bg-color            : #939393;
@@ -12,22 +13,37 @@ $input-disabled-text-color          : #222222;
 $input-valid-color                  : #198754;
 $input-invalid-color                : #dc3545;
 
-$button-border-color                : #555555;
-$button-disabled-text-color         : #222222;
-$button-positiv-color               : #37532d;
+/* button default colors */
+$button-default-text-color          : #222222;
+$button-default-border-color        : #555555;
+$button-default-bg-color            : #dddddd;
+$button-default-hover-color         : #eeeeee;
+$button-default-from-color          : #eeeeee;
+$button-default-to-color            : #aaaaaa;
+$button-default-disabled-bg-color   : #666666;
+$button-default-disabled-text-color : #7d7d7d;
+
+/* button positiv colors */
+$button-positiv-text-color          : #cccccc;
+$button-positiv-border-color        : #555555;
+$button-positiv-bg-color            : #37532d;
 $button-positiv-hover-color         : #47633d;
-$button-negativ-color               : #642a2a;
-$button-negativ-hover-color         : #743a3a;
+$button-positiv-from-color          : #47633d;
+$button-positiv-to-color            : #17330d;
 $button-positiv-disabled-bg-color   : #17330d;
 $button-positiv-disabled-text-color : #7d7d7d;
 
-$button-default-from-color          : #eeeeee;
-$button-default-to-color            : #aaaaaa;
-$button-positiv-from-color          : #47633d;
-$button-positiv-to-color            : #17330d;
+/* button negativ colors */
+$button-negativ-text-color          : #cccccc;
+$button-negativ-border-color        : #555555;
+$button-negativ-bg-color            : #642a2a;
+$button-negativ-hover-color         : #743a3a;
 $button-negativ-from-color          : #642a2a;
 $button-negativ-to-color            : #340a0a;
+$button-negativ-disabled-bg-color   : #420808;
+$button-negativ-disabled-text-color : #7d7d7d;
 
+/* main menu colors */
 $menu-bg-from-color                 : #fefefe;
 $menu-bg-to-color                   : #cccccc;
 $menu-border-color                  : #555555;

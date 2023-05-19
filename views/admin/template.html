@@ -67,7 +67,7 @@ $view_content = ($view instanceof Template) ? $view->parse() : $view;
                                     </div>
                                 <?php } ?>
                                 <div class="form-row">
-                                    <button type="submit" name="login">Login</button>
+                                    <button type="submit" name="login" class="button-positiv">Login</button>
                                 </div>
                             </form>
                         </li>
@@ -78,7 +78,7 @@ $view_content = ($view instanceof Template) ? $view->parse() : $view;
                         <li>
                             <form action="/" method="POST">
                                 <?= HtmlHelper::generateFormToken() ?>
-                                <button type="submit" name="logout" class="link">Logout</button>
+                                <button type="submit" name="logout" class="button-link">Logout</button>
                             </form>
                         </li>
                     <?php endif; ?>

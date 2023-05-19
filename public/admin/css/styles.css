@@ -1,3 +1,8 @@
+/* input field colors */
+/* button default colors */
+/* button positiv colors */
+/* button negativ colors */
+/* main menu colors */
 @font-face {
   font-family: "Comfortaa";
   src: url("../../fonts/Comfortaa-Regular.ttf") format("truetype");
@@ -93,6 +98,15 @@ h2 {
   border-color: #cccccc;
 }
 
+.slide-left-inline, .slide-right-inline, .slide-up-inline, .slide-down-inline {
+  position: relative;
+  content: "";
+  top: calc(50% - 0.3em);
+  width: 0;
+  height: 0;
+  border-color: #cccccc;
+}
+
 .slide-down, #actor-menu .has-children::after, #navigation > ul > li.has-children::after {
   border-left: 4px solid transparent;
   border-right: 4px solid transparent;
@@ -117,6 +131,30 @@ h2 {
   border-right: 4px solid;
 }
 
+.slide-down-inline {
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 4px solid;
+}
+
+.slide-up-inline {
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-bottom: 4px solid;
+}
+
+.slide-right-inline {
+  border-top: 4px solid transparent;
+  border-bottom: 4px solid transparent;
+  border-left: 4px solid;
+}
+
+.slide-left-inline {
+  border-top: 4px solid transparent;
+  border-bottom: 4px solid transparent;
+  border-right: 4px solid;
+}
+
 /* END ui-elements */
 /* START clickable */
 a,
@@ -126,43 +164,100 @@ a:hover {
   text-decoration: none;
 }
 
-.button-negativ, .button-positiv, .button-default {
+.button-link {
+  display: inline-block !important;
+  color: #cccccc;
+  text-align: left !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  background-color: transparent !important;
+  border: 0 !important;
+}
+.button-link:hover {
+  color: #ffffff;
+}
+
+.button-negativ-flat, .button-negativ, .button-positiv-flat, .button-positiv, .button-default-flat, .button-default {
   font-family: Comfortaa, Helvetica, sans-serif;
+  display: inline-block;
   font-size: 0.9em;
   padding: 4px 15px;
-  color: #cccccc;
-  border: 1px solid #555555;
   border-radius: 4px;
 }
 
 .button-default {
+  color: #cccccc;
+  border: 1px solid #555555;
   background: linear-gradient(to bottom, #444444, #111111);
 }
 .button-default:hover {
   background: linear-gradient(to bottom, #111111, #444444);
 }
 .button-default:disabled {
-  color: #222222 !important;
+  color: #7d7d7d !important;
+}
+
+.button-default-flat {
+  color: #cccccc;
+  border: 1px solid #555555;
+  background-color: #333333;
+}
+.button-default-flat:hover {
+  background-color: #666666;
+}
+.button-default-flat:disabled {
+  color: #7d7d7d !important;
+  background-color: #666666 !important;
 }
 
 .button-positiv {
+  color: #cccccc;
+  border: 1px solid #555555;
   background: linear-gradient(to bottom, #47633d, #17330d);
 }
 .button-positiv:hover {
   background: linear-gradient(to bottom, #17330d, #47633d);
 }
 .button-positiv:disabled {
-  color: #222222 !important;
+  color: #7d7d7d !important;
+}
+
+.button-positiv-flat {
+  color: #cccccc;
+  border: 1px solid #555555;
+  background-color: #37532d;
+}
+.button-positiv-flat:hover {
+  background-color: #47633d;
+}
+.button-positiv-flat:disabled {
+  color: #7d7d7d !important;
+  background-color: #17330d !important;
 }
 
 .button-negativ {
+  color: #cccccc;
+  border: 1px solid #555555;
   background: linear-gradient(to bottom, #642a2a, #340a0a);
 }
 .button-negativ:hover {
   background: linear-gradient(to bottom, #340a0a, #642a2a);
 }
 .button-negativ:disabled {
-  color: #222222 !important;
+  color: #7d7d7d !important;
+}
+
+.button-negativ-flat {
+  color: #cccccc;
+  border: 1px solid #555555;
+  background-color: #642a2a;
+}
+.button-negativ-flat:hover {
+  background-color: #743a3a;
+}
+.button-negativ-flat:disabled {
+  color: #7d7d7d !important;
+  background-color: #420808 !important;
 }
 
 /* END clickable */
@@ -283,34 +378,6 @@ a:hover {
   padding: 5px 10px;
   margin: 0;
 }
-#actor-menu input {
-  color: #cccccc;
-  background-color: #383838;
-  border: 1px solid #000000;
-  border-radius: 2px;
-}
-#actor-menu button {
-  width: 100%;
-  text-align: center;
-  color: #cccccc;
-  background-color: #37532d;
-  border: 1px solid #000000;
-  border-radius: 4px;
-}
-#actor-menu button:hover {
-  background-color: #47633d;
-}
-#actor-menu button.link {
-  display: inline-block !important;
-  text-align: left !important;
-  padding: 0 !important;
-  margin: 0 !important;
-  background-color: transparent !important;
-  border: 0 !important;
-}
-#actor-menu button.link:hover {
-  color: #ffffff;
-}
 #actor-menu .menu-item {
   position: relative;
   display: inline-block;
@@ -381,15 +448,18 @@ form input {
   padding: 5px;
   width: 100%;
 }
-form input[type=checkbox] {
-  margin-right: 10px;
-}
 form input[type=submit] {
   padding: 6px 5px;
 }
 form input:disabled {
   color: #7d7d7d;
   background-color: #282828;
+}
+form input[type=checkbox] {
+  color: #cccccc;
+  background-color: #383838;
+  border: 1px solid #555555;
+  margin-right: 10px;
 }
 form select {
   color: #cccccc;
@@ -424,16 +494,19 @@ table tr.table-col {
 }
 .tree-table ul {
   list-style: none;
-  line-height: 38px;
+  line-height: 46px;
   margin: 0;
+}
+.tree-table ul li {
+  position: relative;
 }
 .tree-table ul li::before {
   position: absolute;
-  top: 0;
+  top: -7px;
   left: -15px;
   border-left: 2px solid white;
   border-bottom: 2px solid white;
-  height: 19px;
+  height: 30px;
   width: 10px;
   content: "";
 }
@@ -446,8 +519,8 @@ table tr.table-col {
   border-left: 2px solid white;
   content: "";
 }
-.tree-table li {
-  position: relative;
+.tree-table ul li:last-child::after {
+  display: none;
 }
 
 /* END tree table styles */
