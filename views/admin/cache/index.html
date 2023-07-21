@@ -8,19 +8,19 @@ $lang = App::getInstanceOf(Language::class);
 $cache_infos = $this->get("cache_infos");
 ?>
 <div class="container-fluid">
-	<h1>Cache files</h1>
-	<table class="table table-dark table-striped">
-		<tr>
-			<th>Total Files</th>
-			<th>Total Size</th>
-			<th class="col-md-3 text-end">Optionen</th>
-		</tr>
-		<tr>
-			<td><?= $cache_infos["total_files"] ?></td>
-			<td><?= round($cache_infos["total_size"] / 1024 / 1024, 2) ?>MB</td>
-			<td class="text-nowrap text-end">
-				<a href="/cache/delete" class="button button-negativ"><?= $lang->getValue("translations", "delete") ?></a>
-			</td>
-		</tr>
-	</table>
+    <h1>Cache files</h1>
+    <table class="table table-dark table-striped">
+        <tr>
+            <th>Total Files</th>
+            <th>Total Size</th>
+            <th class="col-md-3 text-end">Optionen</th>
+        </tr>
+        <tr>
+            <td class="align-middle"><?= $cache_infos["total_files"] ?></td>
+            <td class="align-middle"><?= round($cache_infos["total_size"] / 1024 / 1024, 2) ?>MB</td>
+            <td class="text-nowrap align-middle text-end">
+                <a href="/cache/delete" class="button button-negativ"><?= $lang->getValue("translations", "delete") ?></a>
+            </td>
+        </tr>
+    </table>
 </div>

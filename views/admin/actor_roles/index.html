@@ -15,7 +15,7 @@ $role_tree->buildHtmlTree(0, $html);
 $first = true;
 ?>
 <div class="container-fluid">
-	<h1>Rollen</h1>
+    <h1>Rollen</h1>
     <table class="table table-dark table-striped">
         <tr>
             <th>ID</th>
@@ -30,17 +30,15 @@ $first = true;
             $rights = $actor_role->getStringArray();
             ?>
             <tr>
-                <td><?= escaped_string($actor_role->id) ?></td>
-                <?php if( $first ):
-                    $first = false;
-                    ?>
+                <td class="align-middle"><?= escaped_string($actor_role->id) ?></td>
+                <?php if( $first ): $first = false; ?>
                     <td rowspan="100%" class="tree-table"><?= $html ?></td>
                 <?php endif; ?>
-                <td><?= escaped_string(implode(", ", $rights["all"])) ?></td>
-                <td><?= escaped_string(implode(", ", $rights["group"])) ?></td>
-                <td><?= escaped_string(implode(", ", $rights["own"])) ?></td>
-                <td><?= ($actor_role->is_protected) ? "Ja" : "Nein" ?></td>
-                <td class="text-nowrap text-end">
+                <td class="align-middle"><?= escaped_string(implode(", ", $rights["all"])) ?></td>
+                <td class="align-middle"><?= escaped_string(implode(", ", $rights["group"])) ?></td>
+                <td class="align-middle"><?= escaped_string(implode(", ", $rights["own"])) ?></td>
+                <td class="align-middle"><?= ($actor_role->is_protected) ? "Ja" : "Nein" ?></td>
+                <td class="text-nowrap align-middle text-end">
                     <a href="/actor-roles/<?= $actor_role->id ?>" class="button button-default"><?= $lang->getValue("translations", "edit") ?></a>
                     <a href="/actor-roles/delete/<?= $actor_role->id ?>" class="button button-negativ"><?= $lang->getValue("translations", "delete") ?></a>
                 </td>
