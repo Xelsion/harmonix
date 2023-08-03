@@ -88,6 +88,22 @@ h2 {
   color: #1cb5f1;
 }
 
+.exception-title {
+  font-size: 1.5em;
+  padding: 15px 50px;
+  background-color: #1cb5f1;
+  color: #cccccc;
+}
+
+.exception-body {
+  font-size: 1em;
+  padding: 15px 50px;
+  color: #cccccc;
+}
+.exception-body .info {
+  font-size: 1.2em;
+}
+
 /* START ui-elements */
 .slide-left, .slide-right, #navigation * ul > li.has-children::after, .slide-up, .slide-down, #actor-menu .has-children::after, #navigation > ul > li.has-children::after {
   position: absolute;

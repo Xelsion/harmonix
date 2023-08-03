@@ -7,7 +7,7 @@ $value = $_POST['value'] ?? '';
 ?>
 <div class="container-fluid">
     <form action="\tests/validator" method="POST">
-        <?= HtmlHelper::generateFormToken() ?>
+		<?= HtmlHelper::generateFormToken() ?>
         <div class="row">
             <div class="col">
                 <label for="input">Input</label>
@@ -18,29 +18,28 @@ $value = $_POST['value'] ?? '';
             </div>
         </div>
     </form>
-    <?php if( isset($_POST['check']) && $value !== "" ) {
-        $check["is valid Integer"] = ValidationHelper::isValidInteger($value);
-        $check["is valid Numeric"] = ValidationHelper::isValidNumeric($value);
-        $check["is valid E-Mail"] = ValidationHelper::isValidEmail($value);
-        $check["is valid Street"] = ValidationHelper::isValidStreet($value);
-        $check["is valid Street Nr."] = ValidationHelper::isValidStreetNr($value);
-        $check["is valid Zipcode"] = ValidationHelper::isValidZipcode($value);
-        $check["is valid City"] = ValidationHelper::isValidCity($value);
-        $check["is valid Password"] = ValidationHelper::isValidPassword($value);
-        ?>
-        <h3>Eingabe: <?= escaped_string($value) ?></h3>
-        <table class="table table-dark table-striped">
+	<?php if( isset($_POST['check']) && $value !== "" ) {
+		$check["is valid Integer"] = ValidationHelper::isValidInteger($value);
+		$check["is valid Numeric"] = ValidationHelper::isValidNumeric($value);
+		$check["is valid E-Mail"] = ValidationHelper::isValidEmail($value);
+		$check["is valid Street"] = ValidationHelper::isValidStreet($value);
+		$check["is valid Street Nr."] = ValidationHelper::isValidStreetNr($value);
+		$check["is valid Zipcode"] = ValidationHelper::isValidZipcode($value);
+		$check["is valid City"] = ValidationHelper::isValidCity($value);
+		$check["is valid Password"] = ValidationHelper::isValidPassword($value);
+		?>
+        <h3 style="margin-top: 30px;">Eingabe: <?= escaped_string($value) ?></h3>
+        <table class="table table-striped">
             <tr>
                 <th>Bedingung</th>
-                <th>Ergebnis</th>
+                <th style="width: 120px;">Ergebnis</th>
             </tr>
-            <?php foreach( $check as $key => $result ) { ?>
+			<?php foreach( $check as $key => $result ) { ?>
                 <tr>
                     <td><?= $key ?></td>
-                    <td class="col-1"
-                        style="color: <?= ($result) ? 'green' : 'red' ?>;"><?php print_debug($result) ?></td>
+                    <td style="color: <?= ($result) ? 'green' : 'red' ?>;"><?php print_debug($result) ?></td>
                 </tr>
-            <?php } ?>
+			<?php } ?>
         </table>
-    <?php } ?>
+	<?php } ?>
 </div>

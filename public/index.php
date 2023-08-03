@@ -12,6 +12,7 @@ ini_set('display_errors', 'on');
 use lib\App;
 use lib\core\blueprints\ALoggableException;
 use lib\core\classes\Logger;
+use lib\core\classes\Template;
 use lib\helper\StringHelper;
 use lib\middleware\SessionAuth;
 
@@ -45,7 +46,13 @@ try {
 	ob_end_flush();
 } catch( Exception $e ) {
 	try {
-		echo "An error occur: Please check the Log Files for more information";
+		if( SHOW_ERRORS ) {
+			$view = new Template(PATH_VIEWS_ROOT . "exception.html");
+			$view->set("error", $e);
+			echo $view->parse();
+		} else {
+			echo "An error occur: Please check the Log Files for more information";
+		}
 
 		// if it's a loggable exception then call its log function
 		if( $e instanceof ALoggableException ) {

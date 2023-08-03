@@ -7,8 +7,8 @@ use lib\App;
 use lib\core\blueprints\ARepository;
 use lib\core\ConnectionManager;
 use lib\core\exceptions\SystemException;
-use models\entities\ActorType;
 use models\ActorTypeModel;
+use models\entities\ActorType;
 use PDO;
 
 /**
@@ -19,21 +19,22 @@ use PDO;
  */
 class ActorTypeRepository extends ARepository {
 
-    /**
-     * @throws SystemException
-     */
-    public function __construct() {
-        $cm = App::getInstanceOf(ConnectionManager::class);
-        $this->pdo = $cm->getConnection("mvc");
-    }
+	/**
+	 * @throws SystemException
+	 */
+	public function __construct() {
+		$cm = App::getInstanceOf(ConnectionManager::class);
+		$this->pdo = $cm->getConnection("mvc");
+	}
 
-    /**
-     * @param int $id
-     * @return mixed
-     * @throws SystemException
-     */
-    public function get(int $id ): ActorTypeModel {
-        try {
+	/**
+	 * @param int $id
+	 * @return mixed
+	 * @throws SystemException
+	 */
+	public function get(int $id): ActorTypeModel {
+		try {
+			// @formatter:off
             $actor_type = $this->pdo->Select()
                 ->From("actor_types")
                 ->Where("id=:id")
@@ -43,22 +44,24 @@ class ActorTypeRepository extends ARepository {
                 ->execute()
                 ->fetch()
             ;
-            if( !$actor_type ) {
-                $actor_type = new ActorTypeModel();
-            }
-            return $actor_type;
-        } catch( Exception $e ) {
-            throw new SystemException($e->getFile(), $e->getLine(), $e->getMessage(), $e->getCode(), $e->getPrevious());
-        }
-    }
+	        // @formatter:on
+			if( !$actor_type ) {
+				$actor_type = new ActorTypeModel();
+			}
+			return $actor_type;
+		} catch( Exception $e ) {
+			throw new SystemException($e->getFile(), $e->getLine(), $e->getMessage(), $e->getCode(), $e->getPrevious());
+		}
+	}
 
-    /**
-     * @param int $id
-     * @return array
-     * @throws SystemException
-     */
-    public function getAsArray(int $id ): array {
-        try {
+	/**
+	 * @param int $id
+	 * @return array
+	 * @throws SystemException
+	 */
+	public function getAsArray(int $id): array {
+		try {
+			// @formatter:off
             $actor_type = $this->pdo->Select()
                 ->From("actor_types")
                 ->Where("id=:id")
@@ -67,21 +70,23 @@ class ActorTypeRepository extends ARepository {
                 ->execute()
                 ->fetch()
             ;
-            if( !$actor_type ) {
-                $actor_type = array();
-            }
-            return $actor_type;
-        } catch( Exception $e ) {
-            throw new SystemException($e->getFile(), $e->getLine(), $e->getMessage(), $e->getCode(), $e->getPrevious());
-        }
-    }
+	        // @formatter:on
+			if( !$actor_type ) {
+				$actor_type = array();
+			}
+			return $actor_type;
+		} catch( Exception $e ) {
+			throw new SystemException($e->getFile(), $e->getLine(), $e->getMessage(), $e->getCode(), $e->getPrevious());
+		}
+	}
 
-    /**
-     * @return array
-     * @throws SystemException
-     */
-    public function getAll(): array {
-        try {
+	/**
+	 * @return array
+	 * @throws SystemException
+	 */
+	public function getAll(): array {
+		try {
+			// @formatter:off
             return $this->pdo->Select()
                 ->From("actor_types")
                 ->prepareStatement()
@@ -89,69 +94,75 @@ class ActorTypeRepository extends ARepository {
                 ->execute()
                 ->fetchAll()
             ;
-        } catch( Exception $e ) {
-            throw new SystemException($e->getFile(), $e->getLine(), $e->getMessage(), $e->getCode(), $e->getPrevious());
-        }
-    }
+	        // @formatter:on
+		} catch( Exception $e ) {
+			throw new SystemException($e->getFile(), $e->getLine(), $e->getMessage(), $e->getCode(), $e->getPrevious());
+		}
+	}
 
-    /**
-     * @param array $conditions
-     * @param string|null $order
-     * @param string|null $direction
-     * @param int $limit
-     * @param int $page
-     * @return array
-     * @throws SystemException
-     */
-    public function find(array $conditions = array(), ?string $order = "", ?string $direction = "asc", int $limit = 0, int $page = 1): array {
-        return $this->findIn("actor_types", ActorTypeModel::class, $conditions, $order, $direction, $limit, $page);
-    }
+	/**
+	 * @param array $conditions
+	 * @param string|null $order
+	 * @param string|null $direction
+	 * @param int $limit
+	 * @param int $page
+	 * @return array
+	 * @throws SystemException
+	 */
+	public function find(array $conditions = array(), ?string $order = "", ?string $direction = "asc", int $limit = 0, int $page = 1): array {
+		return $this->findIn("actor_types", ActorTypeModel::class, $conditions, $order, $direction, $limit, $page);
+	}
 
-    /**
-     * Returns the total number of actor types
-     *
-     * @return int
-     * @throws SystemException
-     */
-    public function getNumRows(): int {
+	/**
+	 * Returns the total number of actor types
+	 *
+	 * @return int
+	 * @throws SystemException
+	 */
+	public function getNumRows(): int {
+		// @formatter:off
         $result = $this->pdo->Select("COUNT(DISTINCT id)")->As("num_count")
             ->From("actor_types")
             ->prepareStatement()
             ->execute()
             ->fetch()
         ;
-        return (int)$result["num_count"];
-    }
+	    // @formatter:on
+		return (int)$result["num_count"];
+	}
 
-    /**
-     * @param ActorType $type
-     * @return void
-     * @throws SystemException
-     */
-    public function createObject(ActorType $type ): void {
-        try {
+	/**
+	 * @param ActorType $type
+	 * @return void
+	 * @throws SystemException
+	 */
+	public function createObject(ActorType $type): void {
+		try {
+			// @formatter:off
             $this->pdo->Insert("actor_types")
                 ->Columns(["name"])
                 ->prepareStatement()
                     ->withParam(':name', $type->name)
                 ->execute()
             ;
-            $type->id = $this->pdo->lastInsertId();
-        } catch( Exception $e ) {
-            throw new SystemException(__FILE__, __LINE__, $e->getMessage(), $e->getCode(), $e->getPrevious());
-        }
-    }
+	        // @formatter:on
+			$type->id = $this->pdo->lastInsertId();
+		} catch( Exception $e ) {
+			throw new SystemException(__FILE__, __LINE__, $e->getMessage(), $e->getCode(), $e->getPrevious());
+		}
+	}
 
-    /**
-     * @param ActorType $type
-     * @return void
-     * @throws SystemException
-     */
-    public function updateObject(ActorType $type ): void {
-        if( $type->id === 0 || $type->is_protected ) {
-            return;
-        }
-        try {
+	/**
+	 * @param ActorType $type
+	 * @return void
+	 * @throws SystemException
+	 */
+	public function updateObject(ActorType $type): void {
+		if( $type->id === 0 || $type->is_protected ) {
+			return;
+		}
+		try {
+			// @formatter:off
             $this->pdo->Update("actor_types")
                 ->Columns(["name"])
                 ->Where("id=:id")
@@ -160,31 +171,33 @@ class ActorTypeRepository extends ARepository {
                     ->withParam(':name', $type->name)
                 ->execute()
             ;
-        } catch( Exception $e ) {
-            throw new SystemException(__FILE__, __LINE__, $e->getMessage(), $e->getCode(), $e->getPrevious());
-        }
-    }
+	        // @formatter:on
+		} catch( Exception $e ) {
+			throw new SystemException(__FILE__, __LINE__, $e->getMessage(), $e->getCode(), $e->getPrevious());
+		}
+	}
 
-    /**
-     * @param ActorType $type
-     * @return void
-     * @throws SystemException
-     */
-    public function deleteObject(ActorType $type ): void {
-        if( $type->id === 0 || $type->is_protected ) {
-            return;
-        }
-
-        try {
+	/**
+	 * @param ActorType $type
+	 * @return void
+	 * @throws SystemException
+	 */
+	public function deleteObject(ActorType $type): void {
+		if( $type->id === 0 || $type->is_protected ) {
+			return;
+		}
+		try {
+			// @formatter:off
             $this->pdo->Delete("actor_types")
                 ->Where("id=:id")
                 ->prepareStatement()
                     ->withParam(':id', $type->id, PDO::PARAM_INT)
                 ->execute()
             ;
-        } catch( Exception $e ) {
-            throw new SystemException(__FILE__, __LINE__, $e->getMessage(), $e->getCode(), $e->getPrevious());
-        }
-    }
+	        // @formatter:on
+		} catch( Exception $e ) {
+			throw new SystemException(__FILE__, __LINE__, $e->getMessage(), $e->getCode(), $e->getPrevious());
+		}
+	}
 
 }

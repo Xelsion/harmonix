@@ -1,0 +1,55 @@
+<?php
+$error = $this->get('error');
+$error_trace = $error->getTrace();
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Exception</title>
+    <link rel="stylesheet" href="<?= PATH_SRC ?>bootstrap-5.3.0/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="<?= PATH_CSS ?>styles.css"/>
+    <script src="<?= PATH_SRC ?>bootstrap-5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script src="<?= PATH_SRC ?>jquery/jquery-3.7.0.min.js"></script>
+</head>
+<body>
+<header>
+    <div class="exception-title"><?= $error->getMessage() ?></div>
+</header>
+<main class="exception-body">
+    <h2>Quelle:</h2>
+    <div class="info">Datei: <?= $error->getFile() ?></div>
+    <div class="info">Zeile: <?= $error->getLine() ?></div>
+    <h2>Backtrace:</h2>
+    <table class="table table-striped">
+        <tr>
+            <th style="width: 80px;">Pos</th>
+            <th>File</th>
+            <th style="width: 80px;">Line</th>
+            <th>Function</th>
+        </tr>
+		<?php foreach( $error_trace as $key => $trace ) {
+			$args = (empty($trace['args'])) ? '' : implode(", ", $trace['args'])
+			?>
+            <tr>
+                <th><?= $key ?></th>
+                <th><?= $trace["file"] ?></th>
+                <th><?= $trace["line"] ?></th>
+                <th><?= $trace["class"] ?><?= $trace["type"] ?><?= $trace["function"] ?>(<?= $args ?>)</th>
+            </tr>
+		<?php } ?>
+    </table>
+</main>
+<footer>
+    <div class="row text-end" style="margin: 0;">
+        <div class="col"></div>
+        <div class="col-3">
+            <b>Harmonix</b> by: <?= escaped_string(AUTHOR) ?>
+            <b>version</b>: <?= escaped_string(MVC_VERSION) ?>
+        </div>
+    </div>
+    <div class="cleaner"></div>
+</footer>
+</body>
+</html>

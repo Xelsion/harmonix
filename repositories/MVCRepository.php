@@ -2,7 +2,6 @@
 
 namespace repositories;
 
-use PDO;
 use Exception;
 use lib\App;
 use lib\core\blueprints\ARepository;
@@ -12,6 +11,7 @@ use lib\helper\StringHelper;
 use models\entities\Session;
 use models\entities\Token;
 use models\SessionModel;
+use PDO;
 
 /**
  * @inheritDoc
@@ -21,21 +21,22 @@ use models\SessionModel;
  */
 class MVCRepository extends ARepository {
 
-    /**
-     * @throws SystemException
-     */
-    public function __construct() {
-        $cm = App::getInstanceOf(ConnectionManager::class);
-        $this->pdo = $cm->getConnection("mvc");
-    }
+	/**
+	 * @throws SystemException
+	 */
+	public function __construct() {
+		$cm = App::getInstanceOf(ConnectionManager::class);
+		$this->pdo = $cm->getConnection("mvc");
+	}
 
-    /**
-     * @param string $id
-     * @return SessionModel
-     * @throws SystemException
-     */
-    public function getSession( string $id ): SessionModel {
-        try {
+	/**
+	 * @param string $id
+	 * @return SessionModel
+	 * @throws SystemException
+	 */
+	public function getSession(string $id): SessionModel {
+		try {
+			// @formatter:off
             $session = $this->pdo->Select()
                 ->From("sessions")
                 ->Where("id=:id")
@@ -45,22 +46,24 @@ class MVCRepository extends ARepository {
                 ->execute()
                 ->fetch()
             ;
-            if( !$session ) {
-                $session = new SessionModel( App::$config );
-            }
-            return $session;
-        } catch( Exception $e ) {
-            throw new SystemException(__FILE__, __LINE__, $e->getMessage(), $e->getCode(), $e->getPrevious());
-        }
-    }
+	        // @formatter:on
+			if( !$session ) {
+				$session = new SessionModel(App::$config);
+			}
+			return $session;
+		} catch( Exception $e ) {
+			throw new SystemException(__FILE__, __LINE__, $e->getMessage(), $e->getCode(), $e->getPrevious());
+		}
+	}
 
-    /**
-     * @param string $id
-     * @return array
-     * @throws SystemException
-     */
-    public function getSessionAsArray( string $id ): array {
-        try {
+	/**
+	 * @param string $id
+	 * @return array
+	 * @throws SystemException
+	 */
+	public function getSessionAsArray(string $id): array {
+		try {
+			// @formatter:off
             $result = $this->pdo->Select()
                 ->From("sessions")
                 ->Where("id=:id")
@@ -69,23 +72,25 @@ class MVCRepository extends ARepository {
                 ->execute()
                 ->fetch()
             ;
-            if( !$result ) {
-                return array();
-            }
-            return $result;
-        } catch( Exception $e ) {
-            throw new SystemException(__FILE__, __LINE__, $e->getMessage(), $e->getCode(), $e->getPrevious());
-        }
-    }
+	        // @formatter:on
+			if( !$result ) {
+				return array();
+			}
+			return $result;
+		} catch( Exception $e ) {
+			throw new SystemException(__FILE__, __LINE__, $e->getMessage(), $e->getCode(), $e->getPrevious());
+		}
+	}
 
-    /**
-     *
-     * @param Session $session
-     * @return void
-     * @throws SystemException
-     */
-    public function createSession( SessionModel $session ): void {
-        try {
+	/**
+	 *
+	 * @param Session $session
+	 * @return void
+	 * @throws SystemException
+	 */
+	public function createSession(SessionModel $session): void {
+		try {
+			// @formatter:off
             $this->pdo->Insert("sessions")
                 ->Columns(["id", "actor_id", "ip", "expired"])
                 ->prepareStatement()
@@ -95,26 +100,27 @@ class MVCRepository extends ARepository {
                     ->withParam(':expired', $session->expired)
                 ->execute()
             ;
-        } catch( Exception $e ) {
-            throw new SystemException(__FILE__, __LINE__, $e->getMessage(), $e->getCode(), $e->getPrevious());
-        }
-    }
+	        // @formatter:on
+		} catch( Exception $e ) {
+			throw new SystemException(__FILE__, __LINE__, $e->getMessage(), $e->getCode(), $e->getPrevious());
+		}
+	}
 
-    /**
-     * @param Session $session
-     * @return void
-     * @throws SystemException
-     */
-    public function updateSession( SessionModel $session ): void {
-        if( $session->id === "" ) {
-            return;
-        }
-
-        try {
-            $curr_id = $session->id;
-            if( $session->_rotate_session ) {
-                $session->id = StringHelper::getGuID();
-            }
+	/**
+	 * @param Session $session
+	 * @return void
+	 * @throws SystemException
+	 */
+	public function updateSession(SessionModel $session): void {
+		if( $session->id === "" ) {
+			return;
+		}
+		try {
+			$curr_id = $session->id;
+			if( $session->_rotate_session ) {
+				$session->id = StringHelper::getGuID();
+			}
+			// @formatter:off
             $this->pdo->Update("sessions")
                 ->Set(["id", "actor_id", "as_actor", "ip", "expired"])
                 ->Where("id=:curr_id")
@@ -127,22 +133,23 @@ class MVCRepository extends ARepository {
                     ->withParam(':expired', $session->expired)
                 ->execute()
             ;
-        } catch( Exception $e ) {
-            throw new SystemException(__FILE__, __LINE__, $e->getMessage(), $e->getCode(), $e->getPrevious());
-        }
-    }
+	        // @formatter:on
+		} catch( Exception $e ) {
+			throw new SystemException(__FILE__, __LINE__, $e->getMessage(), $e->getCode(), $e->getPrevious());
+		}
+	}
 
-    /**
-     * @param Session $session
-     * @return void
-     * @throws SystemException
-     */
-    public function deleteSession( SessionModel $session ): void {
-        if( $session->id === "" ) {
-            return;
-        }
-
-        try {
+	/**
+	 * @param Session $session
+	 * @return void
+	 * @throws SystemException
+	 */
+	public function deleteSession(SessionModel $session): void {
+		if( $session->id === "" ) {
+			return;
+		}
+		try {
+			// @formatter:off
             $this->pdo->Delete("sessions")
                 ->Where("id=:id")
                 ->prepareStatement()
@@ -150,18 +157,20 @@ class MVCRepository extends ARepository {
                 ->fetchMode(PDO::FETCH_CLASS, Token::class)
                 ->execute()
             ;
-        } catch( Exception $e ) {
-            throw new SystemException(__FILE__, __LINE__, $e->getMessage(), $e->getCode(), $e->getPrevious());
-        }
-    }
+	        // @formatter:on
+		} catch( Exception $e ) {
+			throw new SystemException(__FILE__, __LINE__, $e->getMessage(), $e->getCode(), $e->getPrevious());
+		}
+	}
 
-    /**
-     * @param string $id
-     * @return Token
-     * @throws SystemException
-     */
-    public function getToken( string $id ): Token {
-        try {
+	/**
+	 * @param string $id
+	 * @return Token
+	 * @throws SystemException
+	 */
+	public function getToken(string $id): Token {
+		try {
+			// @formatter:off
             return $this->pdo->Select()
                 ->From("tokens")
                 ->Where("id=:id")
@@ -170,18 +179,20 @@ class MVCRepository extends ARepository {
                 ->fetchMode(PDO::FETCH_CLASS, Token::class)
                 ->execute()
             ;
-        } catch( Exception $e ) {
-            throw new SystemException(__FILE__, __LINE__, $e->getMessage(), $e->getCode(), $e->getPrevious());
-        }
-    }
+	        // @formatter:on
+		} catch( Exception $e ) {
+			throw new SystemException(__FILE__, __LINE__, $e->getMessage(), $e->getCode(), $e->getPrevious());
+		}
+	}
 
-    /**
-     * @param string $id
-     * @return array
-     * @throws SystemException
-     */
-    public function getTokenAsArray( string $id ): array {
-        try {
+	/**
+	 * @param string $id
+	 * @return array
+	 * @throws SystemException
+	 */
+	public function getTokenAsArray(string $id): array {
+		try {
+			// @formatter:off
             return $this->pdo->Select()
                 ->From("tokens")
                 ->Where("id=:id")
@@ -189,18 +200,20 @@ class MVCRepository extends ARepository {
                     ->withParam(":id", $id)
                 ->execute()
             ;
-        } catch( Exception $e ) {
-            throw new SystemException(__FILE__, __LINE__, $e->getMessage(), $e->getCode(), $e->getPrevious());
-        }
-    }
+	        // @formatter:on
+		} catch( Exception $e ) {
+			throw new SystemException(__FILE__, __LINE__, $e->getMessage(), $e->getCode(), $e->getPrevious());
+		}
+	}
 
-    /**
-     * @param Token $token
-     * @return void
-     * @throws SystemException
-     */
-    public function createToken( Token $token): void {
-        try {
+	/**
+	 * @param Token $token
+	 * @return void
+	 * @throws SystemException
+	 */
+	public function createToken(Token $token): void {
+		try {
+			// @formatter:off
             $this->pdo->Insert("tokens")
                 ->Columns(["id", "expired"])
                 ->prepareStatement()
@@ -208,22 +221,23 @@ class MVCRepository extends ARepository {
                     ->withParam(":expired", $token->expired)
                 ->execute()
             ;
-        } catch( Exception $e ) {
-            throw new SystemException(__FILE__, __LINE__, $e->getMessage(), $e->getCode(), $e->getPrevious());
-        }
-    }
+	        // @formatter:on
+		} catch( Exception $e ) {
+			throw new SystemException(__FILE__, __LINE__, $e->getMessage(), $e->getCode(), $e->getPrevious());
+		}
+	}
 
-    /**
-     * @param Token $token
-     * @return void
-     * @throws SystemException
-     */
-    public function updateToken( Token $token): void {
-        if( $token->id === "" ) {
-            return;
-        }
-
-        try {
+	/**
+	 * @param Token $token
+	 * @return void
+	 * @throws SystemException
+	 */
+	public function updateToken(Token $token): void {
+		if( $token->id === "" ) {
+			return;
+		}
+		try {
+			// @formatter:off
             $this->pdo->Update("tokens")
                 ->Set(["expired"])
                 ->Where("id=:id")
@@ -232,31 +246,33 @@ class MVCRepository extends ARepository {
                     ->withParam(":expired", $token->expired)
                 ->execute()
             ;
-        } catch( Exception $e ) {
-            throw new SystemException(__FILE__, __LINE__, $e->getMessage(), $e->getCode(), $e->getPrevious());
-        }
-    }
+	        // @formatter:on
+		} catch( Exception $e ) {
+			throw new SystemException(__FILE__, __LINE__, $e->getMessage(), $e->getCode(), $e->getPrevious());
+		}
+	}
 
-    /**
-     * @param Token $token
-     * @return void
-     * @throws SystemException
-     */
-    public function deleteToken( Token $token ): void {
-        if( $token->id === "" ) {
-            return;
-        }
-
-        try {
+	/**
+	 * @param Token $token
+	 * @return void
+	 * @throws SystemException
+	 */
+	public function deleteToken(Token $token): void {
+		if( $token->id === "" ) {
+			return;
+		}
+		try {
+			// @formatter:off
             $this->pdo->Delete("tokens")
                 ->Where("id=:id")
                 ->prepareStatement()
                     ->withParam(":id", $token->id)
                 ->execute()
             ;
-        } catch( Exception $e ) {
-            throw new SystemException(__FILE__, __LINE__, $e->getMessage(), $e->getCode(), $e->getPrevious());
-        }
-    }
+	        // @formatter:on
+		} catch( Exception $e ) {
+			throw new SystemException(__FILE__, __LINE__, $e->getMessage(), $e->getCode(), $e->getPrevious());
+		}
+	}
 
 }

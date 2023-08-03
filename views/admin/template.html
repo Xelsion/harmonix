@@ -16,37 +16,36 @@ $view_content = ($view instanceof Template) ? $view->parse() : $view;
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title><?= $this->get("title") ?? "Home" ?></title>
-    <link rel="stylesheet" href="<?= PATH_SRC ?>bootstrap-5.2.2/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="<?= PATH_SRC ?>bootstrap-5.3.0/css/bootstrap.min.css"/>
     <link rel="stylesheet" href="<?= PATH_CSS ?>styles.css"/>
-    <?php foreach( $this->getHeaderCss() as $css_file ) { ?>
+	<?php foreach( $this->getHeaderCss() as $css_file ) { ?>
         <link rel="stylesheet" href="<?= $css_file ?>"/>
-    <?php } ?>
-    <script src="<?= PATH_SRC ?>bootstrap-5.2.2/js/bootstrap.bundle.min.js"></script>
-    <script src="<?= PATH_SRC ?>jquery/jquery-3.6.0.min.js"></script>
+	<?php } ?>
+    <script src="<?= PATH_SRC ?>bootstrap-5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script src="<?= PATH_SRC ?>jquery/jquery-3.7.0.min.js"></script>
     <script src="<?= PATH_JS ?>main.js"></script>
-    <?php foreach( $this->getHeaderScripts() as $script_file => $async ) { ?>
-        <?php if( $async ) { ?>
+	<?php foreach( $this->getHeaderScripts() as $script_file => $async ) { ?>
+		<?php if( $async ) { ?>
             <script async src="<?= $script_file ?>"></script>
-        <?php } else { ?>
+		<?php } else { ?>
             <script src="<?= $script_file ?>"></script>
-        <?php } ?>
-    <?php } ?>
+		<?php } ?>
+	<?php } ?>
 </head>
 <body>
 <header>
     <nav id="navigation">
-        <?php include(PATH_VIEWS . "main_menu.html") ?>
+		<?php include(PATH_VIEWS . "main_menu.html") ?>
         <div id="actor-menu">
             <div class="has-children">
-                <span onclick="$('#actor-menu-dropdown').toggle();"
-                      class="menu-item"><?= ($actor->id > 0) ? $actor->first_name . " " . $actor->last_name : "Profile" ?></span>
+                <span onclick="$('#actor-menu-dropdown').toggle();" class="menu-item"><?= ($actor->id > 0) ? $actor->first_name . " " . $actor->last_name : "Profile" ?></span>
             </div>
             <div id="actor-menu-dropdown" style="">
                 <menu>
-                    <?php if( $actor->id === 0 ): ?>
+					<?php if( $actor->id === 0 ): ?>
                         <li>
                             <form action="<?= $_SERVER["REQUEST_URI"] ?>" method="POST">
-                                <?= HtmlHelper::generateFormToken() ?>
+								<?= HtmlHelper::generateFormToken() ?>
                                 <div class="form-row">
                                     <label>
                                         <input type="email" name="email" value="" placeholder="E-Mail"/>
@@ -54,34 +53,31 @@ $view_content = ($view instanceof Template) ? $view->parse() : $view;
                                 </div>
                                 <div class="form-row">
                                     <label>
-                                        <input type="password" name="password" value="" placeholder="Password"
-                                               autocomplete="new-password"/>
+                                        <input type="password" name="password" value="" placeholder="Password" autocomplete="new-password"/>
                                     </label>
                                 </div>
-                                <?php if( $config->getSectionValue("security", "permanent_login") ) { ?>
+								<?php if( $config->getSectionValue("security", "permanent_login") ) { ?>
                                     <div class="form-row form-check">
-                                        <input id="perma_login" class="form-check-input" type="checkbox"
-                                               name="permanent_login" value="yes"/>
-                                        <label for="perma_login" class="form-check-label font-monospace">eingeloggt
-                                            bleiben?</label>
+                                        <input id="perma_login" class="form-check-input" type="checkbox" name="permanent_login" value="yes"/>
+                                        <label for="perma_login" class="form-check-label font-monospace">eingeloggt bleiben?</label>
                                     </div>
-                                <?php } ?>
+								<?php } ?>
                                 <div class="form-row">
                                     <button type="submit" name="login" class="button-positiv">Login</button>
                                 </div>
                             </form>
                         </li>
-                    <?php else: ?>
+					<?php else: ?>
                         <li>
                             <a href="https://www.<?= App::$config->getSectionValue("system", "domain_name") ?>">www-Bereich</a>
                         </li>
                         <li>
                             <form action="/" method="POST">
-                                <?= HtmlHelper::generateFormToken() ?>
+								<?= HtmlHelper::generateFormToken() ?>
                                 <button type="submit" name="logout" class="button-link">Logout</button>
                             </form>
                         </li>
-                    <?php endif; ?>
+					<?php endif; ?>
                 </menu>
             </div>
         </div>
@@ -90,11 +86,11 @@ $view_content = ($view instanceof Template) ? $view->parse() : $view;
 </header>
 <main><?= $view_content ?></main>
 <div>
-    <?php if( App::$storage->get("debug_mode") ) {
-        $debug = new Template(PATH_VIEWS_ROOT . "snippets/debug.html");
-        $debug_content = $debug->parse();
-        echo $debug_content;
-    } ?>
+	<?php if( App::$storage->get("debug_mode") ) {
+		$debug = new Template(PATH_VIEWS_ROOT . "snippets/debug.html");
+		$debug_content = $debug->parse();
+		echo $debug_content;
+	} ?>
 </div>
 <footer>
     <div class="row text-end" style="margin: 0;">
@@ -108,10 +104,10 @@ $view_content = ($view instanceof Template) ? $view->parse() : $view;
 </footer>
 </body>
 <?php foreach( $this->getFooterScripts() as $script_file => $async ) { ?>
-    <?php if( $async ) { ?>
+	<?php if( $async ) { ?>
         <script async src="<?= $script_file ?>"></script>
-    <?php } else { ?>
+	<?php } else { ?>
         <script src="<?= $script_file ?>"></script>
-    <?php } ?>
+	<?php } ?>
 <?php } ?>
 </html>

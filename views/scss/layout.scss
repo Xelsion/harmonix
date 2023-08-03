@@ -88,3 +88,20 @@ h2 {
 .hl {
 	color : $header-color;
 }
+
+.exception-title {
+	font-size        : 1.5em;
+	padding          : 15px 50px;
+	background-color : $header-color;
+	color            : $text-color;
+}
+
+.exception-body {
+	font-size : 1.0em;
+	padding   : 15px 50px;
+	color     : $text-color;
+
+	.info {
+		font-size : 1.2em;
+	}
+}
