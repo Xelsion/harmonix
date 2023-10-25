@@ -3,7 +3,6 @@
 namespace lib\core\classes;
 
 use Closure;
-use Exception;
 use lib\core\exceptions\SystemException;
 use lib\helper\DataHelper;
 
@@ -18,11 +17,11 @@ class LinqList extends Enumerable {
 	private array $temp = [];
 
 	/**
-	 * @throws Exception
+	 * @throws SystemException
 	 */
 	public function __construct(array $data = []) {
 		if( !empty($data) && !$this->isValidData($data) ) {
-			throw new SystemException(__FILE__, __LINE__, "LinqList elements must be of the same type", debug_backtrace());
+			throw new SystemException(__FILE__, __LINE__, "LinqList elements must be of the same type");
 		}
 		parent::__construct($data);
 	}
@@ -36,7 +35,7 @@ class LinqList extends Enumerable {
 	 */
 	public function add(mixed $value): void {
 		if( !$this->isValidValue($value) ) {
-			throw new SystemException(__FILE__, __LINE__, "LinqList elements must be of the same type", debug_backtrace());
+			throw new SystemException(__FILE__, __LINE__, "LinqList elements must be of the same type");
 		}
 		$this->iterator->append($value);
 	}
@@ -48,7 +47,6 @@ class LinqList extends Enumerable {
 	 * @return void
 	 */
 	public function remove(mixed $entry): void {
-		$this->iterator->rewind();
 		foreach( $this->iterator as $key => $value ) {
 			if( valuesAreIdentical($entry, $value) ) {
 				$this->iterator->offsetUnset($key);
@@ -64,7 +62,6 @@ class LinqList extends Enumerable {
 	 * @return LinqList
 	 */
 	public function where(callable $callable = null): LinqList {
-		$this->iterator->rewind();
 		$this->temp = [];
 		if( $callable instanceof Closure ) {
 			foreach( $this->iterator as $key => $entry ) {
@@ -81,7 +78,7 @@ class LinqList extends Enumerable {
 
 	/**
 	 * Sorts the results by the given column if the values are arrays or objects in the given order direction
-	 * or if the values are standard-types like string or int the will be sort in the given direction
+	 * or if the values are standard-types like string or int that will be sort in the given direction
 	 *
 	 * @param string $col
 	 * @param bool $ascending
@@ -138,9 +135,20 @@ class LinqList extends Enumerable {
 			return $result;
 		}
 		if( count($this->temp) > 1 ) {
-			throw new SystemException(__FILE__, __LINE__, "Multiple values found!", debug_backtrace());
+			throw new SystemException(__FILE__, __LINE__, "Multiple values found!");
 		}
 		return null;
+	}
+
+	/**
+	 * Returns all elements of the search result
+	 *
+	 * @return array
+	 */
+	public function getAll(): array {
+		$results = $this->temp;
+		$this->temp = [];
+		return $results;
 	}
 
 	/**
@@ -155,17 +163,6 @@ class LinqList extends Enumerable {
 			return $result;
 		}
 		return null;
-	}
-
-	/**
-	 * Returns all elements of the search result
-	 *
-	 * @return array
-	 */
-	public function getAll(): array {
-		$results = $this->temp;
-		$this->temp = [];
-		return $results;
 	}
 
 	/**

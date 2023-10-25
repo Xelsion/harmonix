@@ -2,33 +2,36 @@
 
 use lib\App;
 use lib\core\classes\Language;
+use lib\core\classes\TemplateData;
+use lib\core\enums\RequestMethod;
 use lib\helper\HtmlHelper;
 
 $lang = App::getInstanceOf(Language::class);
 
-$this->set("title", "Benutzer-Typ bearbeiten");
-$actor_type = $this->get("actor_type");
-$actor_role = $this->get("actor_role");
+TemplateData::set("title", "Benutzer-Typ bearbeiten");
+$actor_type = TemplateData::get("actor_type");
+$actor_role = TemplateData::get("actor_role");
 
-$protected = ( $actor_type->is_protected && !$actor_role->canUpdateALl() );
+$protected = ($actor_type->is_protected && !$actor_role->canUpdateALl());
 ?>
 <h1>Rolle bearbeiten</h1>
 <div class="container-fluid">
-	<form action="/actor-types/<?= $actor_type->id ?>" method="POST" class="needs-validation" novalidate>
-        <?= HtmlHelper::generateFormToken() ?>
-		<div class="form-group row">
-			<label for="name">Name</label>
-			<input type="text" name="name" value="<?= escaped_string($actor_type->name) ?>" id="name"<?= ( $protected ) ? ' disabled' : '' ?> required />
-			<div class="invalid-feedback"><?= $lang->getValue("error-messages", "name") ?></div>
-		</div>
-		<div class="form-group row">
-			<div class="col-auto">
-				<button type="submit" name="cancel" class="button button-default"><?= $lang->getValue("translations", "cancel") ?></button>
-			</div>
-			<div class="col"></div>
-			<div class="col-auto">
-				<button type="submit" name="update" class="button button-positiv"<?= ( $protected ) ? ' disabled' : '' ?>><?= $lang->getValue("translations", "save") ?></button>
-			</div>
-		</div>
-	</form>
+    <form action="/actor-types/<?= $actor_type->id ?>" method="POST" class="needs-validation" novalidate>
+		<?= HtmlHelper::generateFormToken() ?>
+		<?= RequestMethod::PUT->toInputString() ?>
+        <div class="form-group row">
+            <label for="name">Name</label>
+            <input type="text" name="name" value="<?= escaped_string($actor_type->name) ?>" id="name"<?= ($protected) ? ' disabled' : '' ?> required/>
+            <div class="invalid-feedback"><?= $lang->getValue("error-messages", "name") ?></div>
+        </div>
+        <div class="form-group row">
+            <div class="col-auto">
+                <a href="/actor-types" class="button button-default"><?= $lang->getValue("translations", "cancel") ?></a>
+            </div>
+            <div class="col"></div>
+            <div class="col-auto">
+                <button type="submit" name="update" class="button button-positiv"<?= ($protected) ? ' disabled' : '' ?>><?= $lang->getValue("translations", "save") ?></button>
+            </div>
+        </div>
+    </form>
 </div>

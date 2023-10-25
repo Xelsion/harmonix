@@ -5,9 +5,10 @@ namespace models;
 use Exception;
 use lib\App;
 use lib\core\exceptions\SystemException;
+use models\entities\Token;
 use repositories\MVCRepository;
 
-class TokenModel extends entities\Token {
+class TokenModel extends Token {
 
 	/**
 	 * The class constructor

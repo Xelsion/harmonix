@@ -93,4 +93,8 @@ class Enumerable implements IteratorAggregate {
 		return $was_found;
 	}
 
+	public function isEmpty(): bool {
+		return empty($this->data);
+	}
+
 }

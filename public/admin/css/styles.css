@@ -65,6 +65,14 @@ footer {
   border-radius: 8px;
 }
 
+.float-left {
+  float: left;
+}
+
+.float-right {
+  float: right;
+}
+
 .cleaner {
   clear: both;
   width: 0;
@@ -88,6 +96,11 @@ h2 {
   color: #1cb5f1;
 }
 
+.date-info {
+  font-size: 0.7em;
+  color: #1cb5f1;
+}
+
 .exception-title {
   font-size: 1.5em;
   padding: 15px 50px;
@@ -105,6 +118,13 @@ h2 {
 }
 
 /* START ui-elements */
+#system-message {
+  position: absolute;
+  width: 450px;
+  top: 50%;
+  left: calc(50% - 225px);
+}
+
 .slide-left, .slide-right, #navigation * ul > li.has-children::after, .slide-up, .slide-down, #actor-menu .has-children::after, #navigation > ul > li.has-children::after {
   position: absolute;
   content: "";
@@ -422,7 +442,7 @@ form {
   background-color: #2c2c2c;
   padding: 15px 40px 5px 40px;
   width: 100%;
-  margin: 0 auto;
+  margin: 0 auto 15px auto;
   border-radius: 10px;
 }
 form.minimized {

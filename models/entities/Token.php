@@ -2,6 +2,8 @@
 
 namespace models\entities;
 
+use lib\core\attributes\PrimaryKey;
+
 /**
  * The Token entity
  * Represents a single entry in the database
@@ -10,8 +12,8 @@ namespace models\entities;
  * @version 1.0.0;
  */
 class Token {
-
-    public string $id = "";
-    public string $expired = "";
+	#[PrimaryKey]
+	public string $id = "";
+	public string $expired = "";
 
 }

@@ -1,5 +1,8 @@
 <?php
+
 namespace models\entities;
+
+use lib\core\attributes\PrimaryKey;
 
 /**
  * The ActorType entity
@@ -9,17 +12,17 @@ namespace models\entities;
  * @version 1.0.0;
  */
 class ActorType {
+	#[PrimaryKey]
+	public int $id = 0;
 
-    public int $id = 0;
+	public string $name = "";
 
-    public string $name = "";
+	public bool $is_protected = false;
 
-    public bool $is_protected = false;
+	public string $created = "";
 
-    public string $created = "";
+	public ?string $updated = null;
 
-    public ?string $updated = null;
-
-    public ?string $deleted = null;
+	public ?string $deleted = null;
 
 }

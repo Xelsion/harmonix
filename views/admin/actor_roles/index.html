@@ -2,11 +2,13 @@
 
 use lib\App;
 use lib\core\classes\Language;
+use lib\core\classes\TemplateData;
+use lib\core\enums\RequestMethod;
 
 $lang = App::getInstanceOf(Language::class);
 
-$this->set("title", "Rollen");
-$role_tree = $this->get("role_tree");
+TemplateData::set("title", "Rollen");
+$role_tree = TemplateData::get("role_tree");
 $tree_array = [];
 $role_tree->getRolesAsArray(0, $tree_array);
 
@@ -26,23 +28,44 @@ $first = true;
             <th>Gesch&uuml;tzt</th>
             <th class="col-md-2 text-end">Optionen</th>
         </tr>
-        <?php foreach( $tree_array as $actor_role ):
-            $rights = $actor_role->getStringArray();
-            ?>
+		<?php foreach( $tree_array as $actor_role ):
+			$rights = $actor_role->getStringArray();
+			?>
             <tr>
                 <td class="align-middle"><?= escaped_string($actor_role->id) ?></td>
-                <?php if( $first ): $first = false; ?>
+				<?php if( $first ): $first = false; ?>
                     <td rowspan="100%" class="tree-table"><?= $html ?></td>
-                <?php endif; ?>
+				<?php endif; ?>
                 <td class="align-middle"><?= escaped_string(implode(", ", $rights["all"])) ?></td>
                 <td class="align-middle"><?= escaped_string(implode(", ", $rights["group"])) ?></td>
                 <td class="align-middle"><?= escaped_string(implode(", ", $rights["own"])) ?></td>
                 <td class="align-middle"><?= ($actor_role->is_protected) ? "Ja" : "Nein" ?></td>
                 <td class="text-nowrap align-middle text-end">
                     <a href="/actor-roles/<?= $actor_role->id ?>" class="button button-default"><?= $lang->getValue("translations", "edit") ?></a>
-                    <a href="/actor-roles/delete/<?= $actor_role->id ?>" class="button button-negativ"><?= $lang->getValue("translations", "delete") ?></a>
+                    <button class="button button-negativ" onclick="$('#delete-target').attr('action', '/actor-roles/delete/<?= $actor_role->id ?>')" data-bs-toggle="modal" data-bs-target="#confirm-delete"><?= $lang->getValue("translations", "delete") ?></button>
                 </td>
             </tr>
-        <?php endforeach; ?>
+		<?php endforeach; ?>
     </table>
+</div>
+
+<div class="modal fade" id="confirm-delete" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="modalLabel">Achtung!!!</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Sind Sie sicher, das Sie diesen Eintrag l&ouml;schen wollen?
+            </div>
+            <div class="modal-footer">
+                <form id="delete-target" action="" method="POST" style="background-color: transparent;">
+					<?= RequestMethod::DELETE->toInputString() ?>
+                    <button type="button" class="button button-default float-left" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="button button-negativ float-right">Löschen</button>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>

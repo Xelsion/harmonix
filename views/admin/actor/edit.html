@@ -2,73 +2,78 @@
 
 use lib\App;
 use lib\core\classes\Language;
+use lib\core\classes\TemplateData;
+use lib\core\enums\RequestMethod;
 use lib\helper\HtmlHelper;
 
 $lang = App::getInstanceOf(Language::class);
 
-$this->set("title", "Benutzer bearbeiten");
-$type_options = $this->get("type_options");
-$connection_options = $this->get("connection_options");
-$actor = $this->get("actor");
+TemplateData::set("title", "Benutzer bearbeiten");
+$type_options = TemplateData::get("type_options");
+$connection_options = TemplateData::get("connection_options");
+$actor = TemplateData::get("actor");
 ?>
 <div class="container-fluid">
-	<h1>Neuen Benutzer anlegen</h1>
-	<form action="/actors/<?= $actor->id ?>" method="POST" class="needs-validation" autocomplete="off" novalidate>
-        <?= HtmlHelper::generateFormToken() ?>
-		<div class="form-group row">
-			<label for="type_id">Type</label>
-			<select id="type_id" name="type_id">
+    <h1><?= TemplateData::get("title") ?></h1>
+    <form action="/actors/<?= $actor->id ?>" method="POST" class="needs-validation" autocomplete="off" novalidate>
+		<?= HtmlHelper::generateFormToken() ?>
+		<?= RequestMethod::PUT->toInputString() ?>
+        <div class="form-group row">
+            <label for="type_id">Type</label>
+            <select id="type_id" name="type_id">
 				<?php foreach( $type_options as $option ): ?>
-					<option value="<?= $option->id ?>"<?= ( $option->id === $actor->type_id ) ? ' selected="selected"' : '' ?>><?= escaped_string($option->name)  ?></option>
+                    <option value="<?= $option->id ?>"<?= ($option->id === $actor->type_id) ? ' selected="selected"' : '' ?>><?= escaped_string($option->name) ?></option>
 				<?php endforeach; ?>
-			</select>
-			<div class="invalid-feedback"><?= $lang->getValue("error-messages", "type") ?></div>
-		</div>
-		<div class="form-group row">
-			<label for="email">E-Mail</label>
-			<input type="email" name="email" value="<?= escaped_string($actor->email) ?>" id="email" required />
-			<div class="invalid-feedback"><?= $lang->getValue("error-messages", "email") ?></div>
-		</div>
-		<div class="form-group row">
-			<label for="password">Passwort</label>
-			<input type="password" name="password" value="" autocomplete="new-password" id="password" />
-			<div class="invalid-feedback"><?= $lang->getValue("error-messages", "password") ?></div>
-		</div>
-		<div class="form-group row">
-			<label for="password_verify">Passwort Wiederholung</label>
-			<input type="password" name="password_verify" value="" autocomplete="new-password" id="password_verify" />
-			<div class="invalid-feedback"><?= $lang->getValue("error-messages", "password_verify") ?></div>
-		</div>
-		<div class="form-group row">
-			<label for="first_name">Vorname</label>
-			<input type="text" name="first_name" value="<?= escaped_string($actor->first_name) ?>" id="first_name" required />
-			<div class="invalid-feedback"><?= $lang->getValue("error-messages", "first_name") ?></div>
-		</div>
-		<div class="form-group row">
-			<label for="last_name">Nachname</label>
-			<input type="text" name="last_name" value="<?= escaped_string($actor->last_name) ?>" id="last_name" required />
-			<div class="invalid-feedback"><?= $lang->getValue("error-messages", "last_name") ?></div>
-		</div>
-		<div class="form-group row">
-			<label for="login_disabled">Login disabled</label>
-			<select name="login_disabled" id="login_disabled" required>
-				<option value="0"<?= ( !$actor->login_disabled ) ? ' selected="selected"' : ''?>>false</option>
-				<option value="1"<?= ( $actor->login_disabled ) ? ' selected="selected"' : ''?>>true</option>
-			</select>
-			<div class="invalid-feedback"><?= $lang->getValue("error-messages", "selection") ?></div>
-		</div>
-		<div class="form-group row">
-			<label for="login_fails">Login fails</label>
-			<input type="number" name="login_fails" value="<?= escaped_string($actor->login_fails) ?>" id="login_fails" required />
-		</div>
-		<div class="form-group row clearfix">
-			<div class="col-auto">
-				<button type="submit" name="cancel" class="button button-default float-start"><?= $lang->getValue("translations", "cancel") ?></button>
-			</div>
-			<div class="col"></div>
-			<div class="col-auto">
-				<button type="submit" name="update" class="button button-positiv float-end"><?= $lang->getValue("translations", "save") ?></button>
-			</div>
-		</div>
-	</form>
+            </select>
+            <div class="invalid-feedback"><?= $lang->getValue("error-messages", "type") ?></div>
+        </div>
+        <div class="form-group row">
+            <label for="email">E-Mail</label>
+            <input type="email" name="email" value="<?= escaped_string($actor->email) ?>" id="email" required/>
+            <div class="invalid-feedback"><?= $lang->getValue("error-messages", "email") ?></div>
+        </div>
+        <div class="form-group row">
+            <label for="password">Passwort</label>
+            <input type="password" name="password" value="" autocomplete="new-password" id="password"/>
+            <div class="invalid-feedback"><?= $lang->getValue("error-messages", "password") ?></div>
+        </div>
+        <div class="form-group row">
+            <label for="password_verify">Passwort Wiederholung</label>
+            <input type="password" name="password_verify" value="" autocomplete="new-password" id="password_verify"/>
+            <div class="invalid-feedback"><?= $lang->getValue("error-messages", "password_verify") ?></div>
+        </div>
+        <div class="form-group row">
+            <label for="first_name">Vorname</label>
+            <input type="text" name="first_name" value="<?= escaped_string($actor->first_name) ?>" id="first_name" required/>
+            <div class="invalid-feedback"><?= $lang->getValue("error-messages", "first_name") ?></div>
+        </div>
+        <div class="form-group row">
+            <label for="last_name">Nachname</label>
+            <input type="text" name="last_name" value="<?= escaped_string($actor->last_name) ?>" id="last_name" required/>
+            <div class="invalid-feedback"><?= $lang->getValue("error-messages", "last_name") ?></div>
+        </div>
+        <div class="form-group row">
+            <label for="login_disabled">Login disabled</label>
+            <select name="login_disabled" id="login_disabled" required>
+                <option value="0"<?= (!$actor->login_disabled) ? ' selected="selected"' : '' ?>>false
+                </option>
+                <option value="1"<?= ($actor->login_disabled) ? ' selected="selected"' : '' ?>>true
+                </option>
+            </select>
+            <div class="invalid-feedback"><?= $lang->getValue("error-messages", "selection") ?></div>
+        </div>
+        <div class="form-group row">
+            <label for="login_fails">Login fails</label>
+            <input type="number" name="login_fails" value="<?= escaped_string($actor->login_fails) ?>" id="login_fails" required/>
+        </div>
+        <div class="form-group row clearfix">
+            <div class="col-auto">
+                <a class="button button-default float-start" href="/actors"><?= $lang->getValue("translations", "cancel") ?></a>
+            </div>
+            <div class="col"></div>
+            <div class="col-auto">
+                <button type="submit" name="update" class="button button-positiv float-end"><?= $lang->getValue("translations", "save") ?></button>
+            </div>
+        </div>
+    </form>
 </div>

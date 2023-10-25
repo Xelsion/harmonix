@@ -2,6 +2,7 @@
 
 namespace lib\core\database;
 
+use DateTime;
 use Exception;
 use JsonException;
 use lib\App;
@@ -22,7 +23,7 @@ use PDOStatement;
 class PDOConnection extends QueryBuilder {
 
 	private ?Logger $logger;
-	private array $table_infos = array();
+	public array $table_infos = array();
 	private string $used_query = "";
 	private array $used_params = array();
 	protected int $db_version;
@@ -44,6 +45,7 @@ class PDOConnection extends QueryBuilder {
 		if( $this->db_type === DbType::MsSQL && $this->db_version < 2012 ) {
 			throw new SystemException(__FILE__, __LINE__, "QueryBuilder: does not support MsSQL version " . $this->db_version, "");
 		}
+		$this->collectTableInfos($conn->dbname);
 	}
 
 	/**
@@ -234,6 +236,9 @@ class PDOConnection extends QueryBuilder {
 	 */
 	public function getNumRowsOfTable(string $table_name): int {
 		try {
+			if( array_key_exists($table_name, $this->table_infos) ) {
+				return $this->table_infos[$table_name]["num_rows"];
+			}
 			$result = $this->run("SELECT COUNT(*) AS num_rows FROM " . $table_name)->fetch();
 			return (int)$result["num_rows"];
 		} catch( Exception ) {
@@ -291,4 +296,176 @@ class PDOConnection extends QueryBuilder {
 		return ["base" => 0, "full" => "unknown"];
 	}
 
+	/**
+	 * Collects information from all tables in the given DB about num rows and last modification time
+	 *
+	 * @param string $db_name
+	 * @return void
+	 * @throws JsonException
+	 * @throws SystemException
+	 * @throws Exception
+	 */
+	private function collectTableInfos(string $db_name): void {
+		$results = array();
+		if( $this->db_type === DbType::MySQL ) {
+			$results = $this->Select([
+				"TABLE_NAME AS table_name",
+				"TABLE_ROWS AS num_rows",
+				"CREATE_TIME AS created",
+				"UPDATE_TIME AS updated"
+			])
+				->From("information_schema.TABLES")
+				->Where("TABLE_SCHEMA=:db_name")
+				->prepareStatement()
+				->withParam(":db_name", $db_name)
+				->execute()
+				->fetchAll()
+			;
+		} else if( $this->db_type === DbType::MsSQL ) {
+			$results = $this->Select([
+				"TABLE_NAME AS table_name"
+			])
+				->From("INFORMATION_SCHEMA.TABLES")
+				->Where("TABLE_SCHEMA=:db_name")
+				->prepareStatement()
+				->withParam(":db_name", $db_name)
+				->execute()
+				->fetchAll()
+			;
+			foreach( $results as &$row ) {
+				$table_info_num_rows = $this->run("SELECT COUNT(*) as num_rows FROM " . $db_name . "." . $row["table_name"])
+					->fetch()
+				;
+				$row["num_rows"] = $table_info_num_rows["num_rows"];
+				$modification_infos = $this->tryGetLastModified($db_name, $row["table_name"]);
+				$row["created"] = $modification_infos["created"];
+				$row["updated"] = $modification_infos["updated"];
+			}
+			unset($row);
+		} else if( $this->db_type === DbType::Postgres ) {
+			$results = $this->Select([
+				"table_name"
+			])
+				->From("information_schema.tables")
+				->Where("table_schema=:db_name")
+				->prepareStatement()
+				->withParam(":db_name", $db_name)
+				->execute()
+				->fetchAll()
+			;
+			foreach( $results as &$row ) {
+				$table_info_num_rows = $this->run("SELECT COUNT(*) as num_rows FROM " . $db_name . "." . $row["table_name"])
+					->fetch()
+				;
+				$row["num_rows"] = $table_info_num_rows["num_rows"];
+				$modification_infos = $this->tryGetLastModified($db_name, $row["table_name"]);
+				$row["created"] = $modification_infos["created"];
+				$row["updated"] = $modification_infos["updated"];
+			}
+			unset($row);
+		}
+
+		foreach( $results as $info ) {
+			$last_modification = ($info["created"] !== null) ? (new DateTime($info["created"]))->getTimestamp() : 0;
+			if( $info["updated"] !== null ) {
+				$last_modification = (new DateTime($info["updated"]))->getTimestamp();
+			}
+
+			$this->table_infos[$info['table_name']] = [
+				"num_rows" => (int)$info["num_rows"],
+				"modified" => $last_modification
+			];
+		}
+	}
+
+	/**
+	 * Checks if the given column exists in the given table of the given database
+	 *
+	 * @param string $db_name
+	 * @param string $table_name
+	 * @param string $column
+	 * @return bool
+	 * @throws JsonException
+	 * @throws SystemException
+	 */
+	private function columnExists(string $db_name, string $table_name, string $column): bool {
+		$results = array();
+		if( $this->db_type === DbType::MySQL ) {
+			// @formatter:off
+			$results = $this->Select()
+				->From("information_schema.COLUMNS")
+				->Where("TABLE_SCHEMA=:db_name")
+					->And("TABLE_NAME=:table_name")
+					->And("COLUMN_NAME=:col_name")
+				->prepareStatement()
+					->withParam(":db_name", $db_name)
+					->withParam(":table_name", $table_name)
+					->withParam(":col_name", $column)
+				->execute()
+				->fetchAll()
+			;
+			// @formatter:on
+		} else if( $this->db_type === DbType::MsSQL ) {
+			// @formatter:off
+			$results = $this->Select()
+				->From("INFORMATION_SCHEMA.COLUMNS")
+				->Where("TABLE_SCHEMA=:db_name")
+				->And("TABLE_NAME=:table_name")
+				->And("COLUMN_NAME=:col_name")
+				->prepareStatement()
+				->withParam(":db_name", $db_name)
+				->withParam(":table_name", $table_name)
+				->withParam(":col_name", $column)
+				->execute()
+				->fetchAll()
+			;
+			// @formatter:on
+		} else if( $this->db_type === DbType::Postgres ) {
+			// @formatter:off
+			$results = $this->Select()
+				->From("information_schema.columns")
+				->Where("table_schema=:db_name")
+				->And("table_name=:table_name")
+				->And("column_name=:col_name")
+				->prepareStatement()
+				->withParam(":db_name", $db_name)
+				->withParam(":table_name", $table_name)
+				->withParam(":col_name", $column)
+				->execute()
+				->fetchAll()
+			;
+			// @formatter:on
+		}
+
+		return (count($results) > 0);
+	}
+
+	/**
+	 * Try to collect information about the last modification in the given table of the given database
+	 *
+	 * @param $db_name
+	 * @param $table_name
+	 * @return array
+	 * @throws JsonException
+	 * @throws SystemException
+	 */
+	private function tryGetLastModified($db_name, $table_name): array {
+		$result = [
+			"created" => null,
+			"updated" => null
+		];
+		if( $this->columnExists($db_name, $table_name, "created") ) {
+			$table_info_created = $this->run("SELECT MAX(created) as created FROM " . $db_name . "." . $table_name)
+				->fetch()
+			;
+			$result["created"] = $table_info_created["created"];
+		}
+		if( $this->columnExists($db_name, $table_name, "updated") ) {
+			$table_info_updated = $this->run("SELECT MAX(updated) as updated FROM " . $db_name . "." . $table_name)
+				->fetch()
+			;
+			$result["updated"] = $table_info_updated["updated"];
+		}
+		return $result;
+	}
 }

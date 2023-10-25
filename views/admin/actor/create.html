@@ -3,68 +3,69 @@
 use lib\App;
 use lib\core\classes\Language;
 use lib\core\classes\Template;
+use lib\core\classes\TemplateData;
 use lib\helper\HtmlHelper;
 
 $lang = App::getInstanceOf(Language::class);
 
-$this->set("title", "Benutzer erstellen");
-$type_options = $this->get("type_options");
-$snippet = new Template(PATH_VIEWS."snippets/access_permission.html");
+TemplateData::set("title", "Benutzer erstellen");
+$type_options = TemplateData::get("type_options");
+$snippet = new Template(PATH_VIEWS . "snippets/access_permission.html");
 ?>
 <div class="container-fluid">
-	<h1>Neuen Benutzer anlegen</h1>
-	<form action="/actors/create" method="POST" class="needs-validation" autocomplete="off" novalidate>
-        <?= HtmlHelper::generateFormToken() ?>
-		<div class="row">
-			<div class="col-4">
-				<h2>Benutzer</h2>
-				<div class="form-group row">
-					<label for="type_id">Type</label>
-					<select id="type_id" name="type_id">
+    <h1><?= TemplateData::get("title") ?></h1>
+    <form action="/actors/create" method="POST" class="needs-validation" autocomplete="off" novalidate>
+		<?= HtmlHelper::generateFormToken() ?>
+        <div class="row">
+            <div class="col-4">
+                <h2>Benutzer</h2>
+                <div class="form-group row">
+                    <label for="type_id">Type</label>
+                    <select id="type_id" name="type_id">
 						<?php foreach( $type_options as $option ) { ?>
-							<option value="<?= $option->id ?>"><?= escaped_string($option->name)  ?></option>
+                            <option value="<?= $option->id ?>"><?= escaped_string($option->name) ?></option>
 						<?php } ?>
-					</select>
-					<div class="invalid-feedback"><?= $lang->getValue("error-messages", "type") ?></div>
-				</div>
-				<div class="form-group row">
-					<label for="email">E-Mail</label>
-					<input type="email" name="email" value="" id="email" required />
-					<div class="invalid-feedback"><?= $lang->getValue("error-messages", "email") ?></div>
-				</div>
-				<div class="form-group row">
-					<label for="password">Passwort</label>
-					<input type="password" name="password" value="" autocomplete="new-password" id="password" required />
-					<div class="invalid-feedback"><?= $lang->getValue("error-messages", "password") ?></div>
-				</div>
-				<div class="form-group row">
-					<label for="password_verify">Passwort Wiederholung</label>
-					<input type="password" name="password_verify" value="" autocomplete="new-password" id="password_verify" required />
-					<div class="invalid-feedback"><?= $lang->getValue("error-messages", "password_verify") ?></div>
-				</div>
-				<div class="form-group row">
-					<label for="first_name">Vorname</label>
-					<input type="text" name="first_name" value="" placeholder="" id="first_name" required />
-					<div class="invalid-feedback"><?= $lang->getValue("error-messages", "first_name") ?></div>
-				</div>
-				<div class="form-group row">
-					<label for="last_name">Nachname</label>
-					<input type="text" name="last_name" value="" placeholder="" id="last_name" required />
-					<div class="invalid-feedback"><?= $lang->getValue("error-messages", "last_name") ?></div>
-				</div>
-			</div>
-			<div class="col-8">
-				<h2>Rechte</h2>
-				<div class="content-block">
+                    </select>
+                    <div class="invalid-feedback"><?= $lang->getValue("error-messages", "type") ?></div>
+                </div>
+                <div class="form-group row">
+                    <label for="email">E-Mail</label>
+                    <input type="email" name="email" value="" id="email" required/>
+                    <div class="invalid-feedback"><?= $lang->getValue("error-messages", "email") ?></div>
+                </div>
+                <div class="form-group row">
+                    <label for="password">Passwort</label>
+                    <input type="password" name="password" value="" autocomplete="new-password" id="password" required/>
+                    <div class="invalid-feedback"><?= $lang->getValue("error-messages", "password") ?></div>
+                </div>
+                <div class="form-group row">
+                    <label for="password_verify">Passwort Wiederholung</label>
+                    <input type="password" name="password_verify" value="" autocomplete="new-password" id="password_verify" required/>
+                    <div class="invalid-feedback"><?= $lang->getValue("error-messages", "password_verify") ?></div>
+                </div>
+                <div class="form-group row">
+                    <label for="first_name">Vorname</label>
+                    <input type="text" name="first_name" value="" placeholder="" id="first_name" required/>
+                    <div class="invalid-feedback"><?= $lang->getValue("error-messages", "first_name") ?></div>
+                </div>
+                <div class="form-group row">
+                    <label for="last_name">Nachname</label>
+                    <input type="text" name="last_name" value="" placeholder="" id="last_name" required/>
+                    <div class="invalid-feedback"><?= $lang->getValue("error-messages", "last_name") ?></div>
+                </div>
+            </div>
+            <div class="col-8">
+                <h2>Rechte</h2>
+                <div class="content-block">
 					<?= $snippet->parse() ?>
-				</div>
-			</div>
-		</div>
-		<div class="row clearfix">
-			<div class="col">&nbsp;</div>
-			<div class="col-auto">
-				<button type="submit" name="create" class="button button-positiv"><?= $lang->getValue("translations", "create") ?></button>
-			</div>
-		</div>
-	</form>
+                </div>
+            </div>
+        </div>
+        <div class="row clearfix">
+            <div class="col"></div>
+            <div class="col-auto">
+                <button type="submit" name="create" class="button button-positiv"><?= $lang->getValue("translations", "create") ?></button>
+            </div>
+        </div>
+    </form>
 </div>

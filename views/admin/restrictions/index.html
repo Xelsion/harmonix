@@ -2,203 +2,199 @@
 
 use lib\App;
 use lib\core\classes\Language;
+use lib\core\classes\TemplateData;
+use lib\core\enums\RequestMethod;
 use lib\helper\HtmlHelper;
 
 $lang = App::getInstanceOf(Language::class);
 
-$this->set("title", "Zugriffsrechte");
-$routes = $this->get("routes");
-$current_restrictions = $this->get("current_restrictions");
-$role_options = $this->get("role_options");
-$type_options = $this->get("type_options");
+TemplateData::set("title", "Zugriffsrechte");
+$routes = TemplateData::get("routes");
+$current_restrictions = TemplateData::get("current_restrictions");
+$role_options = TemplateData::get("role_options");
+$type_options = TemplateData::get("type_options");
 ?>
 <div class="container-fluid">
-	<h1>Zugriffsrechte</h1>
-	<form action="/restrictions" method="POST" class="needs-validation" style="width: 80%;" novalidate>
-        <?= HtmlHelper::generateFormToken() ?>
-		<div class="row g-2">
-			<div class="col-md">Bereich</div>
-			<div class="col-md-auto">
-				<label>
-					<select onchange="showPath(this.value)">
-						<option value="">- Global -</option>
+    <h1>Zugriffsrechte</h1>
+    <form action="/restrictions" method="POST" class="needs-validation" style="width: 80%;" novalidate>
+		<?= HtmlHelper::generateFormToken() ?>
+		<?= RequestMethod::PUT->toInputString() ?>
+        <div class="row g-2">
+            <div class="col-md">Bereich</div>
+            <div class="col-md-auto">
+                <label>
+                    <select onchange="showPath(this.value)">
+                        <option value="">- Global -</option>
 						<?php foreach( array_keys($routes) as $domain ) { ?>
-							<option value="<?= $domain ?>"><?= $domain ?></option>
+                            <option value="<?= $domain ?>"><?= $domain ?></option>
 						<?php } ?>
-					</select>
-				</label>
-			</div>
-		</div>
-		<div class="row g-2">
-			<div class="col-auto"></div>
-			<div class="col-1">Bereich</div>
-			<div class="col">Controller</div>
-			<div class="col-2">Methode</div>
-			<div class="col-2">URL</div>
-			<div class="col-2">Rolle</div>
-			<div class="col-2">Type</div>
-		</div>
+                    </select>
+                </label>
+            </div>
+        </div>
+        <div class="row g-2">
+            <div class="col-auto"></div>
+            <div class="col-1">Bereich</div>
+            <div class="col">Controller</div>
+            <div class="col-2">Rolle</div>
+            <div class="col-2">Type</div>
+        </div>
 		<?php foreach( $routes as $domain => $controllers ) {
 			$curr_role = $current_restrictions[$domain][null][null]["role"] ?? 0;
 			$curr_type = $current_restrictions[$domain][null][null]["type"] ?? 0;
 			?>
-			<div class="row g-2 domain-selection">
-				<div class="col-auto" style="width: 20px;"></div>
-				<div class="col-1 table-col text-nowrap"><?= $domain ?></div>
-				<div class="col table-col text-nowrap"></div>
-				<div class="col-2 table-col text-nowrap"></div>
-				<div class="col-2 table-col text-nowrap"></div>
-				<div class="col-2">
-					<label>
-						<select name="restriction[<?= $domain ?>][role]" id="<?= $domain?>-null-null-role" onchange="checkRequired('<?= $domain?>-null-null');">
-							<option value="">- keine -</option>
+            <div class="row g-2 domain-selection">
+                <div class="col-auto" style="width: 20px;"></div>
+                <div class="col-1 table-col text-nowrap"><?= $domain ?></div>
+                <div class="col table-col text-nowrap"></div>
+                <div class="col-2">
+                    <label>
+                        <select name="restriction[<?= $domain ?>][role]" id="<?= $domain ?>-null-null-role" onchange="checkRequired('<?= $domain ?>-null-null');">
+                            <option value="">- keine -</option>
 							<?php foreach( $role_options as $role ) {
-								$is_selected = ( $curr_role === $role->id ) ? ' selected' : '';
+								$is_selected = ($curr_role === $role->id) ? ' selected' : '';
 								?>
-								<option value="<?= $role->id ?>"<?= $is_selected ?>><?= escaped_string($role->name) ?></option>
+                                <option value="<?= $role->id ?>"<?= $is_selected ?>><?= escaped_string($role->name) ?></option>
 							<?php } ?>
-						</select>
-					</label>
-				</div>
-				<div class="col-2">
-					<label>
-						<select name="restriction[<?= $domain ?>][type]" id="<?= $domain?>-null-null-type" onchange="checkRequired('<?= $domain?>-null-null');">
-							<option value="">- keine -</option>
+                        </select>
+                    </label>
+                </div>
+                <div class="col-2">
+                    <label>
+                        <select name="restriction[<?= $domain ?>][type]" id="<?= $domain ?>-null-null-type" onchange="checkRequired('<?= $domain ?>-null-null');">
+                            <option value="">- keine -</option>
 							<?php foreach( $type_options as $type ) {
-								$is_selected = ( $curr_type === $type->id ) ? ' selected' : '';
+								$is_selected = ($curr_type === $type->id) ? ' selected' : '';
 								?>
-								<option value="<?= $type->id ?>"<?= $is_selected ?>><?= escaped_string($type->name) ?></option>
+                                <option value="<?= $type->id ?>"<?= $is_selected ?>><?= escaped_string($type->name) ?></option>
 							<?php } ?>
-						</select>
-					</label>
-				</div>
-			</div>
-			<div id="<?= $domain ?>" class="toggles" style="display: none;">
+                        </select>
+                    </label>
+                </div>
+            </div>
+            <div id="<?= $domain ?>" class="toggles" style="display: none;">
 				<?php foreach( $controllers as $controller => $methods ) {
 					$curr_role = $current_restrictions[$domain][$controller][null]["role"] ?? 0;
 					$curr_type = $current_restrictions[$domain][$controller][null]["type"] ?? 0;
 					$controller_name = str_replace("\\", "-", $controller);
 					?>
-					<div class="row g-2">
-						<div class="col-auto" style="width: 20px; cursor: pointer;" onclick="toggleDisplayMethods('<?= $domain."-".$controller_name ?>');">
-							<div id="<?= $domain."-".$controller_name ?>-toggle" class="slide-down"></div>
-						</div>
-						<div class="col-1 table-col text-nowrap" style="cursor: pointer;" onclick="toggleDisplayMethods('<?= $domain."-".$controller_name ?>');"><?= $domain ?></div>
-						<div class="col table-col text-nowrap" style="cursor: pointer;" onclick="toggleDisplayMethods('<?= $domain."-".$controller_name ?>');"><?= $controller ?></div>
-						<div class="col-2 table-col text-nowrap" style="cursor: pointer;" onclick="toggleDisplayMethods('<?= $domain."-".$controller_name ?>');"></div>
-						<div class="col-2 table-col text-nowrap"></div>
-						<div class="col-2">
-							<label>
-								<select name="restriction[<?= $domain ?>][controller][<?= $controller_name ?>][role]" id="<?= $domain?>-<?= $controller_name ?>-null-role" onchange="checkRequired('<?= $domain?>-<?= $controller_name ?>-null');">
-									<option value="">- keine -</option>
+                    <div class="row g-2">
+                        <div class="col-auto" style="width: 20px; cursor: pointer;" onclick="toggleDisplayMethods('<?= $domain . "-" . $controller_name ?>');">
+                            <div id="<?= $domain . "-" . $controller_name ?>-toggle" class="slide-down-inline"></div>
+                        </div>
+                        <div class="col-1 table-col text-nowrap" style="cursor: pointer;" onclick="toggleDisplayMethods('<?= $domain . "-" . $controller_name ?>');"><?= $domain ?></div>
+                        <div class="col table-col text-nowrap" style="cursor: pointer;" onclick="toggleDisplayMethods('<?= $domain . "-" . $controller_name ?>');"><?= $controller ?></div>
+                        <div class="col-2">
+                            <label>
+                                <select name="restriction[<?= $domain ?>][controller][<?= $controller_name ?>][role]" id="<?= $domain ?>-<?= $controller_name ?>-null-role" onchange="checkRequired('<?= $domain ?>-<?= $controller_name ?>-null');">
+                                    <option value="">- keine -</option>
 									<?php foreach( $role_options as $role ) {
-										$is_selected = ( $curr_role === $role->id ) ? ' selected' : '';
+										$is_selected = ($curr_role === $role->id) ? ' selected' : '';
 										?>
-										<option value="<?= $role->id ?>"<?= $is_selected ?>><?= escaped_string($role->name) ?></option>
+                                        <option value="<?= $role->id ?>"<?= $is_selected ?>><?= escaped_string($role->name) ?></option>
 									<?php } ?>
-								</select>
-							</label>
-						</div>
-						<div class="col-2">
-							<label>
-								<select name="restriction[<?= $domain ?>][controller][<?= $controller_name ?>][type]" id="<?= $domain?>-<?= $controller_name ?>-null-type" onchange="checkRequired('<?= $domain?>-<?= $controller_name ?>-null');">
-									<option value="">- keine -</option>
+                                </select>
+                            </label>
+                        </div>
+                        <div class="col-2">
+                            <label>
+                                <select name="restriction[<?= $domain ?>][controller][<?= $controller_name ?>][type]" id="<?= $domain ?>-<?= $controller_name ?>-null-type" onchange="checkRequired('<?= $domain ?>-<?= $controller_name ?>-null');">
+                                    <option value="">- keine -</option>
 									<?php foreach( $type_options as $type ) {
-										$is_selected = ( $curr_type === $type->id ) ? ' selected' : '';
+										$is_selected = ($curr_type === $type->id) ? ' selected' : '';
 										?>
-										<option value="<?= $type->id ?>"<?= $is_selected ?>><?= escaped_string($type->name) ?></option>
+                                        <option value="<?= $type->id ?>"<?= $is_selected ?>><?= escaped_string($type->name) ?></option>
 									<?php } ?>
-								</select>
-							</label>
-						</div>
-					</div>
-					<div id="<?= $domain."-".$controller_name ?>" class="method-toggle" style="display:none;">
-						<?php foreach( $methods as $method => $url ) {
-							$curr_role = $current_restrictions[$domain][$controller][$method]["role"] ?? 0;
-							$curr_type = $current_restrictions[$domain][$controller][$method]["type"] ?? 0;
+                                </select>
+                            </label>
+                        </div>
+                    </div>
+                    <div id="<?= $domain . "-" . $controller_name ?>" class="method-toggle" style="display:none;">
+						<?php foreach( $methods as $method ) {
+							$curr_role = $current_restrictions[$domain][$controller][$method['method']]["role"] ?? 0;
+							$curr_type = $current_restrictions[$domain][$controller][$method['method']]["type"] ?? 0;
 							?>
-							<div class="row g-2">
-								<div class="col-auto" style="width: 20px;"></div>
-								<div class="col-1 table-col text-nowrap"></div>
-								<div class="col table-col text-nowrap"></div>
-								<div class="col-2 table-col text-nowrap"><?= $method ?></div>
-								<div class="col-2 table-col text-nowrap"><?= $url ?></div>
-								<div class="col-2">
-									<label>
-										<select name="restriction[<?= $domain ?>][controller][<?= $controller_name ?>][method][<?= $method ?>][role]" id="<?= $domain?>-<?= $controller_name ?>-<?= $method ?>-role" onchange="checkRequired('<?= $domain?>-<?= $controller_name ?>-<?= $method ?>');">
-											<option value="">- keine -</option>
+                            <div class="row g-2">
+                                <div class="col-auto" style="width: 20px;"></div>
+                                <div class="col-1 table-col text-nowrap"></div>
+                                <div class="col-3 table-col text-nowrap">-&gt;<?= $method['method'] ?></div>
+                                <div class="col table-col text-nowrap"><?= $method['path'] ?></div>
+                                <div class="col-2">
+                                    <label>
+                                        <select name="restriction[<?= $domain ?>][controller][<?= $controller_name ?>][method][<?= $method['method'] ?>][role]" id="<?= $domain ?>-<?= $controller_name ?>-<?= $method['method'] ?>-role" onchange="checkRequired('<?= $domain ?>-<?= $controller_name ?>-<?= $method['method'] ?>');">
+                                            <option value="">- keine -</option>
 											<?php foreach( $role_options as $role ) {
-												$is_selected = ( $curr_role === $role->id ) ? ' selected' : '';
+												$is_selected = ($curr_role === $role->id) ? ' selected' : '';
 												?>
-												<option value="<?= $role->id ?>"<?= $is_selected ?>><?= escaped_string($role->name) ?></option>
+                                                <option value="<?= $role->id ?>"<?= $is_selected ?>><?= escaped_string($role->name) ?></option>
 											<?php } ?>
-										</select>
-									</label>
-								</div>
-								<div class="col-2">
-									<label>
-										<select name="restriction[<?= $domain ?>][controller][<?= $controller_name ?>][method][<?= $method ?>][type]" id="<?= $domain?>-<?= $controller_name ?>-<?= $method ?>-type" onchange="checkRequired('<?= $domain?>-<?= $controller_name ?>-<?= $method ?>');">
-											<option value="">- keine -</option>
+                                        </select>
+                                    </label>
+                                </div>
+                                <div class="col-2">
+                                    <label>
+                                        <select name="restriction[<?= $domain ?>][controller][<?= $controller_name ?>][method][<?= $method['method'] ?>][type]" id="<?= $domain ?>-<?= $controller_name ?>-<?= $method['method'] ?>-type" onchange="checkRequired('<?= $domain ?>-<?= $controller_name ?>-<?= $method['method'] ?>');">
+                                            <option value="">- keine -</option>
 											<?php foreach( $type_options as $type ) {
-												$is_selected = ( $curr_type === $type->id ) ? ' selected' : '';
+												$is_selected = ($curr_type === $type->id) ? ' selected' : '';
 												?>
-												<option value="<?= $type->id ?>"<?= $is_selected ?>><?= escaped_string($type->name) ?></option>
+                                                <option value="<?= $type->id ?>"<?= $is_selected ?>><?= escaped_string($type->name) ?></option>
 											<?php } ?>
-										</select>
-									</label>
-								</div>
-							</div>
+                                        </select>
+                                    </label>
+                                </div>
+                            </div>
 						<?php } ?>
-					</div>
+                    </div>
 				<?php } ?>
-			</div>
+            </div>
 		<?php } ?>
-		<div class="row clearfix">
-			<div class="col-md">
-				<button type="submit" name="update" class="button button-positiv float-end"><?= $lang->getValue("translations", "save") ?></button>
-			</div>
-		</div>
-	</form>
+        <div class="row clearfix">
+            <div class="col-md">
+                <button type="submit" name="update" class="button button-positiv float-end"><?= $lang->getValue("translations", "save") ?></button>
+            </div>
+        </div>
+    </form>
 </div>
 <script type="text/javascript">
-	function showPath(element_id) {
-		$(".toggles").each(function () {
-			$(this).hide();
-		});
-		if (element_id !== "") {
-			$(".domain-selection").each(function () {
-				$(this).hide();
-			});
-			$("#" + element_id).show();
-		} else {
-			$(".domain-selection").each(function () {
-				$(this).show();
-			});
-		}
-	}
+    function showPath(element_id) {
+        $(".toggles").each(function () {
+            $(this).hide();
+        });
+        if (element_id !== "") {
+            $(".domain-selection").each(function () {
+                $(this).hide();
+            });
+            $("#" + element_id).show();
+        } else {
+            $(".domain-selection").each(function () {
+                $(this).show();
+            });
+        }
+    }
 
-	function toggleDisplayMethods(element_id) {
-		let element = $('#' + element_id);
-		let element_toggle = $('#' + element_id + "-toggle");
-		element.toggle();
-		if (element.is(":visible")) {
-			element_toggle.removeClass("slide-down");
-			element_toggle.addClass("slide-up");
-		} else {
-			element_toggle.removeClass("slide-up");
-			element_toggle.addClass("slide-down");
-		}
-	}
+    function toggleDisplayMethods(element_id) {
+        let element = $('#' + element_id);
+        let element_toggle = $('#' + element_id + "-toggle");
+        element.toggle();
+        if (element.is(":visible")) {
+            element_toggle.removeClass("slide-down-inline");
+            element_toggle.addClass("slide-up-inline");
+        } else {
+            element_toggle.removeClass("slide-up-inline");
+            element_toggle.addClass("slide-down-inline");
+        }
+    }
 
-	function checkRequired( element_name ) {
-		let role = $("#"+element_name+"-role");
-		let type = $("#"+element_name+"-type");
-		if( role.val() !== "" || type.val() !== "" ) {
-			role.prop("required", true);
-			type.prop("required", true);
-		} else {
-			role.prop("required", false);
-			type.prop("required", false);
-		}
-	}
+    function checkRequired(element_name) {
+        let role = $("#" + element_name + "-role");
+        let type = $("#" + element_name + "-type");
+        if (role.val() !== "" || type.val() !== "") {
+            role.prop("required", true);
+            type.prop("required", true);
+        } else {
+            role.prop("required", false);
+            type.prop("required", false);
+        }
+    }
 </script>

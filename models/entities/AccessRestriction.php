@@ -1,5 +1,8 @@
 <?php
+
 namespace models\entities;
+
+use lib\core\attributes\PrimaryKey;
 
 /**
  * The AccessRestriction entity
@@ -9,23 +12,23 @@ namespace models\entities;
  * @version 1.0.0;
  */
 class AccessRestriction {
+	#[PrimaryKey]
+	public int $id = 0;
 
-    public int $id = 0;
+	public string $domain = "";
 
-    public string $domain = "";
+	public ?string $controller = null;
 
-    public ?string $controller = null;
+	public ?string $method = null;
 
-    public ?string $method = null;
+	public int $restriction_type = 0;
 
-    public int $restriction_type = 0;
+	public int $role_id = 0;
 
-    public int $role_id = 0;
+	public string $created = "";
 
-    public string $created = "";
+	public ?string $updated = null;
 
-    public ?string $updated = null;
-
-    public ?string $deleted = null;
+	public ?string $deleted = null;
 
 }

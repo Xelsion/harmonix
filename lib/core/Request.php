@@ -1,4 +1,5 @@
 <?php
+
 namespace lib\core;
 
 use lib\core\classes\KeyValuePairs;
@@ -13,50 +14,49 @@ use lib\helper\HtmlHelper;
  */
 class Request extends KeyValuePairs {
 
-    private string $request_uri;
-    private string $request_method;
-    private array $files;
+	private string $request_uri;
+	private string $request_method;
 
-    /**
-     * The class constructor
-     * sets the current requested uri
-     * calls the method initController()
-     * @throws \lib\core\exceptions\SystemException
-     */
+	/**
+	 * The class constructor
+	 * sets the current requested uri
+	 * calls the method initController()
+	 * @throws \lib\core\exceptions\SystemException
+	 */
 	public function __construct() {
-        $this->request_uri = $_SERVER["REQUEST_URI"]??"";
-        $this->request_method = $_SERVER['REQUEST_METHOD']??"";
+		$accept_input = true;
+		if( isset($_POST['csrf_token']) ) {
+			if( !HtmlHelper::validateFormToken($_POST['csrf_token']) ) {
+				$accept_input = false;
+			}
+			HtmlHelper::deleteFormToken();
+		}
 
-        $accept_input = true;
-        if( isset($_POST['csrf_token']) ) {
-            if( !HtmlHelper::validateFormToken($_POST['csrf_token'])) {
-                $accept_input = false;
-            }
-            HtmlHelper::deleteFormToken();
-        }
+		if( $accept_input ) {
+			foreach( $_GET as $key => $value ) {
+				$this->set($key, $value);
+			}
+			foreach( $_POST as $key => $value ) {
+				$this->set($key, $value);
+			}
+			foreach( $_FILES as $key => $value ) {
+				$this->set($key, $value);
+			}
+		}
 
-        if( $accept_input ) {
-            foreach( $_GET as $key => $value ) {
-                $this->set($key, $value);
-            }
-            foreach( $_POST as $key => $value ) {
-                $this->set($key, $value);
-            }
-            foreach( $_FILES as $key => $value ) {
-                $this->set($key, $value);
-            }
-        }
+		$this->request_uri = $_SERVER["REQUEST_URI"] ?? "";
+		$this->request_method = ($this->contains("request_method")) ? strtoupper($this->get("request_method")) : $_SERVER['REQUEST_METHOD'] ?? "";
 	}
 
-    /**
-     * Returns the requested uri
-     *
-     * @param string $uri
-     * @return void
-     */
-    public function setRequestUri( string $uri ): void {
-        $this->request_uri = $uri;
-    }
+	/**
+	 * Returns the requested uri
+	 *
+	 * @param string $uri
+	 * @return void
+	 */
+	public function setRequestUri(string $uri): void {
+		$this->request_uri = $uri;
+	}
 
 	/**
 	 * Returns the requested uri

@@ -1,5 +1,8 @@
 <?php
-$error = $this->get('error');
+
+use lib\core\classes\TemplateData;
+
+$error = TemplateData::get('error');
 $error_trace = $error->getTrace();
 ?>
 <!DOCTYPE html>
@@ -30,13 +33,12 @@ $error_trace = $error->getTrace();
             <th>Function</th>
         </tr>
 		<?php foreach( $error_trace as $key => $trace ) {
-			$args = (empty($trace['args'])) ? '' : implode(", ", $trace['args'])
 			?>
             <tr>
                 <th><?= $key ?></th>
-                <th><?= $trace["file"] ?></th>
-                <th><?= $trace["line"] ?></th>
-                <th><?= $trace["class"] ?><?= $trace["type"] ?><?= $trace["function"] ?>(<?= $args ?>)</th>
+                <th><?= $trace["file"] ?? '' ?></th>
+                <th><?= $trace["line"] ?? '' ?></th>
+                <th><?= $trace["class"] ?><?= $trace["type"] ?><?= $trace["function"] ?></th>
             </tr>
 		<?php } ?>
     </table>

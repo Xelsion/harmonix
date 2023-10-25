@@ -2,20 +2,24 @@
 
 use lib\App;
 use lib\core\classes\Language;
+use lib\core\classes\TemplateData;
 use lib\helper\HtmlHelper;
 use lib\helper\StringHelper;
 
 $lang = App::getInstanceOf(Language::class);
 
-$search_string = $this->get("search_string");
-$actor_list = $this->get("actor_list");
+$search_string = TemplateData::get("search_string");
+$actor_list = TemplateData::get("actor_list");
 ?>
 <div class="container-fluid">
     <form action="/actors/search" method="POST">
-        <?= HtmlHelper::generateFormToken() ?>
+		<?= HtmlHelper::generateFormToken() ?>
         <div class="row">
             <div class="col"></div>
-            <div class="col-3"><input type="text" name="search_string" value="<?= $search_string ?>"/></div>
+            <div class="col-1" style="margin-top: 6px"><label for="search-field">Suchbegriff</label></div>
+            <div class="col-3">
+                <input id="search-field" type="text" name="search_string" value="<?= escaped_string($search_string) ?>"/>
+            </div>
             <div class="col-auto">
                 <input type="submit" name="" value="<?= $lang->getValue("translations", "search") ?>" class="button button-default"/>
             </div>
@@ -30,11 +34,11 @@ $actor_list = $this->get("actor_list");
             <th>Nachname</th>
             <th class="col-md-3 text-end">Optionen</th>
         </tr>
-        <?php foreach( $actor_list as $actor ):
-            $email = StringHelper::getHighlighted($search_string, escaped_string($actor->email));
-            $first_name = StringHelper::getHighlighted($search_string, escaped_string($actor->first_name));
-            $last_name = StringHelper::getHighlighted($search_string, escaped_string($actor->last_name));
-            ?>
+		<?php foreach( $actor_list as $actor ):
+			$email = StringHelper::getHighlighted($search_string, $actor->email);
+			$first_name = StringHelper::getHighlighted($search_string, $actor->first_name);
+			$last_name = StringHelper::getHighlighted($search_string, $actor->last_name);
+			?>
             <tr>
                 <td><?= escaped_string($actor->id) ?></td>
                 <td><?= $email ?></td>
@@ -46,9 +50,9 @@ $actor_list = $this->get("actor_list");
                     <a href="/actors/<?= $actor->id ?>" class="button button-negativ"><?= $lang->getValue("translations", "delete") ?></a>
                 </td>
             </tr>
-        <?php endforeach; ?>
+		<?php endforeach; ?>
     </table>
-    <?php if( count($actor_list) === 0 ): ?>
+	<?php if( count($actor_list) === 0 ): ?>
         <h2>NO RESULTS FOUND</h2>
-    <?php endif; ?>
+	<?php endif; ?>
 </div>

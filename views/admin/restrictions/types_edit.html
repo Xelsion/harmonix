@@ -2,42 +2,45 @@
 
 use lib\App;
 use lib\core\classes\Language;
+use lib\core\classes\TemplateData;
+use lib\core\enums\RequestMethod;
 use lib\helper\HtmlHelper;
 
 $lang = App::getInstanceOf(Language::class);
 
-$this->set("title", "Zugriffstype bearbeiten");
-$type = $this->get("type");
+TemplateData::set("title", "Zugriffstype bearbeiten");
+$type = TemplateData::get("type");
 ?>
 <div class="container-fluid">
-	<h1>Zugriffstype bearbeiten</h1>
-	<form action="/restrictions/types/<?= $type->id ?>" method="POST" class="needs-validation" autocomplete="off" novalidate>
-        <?= HtmlHelper::generateFormToken() ?>
-		<div class="form-group row">
-			<label for="email">Name</label>
-			<input type="text" name="name" value="<?= escaped_string($type->name) ?>" id="email" required />
-			<div class="invalid-feedback"><?= $lang->getValue("error-messages", "name") ?></div>
-		</div>
-		<div class="clearfix">
-			<input type="checkbox" name="include_siblings" value="1" id="include_siblings" class="form-check-input float-start"<?= ($type->include_siblings === 1 ) ? ' checked': ''?> />
-			<label for="first_name" class="form-check-label float-start">Incl. gleicher Obergruppe</label>
-		</div>
-		<div class="clearfix">
-			<input type="checkbox" name="include_children" value="1" id="include_children" class="form-check-input float-start"<?= ($type->include_children === 1 ) ? ' checked': ''?> />
-			<label for="first_name" class="form-check-label float-start">Incl. direkter Untergruppen</label>
-		</div>
-		<div class="clearfix">
-			<input type="checkbox" name="include_descendants" value="1" id="include_descendants" class="form-check-input float-start"<?= ($type->include_descendants === 1 ) ? ' checked': ''?> />
-			<label for="first_name" class="form-check-label float-start">Incl. aller Untergruppen</label>
-		</div>
-		<div class="form-group row clearfix">
-			<div class="col-auto">
-				<button type="submit" name="cancel" class="button button-default float-start"><?= $lang->getValue("translations", "cancel") ?></button>
-			</div>
-			<div class="col"></div>
-			<div class="col-auto">
-				<button type="submit" name="update" class="button button-positiv float-end"><?= $lang->getValue("translations", "save") ?></button>
-			</div>
-		</div>
-	</form>
+    <h1>Zugriffstype bearbeiten</h1>
+    <form action="/restrictions/types/<?= $type->id ?>" method="POST" class="needs-validation" autocomplete="off" novalidate>
+		<?= HtmlHelper::generateFormToken() ?>
+		<?= RequestMethod::PUT->toInputString() ?>
+        <div class="form-group row">
+            <label for="email">Name</label>
+            <input type="text" name="name" value="<?= escaped_string($type->name) ?>" id="email" required/>
+            <div class="invalid-feedback"><?= $lang->getValue("error-messages", "name") ?></div>
+        </div>
+        <div class="clearfix">
+            <input type="checkbox" name="include_siblings" value="1" id="include_siblings" class="form-check-input float-start"<?= ($type->include_siblings === 1) ? ' checked' : '' ?> />
+            <label for="include_siblings" class="form-check-label float-start">Incl. gleicher Obergruppe</label>
+        </div>
+        <div class="clearfix">
+            <input type="checkbox" name="include_children" value="1" id="include_children" class="form-check-input float-start"<?= ($type->include_children === 1) ? ' checked' : '' ?> />
+            <label for="include_children" class="form-check-label float-start">Incl. direkter Untergruppen</label>
+        </div>
+        <div class="clearfix">
+            <input type="checkbox" name="include_descendants" value="1" id="include_descendants" class="form-check-input float-start"<?= ($type->include_descendants === 1) ? ' checked' : '' ?> />
+            <label for="include_descendants" class="form-check-label float-start">Incl. aller Untergruppen</label>
+        </div>
+        <div class="form-group row clearfix">
+            <div class="col-auto">
+                <a href="/restrictions/types" class="button button-default float-start"><?= $lang->getValue("translations", "cancel") ?></a>
+            </div>
+            <div class="col"></div>
+            <div class="col-auto">
+                <button type="submit" name="update" class="button button-positiv float-end"><?= $lang->getValue("translations", "save") ?></button>
+            </div>
+        </div>
+    </form>
 </div>

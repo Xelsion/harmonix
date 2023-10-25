@@ -2,11 +2,12 @@
 
 use lib\App;
 use lib\core\classes\Language;
+use lib\core\classes\TemplateData;
 
 $lang = App::getInstanceOf(Language::class);
 
-$this->set("title", "Zugriffstypen");
-$type_list = $this->get("type_list");
+TemplateData::set("title", "Zugriffstypen");
+$type_list = TemplateData::get("type_list");
 ?>
 <div class="container-fluid">
     <h1>Zugriffstypen</h1>
@@ -19,7 +20,7 @@ $type_list = $this->get("type_list");
             <th>incl. aller Untergruppen</th>
             <th class="col-md-2 text-end">Optionen</th>
         </tr>
-        <?php foreach( $type_list as $type ): ?>
+		<?php foreach( $type_list as $type ): ?>
             <tr>
                 <td class="align-middle"><?= escaped_string($type->id) ?></td>
                 <td class="align-middle"><?= escaped_string($type->name) ?></td>
@@ -31,6 +32,6 @@ $type_list = $this->get("type_list");
                     <a href="/restrictions/types/delete/<?= $type->id ?>" class="button button-negativ"><?= $lang->getValue("translations", "delete") ?></a>
                 </td>
             </tr>
-        <?php endforeach; ?>
+		<?php endforeach; ?>
     </table>
 </div>

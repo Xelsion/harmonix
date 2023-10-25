@@ -1,0 +1,11 @@
+<?php
+
+use lib\core\classes\TemplateData;
+
+$message_title = TemplateData::get("system_message_title") ?? "System Nachricht";
+$message_content = TemplateData::get("system_message");
+?>
+<div class="alert alert-<?= TemplateData::get("system_message_type") ?>" role="alert">
+    <strong><?= $message_title ?>:</strong> <?= $message_content ?>
+</div>
+

@@ -1,8 +1,11 @@
 <?php
+
 use lib\App;
+use lib\core\classes\TemplateData;
+
 ?>
 <div class="container-fluid">
-	<h1><?= $this->get("title") ?></h1>
+    <h1><?= TemplateData::get("title") ?></h1>
 	<?php if( App::$storage->get("message") !== null ) {
 		echo App::$storage->get("message");
 	} ?>

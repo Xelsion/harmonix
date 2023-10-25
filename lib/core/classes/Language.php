@@ -20,7 +20,7 @@ class Language {
 	 *
 	 * @param $language
 	 */
-	private function __construct($language = "de") {
+	private function __construct(string $language = "de") {
 		$this->lang = parse_ini_file(PATH_ROOT . "lang-" . $language . ".ini", true);
 	}
 

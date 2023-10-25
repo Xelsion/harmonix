@@ -19,6 +19,7 @@ use PDO;
 /**
  * @inheritDoc
  *
+ * @see ARepository
  * @author Markus Schröder <xelsion@gmail.com>
  * @version 1.0.0
  */
@@ -297,16 +298,7 @@ class ActorRepository extends ARepository {
 	 * @throws SystemException
 	 */
 	public function getNumRows(): int {
-		// @formatter:off
-		$result = $this->pdo->Select("COUNT(DISTINCT id)")
-			->As("num_count")
-			->From("actors")
-			->prepareStatement()
-			->execute()
-			->fetch()
-		;
-		// @formatter:on
-		return (int)$result["num_count"];
+		return (int)$this->pdo->getNumRowsOfTable("actors");
 	}
 
 	/**
@@ -314,9 +306,14 @@ class ActorRepository extends ARepository {
 	 * @return void
 	 * @throws SystemException
 	 */
-	public function createObject(Actor $actor): void {
+	public function createObject(ActorModel $actor): void {
 		try {
 			$actor->password = StringHelper::getBCrypt($actor->password);
+
+			// store this action
+			$storage_repo = App::getInstanceOf(ActionStorageRepository::class);
+			$storage_repo->storeAction("create", "mvc", "actors", null, $actor->getAsEntity());
+
 			// @formatter:off
 			$this->pdo->Insert("actors")
 				->Columns(["type_id", "email", "password", "first_name", "last_name", "login_fails", "login_disabled"])
@@ -342,7 +339,7 @@ class ActorRepository extends ARepository {
 	 * @return void
 	 * @throws SystemException
 	 */
-	public function updateObject(Actor $actor): void {
+	public function updateObject(ActorModel $actor): void {
 		try {
 			// @formatter:off
 			$row = $this->pdo->Select("password")
@@ -360,6 +357,12 @@ class ActorRepository extends ARepository {
 				} else {
 					$actor->password = $row["password"];
 				}
+
+				// store this action
+				$obj_orig = $this->get($actor->id);
+				$storage_repo = App::getInstanceOf(ActionStorageRepository::class);
+				$storage_repo->storeAction("update", "mvc", "actors", $obj_orig->getAsEntity(), $actor->getAsEntity());
+
 				// @formatter:off
 				$this->pdo->Update("actors")
 					->Set(["email", "password", "first_name", "last_name", "login_fails", "login_disabled", "deleted"])
@@ -405,7 +408,34 @@ class ActorRepository extends ARepository {
 					->execute()
 				;
 				// @formatter:on
-				$actor = new ActorModel();
+			} catch( Exception $e ) {
+				throw new SystemException(__FILE__, __LINE__, $e->getMessage(), $e->getCode(), $e->getPrevious());
+			}
+		}
+	}
+
+	/**
+	 * Deletes the given actor from the database.
+	 * Hint: instead of deleting the record will be marked as "deleted"
+	 *
+	 * @param Actor $actor
+	 * @return void
+	 * @throws SystemException
+	 */
+	public function undeleteObject(Actor $actor): void {
+		if( $actor->id > 0 ) {
+			try {
+				// @formatter:off
+				$this->pdo->Update("actors")
+					->Set(["deleted", "login_disabled"])
+					->Where("id=:id")
+					->prepareStatement()
+						->withParam(':id', $actor->id, PDO::PARAM_INT)
+						->withParam(':login_disabled', 0, PDO::PARAM_INT)
+						->withParam(':deleted', null, PDO::PARAM_NULL)
+					->execute()
+				;
+				// @formatter:on
 			} catch( Exception $e ) {
 				throw new SystemException(__FILE__, __LINE__, $e->getMessage(), $e->getCode(), $e->getPrevious());
 			}

@@ -8,6 +8,7 @@ use lib\App;
 use lib\core\classes\Configuration;
 use lib\core\exceptions\SystemException;
 use lib\helper\StringHelper;
+use models\entities\Session;
 use repositories\ActorRepository;
 use repositories\MVCRepository;
 
@@ -17,7 +18,7 @@ use repositories\MVCRepository;
  * @author Markus Schröder <xelsion@gmail.com>
  * @version 1.0.0;
  */
-class SessionModel extends entities\Session {
+class SessionModel extends Session {
 
 	private readonly MVCRepository $mvc_repository;
 
@@ -208,7 +209,12 @@ class SessionModel extends entities\Session {
 	public function writeCookie(): void {
 		$date_time = DateTime::createFromFormat("Y-m-d H:i:s", $this->expired);
 		$session_id = ($this->encryption) ? StringHelper::encrypt($this->id) : $this->id;
-		$cookie_options = array('expires' => $date_time->getTimestamp(), 'path' => $this->cookie_path, 'domain' => $this->cookie_domain, 'secure' => $this->cookie_secure, 'samesite' => $this->cookie_same_site);
+		$cookie_options = array('expires'  => $date_time->getTimestamp(),
+		                        'path'     => $this->cookie_path,
+		                        'domain'   => $this->cookie_domain,
+		                        'secure'   => $this->cookie_secure,
+		                        'samesite' => $this->cookie_same_site
+		);
 		setcookie($this->cookie_name, $session_id, $cookie_options);
 	}
 

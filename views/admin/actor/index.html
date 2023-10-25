@@ -2,25 +2,27 @@
 
 use lib\App;
 use lib\core\classes\Language;
+use lib\core\classes\TemplateData;
+use lib\core\enums\RequestMethod;
 use lib\helper\HtmlHelper;
 
 $lang = App::getInstanceOf(Language::class);
-$this->set("title", "Benutzer");
-$actor_list = $this->get("actor_list");
-$pagination = $this->get("pagination");
+TemplateData::set("title", "Benutzer");
+$actor_list = TemplateData::get("actor_list");
+$pagination = TemplateData::get("pagination");
 ?>
 <div class="container-fluid">
+    <h1>Benutzer</h1>
     <form action="/actors/search" method="POST">
-        <?= HtmlHelper::generateFormToken() ?>
+		<?= HtmlHelper::generateFormToken() ?>
         <div class="row">
-            <div class="col text-end pt-2">Suchbegriff</div>
-            <div class="col-3"><input type="text" name="search_string" value=""/></div>
+            <div class="col text-end pt-2"><label for="search-field">Suchbegriff</label></div>
+            <div class="col-3"><input id="search-field" type="text" name="search_string" value=""/></div>
             <div class="col-auto">
                 <input type="submit" name="" value="<?= $lang->getValue("translations", "search") ?>" class="button button-default"/>
             </div>
         </div>
     </form>
-    <h1>Benutzer</h1>
     <table class="table table-dark table-striped">
         <tr>
             <th>ID</th>
@@ -29,9 +31,9 @@ $pagination = $this->get("pagination");
             <th>Nachname</th>
             <th class="col-md-3 text-end">Optionen</th>
         </tr>
-        <?php foreach( $actor_list as $actor ):
-            $row_style = ($actor->deleted === NULL) ? '' : ' style="color: #cc3737; text-decoration: line-through;"'
-            ?>
+		<?php foreach( $actor_list as $actor ):
+			$row_style = ($actor->deleted === NULL) ? '' : ' style="color: #cc3737; text-decoration: line-through;"'
+			?>
             <tr>
                 <td class="align-middle"<?= $row_style ?>><?= escaped_string($actor->id) ?></td>
                 <td class="align-middle"<?= $row_style ?>><?= escaped_string($actor->email) ?></td>
@@ -44,14 +46,19 @@ $pagination = $this->get("pagination");
                     </form>
                     <a href="/actors/roles/<?= $actor->id ?>" class="button button-default"><?= $lang->getValue("translations", "roles") ?></a>
                     <a href="/actors/<?= $actor->id ?>" class="button button-default"><?= $lang->getValue("translations", "edit") ?></a>
-                    <button class="button button-negativ" onclick="$('#delete-target').attr('href', '/actors/delete/<?= $actor->id ?>')" data-bs-toggle="modal" data-bs-target="#confirm-delete"><?= $lang->getValue("translations", "delete") ?></button>
+					<?php if( $actor->deleted === null ) { ?>
+                        <button class="button button-negativ" onclick="$('#delete-target').attr('action', '/actors/delete/<?= $actor->id ?>')" data-bs-toggle="modal" data-bs-target="#confirm-delete"><?= $lang->getValue("translations", "deactivate") ?></button>
+					<?php } else { ?>
+                        <button class="button button-positiv" onclick="$('#undelete-target').attr('action', '/actors/undelete/<?= $actor->id ?>')" data-bs-toggle="modal" data-bs-target="#confirm-undelete"><?= $lang->getValue("translations", "activate") ?></button>
+					<?php } ?>
+
                 </td>
             </tr>
-        <?php endforeach; ?>
+		<?php endforeach; ?>
     </table>
     <form action="/actors" method="POST" style="padding-bottom: 15px;">
-        <?= HtmlHelper::generateFormToken() ?>
-        <?= $pagination ?>
+		<?= HtmlHelper::generateFormToken() ?>
+		<?= $pagination ?>
     </form>
 </div>
 
@@ -63,11 +70,34 @@ $pagination = $this->get("pagination");
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                Sind Sie sicher, das Sie diesen Eintrag löschen wollen?
+                Soll dieser Actor wieder deaktiviert werden?
             </div>
             <div class="modal-footer">
-                <button type="button" class="button button-default" data-bs-dismiss="modal">Close</button>
-                <a id="delete-target" href="" class="button button-negativ">Löschen</a>
+                <form id="delete-target" action="" method="POST" style="background-color: transparent;">
+					<?= RequestMethod::DELETE->toInputString() ?>
+                    <button type="button" class="button button-default float-left" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="button button-negativ float-right">Deaktivieren</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="confirm-undelete" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="exampleModalLabel">Achtung!!!</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Soll dieser Actor wieder aktiviert werden?
+            </div>
+            <div class="modal-footer">
+                <form id="undelete-target" action="" method="POST" style="background-color: transparent;">
+                    <button type="button" class="button button-default float-left" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="button button-positiv float-right">aktivieren</button>
+                </form>
             </div>
         </div>
     </div>

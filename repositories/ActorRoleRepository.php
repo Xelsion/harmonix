@@ -14,6 +14,7 @@ use PDO;
 /**
  * @inheritDoc
  *
+ * @see ARepository
  * @author Markus Schröder <xelsion@gmail.com>
  * @version 1.0.0
  */
@@ -101,6 +102,47 @@ class ActorRoleRepository extends ARepository {
 	}
 
 	/**
+	 * Returns the parent role of the given role id
+	 *
+	 * @param int $id
+	 * @return ActorRoleModel
+	 * @throws SystemException
+	 */
+	public function getParentOf(int $id): ActorRoleModel {
+		try {
+			$role = $this->get($id);
+			return $this->get($role->child_of);
+		} catch( Exception $e ) {
+			throw new SystemException($e->getFile(), $e->getLine(), $e->getMessage(), $e->getCode(), $e->getPrevious());
+		}
+	}
+
+	/**
+	 * Returns all children of the given role id
+	 *
+	 * @param int $id
+	 * @return array
+	 * @throws SystemException
+	 */
+	public function getChildsOf(int $id): array {
+		try {
+			// @formatter:off
+			return $this->pdo->Select()
+				->From("actor_roles")
+				->Where("child_of=:id")
+				->prepareStatement()
+					->withParam(":id", $id, PDO::PARAM_INT)
+				->fetchMode(PDO::FETCH_CLASS, ActorRoleModel::class)
+				->execute()
+				->fetchAll()
+			;
+			// @formatter:on
+		} catch( Exception $e ) {
+			throw new SystemException($e->getFile(), $e->getLine(), $e->getMessage(), $e->getCode(), $e->getPrevious());
+		}
+	}
+
+	/**
 	 * @param array $conditions
 	 * @param string|null $order
 	 * @param string|null $direction
@@ -136,8 +178,12 @@ class ActorRoleRepository extends ARepository {
 	 * @return void
 	 * @throws SystemException
 	 */
-	public function createObject(ActorRole $role): void {
+	public function createObject(ActorRoleModel $role): void {
 		try {
+			// store this action
+			$storage_repo = App::getInstanceOf(ActionStorageRepository::class);
+			$storage_repo->storeAction("create", "mvc", "actor_roles", null, $role->getAsEntity());
+
 			// @formatter:off
             $this->pdo->Insert("actor_roles")
                 ->Columns(["child_of", "name", "rights_all", "rights_group", "rights_own"])
@@ -161,12 +207,17 @@ class ActorRoleRepository extends ARepository {
 	 * @return void
 	 * @throws SystemException
 	 */
-	public function updateObject(ActorRole $role): void {
+	public function updateObject(ActorRoleModel $role): void {
 		if( $role->id === 0 || $role->is_protected ) {
 			return;
 		}
 
 		try {
+			// store this action
+			$obj_orig = $this->get($role->id);
+			$storage_repo = App::getInstanceOf(ActionStorageRepository::class);
+			$storage_repo->storeAction("update", "mvc", "actor_roles", $obj_orig->getAsEntity(), $role->getAsEntity());
+
 			// @formatter:off
             $this->pdo->Update("actor_roles")
                 ->Set(["child_of", "name", "rights_all", "rights_group", "rights_own"])
@@ -191,12 +242,22 @@ class ActorRoleRepository extends ARepository {
 	 * @return void
 	 * @throws SystemException
 	 */
-	public function deleteObject(ActorRole $role): void {
+	public function deleteObject(ActorRoleModel $role): void {
 		if( $role->id === 0 || $role->is_protected ) {
 			return;
 		}
 
 		try {
+			$childs = $this->getChildsOf($role->id);
+			foreach( $childs as $child ) {
+				$child->child_of = $role->child_of;
+				$this->updateObject($child);
+			}
+
+			// store this action
+			$storage_repo = App::getInstanceOf(ActionStorageRepository::class);
+			$storage_repo->storeAction("delete", "mvc", "actor_roles", $role->getAsEntity(), null);
+
 			// @formatter:off
             $this->pdo->Delete("actor_roles")
                 ->Where("id=:id")

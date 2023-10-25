@@ -6,9 +6,10 @@ use Exception;
 use lib\App;
 use lib\core\attributes\Route;
 use lib\core\blueprints\AController;
+use lib\core\enums\ErrorType;
+use lib\core\enums\RequestMethod;
 use lib\core\exceptions\SystemException;
-use ReflectionAttribute;
-use ReflectionClass;
+use lib\helper\AttributeHelper;
 use ReflectionException;
 use ReflectionMethod;
 
@@ -57,25 +58,10 @@ class Router {
 				$class = Path2Namespace($class_file);
 				$controller = App::getInstanceOf($class);
 				if( $controller instanceof AController ) {
-					$reflection = new ReflectionClass($controller::class);
-					$class_attributes = $reflection->getAttributes(Route::class, ReflectionAttribute::IS_INSTANCEOF);
-					$class_path = "";
-					if( !empty($class_attributes) ) {
-						foreach( $class_attributes as $attr ) {
-							$class_route = $attr->newInstance();
-							$class_path = $class_route->path;
-						}
-					}
-					foreach( $reflection->getMethods() as $method ) {
-						$method_attributes = $method->getAttributes(Route::class, ReflectionAttribute::IS_INSTANCEOF);
-						if( !empty($method_attributes) ) {
-							foreach( $method_attributes as $attr ) {
-								$route = $attr->newInstance();
-								$method_path = $route->path;
-								$route->path = $this->getClearedRoutePath($class_path . "/" . $method_path);
-								$this->addRoute($sub_domain, $route, $controller::class, $method->getName());
-							}
-						}
+					// use the attribute helper to parse the controller class for routes defined with the Route attribute
+					$controller_routes = AttributeHelper::getControllerRoutes($controller);
+					foreach( $controller_routes as $controller_route ) {
+						$this->addRoute($sub_domain, $controller_route["route"], $controller_route["controller"], $controller_route["method"]);
 					}
 				}
 			} else if( $file !== "." && $file !== ".." && is_dir($path . DIRECTORY_SEPARATOR . $file) ) {
@@ -118,23 +104,25 @@ class Router {
 	 * @throws \lib\core\exceptions\SystemException
 	 */
 	public function addRoute(string $sub_domain, Route $route, string $class, ?string $method = null): void {
-		if( !isset($this->routes[$sub_domain][$route->method][$route->path]) ) {
-			if( is_null($method) ) {
-				$method = "index";
-			}
-			$regex = str_replace("/", "\/", $route->path);
-			$regex = preg_replace("/{id}/", "([0-9]+)", $regex);
-			$regex = preg_replace("/{[a-zA-Z|_-]+_id}/", "([0-9]+)", $regex);
-			$regex = preg_replace("/{[a-zA-Z|_-]+}/", "([\w]+)", $regex);
-			if( $route->method === "ALL" ) {
-				$this->routes[$sub_domain]["GET"][$route->path] = array("controller" => $class, 'method' => $method, 'regex' => $regex);
-				$this->routes[$sub_domain]["POST"][$route->path] = array("controller" => $class, 'method' => $method, 'regex' => $regex);
+		foreach( $route->methods as $request_method ) {
+			if( !isset($this->routes[$sub_domain][$request_method][$route->path]) ) {
+				if( is_null($method) ) {
+					$method = "index";
+				}
+				$regex = str_replace("/", "\/", $route->path);
+				$regex = preg_replace("/{id}/", "([0-9]+)", $regex);
+				$regex = preg_replace("/{[a-zA-Z|_-]+_id}/", "([0-9]+)", $regex);
+				$regex = preg_replace("/{[a-zA-Z|_-]+}/", "([\w]+)", $regex);
+				$this->routes[$sub_domain][$request_method][$route->path] = array(
+					"controller" => $class,
+					'method'     => $method,
+					'regex'      => $regex
+				);
 			} else {
-				$this->routes[$sub_domain][$route->method][$route->path] = array("controller" => $class, 'method' => $method, 'regex' => $regex);
+				throw new SystemException(__FILE__, __LINE__, "Router: The route [" . $route->path . "] is already taken");
 			}
-		} else {
-			throw new SystemException(__FILE__, __LINE__, "Router: The route [" . $route->path . "] is already taken");
 		}
+
 	}
 
 	/**
@@ -196,22 +184,107 @@ class Router {
 			foreach( $request_methods as $request_method => $paths ) {
 				foreach( $paths as $path => $settings ) {
 					$controller = $settings["controller"];
-					$controller_method = $settings["method"];
-					if( isset($sorted_routes[$domain][$controller][$controller_method]) ) {
-						$sorted_routes[$domain][$controller][$controller_method] = "[" . $request_method . "]" . $sorted_routes[$domain][$controller][$controller_method];
-					} else {
-						$sorted_routes[$domain][$controller][$controller_method] = "[" . $request_method . "] " . $path;
-					}
+					$sorted_routes[$domain][$controller][] = [
+						"method"         => $settings["method"],
+						"request_method" => $request_method,
+						"path"           => $path,
+						"regex"          => $settings["regex"]
+					];
 				}
+			}
+		}
+
+		foreach( $sorted_routes as &$controllers ) {
+			foreach( $controllers as &$methods ) {
+				usort($methods, callback: static function($a, $b) {
+					return $a["path"] <=> $b["path"];
+				});
 			}
 		}
 		return $sorted_routes;
 	}
 
 	/**
+	 * Checks if Routes conflicts each other and returns them in an array
+	 *
+	 * @return array
+	 */
+	public function checkForConflicts(): array {
+		$conflicts = array();
+		foreach( $this->routes as $domain => $request_methods ) {
+			foreach( $request_methods as $request_method => $paths ) {
+				foreach( $paths as $path => $route ) {
+					$regex = $route["regex"];
+					// check all routes wich have the same subdomain and request method
+					foreach( $this->routes[$domain][$request_method] as $check_path => $check_route ) {
+						// the router would throw an error if 2 paths where the same in the same subdomain
+						// so if the entry is the same as the entry to check we can skip it
+						if( $check_path === $path ) {
+							continue;
+						}
+
+						$matches = array();
+						preg_match("/^" . $regex . "$/", $check_path, $matches);
+						if( count($matches) > 0 ) {
+							$conflicts[] = array(
+								"error_type"              => ErrorType::WARNING,
+								"domain"                  => $domain,
+								"request_method"          => $request_method,
+								"path"                    => $path,
+								"route"                   => $route,
+								"conflict_domain"         => $domain,
+								"conflict_request_method" => $request_method,
+								"conflict_path"           => $check_path,
+								"conflict_route"          => $check_route
+							);
+						}
+					}
+
+					// if the current request method to check is not ANY we need to check them as well
+					if( $request_method !== RequestMethod::ANY->toString() ) {
+						foreach( $this->routes[$domain][RequestMethod::ANY->toString()] as $check_path => $check_route ) {
+							if( $check_path === $path ) {
+								$conflicts[] = array(
+									"error_type"              => ErrorType::CRITICAL,
+									"domain"                  => $domain,
+									"request_method"          => $request_method,
+									"path"                    => $path,
+									"route"                   => $route,
+									"conflict_domain"         => $domain,
+									"conflict_request_method" => RequestMethod::ANY->toString(),
+									"conflict_path"           => $check_path,
+									"conflict_route"          => $check_route
+								);
+							} else {
+								$matches = array();
+								preg_match("/^" . $regex . "$/", $check_path, $matches);
+								if( count($matches) > 0 ) {
+									$conflicts[] = array(
+										"error_type"              => ErrorType::WARNING,
+										"domain"                  => $domain,
+										"request_method"          => $request_method,
+										"path"                    => $path,
+										"route"                   => $route,
+										"conflict_domain"         => $domain,
+										"conflict_request_method" => RequestMethod::ANY->toString(),
+										"conflict_path"           => $check_path,
+										"conflict_route"          => $check_route
+									);
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		return $conflicts;
+	}
+
+	/**
 	 * Parses the request parts to getInstanceOf the controller and the wanted method
 	 *
 	 * @param string $request
+	 * @param string $request_method
 	 * @return array
 	 *
 	 * @throws ReflectionException
@@ -227,7 +300,11 @@ class Router {
 			$entry = $this->routes[SUB_DOMAIN][$request_method][addcslashes($request, "/")];
 			$controller = App::getInstanceOf($entry["controller"]);
 			$controller_method = $entry["method"];
-			return array("controller" => $controller, "method" => $controller_method, "params" => array());
+			return array(
+				"controller" => $controller,
+				"method"     => $controller_method,
+				"params"     => array()
+			);
 		}
 
 		// then check for dynamic urls
@@ -238,9 +315,19 @@ class Router {
 				$controller = App::getInstanceOf($entry["controller"]);
 				$controller_method = $entry["method"];
 				$params = $this->getFormattedParameters($controller, $controller_method, $matches);
-				return array("controller" => $controller, "method" => $controller_method, "params" => $params);
+				return array(
+					"controller" => $controller,
+					"method"     => $controller_method,
+					"params"     => $params
+				);
 			}
 		}
+
+		// if nothing was found try to find a matching route for the request with the request method 'ANY'
+		if( $request_method !== RequestMethod::ANY->toString() ) {
+			return $this->getRouteArray($request, RequestMethod::ANY->toString());
+		}
+
 		return array();
 	}
 
@@ -278,7 +365,7 @@ class Router {
 	 * @throws SystemException
 	 * @throws ReflectionException
 	 */
-	private function getFormattedParameters(AController $controller, string $method, array $params): ?array {
+	private function getFormattedParameters(AController $controller, string $method, array $params): array|null {
 		$num_params = count($params);
 		$result = array();
 
@@ -315,6 +402,7 @@ class Router {
 						$result[$arg_name] = $params[$i];
 						break;
 					default:
+						// looks like we have an object type parameter lets try to create it with this parameter
 						try {
 							$class_reflection = new ReflectionMethod($arg_type, "__construct");
 							$constructor_args = $class_reflection->getParameters();
@@ -325,7 +413,9 @@ class Router {
 							if( $constructor_arg_type === "string" && !is_string($params[$i]) ) {
 								throw new SystemException(__FILE__, __LINE__, "Router: Param type mismatch for method[" . $controller . "->" . $method . "]");
 							}
-							$result[$arg_name] = App::getInstanceOf($arg_type, null, ["id" => $params[$i]]);
+							$primary_keys = AttributeHelper::getPrimaryKeysOfEntity($arg_type);
+							$primary_key = (!empty($primary_keys)) ? $primary_keys[0][1] : "id";
+							$result[$arg_name] = App::getInstanceOf($arg_type, null, [$primary_key => $params[$i]]);
 						} catch( Exception ) {
 							throw new SystemException(__FILE__, __LINE__, "Router: Param type mismatch for method[" . $controller . "->" . $method . "]");
 						}

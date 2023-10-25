@@ -13,6 +13,7 @@ use lib\core\classes\Configuration;
 use lib\core\classes\GarbageCollector;
 use lib\core\classes\KeyValuePairs;
 use lib\core\classes\Language;
+use lib\core\classes\TemplateData;
 use lib\core\ClassManager;
 use lib\core\ConnectionManager;
 use lib\core\exceptions\SystemException;
@@ -76,11 +77,11 @@ class App {
 		self::$analyser = self::getInstanceOf(Analyser::class);
 		self::$storage = self::getInstanceOf(KeyValuePairs::class);
 
-		$this->setAsSingleton(Configuration::class, self::$config);
-		$this->setAsSingleton(ConnectionManager::class, self::getInstanceOf(ConnectionManager::class));
-		$this->setAsSingleton(Request::class, self::getInstanceOf(Request::class));
-		$this->setAsSingleton(Router::class, Router::getInstance());
-		$this->setAsSingleton(Language::class, Language::getInstance());
+		self::setAsSingleton(Configuration::class, self::$config);
+		self::setAsSingleton(ConnectionManager::class, self::getInstanceOf(ConnectionManager::class));
+		self::setAsSingleton(Request::class, self::getInstanceOf(Request::class));
+		self::setAsSingleton(Router::class, Router::getInstance());
+		self::setAsSingleton(Language::class, Language::getInstance());
 
 		self::$request = self::getInstanceOf(Request::class);
 		self::$curr_actor = self::getInstanceOf(ActorModel::class);
@@ -98,7 +99,7 @@ class App {
 		if( get_parent_class($middleware) === AMiddleware::class ) {
 			$this->middleware[] = $middleware;
 		} else {
-			throw new SystemException(__FILE__, __LINE__, $middleware . " is not a valid implementation of " . AMiddleware::class);
+			throw new SystemException(__FILE__, __LINE__, $middleware . " is not a valid implementation of " . AMiddleware::class, 1001);
 		}
 	}
 
@@ -110,71 +111,68 @@ class App {
 	 * @throws SystemException - if no valid controller and its method was found
 	 */
 	public function run(): void {
+		// Initiate general settings
+		$environment = self::$config->getSectionValue("system", "environment");
+		$debug = self::$config->getSectionValue($environment, "debug");
+		self::$storage->set("debug_mode", (bool)$debug);
+		self::$storage->set("is_cached", false);
+
+		self::$analyser->start();
+
+		// some classes need a db connections to be initialized, we do them now
+		self::setAsSingleton(RoleTree::class, RoleTree::getInstance());
+
+		// process all middlewares
+		foreach( $this->middleware as $middleware ) {
+			(self::getInstanceOf($middleware))->invoke();
+		}
+
+		// clear the garbage
+		$gc = self::getInstanceOf(GarbageCollector::class);
+		$gc->clean();
+
+		// Try to getInstanceOf the responsible route for this requested uri
+		$router = self::getInstanceOf(Router::class);
 		try {
-			// Initiate general settings
-			$environment = self::$config->getSectionValue("system", "environment");
-			$debug = self::$config->getSectionValue($environment, "debug");
-			self::$storage->set("debug_mode", (bool)$debug);
-			self::$storage->set("is_cached", false);
-			
-			self::$analyser->start();
+			$route = $router->getRoute(self::$request);
 
-			// some classes need db connections to be initialized, we do them now
-			$this->setAsSingleton(RoleTree::class, RoleTree::getInstance());
-
-			// process all middlewares
-			foreach( $this->middleware as $middleware ) {
-				(self::getInstanceOf($middleware))->invoke();
-			}
-
-			// clear the garbage
-			$gc = self::getInstanceOf(GarbageCollector::class);
-			$gc->clean();
-
-			// Try to getInstanceOf the responsible route for this requested uri
-			$router = self::getInstanceOf(Router::class);
-			try {
-				$route = $router->getRoute(self::$request);
-				if( empty($route) ) { // no route found
-					self::$request->setRequestUri("/error/404");
-					$route = $router->getRoute(self::$request);
-				}
-			} catch( Exception $e ) { // route was found but with mismatching arguments
-				self::$storage->set("message", $e->getMessage());
-				self::$request->setRequestUri("/error/400");
+			if( empty($route) ) { // no route found
+				self::$request->setRequestUri("/error/404");
 				$route = $router->getRoute(self::$request);
 			}
+		} catch( Exception $e ) { // route was found but with mismatching arguments
+			self::$storage->set("message", $e->getMessage());
+			self::$request->setRequestUri("/error/400");
+			$route = $router->getRoute(self::$request);
+		}
 
-			// Get the controller
-			$controller = $route["controller"];
+		// Get the controller
+		$controller = $route["controller"];
 
-			// Is it a compatible controller?
-			if( $controller instanceof AController ) {
+		// Is it a compatible controller?
+		if( $controller instanceof AController ) {
 
-				// Get the method and its parameters
-				$method = $route["method"];
-				$params = $route["params"];
+			// Get the method and its parameters
+			$method = $route["method"];
+			$params = $route["params"];
 
-				// Set the actor role for the current request
-				self::$curr_actor_role = self::$curr_actor->getRole($controller::class, $method);
+			// Set the actor role for the current request
+			self::$curr_actor_role = self::$curr_actor->getRole($controller::class, $method);
 
-				// Set the Authentication class
-				self::$auth = self::getInstanceOf(Auth::class);
+			// Set the Authentication class
+			self::$auth = self::getInstanceOf(Auth::class);
 
-				// Has the current actor access to this request?
-				if( self::$auth->hasAccess() ) {
-					// Get the Response obj from the controller
-					$this::$response = call_user_func_array([$controller, $method], $params);
-					$this::$response->setHeaders();
-				} else {
-					redirect("/error/403");
-				}
+			// Has the current actor access to this request?
+			if( self::$auth->hasAccess() ) {
+				// Get the Response obj from the controller
+				$this::$response = call_user_func_array([$controller, $method], $params);
+				$this::$response->setHeaders();
 			} else {
-				// No valid controller found
-				throw new SystemException(__FILE__, __LINE__, "Controller for request " . self::$request->getRequestUri() . " cant be found!");
+				redirect("/error/403");
 			}
-		} catch( Exception $e ) {
-			throw new SystemException($e->getFile(), $e->getLine(), $e->getMessage(), $e->getCode(), $e->getPrevious());
+		} else {
+			// No valid controller found
+			throw new SystemException(__FILE__, __LINE__, "Controller for request " . self::$request->getRequestUri() . " cant be found!");
 		}
 	}
 
@@ -186,9 +184,12 @@ class App {
 	public function getResponseOutput(): string {
 		$output = $this::$response->getOutput();
 		$elapsed_time = self::$analyser->getElapsedTime()->format("ms");
-		$output = str_replace("{{build_time}}", $elapsed_time, $output);
 		$is_cached = (self::$storage->get("is_cached")) ? "true" : "false";
-		return str_replace("{{is_cached}}", $is_cached, $output);
+		return str_replace(array(
+			"{{system_message}}",
+			"{{build_time}}",
+			"{{is_cached}}"
+		), array(TemplateData::getSystemMessage(), $elapsed_time, $is_cached), $output);
 	}
 
 	/**
@@ -212,7 +213,7 @@ class App {
 	 *
 	 * @return void
 	 */
-	public function setAsSingleton(string $namespace, object $instance): void {
+	public static function setAsSingleton(string $namespace, object $instance): void {
 		self::$class_manager->singleton($namespace, $instance);
 	}
 

@@ -7,12 +7,13 @@
  */
 declare(strict_types=1);
 error_reporting(E_ALL);
-ini_set('display_errors', 'on');
+ini_set('display_errors', 'off');
 
 use lib\App;
 use lib\core\blueprints\ALoggableException;
 use lib\core\classes\Logger;
 use lib\core\classes\Template;
+use lib\core\classes\TemplateData;
 use lib\helper\StringHelper;
 use lib\middleware\SessionAuth;
 
@@ -36,6 +37,7 @@ try {
 
 	// getActor the process
 	$app = new App();
+
 	$app->addMiddleware(SessionAuth::class);
 	$app->run();
 
@@ -48,7 +50,7 @@ try {
 	try {
 		if( SHOW_ERRORS ) {
 			$view = new Template(PATH_VIEWS_ROOT . "exception.html");
-			$view->set("error", $e);
+			TemplateData::set("error", $e);
 			echo $view->parse();
 		} else {
 			echo "An error occur: Please check the Log Files for more information";

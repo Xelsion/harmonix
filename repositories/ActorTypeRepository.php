@@ -14,6 +14,7 @@ use PDO;
 /**
  * @inheritDoc
  *
+ * @see ARepository
  * @author Markus Schröder <xelsion@gmail.com>
  * @version 1.0.0
  */
@@ -136,8 +137,12 @@ class ActorTypeRepository extends ARepository {
 	 * @return void
 	 * @throws SystemException
 	 */
-	public function createObject(ActorType $type): void {
+	public function createObject(ActorTypeModel $type): void {
 		try {
+			// store this action
+			$storage_repo = App::getInstanceOf(ActionStorageRepository::class);
+			$storage_repo->storeAction("create", "mvc", "actor_types", null, $type->getAsEntity());
+
 			// @formatter:off
             $this->pdo->Insert("actor_types")
                 ->Columns(["name"])
@@ -157,11 +162,16 @@ class ActorTypeRepository extends ARepository {
 	 * @return void
 	 * @throws SystemException
 	 */
-	public function updateObject(ActorType $type): void {
+	public function updateObject(ActorTypeModel $type): void {
 		if( $type->id === 0 || $type->is_protected ) {
 			return;
 		}
 		try {
+			// store this action
+			$obj_orig = $this->get($type->id);
+			$storage_repo = App::getInstanceOf(ActionStorageRepository::class);
+			$storage_repo->storeAction("update", "mvc", "actor_types", $obj_orig->getAsEntity(), $type->getAsEntity());
+
 			// @formatter:off
             $this->pdo->Update("actor_types")
                 ->Columns(["name"])
@@ -182,11 +192,15 @@ class ActorTypeRepository extends ARepository {
 	 * @return void
 	 * @throws SystemException
 	 */
-	public function deleteObject(ActorType $type): void {
+	public function deleteObject(ActorTypeModel $type): void {
 		if( $type->id === 0 || $type->is_protected ) {
 			return;
 		}
 		try {
+			// store this action
+			$storage_repo = App::getInstanceOf(ActionStorageRepository::class);
+			$storage_repo->storeAction("delete", "mvc", "actor_types", $type->getAsEntity(), null);
+
 			// @formatter:off
             $this->pdo->Delete("actor_types")
                 ->Where("id=:id")

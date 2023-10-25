@@ -1,24 +1,73 @@
 <?php
-$this->set("title", "Routes");
 
-$routes_list = $this->get("routes_list");
+use lib\core\classes\TemplateData;
+use lib\core\enums\ErrorType;
+
+TemplateData::set("title", "Routes");
+
+$routes_list = TemplateData::get("routes_list");
+$conflicts = TemplateData::get("conflicts");
 ?>
 <div class="container-fluid">
-	<h1>Routes</h1>
-	<?php foreach( $routes_list as $domain => $entries ) { ?>
-		<div class="list-group pb-5">
-		<div class="list-group-item active"><?= $domain ?></div>
-			<?php foreach( $entries as $controller => $routes ) { ?>
-				<div class="list-group-item">
-					<?php foreach( $routes as $method => $route ) { ?>
-						<div class="row">
-							<div class="col-4"><?= $route ?></div>
-							<div class="col-2"><?= $domain ?></div>
-							<div class="col-6"><?= basename($controller) ?>-><?= $method ?></div>
-						</div>
+    <h1>Routes</h1>
+	<?php foreach( $routes_list as $domain => $controllers ) { ?>
+        <div class="list-group pb-5">
+            <div class="list-group-item active"><?= $domain ?></div>
+            <div class="list-group-item">
+                <div class="row">
+                    <div class="col-4 h5">Request method</div>
+                    <div class="col-2 h5">Pattern</div>
+                    <div class="col-6 h5">Controller->Method</div>
+                </div>
+            </div>
+			<?php foreach( $controllers as $controller => $routes ) { ?>
+                <div class="list-group-item">
+					<?php foreach( $routes as $route ) {
+						$path = $route["path"];
+						$conflict = $conflicts->where(function($entry) use ($domain, $path) {
+							if( $entry['domain'] === $domain && $entry['path'] === $path ) {
+								return $entry;
+							}
+							return null;
+						})->getFirst();
+						$has_conflicts = (!is_null($conflict));
+						?>
+                        <div class="row"<?= ($has_conflicts) ? ' style="color: orange;"' : '' ?>>
+                            <div class="col-4">[<?= $route["request_method"] ?>] <?= $route["path"] ?></div>
+                            <div class="col-2"><?= stripslashes($route["regex"]) ?></div>
+                            <div class="col-6"><?= basename($controller) ?>-><?= $route["method"] ?></div>
+                        </div>
 					<?php } ?>
-				</div>
+                </div>
 			<?php } ?>
-		</div>
+        </div>
+	<?php } ?>
+
+	<?php if( !$conflicts->isEmpty() ) { ?>
+        <h2>Conflicts</h2>
+        <div class="list-group pb-5">
+            <div class="list-group-item">
+                <div class="row">
+                    <div class="col-6">Route</div>
+                    <div class="col-6">Conflict with</div>
+                </div>
+            </div>
+			<?php foreach( $conflicts as $conflict ) {
+				$color = ($conflict["error_type"] === ErrorType::WARNING) ? 'orange' : 'red';
+				?>
+                <div class="list-group-item">
+                    <div class="row" style="color: <?= $color ?>;">
+                        <div class="col-6">
+							<?= $conflict["route"]["controller"] ?>-><?= $conflict["route"]["method"] ?>()<br/>
+							<?= $conflict["path"] ?><br/>
+                        </div>
+                        <div class="col-6">
+							<?= $conflict["conflict_route"]["controller"] ?>-><?= $conflict["conflict_route"]["method"] ?>()<br/>
+							<?= $conflict["conflict_path"] ?><br/>
+                        </div>
+                    </div>
+                </div>
+			<?php } ?>
+        </div>
 	<?php } ?>
 </div>

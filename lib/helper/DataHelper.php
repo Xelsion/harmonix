@@ -2,7 +2,7 @@
 
 namespace lib\helper;
 
-class DataHelper {
+readonly class DataHelper {
 
 	/**
 	 * @param string $str1

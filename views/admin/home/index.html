@@ -1,21 +1,24 @@
 <?php
-use lib\App;
 
-$this->set("title", "Home");
+use lib\App;
+use lib\core\classes\TemplateData;
+
+TemplateData::set("title", "Home");
 ob_start();
-phpinfo(INFO_GENERAL|INFO_MODULES);
-$html = ob_get_contents();
+phpinfo(INFO_GENERAL | INFO_MODULES);
+$html = ob_get_clean();
 ob_end_clean();
 ?>
 <div class="container-fluid">
-	<h1>Welcome!</h1>
-    <?php if( App::$curr_actor->isDeveloper() ) { ?>
+    <h1>Welcome!</h1>
+	<?php if( App::$curr_actor->isDeveloper() ) { ?>
         <iframe id="php_info" width="100%" sandbox="allow-same-origin" srcdoc="<?= htmlspecialchars($html) ?>"></iframe>
         <script>
-            $(function() {
+            $(function () {
                 let iFrame = $("#php_info");
+                console.log(iFrame.contents().height());
                 iFrame.height(iFrame.contents().height());
             });
         </script>
-    <?php } ?>
+	<?php } ?>
 </div>

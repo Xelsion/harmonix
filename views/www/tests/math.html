@@ -1,27 +1,29 @@
 <?php
 
-use lib\helper\HtmlHelper;
+use lib\App;
+use lib\core\classes\TemplateData;
+use lib\helper\DateHelper;
 
-$distance = $this->get('distance');
-$timespan = $this->get('timespan');
-
+$distance = TemplateData::get('distance');
+$timespan = TemplateData::get('timespan');
+$currency = TemplateData::get('currency');
+$coord = App::$request->get("coord");
 ?>
 <div class="container-fluid">
     <h1>Math Helper</h1>
     <div class="row">
         <div class="col-4">
-            <h2>Entfernungs-Berechnung</h2>
+            <h2>Entfernungsberechnung</h2>
             <form action="/tests/math" method="POST">
-                <?php //HtmlHelper::generateFormToken() ?>
                 <div>Coordinate 1</div>
                 <div class="row">
                     <div class="col">
                         <label for="long_1">Longitude</label>
-                        <input id="long_1" type="text" name="coord[0][long]" value="" required="required"/>
+                        <input id="long_1" type="text" name="coord[0][long]" value="<?= ($coord !== null) ? $coord[0]["long"] : "" ?>" required="required"/>
                     </div>
                     <div class="col">
                         <label for="lat_1">Latitude</label>
-                        <input id="lat_1" type="text" name="coord[0][lat]" value="" required="required"/>
+                        <input id="lat_1" type="text" name="coord[0][lat]" value="<?= ($coord !== null) ? $coord[0]["lat"] : "" ?>" required="required"/>
                     </div>
                 </div>
 
@@ -29,14 +31,13 @@ $timespan = $this->get('timespan');
                 <div class="row">
                     <div class="col">
                         <label for="long_2">Longitude</label>
-                        <input id="long_2" type="text" name="coord[1][long]" value="" required="required"/>
+                        <input id="long_2" type="text" name="coord[1][long]" value="<?= ($coord !== null) ? $coord[1]["long"] : "" ?>" required="required"/>
                     </div>
                     <div class="col">
                         <label for="lat_2">Latitude</label>
-                        <input id="lat_2" type="text" name="coord[1][lat]" value="" required="required"/>
+                        <input id="lat_2" type="text" name="coord[1][lat]" value="<?= ($coord !== null) ? $coord[1]["lat"] : "" ?>" required="required"/>
                     </div>
                 </div>
-
                 <div class="row">
                     <div class="col">Distance</div>
                     <div class="col"><?= $distance ?></div>
@@ -49,20 +50,20 @@ $timespan = $this->get('timespan');
             </form>
         </div>
         <div class="col-4">
-            <h2>Zeit-Berechnung</h2>
+            <h2>Zeitberechnung</h2>
             <form action="/tests/math" method="POST">
-                <?php HtmlHelper::generateFormToken() ?>
                 <div class="row">
                     <label for="start_date">Start Datum</label>
-                    <input id="start_date" type="date" name="start_date" value="" required="required"/>
+                    <input id="start_date" type="date" name="start_date" value="<?= App::$request->get("start_date") ?>" required="required"/>
                 </div>
                 <div class="row">
                     <label for="end_date">End Datum</label>
-                    <input id="end_date" type="date" name="end_date" value="" required="required"/>
+                    <input id="end_date" type="date" name="end_date" value="<?= App::$request->get("end_date") ?>" required="required"/>
                 </div>
                 <div class="row row">
                     <div class="col">Zeitraum</div>
-                    <div class="col"><?= ($timespan === null) ? "" : $timespan->y ?></div>
+                    <div class="col"><?= ($timespan === null) ? "" : DateHelper::getFormattedTimespan($timespan) ?>
+                    </div>
                 </div>
                 <div>
                     <div class="col" style="padding-top: 21px;">
@@ -71,7 +72,23 @@ $timespan = $this->get('timespan');
                 </div>
             </form>
         </div>
-        <div class="col-4"></div>
+        <div class="col-4">
+            <h2>W&auml;hrungsumwandlung</h2>
+            <form action="/tests/math" method="POST">
+                <div class="row">
+                    <label for="numeric-value">Numerischer Wert</label>
+                    <input id="numeric-value" type="text" name="numeric_value" value="<?= App::$request->get("numeric_value") ?>" required="required"/>
+                </div>
+                <div class="row row">
+                    <div class="col">Als W&auml;hrung</div>
+                    <div class="col"><?= $currency ?? "" ?></div>
+                </div>
+                <div>
+                    <div class="col" style="padding-top: 21px;">
+                        <input type="submit" name="currency" value="Berechnen" class="button-default"/>
+                    </div>
+                </div>
+            </form>
+        </div>
     </div>
-
 </div>

@@ -1,18 +1,19 @@
 <?php
 
 use lib\App;
+use lib\core\classes\TemplateData;
 use models\ActorRoleModel;
 
-$sorted_routes = $this->get("routes");
+$sorted_routes = TemplateData::get("routes");
 $curr_actor_role = App::$curr_actor_role;
 
-$actor = $this->get("actor");
-$access_permissions = $this->get("access_permissions");
+$actor = TemplateData::get("actor");
+$access_permissions = TemplateData::get("access_permissions");
 $permissions = array();
 foreach( $access_permissions as $ap ) {
-    $permissions[$ap->domain][$ap->controller][$ap->method] = $ap->role_id;
+	$permissions[$ap->domain][$ap->controller][$ap->method] = $ap->role_id;
 }
-$role_options = $this->get("role_options");
+$role_options = TemplateData::get("role_options");
 ?>
 <div class="row g-2">
     <div class="col-md">Bereich</div>
@@ -20,9 +21,9 @@ $role_options = $this->get("role_options");
         <label>
             <select onchange="showPath(this.value)">
                 <option value="">- Global -</option>
-                <?php foreach( array_keys($sorted_routes) as $domain ) { ?>
+				<?php foreach( array_keys($sorted_routes) as $domain ) { ?>
                     <option value="<?= $domain ?>"><?= $domain ?></option>
-                <?php } ?>
+				<?php } ?>
             </select>
         </label>
     </div>
@@ -34,97 +35,88 @@ $role_options = $this->get("role_options");
     <div class="col-2">Rolle</div>
 </div>
 <?php foreach( $sorted_routes as $domain => $controllers ) {
-    $curr_role = $permissions[$domain][null][null] ?? 0;
-    $actor_role = App::getInstanceOf(ActorRoleModel::class, null, ["id" => $curr_role]);
-    $is_protected = ($curr_actor_role->isDescendantOf($actor_role)) ? ' readonly' : '';
-    ?>
+	$curr_role = $permissions[$domain][null][null] ?? 0;
+	$actor_role = App::getInstanceOf(ActorRoleModel::class, null, ["id" => $curr_role]);
+	$is_protected = ($curr_actor_role->isDescendantOf($actor_role)) ? ' readonly' : '';
+	?>
     <div class="row g-2 domain-selection">
         <div class="col-auto" style="width: 20px;"></div>
-        <div class="col-1 table-col text-nowrap"><?= $domain ?></div>
+        <div class="col-1 table-col text-nowrap"><?= escaped_string($domain) ?></div>
+        <div class="col-3 table-col text-nowrap"></div>
         <div class="col table-col text-nowrap"></div>
-        <div class="col-2 table-col text-nowrap"></div>
         <div class="col-2 table-col text-nowrap"></div>
         <div class="col-2">
             <label>
                 <select name="role[<?= $domain ?>][role]"<?= $is_protected ?>>
                     <option value=""<?= ($is_protected) ? ' disabled' : '' ?>>- keine -</option>
-                    <?php foreach( $role_options as $role ) {
-                        $actor_role = App::getInstanceOf(ActorRoleModel::class, null, ["id" => $curr_role]);
-                        $is_selected = ($curr_role === $role->id) ? ' selected' : '';
-                        $is_disabled = ($curr_actor_role->isDescendantOf($actor_role) && $curr_role !== $role->id) ? ' disabled' : '';
-                        ?>
-                        <option
-                            value="<?= $role->id ?>"<?= $is_selected ?><?= $is_disabled ?>><?= escaped_string($role->name) ?></option>
-                    <?php } ?>
+					<?php foreach( $role_options as $role ) {
+						$actor_role = App::getInstanceOf(ActorRoleModel::class, null, ["id" => $curr_role]);
+						$is_selected = ($curr_role === $role->id) ? ' selected' : '';
+						$is_disabled = ($curr_actor_role->isDescendantOf($actor_role) && $curr_role !== $role->id) ? ' disabled' : '';
+						?>
+                        <option value="<?= $role->id ?>"<?= $is_selected ?><?= $is_disabled ?>><?= escaped_string($role->name) ?></option>
+					<?php } ?>
                 </select>
             </label>
         </div>
     </div>
     <div id="<?= $domain ?>" class="toggles" style="display: none;">
-        <?php foreach( $controllers as $controller => $methods ) {
-            $curr_role = $permissions[$domain][$controller][null] ?? 0;
-            $actor_role = App::getInstanceOf(ActorRoleModel::class, null, ["id" => $curr_role]);
-            $is_protected = ($curr_actor_role->isDescendantOf($actor_role)) ? ' readonly' : '';
-            $controller_name = str_replace("\\", "-", $controller);
-            ?>
+		<?php foreach( $controllers as $controller => $methods ) {
+			$curr_role = $permissions[$domain][$controller][null] ?? 0;
+			$actor_role = App::getInstanceOf(ActorRoleModel::class, null, ["id" => $curr_role]);
+			$is_protected = ($curr_actor_role->isDescendantOf($actor_role)) ? ' readonly' : '';
+			$controller_name = str_replace("\\", "-", $controller);
+			?>
             <div class="row g-2">
-                <div class="col-auto" style="width: 20px; cursor: pointer;"
-                     onclick="toggleDisplayMethods('<?= $domain . "-" . $controller_name ?>');">
+                <div class="col-auto" style="width: 20px; cursor: pointer;" onclick="toggleDisplayMethods('<?= $domain . "-" . $controller_name ?>');">
                     <div id="<?= $domain . "-" . $controller_name ?>-toggle" class="slide-down-inline"></div>
                 </div>
-                <div class="col-1 table-col text-nowrap" style="cursor: pointer;"
-                     onclick="toggleDisplayMethods('<?= $domain . "-" . $controller_name ?>');"><?= $domain ?></div>
-                <div class="col table-col text-nowrap" style="cursor: pointer;"
-                     onclick="toggleDisplayMethods('<?= $domain . "-" . $controller_name ?>');"><?= $controller ?></div>
-                <div class="col-2 table-col text-nowrap" style="cursor: pointer;"
-                     onclick="toggleDisplayMethods('<?= $domain . "-" . $controller_name ?>');"></div>
+                <div class="col-1 table-col text-nowrap" style="cursor: pointer;" onclick="toggleDisplayMethods('<?= $domain . "-" . $controller_name ?>');"><?= $domain ?></div>
+                <div class="col-3 table-col text-nowrap" style="cursor: pointer;" onclick="toggleDisplayMethods('<?= $domain . "-" . $controller_name ?>');"><?= $controller ?></div>
+                <div class="col table-col text-nowrap" style="cursor: pointer;" onclick="toggleDisplayMethods('<?= $domain . "-" . $controller_name ?>');"></div>
                 <div class="col-2 table-col text-nowrap"></div>
                 <div class="col-2">
                     <label>
-                        <select
-                            name="role[<?= $domain ?>][controller][<?= $controller_name ?>][role]"<?= $is_protected ?>>
+                        <select name="role[<?= $domain ?>][controller][<?= $controller_name ?>][role]"<?= $is_protected ?>>
                             <option value=""<?= ($is_protected) ? ' disabled' : '' ?>>- keine -</option>
-                            <?php foreach( $role_options as $role ) {
-                                $is_selected = ($curr_role === $role->id) ? ' selected' : '';
-                                $is_disabled = ($curr_actor_role->isDescendantOf($role) && $curr_role !== $role->id) ? ' disabled' : '';
-                                ?>
-                                <option
-                                    value="<?= $role->id ?>"<?= $is_selected ?><?= $is_disabled ?>><?= escaped_string($role->name) ?></option>
-                            <?php } ?>
+							<?php foreach( $role_options as $role ) {
+								$is_selected = ($curr_role === $role->id) ? ' selected' : '';
+								$is_disabled = ($curr_actor_role->isDescendantOf($role) && $curr_role !== $role->id) ? ' disabled' : '';
+								?>
+                                <option value="<?= $role->id ?>"<?= $is_selected ?><?= $is_disabled ?>><?= escaped_string($role->name) ?></option>
+							<?php } ?>
                         </select>
                     </label>
                 </div>
             </div>
             <div id="<?= $domain . "-" . $controller_name ?>" class="method-toggle" style="display:none;">
-                <?php foreach( $methods as $method => $url ) {
-                    $curr_role = $permissions[$domain][$controller][$method] ?? 0;
-                    $actor_role = App::getInstanceOf(ActorRoleModel::class, null, ["id" => $curr_role]);
-                    $is_protected = ($curr_actor_role->isDescendantOf($actor_role)) ? ' readonly' : '';
-                    ?>
+				<?php foreach( $methods as $route ) {
+					$curr_role = $permissions[$domain][$controller][$route['method']] ?? 0;
+					$actor_role = App::getInstanceOf(ActorRoleModel::class, null, ["id" => $curr_role]);
+					$is_protected = ($curr_actor_role->isDescendantOf($actor_role)) ? ' readonly' : '';
+					?>
                     <div class="row g-2">
                         <div class="col-auto" style="width: 20px;"></div>
                         <div class="col-1 table-col text-nowrap"></div>
-                        <div class="col-2 table-col text-nowrap"><?= $method ?></div>
-                        <div class="col table-col text-nowrap"><?= $url ?></div>
+                        <div class="col-3 table-col text-nowrap">-&gt;<?= $route['method'] ?></div>
+                        <div class="col table-col text-nowrap"><?= $route['path'] ?></div>
                         <div class="col-2">
                             <label>
-                                <select
-                                    name="role[<?= $domain ?>][controller][<?= $controller_name ?>][method][<?= $method ?>]"<?= $is_disabled ?>>
+                                <select name="role[<?= $domain ?>][controller][<?= $controller_name ?>][method][<?= $route['method'] ?>]"<?= $is_disabled ?>>
                                     <option value=""<?= ($is_protected) ? ' disabled' : '' ?>>- keine -</option>
-                                    <?php foreach( $role_options as $role ) {
-                                        $is_selected = ($curr_role === $role->id) ? ' selected' : '';
-                                        $is_disabled = ($curr_actor_role->isDescendantOf($role) && $curr_role !== $role->id) ? ' disabled' : '';
-                                        ?>
-                                        <option
-                                            value="<?= $role->id ?>"<?= $is_selected ?><?= $is_disabled ?>><?= escaped_string($role->name) ?></option>
-                                    <?php } ?>
+									<?php foreach( $role_options as $role ) {
+										$is_selected = ($curr_role === $role->id) ? ' selected' : '';
+										$is_disabled = ($curr_actor_role->isDescendantOf($role) && $curr_role !== $role->id) ? ' disabled' : '';
+										?>
+                                        <option value="<?= $role->id ?>"<?= $is_selected ?><?= $is_disabled ?>><?= escaped_string($role->name) ?></option>
+									<?php } ?>
                                 </select>
                             </label>
                         </div>
                     </div>
-                <?php } ?>
+				<?php } ?>
             </div>
-        <?php } ?>
+		<?php } ?>
     </div>
 <?php } ?>
 <script type="text/javascript">

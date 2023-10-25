@@ -228,4 +228,13 @@ class StringHelper {
 		}
 		return "";
 	}
+
+	/**
+	 * @param string|null $str
+	 * @return bool
+	 */
+	public static function isNullOrEmpty(?string $str): bool {
+		return ($str === null || $str === "");
+	}
+
 }

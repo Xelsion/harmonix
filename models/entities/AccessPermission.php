@@ -1,4 +1,5 @@
 <?php
+
 namespace models\entities;
 
 /**
@@ -10,7 +11,6 @@ namespace models\entities;
  */
 class AccessPermission {
 
-	// The columns
 	public int $actor_id = 0;
 
 	public int $role_id = 0;
@@ -21,10 +21,10 @@ class AccessPermission {
 
 	public ?string $method = null;
 
-    public string $created = "";
+	public string $created = "";
 
-    public ?string $updated = null;
+	public ?string $updated = null;
 
-    public ?string $deleted = null;
+	public ?string $deleted = null;
 
 }

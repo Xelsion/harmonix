@@ -14,6 +14,7 @@ use PDO;
 /**
  * @inheritDoc
  *
+ * @see ARepository
  * @author Markus Schröder <xelsion@gmail.com>
  * @version 1.0.0
  */
@@ -146,8 +147,12 @@ class AccessRestrictionRepository extends ARepository {
 	 * @return void
 	 * @throws SystemException
 	 */
-	public function createObject(AccessRestriction $restriction): void {
+	public function createObject(AccessRestrictionModel $restriction): void {
 		try {
+			// store this action
+			$storage_repo = App::getInstanceOf(ActionStorageRepository::class);
+			$storage_repo->storeAction("create", "mvc", "access_restrictions", null, $restriction->getAsEntity());
+
 			// @formatter:off
             $this->pdo->Insert("access_restrictions")
                 ->Columns(["domain", "controller", "method", "restriction_type", "role_id"])
@@ -171,8 +176,13 @@ class AccessRestrictionRepository extends ARepository {
 	 * @return void
 	 * @throws SystemException
 	 */
-	public function updateObject(AccessRestriction $restriction): void {
+	public function updateObject(AccessRestrictionModel $restriction): void {
 		try {
+			// store this action
+			$obj_orig = $this->get($restriction->domain, $restriction->controller, $restriction->method);
+			$storage_repo = App::getInstanceOf(ActionStorageRepository::class);
+			$storage_repo->storeAction("update", "mvc", "access_restrictions", $obj_orig->getAsEntity(), $restriction->getAsEntity());
+
 			// @formatter:off
             $this->pdo->Update("access_restrictions")
                 ->Set(["domain", "controller", "method", "restriction_type", "role_id"])
@@ -197,8 +207,12 @@ class AccessRestrictionRepository extends ARepository {
 	 * @return void
 	 * @throws SystemException
 	 */
-	public function deleteObject(AccessRestriction $restriction): void {
+	public function deleteObject(AccessRestrictionModel $restriction): void {
 		try {
+			// store this action
+			$storage_repo = App::getInstanceOf(ActionStorageRepository::class);
+			$storage_repo->storeAction("delete", "mvc", "access_restrictions", $restriction->getAsEntity(), null);
+
 			// @formatter:off
             $this->pdo->Delete("access_restrictions")
                 ->Where("id=:id")

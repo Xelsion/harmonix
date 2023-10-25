@@ -15,6 +15,7 @@ use PDO;
 /**
  * @inheritDoc
  *
+ * @see ARepository
  * @author Markus Schröder <xelsion@gmail.com>
  * @version 1.0.0
  */
@@ -158,7 +159,7 @@ class AccessPermissionRepository extends ARepository {
 			$this->pdo->Delete("access_permissions")
 				->Where("actor_id=:actor_id")
 				->prepareStatement()
-				->withParam(":actor:id", $actor->id, PDO::PARAM_INT)
+				->withParam(":actor_id", $actor->id, PDO::PARAM_INT)
 				->execute()
 			;
 			// @formatter:on

@@ -1,0 +1,159 @@
+<?php
+
+
+use lib\App;
+use lib\core\classes\Language;
+use lib\core\classes\TemplateData;
+use lib\helper\HtmlHelper;
+use lib\helper\StringHelper;
+use models\ActorModel;
+
+$lang = App::getInstanceOf(Language::class);
+$filter = TemplateData::get("filter");
+$stored_objects = TemplateData::get("stored_objects");
+$pagination = TemplateData::get("pagination");
+$actor_list = TemplateData::get("actor_list");
+?>
+<div class="container-fluid">
+    <h1>Benutzer Aktionen</h1>
+    <form action="/action-storage" method="POST">
+		<?= HtmlHelper::generateFormToken() ?>
+        <div class="row">
+            <div class="col-1"><h2>Filter</h2></div>
+            <div class="col-2">
+                <label for="date-from" class="form-label">von:</label>
+                <input id="date-from" type="date" name="filter[date_from]" value="<?= $filter["date_from"] ?>"/>
+            </div>
+            <div class="col-2">
+                <label for="date-to" class="form-label">bis:</label>
+                <input id="date-to" type="date" name="filter[date_to]" value="<?= $filter["date_to"] ?>"/>
+            </div>
+            <div class="col-2">
+                <label for="actor" class="form-label">Benutzer</label>
+                <select id="actor" name="filter[actor]">
+                    <option value="">- Alle -</option>
+					<?php foreach( $actor_list as $actor ) { ?>
+                        <option value="<?= $actor->id ?>"<?= ($actor->id === (int)$filter["actor"]) ? ' selected="selected"' : '' ?>><?= $actor->first_name ?> <?= $actor->last_name ?></option>
+					<?php } ?>
+                </select>
+            </div>
+            <div class="col-2">
+                <label for="action" class="form-label">Action</label>
+                <select id="action" name="filter[action]">
+                    <option value="">- Alle -</option>
+                    <option value="create"<?= ($filter["action"] === "create") ? ' selected="selected"' : '' ?>>Create</option>
+                    <option value="update"<?= ($filter["action"] === "update") ? ' selected="selected"' : '' ?>>Update</option>
+                    <option value="delete"<?= ($filter["action"] === "delete") ? ' selected="selected"' : '' ?>>Delete</option>
+                </select>
+            </div>
+            <div class="col-1" style="padding-top: 31px;">
+                <input type="submit" name="show" value="Anzeigen" class="button button-default"/>
+            </div>
+        </div>
+    </form>
+    <table class="table table-dark table-striped">
+        <tr>
+            <th class="col-md-1">Datum</th>
+            <th class="col-md-1">Ausgef&uuml;hrt von</th>
+            <th class="col-md-1">Aktion</th>
+            <th class="col-md-1">Datenbank</th>
+            <th class="col-md-2">Tabelle</th>
+            <th class="col-md-2">Vorher</th>
+            <th class="col-md-2">Nachher</th>
+            <th class="col-md-2 text-end">Optionen</th>
+        </tr>
+		<?php foreach( $stored_objects as $object ) {
+			$actor = App::getInstanceOf(ActorModel::class, null, ["id" => $object->actor_id]);
+			$obj_date = new DateTime($object->created);
+			$arr_before = [];
+			if( $object->obj_before !== null ) {
+				$obj_before = unserialize($object->obj_before, ["allowed_classes" => true]);
+				$arr_before = obj2Array($obj_before);
+			} else {
+				$arr_before["object class"] = "NULL";
+			}
+
+			$arr_after = [];
+			if( $object->obj_after !== null ) {
+				$obj_after = unserialize($object->obj_after, ["allowed_classes" => true]);
+				$arr_after = obj2Array($obj_after);
+			} else {
+				$arr_after["object class"] = "NULL";
+			}
+			?>
+            <tr>
+                <td class="align-top">
+                    <div class="date-info"><?= $obj_date->format("d.m.y") ?></div>
+                    <div><?= $obj_date->format("H:i:s") ?></div>
+                </td>
+                <td class="align-top"><?= escaped_string($actor->first_name . " " . $actor->last_name) ?></td>
+                <td class="align-top"><?= escaped_string($object->action) ?></td>
+                <td class="align-top"><?= escaped_string($object->connection_key) ?></td>
+                <td class="align-top"><?= escaped_string($object->table_name) ?></td>
+                <td class="align-top">
+					<?= $arr_before["object class"] ?>
+                    <div id="before_<?= $object->id ?>_data" style="display: none; font-size: 11px;">
+						<?php if( $object->obj_before !== null ) {
+							foreach( $arr_before as $k => $v ) {
+								if( ($v === null) ) {
+									$v = "NULL";
+								} else if( strlen($v) === 0 ) {
+									$v = "EMPTY";
+								}
+								$v = "" . $v;
+								echo $k . " =&gt; " . StringHelper::getShortString($v, 60, "[...]") . "<br />";
+							}
+						} ?>
+                    </div>
+                </td>
+                <td class="align-top">
+					<?= $arr_after["object class"] ?>
+                    <div id="after_<?= $object->id ?>_data" style="display: none; font-size: 11px;">
+						<?php if( $object->obj_after !== null ) {
+							foreach( $arr_after as $k => $v ) {
+								if( ($v === null) ) {
+									$v = "NULL";
+								} else if( strlen($v) === 0 ) {
+									$v = "EMPTY";
+								}
+								$v = "" . $v;
+								echo $k . " =&gt; " . StringHelper::getShortString($v, 60, "[...]") . "<br />";
+							}
+						} ?>
+                    </div>
+                </td>
+                <td class="text-nowrap align-top text-end">
+                    <span onclick="$('#after_<?= $object->id ?>_data').toggle();$('#before_<?= $object->id ?>_data').toggle();" class="button button-default">details</span>
+                    <button class="button button-negativ" onclick="$('#delete-target').attr('action', '/action-storage/undo/<?= $object->id ?>')" data-bs-toggle="modal" data-bs-target="#confirm-delete"><?= $lang->getValue("translations", "restore") ?></button>
+                </td>
+            </tr>
+		<?php } ?>
+    </table>
+    <form action="/action-storage" method="POST" style="padding-bottom: 15px;">
+		<?= HtmlHelper::generateFormToken() ?>
+		<?php foreach( $filter as $key => $value ) {
+			echo '<input type="hidden" name="' . $key . '" value="' . $value . '">';
+		} ?>
+		<?= $pagination ?>
+    </form>
+</div>
+
+<div class="modal fade" id="confirm-delete" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="exampleModalLabel">Achtung!!!</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Soll dieser Stand wiederhergestellt werden?
+            </div>
+            <div class="modal-footer">
+                <form id="delete-target" action="" method="POST" style="background-color: transparent;">
+                    <button type="button" class="button button-default float-left" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="button button-negativ float-right">Best&auml;tigen</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

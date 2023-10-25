@@ -71,7 +71,7 @@ function escaped_string(?string $string): ?string {
 	if( $encoding !== "UTF-8" ) {
 		$string = iconv($encoding, "UTF-8", $string);
 	}
-	return htmlentities($string, ENT_HTML5, "UTF-8");
+	return htmlentities($string, ENT_QUOTES, "UTF-8");
 }
 
 function valuesAreIdentical(mixed $value1, mixed $value2): bool {
@@ -117,9 +117,11 @@ function print_debug($message): void {
 	if( $message === null ) {
 		echo "NULL";
 	} elseif( is_object($message) ) {
-		echo "<pre>";
-		var_dump($message);
-		echo "</pre>";
+		$obj_params = get_object_vars($message);
+		echo "Object Type: " . get_class($message) . "<br />";
+		foreach( $obj_params as $key => $value ) {
+			echo $key . " => " . $value . "<br />";
+		}
 	} elseif( is_array($message) ) {
 		echo "<pre>";
 		print_r($message);
@@ -130,3 +132,11 @@ function print_debug($message): void {
 		echo $message . "<br />";
 	}
 }
+
+function obj2Array(object $obj): array {
+	$obj_params = get_object_vars($obj);
+	$obj_params["object class"] = get_class($obj);
+	return $obj_params;
+}
+
+

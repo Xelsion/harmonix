@@ -66,6 +66,14 @@ footer {
 	border-radius    : 8px;
 }
 
+.float-left {
+	float : left;
+}
+
+.float-right {
+	float : right;
+}
+
 .cleaner {
 	clear    : both;
 	width    : 0;
@@ -87,6 +95,11 @@ h2 {
 
 .hl {
 	color : $header-color;
+}
+
+.date-info {
+	font-size : 0.7em;
+	color     : $header-color;
 }
 
 .exception-title {

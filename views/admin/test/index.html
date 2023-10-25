@@ -1,24 +1,27 @@
 <?php
-$this->set("title", "Routes");
 
-$routes_list = $this->get("routes_list");
+use lib\core\classes\TemplateData;
+
+TemplateData::set("title", "Routes");
+
+$routes_list = TemplateData::get("routes_list");
 ?>
 <div class="container-fluid">
-	<h1>Routes</h1>
+    <h1>Routes</h1>
 	<?php foreach( $routes_list as $domain => $entries ) { ?>
-		<div class="list-group pb-5">
-		<div class="list-group-item active"><?= $domain ?></div>
+        <div class="list-group pb-5">
+            <div class="list-group-item active"><?= $domain ?></div>
 			<?php foreach( $entries as $controller => $routes ) { ?>
-				<div class="list-group-item">
+                <div class="list-group-item">
 					<?php foreach( $routes as $method => $route ) { ?>
-						<div class="row">
-							<div class="col-4"><?= $route ?></div>
-							<div class="col-2"><?= $domain ?></div>
-							<div class="col-6"><?= $controller ?>-><?= $method ?></div>
-						</div>
+                        <div class="row">
+                            <div class="col-4"><?= $route ?></div>
+                            <div class="col-2"><?= $domain ?></div>
+                            <div class="col-6"><?= $controller ?>-><?= $method ?></div>
+                        </div>
 					<?php } ?>
-				</div>
+                </div>
 			<?php } ?>
-		</div>
+        </div>
 	<?php } ?>
 </div>

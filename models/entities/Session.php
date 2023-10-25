@@ -1,5 +1,8 @@
 <?php
+
 namespace models\entities;
+
+use lib\core\attributes\PrimaryKey;
 
 /**
  * The SessionModel entity
@@ -9,19 +12,18 @@ namespace models\entities;
  * @version 1.0.0;
  */
 class Session {
+	#[PrimaryKey]
+	public string $id = "";
 
-	// The columns of the DB table
-    public string $id = "";
+	public int $actor_id = 0;
+	public int $as_actor = 0;
 
-    public int $actor_id = 0;
-    public int $as_actor = 0;
+	public string $ip = "";
 
-    public string $ip = "";
+	public string $expired = "";
 
-    public string $expired = "";
+	public string $created = "";
 
-    public string $created = "";
-
-    public ?string $updated = null;
+	public ?string $updated = null;
 
 }

@@ -1,9 +1,10 @@
 <?php
+
 use lib\App;
 
 $debug_messages = App::$storage->get("debug");
 if( is_array($debug_messages) ) {
-	foreach($debug_messages as $msg) {
+	foreach( $debug_messages as $msg ) {
 		print_debug($msg);
 	}
 }
@@ -17,17 +18,17 @@ $analyser_entries = App::$analyser->getEntries();
             <th>Backtrace</th>
             <th>Needed Time</th>
         </tr>
-        <?php foreach( $analyser_entries as $entry): ?>
+		<?php foreach( $analyser_entries as $entry ): ?>
             <tr>
                 <td><?= $entry["info"] ?></td>
                 <td>
-                    <?php foreach($entry["backtrace"] as $trace): ?>
-                        <div><?= ($trace["class"]??'')."->".$trace["function"] ?></div>
-                    <?php endforeach; ?>
+					<?php foreach( $entry["backtrace"] as $trace ): ?>
+                        <div><?= ($trace["class"] ?? '') . "->" . $trace["function"] ?></div>
+					<?php endforeach; ?>
                 </td>
                 <td class="col-1"><?= $entry["time"] ?></td>
             </tr>
-        <?php endforeach; ?>
+		<?php endforeach; ?>
     </table>
 </div>
 

@@ -1,9 +1,11 @@
 <?php
+
 namespace models;
 
 use Exception;
 use lib\App;
 use lib\core\exceptions\SystemException;
+use models\entities\AccessRestrictionType;
 use repositories\AccessRestrictionTypeRepository;
 
 /**
@@ -12,38 +14,56 @@ use repositories\AccessRestrictionTypeRepository;
  * @author Markus Schröder <xelsion@gmail.com>
  * @version 1.0.0;
  */
-class AccessRestrictionTypeModel extends entities\AccessRestrictionType {
+class AccessRestrictionTypeModel extends AccessRestrictionType {
 
-    private readonly AccessRestrictionTypeRepository $restriction_type_repository;
+	private readonly AccessRestrictionTypeRepository $restriction_type_repository;
 
-    /**
-     * The class constructor
-     * If id is 0 it will return an empty actor
-     *
-     * @param int $id
-     *
-     * @throws SystemException
-     */
-    public function __construct( int $id = 0 ) {
-        $this->restriction_type_repository = App::getInstanceOf(AccessRestrictionTypeRepository::class);
+	/**
+	 * The class constructor
+	 * If id is 0 it will return an empty actor
+	 *
+	 * @param int $id
+	 *
+	 * @throws SystemException
+	 */
+	public function __construct(int $id = 0) {
+		$this->restriction_type_repository = App::getInstanceOf(AccessRestrictionTypeRepository::class);
 
-        if( $id > 0 ) {
-            try {
-                $restriction_type_data = $this->restriction_type_repository->getAsArray($id);
-                if( !empty($restriction_type_data) ) {
-                    $this->id = (int)$restriction_type_data["id"];
-                    $this->name = $restriction_type_data["name"];
-                    $this->include_siblings = (int)$restriction_type_data["include_siblings"];
-                    $this->include_children = (int)$restriction_type_data["include_children"];
-                    $this->include_descendants = (int)$restriction_type_data["include_descendants"];
-                    $this->created = $restriction_type_data["created"];
-                    $this->updated = ( $restriction_type_data["updated"] !== "" ) ? $restriction_type_data["updated"] : null;
-                    $this->deleted = ( $restriction_type_data["deleted"] !== "" ) ? $restriction_type_data["deleted"] : null;
-                }
-            } catch( Exception $e ) {
-                throw new SystemException(__FILE__, __LINE__, $e->getMessage(), $e->getCode(), $e->getPrevious());
-            }
-        }
-    }
+		if( $id > 0 ) {
+			try {
+				$restriction_type_data = $this->restriction_type_repository->getAsArray($id);
+				if( !empty($restriction_type_data) ) {
+					$this->id = (int)$restriction_type_data["id"];
+					$this->name = $restriction_type_data["name"];
+					$this->include_siblings = (int)$restriction_type_data["include_siblings"];
+					$this->include_children = (int)$restriction_type_data["include_children"];
+					$this->include_descendants = (int)$restriction_type_data["include_descendants"];
+					$this->created = $restriction_type_data["created"];
+					$this->updated = ($restriction_type_data["updated"] !== "") ? $restriction_type_data["updated"] : null;
+					$this->deleted = ($restriction_type_data["deleted"] !== "") ? $restriction_type_data["deleted"] : null;
+				}
+			} catch( Exception $e ) {
+				throw new SystemException(__FILE__, __LINE__, $e->getMessage(), $e->getCode(), $e->getPrevious());
+			}
+		}
+	}
+
+	/**
+	 * Returns this Model as Entity
+	 *
+	 * @return AccessRestrictionType
+	 */
+	public function getAsEntity(): AccessRestrictionType {
+		$entity = new AccessRestrictionType();
+		$entity->id = $this->id;
+		$entity->name = $this->name;
+		$entity->include_siblings = $this->include_siblings;
+		$entity->include_children = $this->include_children;
+		$entity->include_descendants = $this->include_descendants;
+		$entity->created = $this->created;
+		$entity->updated = $this->updated;
+		$entity->deleted = $this->deleted;
+		return $entity;
+	}
 
 }

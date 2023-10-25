@@ -2,30 +2,31 @@
 
 use lib\App;
 use lib\core\classes\Language;
+use lib\core\classes\TemplateData;
 use lib\helper\HtmlHelper;
 
 $lang = App::getInstanceOf(Language::class);
 
-$this->set("title", "Daten Verbindung erstellen");
-$connections = $this->get("available_connections");
+TemplateData::set("title", "Daten Verbindung erstellen");
+$connections = TemplateData::get("available_connections");
 ?>
 <div class="container-fluid">
-	<h1>Neue Verbindung anlegen</h1>
-	<form action="/data-connections/create" method="POST" class="needs-validation" novalidate>
-        <?= HtmlHelper::generateFormToken() ?>
-		<div class="form-group row">
+    <h1>Neue Verbindung anlegen</h1>
+    <form action="/data-connections/create" method="POST" class="needs-validation" novalidate>
+		<?= HtmlHelper::generateFormToken() ?>
+        <div class="form-group row">
             <div class="col-2">
                 <label for="name">Name</label>
-                <input type="text" name="name" value="" id="name" required />
+                <input type="text" name="name" value="" id="name" required/>
                 <div class="invalid-feedback"><?= $lang->getValue("error-messages", "name") ?></div>
             </div>
             <div class="col-2">
                 <label for="db_name">Datenbank</label>
                 <select id="db_name" name="db_name" onchange="getTables();">
                     <option value="">- Datenbank -</option>
-                    <?php foreach( $connections as $conn_key ) { ?>
+					<?php foreach( $connections as $conn_key ) { ?>
                         <option value="<?= $conn_key ?>"><?= $conn_key ?></option>
-                    <?php } ?>
+					<?php } ?>
                 </select>
                 <div class="invalid-feedback"><?= $lang->getValue("error-messages", "name") ?></div>
             </div>
@@ -52,8 +53,8 @@ $connections = $this->get("available_connections");
             <div class="col-1" style="padding-top: 23px;">
                 <button type="submit" name="create" class="button button-positiv float-end"><?= $lang->getValue("translations", "create") ?></button>
             </div>
-		</div>
-	</form>
+        </div>
+    </form>
 </div>
 <script>
     function getTables() {
@@ -65,14 +66,14 @@ $connections = $this->get("available_connections");
         $("#table_col").prop("disabled", true);
         option_list.innerHTML = "";
 
-        if( db_name !== "" ) {
+        if (db_name !== "") {
             $.ajax({
                 type: "POST",
                 url: "/ajax/get-tables/" + db_name,
                 dataType: "json",
-                success: function( response ) {
-                    if( response.length > 0 ) {
-                        for( let table of response ) {
+                success: function (response) {
+                    if (response.length > 0) {
+                        for (let table of response) {
                             let option = document.createElement("option");
                             option.value = table.table_name;
                             option.innerText = table.table_name;
@@ -82,7 +83,7 @@ $connections = $this->get("available_connections");
                         $("#table_name").removeClass("loading");
                     }
                 },
-                error: function() {
+                error: function () {
                     $("#table_name").removeClass("loading");
                 }
             });
@@ -98,14 +99,14 @@ $connections = $this->get("available_connections");
         $("#table_col").addClass("loading");
         option_list.innerHTML = "";
 
-        if( table_name !== "" && db_name !== "" ) {
+        if (table_name !== "" && db_name !== "") {
             $.ajax({
                 type: "POST",
                 url: "/ajax/get-table-key-columns/" + db_name + "/" + table_name,
                 dataType: "json",
-                success: function( response ) {
-                    if( response.length > 0 ) {
-                        for( let column of response ) {
+                success: function (response) {
+                    if (response.length > 0) {
+                        for (let column of response) {
                             let option = document.createElement("option");
                             option.value = column.column_name;
                             option.innerText = column.column_name;
@@ -115,7 +116,7 @@ $connections = $this->get("available_connections");
                         $("#table_col").removeClass("loading");
                     }
                 },
-                error: function() {
+                error: function () {
                     $("#table_col").removeClass("loading");
                 }
             });
@@ -129,18 +130,18 @@ $connections = $this->get("available_connections");
         let column_list = document.getElementById("column_list");
         column_list.innerHTML = "";
         column_list.classList.add("loading");
-        if( table_name !== "" && db_name !== "" ) {
+        if (table_name !== "" && db_name !== "") {
             $.ajax({
                 type: "POST",
                 url: "/ajax/get-table-columns/" + db_name + "/" + table_name,
                 dataType: "json",
-                success: function( response ) {
-                    if( response.length > 0 ) {
-                        for( let column of response ) {
+                success: function (response) {
+                    if (response.length > 0) {
+                        for (let column of response) {
                             let div = document.createElement("div");
                             div.className = "clearfix";
                             let checkbox_label = document.createElement("label");
-                            checkbox_label.className="form-check-label float-end"
+                            checkbox_label.className = "form-check-label float-end"
                             checkbox_label.setAttribute("for", column.column_name);
                             checkbox_label.innerText = column.column_name;
                             let checkbox = document.createElement("input");

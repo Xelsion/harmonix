@@ -6,6 +6,7 @@ use Exception;
 use lib\App;
 use lib\core\enums\ActorType;
 use lib\core\exceptions\SystemException;
+use models\entities\Actor;
 use repositories\AccessPermissionRepository;
 use repositories\ActorRepository;
 use repositories\ActorRoleRepository;
@@ -16,7 +17,7 @@ use repositories\ActorRoleRepository;
  * @author Markus Schröder <xelsion@gmail.com>
  * @version 1.0.0;
  */
-class ActorModel extends entities\Actor {
+class ActorModel extends Actor {
 
 	private readonly ActorRepository $actor_repository;
 
@@ -65,6 +66,27 @@ class ActorModel extends entities\Actor {
 				throw new SystemException(__FILE__, __LINE__, $e->getMessage(), $e->getCode(), $e->getPrevious());
 			}
 		}
+	}
+
+	/**
+	 * Returns this Model as Entity
+	 *
+	 * @return Actor
+	 */
+	public function getAsEntity(): Actor {
+		$entity = new Actor();
+		$entity->id = $this->id;
+		$entity->type_id = $this->type_id;
+		$entity->first_name = $this->first_name;
+		$entity->last_name = $this->last_name;
+		$entity->email = $this->email;
+		$entity->password = $this->password;
+		$entity->login_fails = $this->login_fails;
+		$entity->login_disabled = $this->login_disabled;
+		$entity->created = $this->created;
+		$entity->updated = $this->updated;
+		$entity->deleted = $this->deleted;
+		return $entity;
 	}
 
 	/**

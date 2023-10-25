@@ -2,11 +2,14 @@
 
 namespace lib\core\attributes;
 
-#[\Attribute]
+use Attribute;
+use lib\core\enums\RequestMethod;
+
+#[Attribute]
 class HttpPost extends Route {
 
-    public function __construct( string $path ) {
-        parent::__construct( $path, "POST" );
-    }
+	public function __construct(string $path) {
+		parent::__construct($path, RequestMethod::POST);
+	}
 
 }

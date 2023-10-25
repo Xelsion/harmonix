@@ -8,6 +8,9 @@ use lib\core\blueprints\AController;
 use lib\core\blueprints\AResponse;
 use lib\core\classes\Configuration;
 use lib\core\classes\Template;
+use lib\core\classes\TemplateData;
+use lib\core\enums\RequestMethod;
+use lib\core\enums\SystemMessageType;
 use lib\core\exceptions\SystemException;
 use lib\core\Request;
 use lib\core\response_types\HtmlResponse;
@@ -36,7 +39,6 @@ class ActorController extends AController {
 	private readonly ActorRoleRepository $role_repository;
 	private readonly ActorTypeRepository $type_repository;
 	private readonly AccessPermissionRepository $permission_repository;
-
 	private readonly Request $request;
 
 	public function __construct(ActorRepository $actor_repository, ActorRoleRepository $role_repository, ActorTypeRepository $type_repository, AccessPermissionRepository $permission_repository, Request $request, Configuration $config) {
@@ -55,7 +57,7 @@ class ActorController extends AController {
 	 *
 	 * @throws SystemException
 	 */
-	#[Route("")]
+	#[Route("", RequestMethod::GET, RequestMethod::POST)]
 	public function index(): AResponse {
 		$params = App::getInstanceOf(RequestHelper::class)->getPaginationParams();
 
@@ -63,11 +65,11 @@ class ActorController extends AController {
 		HTMLHelper::getPagination($params['page'], $this->actor_repository->getNumRows(), $params['limit'], $pagination);
 
 		$view = new Template(PATH_VIEWS . "actor/index.html");
-		$view->set("actor_list", $this->actor_repository->find(array(), $params['order'], $params['direction'], $params['limit'], $params['page']));
-		$view->set("pagination", $pagination);
+		TemplateData::set("actor_list", $this->actor_repository->find(array(), $params['order'], $params['direction'], $params['limit'], $params['page']));
+		TemplateData::set("pagination", $pagination);
 
 		$template = new Template(PATH_VIEWS . "template.html");
-		$template->set("view", $view->parse());
+		TemplateData::set("view", $view->parse());
 
 		return new HtmlResponse($template->parse());
 	}
@@ -79,19 +81,23 @@ class ActorController extends AController {
 	 *
 	 * @throws SystemException
 	 */
-	#[Route("search")]
+	#[Route("search", RequestMethod::POST)]
 	public function search(): AResponse {
 		$search_string = $this->request->get("search_string");
 		$results = array();
 		if( $search_string !== null ) {
-			$results = $this->actor_repository->find([["first_name", "LIKE", '%' . $search_string . '%'], ["OR", "last_name", "LIKE", '%' . $search_string . '%'], ["OR", "email", "LIKE", '%' . $search_string . '%'],]);
+			$results = $this->actor_repository->find([
+				["first_name", "LIKE", '%' . $search_string . '%'],
+				["OR", "last_name", "LIKE", '%' . $search_string . '%'],
+				["OR", "email", "LIKE", '%' . $search_string . '%'],
+			]);
 		}
 		$view = new Template(PATH_VIEWS . "actor/search.html");
-		$view->set("search_string", $search_string);
-		$view->set("actor_list", $results);
+		TemplateData::set("search_string", $search_string);
+		TemplateData::set("actor_list", $results);
 
 		$template = new Template(PATH_VIEWS . "template.html");
-		$template->set("view", $view->parse());
+		TemplateData::set("view", $view->parse());
 
 		return new HtmlResponse($template->parse());
 	}
@@ -103,32 +109,46 @@ class ActorController extends AController {
 	 *
 	 * @throws SystemException
 	 */
-	#[Route("create")]
-	public function create(): AResponse {
+	#[Route("create", RequestMethod::GET)]
+	public function createActor(): AResponse {
 		if( !App::$curr_actor_role->canCreateAll() ) {
 			redirect("/error/403");
-		} else if( App::$request->contains('create') ) {
-			$is_valid = $this->postIsValid();
-			if( $is_valid ) {
-				$actor = new ActorModel();
-				$this->setActorParams($actor);
-				$this->actor_repository->createObject($actor);
-				$this->savePermissions($actor);
-				redirect("/actors");
-			}
 		}
 
 		$routes = App::getInstanceOf(Router::class)->getSortedRoutes();
 		$view = new Template(PATH_VIEWS . "actor/create.html");
-		$view->set("routes", $routes);
-		$view->set("role_options", $this->role_repository->getAll());
-		$view->set("type_options", $this->type_repository->getAll());
-		$view->set("access_permissions", array());
+		TemplateData::set("routes", $routes);
+		TemplateData::set("role_options", $this->role_repository->getAll());
+		TemplateData::set("type_options", $this->type_repository->getAll());
+		TemplateData::set("access_permissions", array());
 
 		$template = new Template(PATH_VIEWS . "template.html");
-		$template->set("view", $view->parse());
+		TemplateData::set("view", $view->parse());
 
 		return new HtmlResponse($template->parse());
+	}
+
+	/**
+	 * @return AResponse
+	 * @throws SystemException
+	 */
+	#[Route("create", RequestMethod::POST)]
+	public function createActorSubmit(): AResponse {
+		if( !App::$curr_actor_role->canCreateAll() ) {
+			redirect("/error/403");
+		}
+
+		$is_valid = $this->postIsValid();
+		if( $is_valid ) {
+			$actor = new ActorModel();
+			$this->setActorParams($actor);
+			$this->actor_repository->createObject($actor);
+			$this->savePermissions($actor);
+			TemplateData::setSystemMessage("Der Benutzer wurde erfolgreich erstellt.");
+		} else {
+			TemplateData::setSystemMessage("Es ist ein Fehler aufgetreten", SystemMessageType::ERROR);
+		}
+		return $this->createActor();
 	}
 
 	/**
@@ -138,30 +158,17 @@ class ActorController extends AController {
 	 *
 	 * @throws SystemException
 	 */
-	#[Route("{actor}")]
-	public function update(ActorModel $actor): AResponse {
-		if( !App::$curr_actor_role->canUpdate($actor->id) ) {
-			redirect("/error/403");
-		} else if( App::$request->contains('cancel') ) {
-			redirect("/actors");
-		} else if( App::$request->contains('update') ) {
-			$is_valid = $this->postIsValid();
-			if( $is_valid ) {
-				$this->setActorParams($actor);
-				$this->actor_repository->updateObject($actor);
-				redirect("/actors");
-			}
-		}
-
+	#[Route("{actor_id}", RequestMethod::GET)]
+	public function updateActor(ActorModel $actor): AResponse {
 		$access_permissions = array();
 		$view = new Template(PATH_VIEWS . "actor/edit.html");
-		$view->set("actor", $actor);
-		$view->set("role_options", $this->role_repository->getAll());
-		$view->set("type_options", $this->type_repository->getAll());
-		$view->set("access_permissions", $access_permissions);
+		TemplateData::set("actor", $actor);
+		TemplateData::set("role_options", $this->role_repository->getAll());
+		TemplateData::set("type_options", $this->type_repository->getAll());
+		TemplateData::set("access_permissions", $access_permissions);
 
 		$template = new Template(PATH_VIEWS . "template.html");
-		$template->set("view", $view->parse());
+		TemplateData::set("view", $view->parse());
 
 		return new HtmlResponse($template->parse());
 	}
@@ -173,16 +180,21 @@ class ActorController extends AController {
 	 *
 	 * @throws SystemException
 	 */
-	#[Route("delete/{actor}")]
-	public function delete(ActorModel $actor): AResponse {
-		if( !App::$curr_actor_role->canDelete($actor->id) ) {
+	#[Route("{actor_id}", RequestMethod::PUT)]
+	public function updateActorSubmit(ActorModel $actor): AResponse {
+		if( !App::$curr_actor_role->canUpdate($actor->id) ) {
 			redirect("/error/403");
-		} else if( App::$request->contains('cancel') ) {
-			redirect("/actors");
 		}
-		$this->actor_repository->deleteObject($actor);
-		redirect("/actors");
-		return new HtmlResponse();
+
+		$is_valid = $this->postIsValid();
+		if( $is_valid ) {
+			$this->setActorParams($actor);
+			$this->actor_repository->updateObject($actor);
+			TemplateData::setSystemMessage("Der Benutzer wurde erfolgreich aktualisiert.");
+		} else {
+			TemplateData::setSystemMessage("Es ist ein Fehler aufgetreten", SystemMessageType::ERROR);
+		}
+		return $this->updateActor($actor);
 	}
 
 	/**
@@ -192,28 +204,74 @@ class ActorController extends AController {
 	 *
 	 * @throws SystemException
 	 */
-	#[Route("roles/{actor}")]
-	public function roles(ActorModel $actor): AResponse {
+	#[Route("delete/{actor_id}", RequestMethod::DELETE)]
+	public function deleteSubmit(ActorModel $actor): AResponse {
+		if( !App::$curr_actor_role->canDelete($actor->id) ) {
+			redirect("/error/403");
+		}
+		$this->actor_repository->deleteObject($actor);
+		TemplateData::setSystemMessage("Der Benutzer wurde erfolgreich deaktiviert.");
+		return $this->index();
+	}
+
+	/**
+	 * @param ActorModel $actor
+	 *
+	 * @return AResponse
+	 *
+	 * @throws SystemException
+	 */
+	#[Route("undelete/{actor_id}", RequestMethod::POST)]
+	public function undeleteSubmit(ActorModel $actor): AResponse {
+		if( !App::$curr_actor_role->canDelete($actor->id) ) {
+			redirect("/error/403");
+		}
+
+		$this->actor_repository->undeleteObject($actor);
+		TemplateData::setSystemMessage("Der Benutzer wurde erfolgreich reaktiviert.");
+		return $this->index();
+	}
+
+	/**
+	 * @param ActorModel $actor
+	 *
+	 * @return AResponse
+	 *
+	 * @throws SystemException
+	 */
+	#[Route("roles/{actor_id}", RequestMethod::GET)]
+	public function actorRolesUpdate(ActorModel $actor): AResponse {
 		if( !App::$curr_actor_role->canUpdate($actor->id) ) {
 			redirect("/error/403");
-		} else if( App::$request->contains('cancel') ) {
-			redirect("/actors");
-		} else if( App::$request->contains('update') ) {
-			$this->savePermissions($actor);
-			redirect("/actors");
 		}
 
 		$view = new Template(PATH_VIEWS . "actor/roles.html");
-		$view->set("actor", $actor);
-		$view->set("routes", App::getInstanceOf(Router::class)->getSortedRoutes());
-		$view->set("role_options", $this->role_repository->getAll());
-		$view->set("access_permissions", $this->permission_repository->find([["actor_id", "=", $actor->id]]));
+		TemplateData::set("actor", $actor);
+		TemplateData::set("routes", App::getInstanceOf(Router::class)->getSortedRoutes());
+		TemplateData::set("role_options", $this->role_repository->getAll());
+		TemplateData::set("access_permissions", $this->permission_repository->find([["actor_id", "=", $actor->id]]));
 
 		$template = new Template(PATH_VIEWS . "template.html");
-		$template->set("view", $view->parse());
+		TemplateData::set("view", $view->parse());
 
 		return new HtmlResponse($template->parse());
 	}
+
+	/**
+	 * @param ActorModel $actor
+	 * @return AResponse
+	 * @throws SystemException
+	 */
+	#[Route("roles/{actor_id}", RequestMethod::POST)]
+	public function actorRolesUpdateSubmit(ActorModel $actor): AResponse {
+		if( !App::$curr_actor_role->canUpdate($actor->id) ) {
+			redirect("/error/403");
+		}
+		$this->savePermissions($actor);
+		TemplateData::setSystemMessage("Die Benutzerrollen wurde erfolgreich aktualisiert.");
+		return $this->actorRolesUpdate($actor);
+	}
+
 
 	/**
 	 * Checks if all required values are setClass

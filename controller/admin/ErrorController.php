@@ -1,10 +1,14 @@
 <?php
+
 namespace controller\admin;
 
 use lib\core\attributes\Route;
 use lib\core\blueprints\AController;
 use lib\core\blueprints\AResponse;
 use lib\core\classes\Template;
+use lib\core\classes\TemplateData;
+use lib\core\enums\HttpResponseCode;
+use lib\core\enums\RequestMethod;
 use lib\core\exceptions\SystemException;
 use lib\core\response_types\HtmlResponse;
 
@@ -17,42 +21,25 @@ use lib\core\response_types\HtmlResponse;
 #[Route("error")]
 class ErrorController extends AController {
 
-    /**
-     *  Shows the error page with the given code
-     *
-     * @param int $error_code
-     *
-     * @return AResponse
-     * @throws SystemException
-     */
-    #[Route("{error_code}")]
-    public function error( int $error_code ): AResponse {
-		$view = new Template(PATH_VIEWS."error/display.html");
-        switch( $error_code ) {
-            case 400:
-                $view->set("title","400 Bad Request");
-                break;
-            case 401:
-                $view->set("title","401 Unauthorized");
-                break;
-            case 403:
-                $view->set("title","403 Forbidden");
-                break;
-            case 404:
-                $view->set("title","404 Not Found");
-                break;
-            case 500:
-                $view->set("title","500 Internal Server Error");
-                break;
-        }
+	/**
+	 *  Shows the error page with the given code
+	 *
+	 * @param int $error_code
+	 *
+	 * @return AResponse
+	 * @throws SystemException
+	 */
+	#[Route("{error_id}", RequestMethod::ANY)]
+	public function error(int $error_code): AResponse {
+		$response_code = HttpResponseCode::fromCode($error_code);
+		$view = new Template(PATH_VIEWS . "error/display.html");
+		TemplateData::set("title", $response_code->toString());
 
+		$template = new Template(PATH_VIEWS . "template.html");
+		TemplateData::set("view", $view->parse());
 
-		$template = new Template(PATH_VIEWS."template.html");
-		$template->set("view", $view->parse());
-
-        $response = new HtmlResponse();
-        $response->status_code = $error_code;
-        $response->setOutput($template->parse());
+		$response = new HtmlResponse($template->parse());
+		$response->status_code = $response_code;
 		return $response;
 	}
 }

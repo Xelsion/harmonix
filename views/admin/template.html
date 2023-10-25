@@ -3,28 +3,32 @@
 use lib\App;
 use lib\core\classes\Configuration;
 use lib\core\classes\Template;
+use lib\core\classes\TemplateData;
 use lib\helper\HtmlHelper;
 
 $actor = App::$curr_actor;
 $config = App::getInstanceOf(Configuration::class);
-$view = $this->get("view");
+$view = TemplateData::get("view");
 $view_content = ($view instanceof Template) ? $view->parse() : $view;
+$ts = time();
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title><?= $this->get("title") ?? "Home" ?></title>
-    <link rel="stylesheet" href="<?= PATH_SRC ?>bootstrap-5.3.0/css/bootstrap.min.css"/>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title><?= TemplateData::get("title") ?? "Home" ?></title>
+    <link rel="stylesheet" href="<?= PATH_SRC ?>bootstrap-5.3.2/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="<?= PATH_SRC ?>bootstrap-5.3.2/css/bootstrap-utilities.min.css"/>
     <link rel="stylesheet" href="<?= PATH_CSS ?>styles.css"/>
-	<?php foreach( $this->getHeaderCss() as $css_file ) { ?>
+	<?php foreach( TemplateData::getHeaderCss() as $css_file ) { ?>
         <link rel="stylesheet" href="<?= $css_file ?>"/>
 	<?php } ?>
-    <script src="<?= PATH_SRC ?>bootstrap-5.3.0/js/bootstrap.bundle.min.js"></script>
-    <script src="<?= PATH_SRC ?>jquery/jquery-3.7.0.min.js"></script>
-    <script src="<?= PATH_JS ?>main.js"></script>
-	<?php foreach( $this->getHeaderScripts() as $script_file => $async ) { ?>
+    <script src="<?= PATH_SRC ?>bootstrap-5.3.2/js/bootstrap.bundle.min.js"></script>
+    <script src="<?= PATH_SRC ?>bootstrap-5.3.2/js/bootstrap.bundle.min.js"></script>
+    <script src="<?= PATH_SRC ?>jquery/jquery-3.7.1.min.js"></script>
+    <script src="<?= PATH_JS ?>main.js?ts=<?= $ts ?>"></script>
+	<?php foreach( TemplateData::getHeaderScripts() as $script_file => $async ) { ?>
 		<?php if( $async ) { ?>
             <script async src="<?= $script_file ?>"></script>
 		<?php } else { ?>
@@ -84,7 +88,10 @@ $view_content = ($view instanceof Template) ? $view->parse() : $view;
         <div class="cleaner"></div>
     </nav>
 </header>
-<main><?= $view_content ?></main>
+<main>
+    {{system_message}}
+	<?= $view_content ?>
+</main>
 <div>
 	<?php if( App::$storage->get("debug_mode") ) {
 		$debug = new Template(PATH_VIEWS_ROOT . "snippets/debug.html");
@@ -103,7 +110,7 @@ $view_content = ($view instanceof Template) ? $view->parse() : $view;
     <div class="cleaner"></div>
 </footer>
 </body>
-<?php foreach( $this->getFooterScripts() as $script_file => $async ) { ?>
+<?php foreach( TemplateData::getFooterScripts() as $script_file => $async ) { ?>
 	<?php if( $async ) { ?>
         <script async src="<?= $script_file ?>"></script>
 	<?php } else { ?>
