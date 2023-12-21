@@ -3,6 +3,7 @@
 namespace lib\helper;
 
 use Exception;
+use lib\core\exceptions\SystemException;
 
 /**
  * Functions that helps with strings
@@ -151,35 +152,38 @@ class StringHelper {
 	 * @param bool $trim default true
 	 *
 	 * @return string
+	 * @throws SystemException
 	 */
 	public static function getGuID(bool $trim = true): string {
-		// Windows
-		if( function_exists('com_create_guid') === true ) {
-			if( $trim === true ) {
-				return trim(com_create_guid(), '{}');
-			}
-			return com_create_guid();
-		}
-
-		// OSX/Linux
-		if( function_exists('openssl_random_pseudo_bytes') === true ) {
-			$secured = true;
-			$data = openssl_random_pseudo_bytes(16, $secured);
-			if( $data ) {
-				$data[6] = chr(ord($data[6]) & 0x0f | 0x40);    // setClass version to 0100
-				$data[8] = chr(ord($data[8]) & 0x3f | 0x80);    // setClass bits 6-7 to 10
-				return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
+		try {
+			// Windows
+			if( function_exists('com_create_guid') === true && is_callable('com_create_guid') ) {
+				if( $trim === true ) {
+					return trim(com_create_guid(), '{}');
+				}
+				return com_create_guid();
 			}
 
-		}
+			// OSX/Linux
+			if( function_exists('random_bytes') === true && is_callable('random_bytes') ) {
+				$data = random_bytes(16);
+				if( $data ) {
+					$data[6] = chr(ord($data[6]) & 0x0f | 0x40);    // setClass version to 0100
+					$data[8] = chr(ord($data[8]) & 0x3f | 0x80);    // setClass bits 6-7 to 10
+					return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
+				}
+			}
 
-		// Fallback (PHP 4.2+)
-		mt_srand((double)microtime() * 10000);
-		$char_id = strtolower(md5(uniqid(mt_rand(), true)));
-		$hyphen = chr(45);                  // "-"
-		$lbrace = $trim ? "" : chr(123);    // "{"
-		$rbrace = $trim ? "" : chr(125);    // "}"
-		return $lbrace . substr($char_id, 0, 8) . $hyphen . substr($char_id, 8, 4) . $hyphen . substr($char_id, 12, 4) . $hyphen . substr($char_id, 16, 4) . $hyphen . substr($char_id, 20, 12) . $rbrace;
+			// Fallback (PHP 4.2+)
+			mt_srand((double)microtime() * 10000);
+			$char_id = strtolower(md5(uniqid(mt_rand(), true)));
+			$hyphen = chr(45);                  // "-"
+			$lbrace = $trim ? "" : chr(123);    // "{"
+			$rbrace = $trim ? "" : chr(125);    // "}"
+			return $lbrace . substr($char_id, 0, 8) . $hyphen . substr($char_id, 8, 4) . $hyphen . substr($char_id, 12, 4) . $hyphen . substr($char_id, 16, 4) . $hyphen . substr($char_id, 20, 12) . $rbrace;
+		} catch( Exception $e ) {
+			throw new SystemException($e->getFile(), $e->getLine(), $e->getMessage(), $e->getCode(), $e->getPrevious());
+		}
 	}
 
 	/**
