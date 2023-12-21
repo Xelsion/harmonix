@@ -1,5 +1,5 @@
+.idea/
 build/
-logs/
-cache/
-
-/vendor/
+logs/*
+cache/*
+.editorconfig

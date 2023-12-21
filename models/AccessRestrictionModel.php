@@ -16,8 +16,6 @@ use repositories\AccessRestrictionRepository;
  */
 class AccessRestrictionModel extends AccessRestriction {
 
-	private readonly AccessRestrictionRepository $restriction_repository;
-
 	/**
 	 * The class constructor
 	 *
@@ -25,10 +23,10 @@ class AccessRestrictionModel extends AccessRestriction {
 	 * @throws SystemException
 	 */
 	public function __construct(int $id = 0) {
-		$this->restriction_repository = App::getInstanceOf(AccessRestrictionRepository::class);
 		if( $id > 0 ) {
 			try {
-				$restriction_data = $this->restriction_repository->getAsArray($id);
+				$access_restriction_repo = App::getInstanceOf(AccessRestrictionRepository::class);
+				$restriction_data = $access_restriction_repo->getAsArray($id);
 				if( !empty($restriction_data) ) {
 					$this->id = (int)$restriction_data["id"];
 					$this->domain = $restriction_data["domain"];
@@ -44,25 +42,6 @@ class AccessRestrictionModel extends AccessRestriction {
 				throw new SystemException(__FILE__, __LINE__, $e->getMessage(), $e->getCode(), $e->getPrevious());
 			}
 		}
-	}
-
-	/**
-	 * Returns this Model as Entity
-	 *
-	 * @return AccessRestriction
-	 */
-	public function getAsEntity(): AccessRestriction {
-		$entity = new AccessRestriction();
-		$entity->id = $this->id;
-		$entity->domain = $this->domain;
-		$entity->controller = $this->controller;
-		$entity->method = $this->method;
-		$entity->restriction_type = $this->restriction_type;
-		$entity->role_id = $this->role_id;
-		$entity->created = $this->created;
-		$entity->updated = $this->updated;
-		$entity->deleted = $this->deleted;
-		return $entity;
 	}
 
 }

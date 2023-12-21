@@ -190,8 +190,14 @@ class StringHelper {
 	 * @return string
 	 */
 	public static function encrypt(string $string): string {
-		openssl_cipher_iv_length(self::$enc_ciphering);
+		if( function_exists('openssl_get_cipher_methods') ) {
+			$ciphers = openssl_get_cipher_methods(true);
+		}
+		if( function_exists('openssl_cipher_iv_length') ) {
+			openssl_cipher_iv_length(self::$enc_ciphering);
+		}
 		$options = 0;
+
 		/** @noinspection EncryptionInitializationVectorRandomnessInspection */
 		return openssl_encrypt($string, self::$enc_ciphering, static::$enc_key, $options, static::$enc_iv);
 	}

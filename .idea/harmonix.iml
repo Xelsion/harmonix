@@ -9,6 +9,12 @@
       <sourceFolder url="file://$MODULE_DIR$/models" isTestSource="false" packagePrefix="models\" />
       <sourceFolder url="file://$MODULE_DIR$/repositories" isTestSource="false" packagePrefix="repositories\" />
       <sourceFolder url="file://$MODULE_DIR$/tests/Unit" isTestSource="true" />
+      <excludeFolder url="file://$MODULE_DIR$/.idea/dataSources" />
+      <excludeFolder url="file://$MODULE_DIR$/build/doc" />
+      <excludeFolder url="file://$MODULE_DIR$/cache/controller" />
+      <excludeFolder url="file://$MODULE_DIR$/logs/database" />
+      <excludeFolder url="file://$MODULE_DIR$/logs/exception" />
+      <excludeFolder url="file://$MODULE_DIR$/logs/runtime" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

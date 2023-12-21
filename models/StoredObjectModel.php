@@ -10,21 +10,16 @@ use repositories\ActionStorageRepository;
 
 class StoredObjectModel extends StoredObject {
 
-	private readonly ActionStorageRepository $repository;
-
 	/**
 	 * @param int $id
 	 * @throws SystemException
 	 */
 	public function __construct(int $id = 0) {
-		$this->repository = App::getInstanceOf(ActionStorageRepository::class);
-
 		if( $id > 0 ) {
 			try {
-				$data = $this->repository->getAsArray($id);
-
+				$storage_repo = App::getInstanceOf(ActionStorageRepository::class);
+				$data = $storage_repo->getAsArray($id);
 				if( !empty($data) ) {
-
 					$this->id = (int)$data["id"];
 					$this->actor_id = (int)$data["actor_id"];
 					$this->action = $data["action"];

@@ -20,8 +20,6 @@ use repositories\MVCRepository;
  */
 class SessionModel extends Session {
 
-	private readonly MVCRepository $mvc_repository;
-
 	public bool $_rotate_session = false;
 
 	// Defines if the cookie will be encrypted or not
@@ -56,8 +54,6 @@ class SessionModel extends Session {
 	 * @throws SystemException
 	 */
 	public function __construct(Configuration $config) {
-		$this->mvc_repository = App::getInstanceOf(MVCRepository::class);
-
 		$cookie_settings = $config->getSection("cookie");
 		$rotate_session = $config->getSectionValue("security", "rotate_session");
 		if( !is_null($rotate_session) ) {
@@ -93,7 +89,8 @@ class SessionModel extends Session {
 		}
 
 		try {
-			$session_data = $this->mvc_repository->getSessionAsArray($session_id);
+			$mvc_repo = App::getInstanceOf(MVCRepository::class);
+			$session_data = $mvc_repo->getSessionAsArray($session_id);
 			if( !empty($session_data) ) {
 				$this->id = $session_data["id"];
 				$this->actor_id = (int)$session_data["actor_id"];
@@ -117,6 +114,7 @@ class SessionModel extends Session {
 	 */
 	public function getActor(): ActorModel {
 		try {
+			$mvc_repo = App::getInstanceOf(MVCRepository::class);
 			$actor = App::getInstanceOf(ActorModel::class);
 			// do we have an actor?
 			if( $this->actor_id > 0 ) {
@@ -125,7 +123,7 @@ class SessionModel extends Session {
 				$this->ip = $_SERVER["REMOTE_ADDR"];
 				$this->expired = $date_time->format("Y-m-d H:i:s");
 				$actor = App::getInstanceOf(ActorModel::class, null, ["id" => $this->actor_id]);
-				$this->mvc_repository->updateSession($this);
+				$mvc_repo->updateSession($this);
 				$this->writeCookie();
 			}
 			return $actor;
@@ -146,8 +144,9 @@ class SessionModel extends Session {
 	public function login(string $email, string $password): bool {
 		$permanent = (App::$request->contains("permanent_login") && App::$request->get("permanent_login") === "yes");
 		try {
-			$actor_repository = App::getInstanceOf(ActorRepository::class);
-			$actor = $actor_repository->getByLogin($email);
+			$mvc_repo = App::getInstanceOf(MVCRepository::class);
+			$actor_repo = App::getInstanceOf(ActorRepository::class);
+			$actor = $actor_repo->getByLogin($email);
 			if( $actor->id > 0 && password_verify($password, $actor->password) ) {
 				$session_id = StringHelper::getGuID();
 				$date_time = new DateTime();
@@ -160,7 +159,8 @@ class SessionModel extends Session {
 				$this->actor_id = $actor->id;
 				$this->ip = $_SERVER["REMOTE_ADDR"];
 				$this->expired = $date_time->format("Y-m-d H:i:s");
-				$this->mvc_repository->createSession($this);
+				$mvc_repo->createSession($this);
+
 				$this->writeCookie();
 				return true;
 			}
@@ -180,16 +180,17 @@ class SessionModel extends Session {
 	 */
 	public function logout(): void {
 		try {
+			$mvc_repo = App::getInstanceOf(MVCRepository::class);
 			if( $this->as_actor > 0 ) {
 				$this->as_actor = 0;
-				$this->mvc_repository->updateSession($this);
+				$mvc_repo->updateSession($this);
 				$this->writeCookie();
 			} else {
 				$session_id = ($this->encryption) ? StringHelper::decrypt($_COOKIE[$this->cookie_name]) : $_COOKIE[$this->cookie_name];
 				if( isset($_COOKIE[$this->cookie_name]) && $session_id === $this->id ) {
 					$date_time = new DateTime();
 					$date_time->setTimestamp(time() - 3600);
-					$this->mvc_repository->deleteSession($this);
+					$mvc_repo->deleteSession($this);
 					$this->actor_id = 0;
 					$this->expired = $date_time->format('Y-m-d H:i:s');
 					$this->writeCookie();
@@ -209,11 +210,13 @@ class SessionModel extends Session {
 	public function writeCookie(): void {
 		$date_time = DateTime::createFromFormat("Y-m-d H:i:s", $this->expired);
 		$session_id = ($this->encryption) ? StringHelper::encrypt($this->id) : $this->id;
-		$cookie_options = array('expires'  => $date_time->getTimestamp(),
-		                        'path'     => $this->cookie_path,
-		                        'domain'   => $this->cookie_domain,
-		                        'secure'   => $this->cookie_secure,
-		                        'samesite' => $this->cookie_same_site
+
+		$cookie_options = array(
+			'expires'  => $date_time->getTimestamp(),
+			'path'     => $this->cookie_path,
+			'domain'   => $this->cookie_domain,
+			'secure'   => $this->cookie_secure,
+			'samesite' => $this->cookie_same_site
 		);
 		setcookie($this->cookie_name, $session_id, $cookie_options);
 	}

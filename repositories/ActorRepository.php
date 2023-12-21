@@ -312,7 +312,7 @@ class ActorRepository extends ARepository {
 
 			// store this action
 			$storage_repo = App::getInstanceOf(ActionStorageRepository::class);
-			$storage_repo->storeAction("create", "mvc", "actors", null, $actor->getAsEntity());
+			$storage_repo->storeAction("create", "mvc", "actors", null, $actor);
 
 			// @formatter:off
 			$this->pdo->Insert("actors")
@@ -361,7 +361,7 @@ class ActorRepository extends ARepository {
 				// store this action
 				$obj_orig = $this->get($actor->id);
 				$storage_repo = App::getInstanceOf(ActionStorageRepository::class);
-				$storage_repo->storeAction("update", "mvc", "actors", $obj_orig->getAsEntity(), $actor->getAsEntity());
+				$storage_repo->storeAction("update", "mvc", "actors", $obj_orig, $actor);
 
 				// @formatter:off
 				$this->pdo->Update("actors")

@@ -18,10 +18,10 @@ class TokenModel extends Token {
 	 * @throws SystemException
 	 */
 	public function __construct(string $id = "") {
-		$mvc_repository = App::getInstanceOf(MVCRepository::class);
 		if( $id !== "" ) {
 			try {
-				$token_data = $mvc_repository->getTokenAsArray($id);
+				$mvc_repo = App::getInstanceOf(MVCRepository::class);
+				$token_data = $mvc_repo->getTokenAsArray($id);
 				if( !empty($token_data) ) {
 					$this->id = $token_data["id"];
 					$this->expired = $token_data["expired"];

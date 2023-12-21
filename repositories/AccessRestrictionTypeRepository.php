@@ -142,7 +142,7 @@ class AccessRestrictionTypeRepository extends ARepository {
 		try {
 			// store this action
 			$storage_repo = App::getInstanceOf(ActionStorageRepository::class);
-			$storage_repo->storeAction("create", "mvc", "access_restriction_types", null, $restriction_type->getAsEntity());
+			$storage_repo->storeAction("create", "mvc", "access_restriction_types", null, $restriction_type);
 
 			// @formatter:off
             $this->pdo->Insert("access_restriction_types")
@@ -171,7 +171,7 @@ class AccessRestrictionTypeRepository extends ARepository {
 			// store this action
 			$obj_orig = $this->get($restriction_type->id);
 			$storage_repo = App::getInstanceOf(ActionStorageRepository::class);
-			$storage_repo->storeAction("update", "mvc", "access_restriction_types", $obj_orig->getAsEntity(), $restriction_type->getAsEntity());
+			$storage_repo->storeAction("update", "mvc", "access_restriction_types", $obj_orig, $restriction_type);
 
 			// @formatter:off
             $this->pdo->Update("access_restriction_types")
@@ -200,7 +200,7 @@ class AccessRestrictionTypeRepository extends ARepository {
 		try {
 			// store this action
 			$storage_repo = App::getInstanceOf(ActionStorageRepository::class);
-			$storage_repo->storeAction("delete", "mvc", "access_restriction_types", $restriction_type->getAsEntity(), null);
+			$storage_repo->storeAction("delete", "mvc", "access_restriction_types", $restriction_type, null);
 
 			// @formatter:off
             $this->pdo->Delete("access_restriction_types")

@@ -19,12 +19,6 @@ use repositories\ActorRoleRepository;
  */
 class ActorModel extends Actor {
 
-	private readonly ActorRepository $actor_repository;
-
-	private readonly ActorRoleRepository $role_repository;
-
-	private readonly AccessPermissionRepository $permission_repository;
-
 	// a collection of all permission this user contains
 	public array $permissions = array();
 
@@ -36,19 +30,14 @@ class ActorModel extends Actor {
 	 *
 	 * @param int $id
 	 *
-	 * @throws \lib\core\exceptions\SystemException
+	 * @throws SystemException
 	 */
 	public function __construct(int $id = 0) {
-		$this->actor_repository = App::getInstanceOf(ActorRepository::class);
-		$this->role_repository = App::getInstanceOf(ActorRoleRepository::class);
-		$this->permission_repository = App::getInstanceOf(AccessPermissionRepository::class);
-
 		if( $id > 0 ) {
 			try {
-				$actor_data = $this->actor_repository->getAsArray($id);
-
+				$actor_repo = App::getInstanceOf(ActorRepository::class);
+				$actor_data = $actor_repo->getAsArray($id);
 				if( !empty($actor_data) ) {
-
 					$this->id = (int)$actor_data["id"];
 					$this->type_id = (int)$actor_data["type_id"];
 					$this->first_name = $actor_data["first_name"];
@@ -69,34 +58,10 @@ class ActorModel extends Actor {
 	}
 
 	/**
-	 * Returns this Model as Entity
-	 *
-	 * @return Actor
-	 */
-	public function getAsEntity(): Actor {
-		$entity = new Actor();
-		$entity->id = $this->id;
-		$entity->type_id = $this->type_id;
-		$entity->first_name = $this->first_name;
-		$entity->last_name = $this->last_name;
-		$entity->email = $this->email;
-		$entity->password = $this->password;
-		$entity->login_fails = $this->login_fails;
-		$entity->login_disabled = $this->login_disabled;
-		$entity->created = $this->created;
-		$entity->updated = $this->updated;
-		$entity->deleted = $this->deleted;
-		return $entity;
-	}
-
-	/**
 	 * Returns if the actor is of type developer or not
-	 *
-	 * @param int $actor_id
 	 *
 	 * @return bool
 	 *
-	 * @throws \lib\core\exceptions\SystemException
 	 */
 	public function isDeveloper(): bool {
 		return ($this->type_id === ActorType::Developer->value);
@@ -114,7 +79,7 @@ class ActorModel extends Actor {
 	 *
 	 * @return ActorRoleModel
 	 *
-	 * @throws \lib\core\exceptions\SystemException
+	 * @throws SystemException
 	 */
 	public function getRole(string $controller, string $method, string $domain = SUB_DOMAIN): ActorRoleModel {
 		try {
@@ -142,7 +107,8 @@ class ActorModel extends Actor {
 			}
 
 			// actor object is not loaded, so we return the default actor role
-			$result = $this->role_repository->find([["is_default", "=", 1]]);
+			$actor_role_repo = App::getInstanceOf(ActorRoleRepository::class);
+			$result = $actor_role_repo->find([["is_default", "=", 1]]);
 			if( count($result) === 1 ) {
 				return $result[0];
 			}
@@ -159,11 +125,12 @@ class ActorModel extends Actor {
 	 *
 	 * @return bool
 	 *
-	 * @throws \lib\core\exceptions\SystemException
+	 * @throws SystemException
 	 */
 	public function deletePermissions(): bool {
 		if( $this->id > 0 ) {
-			$this->permission_repository->deleteAccessPermissionFor($this);
+			$access_permission_repo = App::getInstanceOf(AccessPermissionRepository::class);
+			$access_permission_repo->deleteAccessPermissionFor($this);
 			return true;
 		}
 		return false;
@@ -172,11 +139,12 @@ class ActorModel extends Actor {
 	/**
 	 * Collects all permission for this user
 	 *
-	 * @throws \lib\core\exceptions\SystemException
+	 * @throws SystemException
 	 */
 	private function initPermission(): void {
 		try {
-			$permissions = $this->permission_repository->getAccessPermissionFor($this);
+			$access_permission_repo = App::getInstanceOf(AccessPermissionRepository::class);
+			$permissions = $access_permission_repo->getAccessPermissionFor($this);
 			foreach( $permissions as $permission ) {
 				$this->permissions[$permission->domain][$permission->controller][$permission->method] = $permission->getRole();
 			}

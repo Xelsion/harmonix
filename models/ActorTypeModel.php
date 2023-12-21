@@ -16,8 +16,6 @@ use repositories\ActorTypeRepository;
  */
 class ActorTypeModel extends ActorType {
 
-	private readonly ActorTypeRepository $type_repository;
-
 	/**
 	 * The class constructor
 	 *
@@ -26,10 +24,10 @@ class ActorTypeModel extends ActorType {
 	 * @throws SystemException
 	 */
 	public function __construct(int $id = 0) {
-		$this->type_repository = App::getInstanceOf(ActorTypeRepository::class);
 		if( $id > 0 ) {
 			try {
-				$type_data = $this->type_repository->getAsArray($id);
+				$actor_type_repo = App::getInstanceOf(ActorTypeRepository::class);
+				$type_data = $actor_type_repo->getAsArray($id);
 				if( !empty($type_data) ) {
 					$this->id = (int)$type_data["id"];
 					$this->name = $type_data["name"];
@@ -42,22 +40,6 @@ class ActorTypeModel extends ActorType {
 				throw new SystemException(__FILE__, __LINE__, $e->getMessage(), $e->getCode(), $e->getPrevious());
 			}
 		}
-	}
-
-	/**
-	 * Returns this Model as Entity
-	 *
-	 * @return ActorType
-	 */
-	public function getAsEntity(): ActorType {
-		$entity = new ActorType();
-		$entity->id = $this->id;
-		$entity->name = $this->name;
-		$entity->is_protected = $this->is_protected;
-		$entity->created = $this->created;
-		$entity->updated = $this->updated;
-		$entity->deleted = $this->deleted;
-		return $entity;
 	}
 
 }

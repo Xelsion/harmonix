@@ -33,11 +33,10 @@ $runtime_logger = new Logger("runtime");
 
 try {
 	// getActor output buffering and prevent all direct output
-	ob_start();
+	ob_start('ob_gzhandler');
 
 	// getActor the process
 	$app = new App();
-
 	$app->addMiddleware(SessionAuth::class);
 	$app->run();
 

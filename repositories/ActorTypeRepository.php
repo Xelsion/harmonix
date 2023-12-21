@@ -141,7 +141,7 @@ class ActorTypeRepository extends ARepository {
 		try {
 			// store this action
 			$storage_repo = App::getInstanceOf(ActionStorageRepository::class);
-			$storage_repo->storeAction("create", "mvc", "actor_types", null, $type->getAsEntity());
+			$storage_repo->storeAction("create", "mvc", "actor_types", null, $type);
 
 			// @formatter:off
             $this->pdo->Insert("actor_types")
@@ -170,7 +170,7 @@ class ActorTypeRepository extends ARepository {
 			// store this action
 			$obj_orig = $this->get($type->id);
 			$storage_repo = App::getInstanceOf(ActionStorageRepository::class);
-			$storage_repo->storeAction("update", "mvc", "actor_types", $obj_orig->getAsEntity(), $type->getAsEntity());
+			$storage_repo->storeAction("update", "mvc", "actor_types", $obj_orig, $type);
 
 			// @formatter:off
             $this->pdo->Update("actor_types")
@@ -199,7 +199,7 @@ class ActorTypeRepository extends ARepository {
 		try {
 			// store this action
 			$storage_repo = App::getInstanceOf(ActionStorageRepository::class);
-			$storage_repo->storeAction("delete", "mvc", "actor_types", $type->getAsEntity(), null);
+			$storage_repo->storeAction("delete", "mvc", "actor_types", $type, null);
 
 			// @formatter:off
             $this->pdo->Delete("actor_types")

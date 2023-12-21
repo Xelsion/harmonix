@@ -1,0 +1,47 @@
+<?php
+
+global $lang;
+
+use lib\core\classes\TemplateData;
+use lib\helper\HtmlHelper;
+
+$config_data = TemplateData::get("config_data");
+?>
+<div class="container-fluid">
+	<h1>Configuration</h1>
+	<form method="post" action="/config">
+		<?php foreach( $config_data as $section => $entries ) { ?>
+			<h2>[<?= $section ?>]</h2>
+			<?php foreach( $entries as $name => $entry ) { ?>
+				<?php if( is_array($entry) ) { ?>
+					<?php foreach( $entry as $key => $value ) {
+						$field_name = "config[{$section}][{$name}][{$key}]";
+						?>
+						<div class="row">
+							<div class="col-2"><?= $name ?>[<?= $key ?>]</div>
+							<div class="col">
+								<?= HtmlHelper::getUserInputFor($field_name, $value) ?>
+							</div>
+						</div>
+					<?php } ?>
+					<br/>
+				<?php } else {
+					$field_name = "config[{$section}][{$name}]";
+					?>
+					<div class="row">
+						<div class="col-2"><?= $name ?></div>
+						<div class="col">
+							<?= HtmlHelper::getUserInputFor($field_name, $entry) ?>
+						</div>
+					</div>
+				<?php } ?>
+			<?php } ?>
+		<?php } ?>
+		<div class="row clearfix">
+			<div class="col"></div>
+			<div class="col-auto">
+				<button type="submit" name="save" class="button button-positiv">Speichern</button>
+			</div>
+		</div>
+	</form>
+</div>

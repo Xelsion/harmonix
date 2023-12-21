@@ -17,8 +17,6 @@ use repositories\ActorRoleRepository;
  */
 class ActorRoleModel extends ActorRole {
 
-	private readonly ActorRoleRepository $role_repository;
-
 	public static int $CAN_READ = 0b1000;
 
 	public static int $CAN_CREATE = 0b0100;
@@ -36,10 +34,10 @@ class ActorRoleModel extends ActorRole {
 	 * @throws SystemException
 	 */
 	public function __construct(int $id = 0) {
-		$this->role_repository = App::getInstanceOf(ActorRoleRepository::class);
 		if( $id > 0 ) {
 			try {
-				$role_data = $this->role_repository->getAsArray($id);
+				$actor_role_repo = App::getInstanceOf(ActorRoleRepository::class);
+				$role_data = $actor_role_repo->getAsArray($id);
 				if( !empty($role_data) ) {
 					$this->id = (int)$role_data["id"];
 					$this->child_of = (is_numeric($role_data["child_of"])) ? (int)$role_data["child_of"] : null;
@@ -57,22 +55,6 @@ class ActorRoleModel extends ActorRole {
 				throw new SystemException(__FILE__, __LINE__, $e->getMessage(), $e->getCode(), $e->getPrevious());
 			}
 		}
-	}
-
-	public function getAsEntity(): ActorRole {
-		$entity = new ActorRole();
-		$entity->id = $this->id;
-		$entity->child_of = $this->child_of;
-		$entity->name = $this->name;
-		$entity->rights_all = $this->rights_all;
-		$entity->rights_group = $this->rights_group;
-		$entity->rights_own = $this->rights_own;
-		$entity->is_default = $this->is_default;
-		$entity->is_protected = $this->is_protected;
-		$entity->created = $this->created;
-		$entity->updated = $this->updated;
-		$entity->deleted = $this->deleted;
-		return $entity;
 	}
 
 	/**
@@ -102,7 +84,7 @@ class ActorRoleModel extends ActorRole {
 	 */
 	public function getChildren(): array {
 		try {
-			return $this->role_repository->find([["child_of", "=", $this->id]]);
+			return App::getInstanceOf(ActorRoleRepository::class)->find([["child_of", "=", $this->id]]);
 		} catch( Exception $e ) {
 			throw new SystemException(__FILE__, __LINE__, $e->getMessage(), $e->getCode(), $e->getPrevious());
 		}
@@ -395,7 +377,6 @@ class ActorRoleModel extends ActorRole {
 	 * @throws SystemException
 	 */
 	public function getStringArray(): array {
-		global $lang;
 		$rights = array("all" => array(), "group" => array(), "own" => array(),);
 		if( $this->canCreateAll() ) {
 			$rights["all"][] = App::getInstanceOf(Language::class)->getValue("right-chars", "create");

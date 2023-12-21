@@ -16,8 +16,6 @@ use repositories\AccessRestrictionTypeRepository;
  */
 class AccessRestrictionTypeModel extends AccessRestrictionType {
 
-	private readonly AccessRestrictionTypeRepository $restriction_type_repository;
-
 	/**
 	 * The class constructor
 	 * If id is 0 it will return an empty actor
@@ -27,11 +25,10 @@ class AccessRestrictionTypeModel extends AccessRestrictionType {
 	 * @throws SystemException
 	 */
 	public function __construct(int $id = 0) {
-		$this->restriction_type_repository = App::getInstanceOf(AccessRestrictionTypeRepository::class);
-
 		if( $id > 0 ) {
 			try {
-				$restriction_type_data = $this->restriction_type_repository->getAsArray($id);
+				$access_restriction_repo = App::getInstanceOf(AccessRestrictionTypeRepository::class);
+				$restriction_type_data = $access_restriction_repo->getAsArray($id);
 				if( !empty($restriction_type_data) ) {
 					$this->id = (int)$restriction_type_data["id"];
 					$this->name = $restriction_type_data["name"];
@@ -46,24 +43,6 @@ class AccessRestrictionTypeModel extends AccessRestrictionType {
 				throw new SystemException(__FILE__, __LINE__, $e->getMessage(), $e->getCode(), $e->getPrevious());
 			}
 		}
-	}
-
-	/**
-	 * Returns this Model as Entity
-	 *
-	 * @return AccessRestrictionType
-	 */
-	public function getAsEntity(): AccessRestrictionType {
-		$entity = new AccessRestrictionType();
-		$entity->id = $this->id;
-		$entity->name = $this->name;
-		$entity->include_siblings = $this->include_siblings;
-		$entity->include_children = $this->include_children;
-		$entity->include_descendants = $this->include_descendants;
-		$entity->created = $this->created;
-		$entity->updated = $this->updated;
-		$entity->deleted = $this->deleted;
-		return $entity;
 	}
 
 }

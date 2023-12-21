@@ -81,7 +81,7 @@ class Logger extends File {
 		$this->file_path = $this->getLogPath($this->log_type);
 		$path_parts = pathinfo($this->file_path);
 		// Create all necessary folders
-		if( !file_exists($path_parts["dirname"]) && !mkdir($path_parts["dirname"], 0777, true) && !is_dir($path_parts["dirname"]) ) {
+		if( !file_exists($path_parts["dirname"]) && !mkdir($path_parts["dirname"], 0660, true) && !is_dir($path_parts["dirname"]) ) {
 			throw new SystemException(__FILE__, __LINE__, sprintf('Directory "%s" was not created', $path_parts["dirname"]));
 		}
 		return $this->append($log);

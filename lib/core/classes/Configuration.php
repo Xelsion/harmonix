@@ -1,5 +1,8 @@
 <?php
+
 namespace lib\core\classes;
+
+use lib\core\exceptions\SystemException;
 
 /**
  * The Configuration type setAsSingleton
@@ -10,6 +13,9 @@ namespace lib\core\classes;
  */
 class Configuration {
 
+	// The .ini file
+	private ?File $file = null;
+
 	// an array holding all configurations
 	private array $config;
 
@@ -18,8 +24,9 @@ class Configuration {
 	 * will be called once by the static method getInstanceOf()
 	 * Parses the {configuration}.ini
 	 */
-	public function __construct( string $file ) {
-		$this->config = parse_ini_file($file, true);
+	public function __construct(string $file) {
+		$this->file = new File($file);
+		$this->config = parse_ini_file($file, true, INI_SCANNER_TYPED);
 	}
 
 	/**
@@ -32,29 +39,97 @@ class Configuration {
 	}
 
 	/**
+	 * Sets the whole configuration with the given data
+	 *
+	 * @param array $config
+	 * @return void
+	 */
+	public function setConfig(array $config): void {
+		$this->config = [];
+		foreach( $config as $section => $entries ) {
+			foreach( $entries as $name => $entry ) {
+				if( is_array($entry) ) {
+					foreach( $entry as $key => $value ) {
+						if( $value === "true" ) {
+							$value = true;
+						} else if( $value === "false" ) {
+							$value = false;
+						}
+						$this->config[$section][$name][$key] = $value;
+					}
+				} else {
+					if( $entry === "true" ) {
+						$entry = true;
+					} else if( $entry === "false" ) {
+						$entry = false;
+					}
+					$this->config[$section][$name] = $entry;
+				}
+			}
+		}
+	}
+
+	/**
+	 * @return bool
+	 * @throws SystemException
+	 */
+	public function writeConfig(): bool {
+		$content = "";
+		foreach( $this->config as $section => $entries ) {
+			$content .= "[{$section}]\n";
+			foreach( $entries as $name => $values ) {
+				if( is_array($values) ) {
+					foreach( $values as $key => $value ) {
+						$value = $this->getFormattedWriteValue($value);
+						$content .= "{$name}[{$key}] = {$value};\n";
+					}
+					$content .= "\n";
+				} else {
+					$value = $this->getFormattedWriteValue($values);
+					$content .= "{$name} = {$value};\n";
+				}
+			}
+			$content .= "\n";
+		}
+		$this->file->setContent($content);
+		return $this->file->save();
+	}
+
+	/**
 	 * Returns a specific section of the configuration
 	 *
 	 * @param string $name
 	 * @return array
 	 */
-	public function getSection( string $name ): array {
+	public function getSection(string $name): array {
 		return $this->config[$name] ?? array();
 	}
 
-    /**
-     * Returns a specific value in a specific section
-     *
-     * @param string $name
-     * @param string $key
-     *
-     * @return mixed
-     */
-    public function getSectionValue( string $name, string $key): mixed {
-        $section = $this->getSection($name);
-        if( empty($section) || !array_key_exists($key, $section) ) {
-            return null;
-        }
-        return $section[$key];
-    }
+	/**
+	 * Returns a specific value in a specific section
+	 *
+	 * @param string $name
+	 * @param string $key
+	 *
+	 * @return mixed
+	 */
+	public function getSectionValue(string $name, string $key): mixed {
+		$section = $this->getSection($name);
+		if( empty($section) || !array_key_exists($key, $section) ) {
+			return null;
+		}
+		return $section[$key];
+	}
+
+
+	public function getFormattedWriteValue(mixed $value): mixed {
+		if( is_bool($value) ) {
+			return ($value) ? 'true' : 'false';
+		}
+		if( $value === "true" || $value === "false" || preg_match("/^[0-9|.]+$/", $value) ) {
+			return $value;
+		}
+		return '"' . $value . '"';
+	}
 
 }
