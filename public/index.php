@@ -11,6 +11,7 @@ ini_set('display_errors', 'off');
 
 use lib\App;
 use lib\core\blueprints\ALoggableException;
+use lib\core\classes\Configuration;
 use lib\core\classes\Logger;
 use lib\core\classes\Template;
 use lib\core\classes\TemplateData;
@@ -30,7 +31,7 @@ session_start();
 mb_detect_order(["UTF-8", "ISO-8859-1", "ASCII"]);
 
 $runtime_logger = new Logger("runtime");
-
+$config = new Configuration(PATH_ROOT . "application.ini");
 try {
 	// getActor output buffering and prevent all direct output
 	ob_start('ob_gzhandler');
@@ -47,10 +48,11 @@ try {
 	ob_end_flush();
 } catch( Exception $e ) {
 	try {
-		if( SHOW_ERRORS ) {
+		$environment = $config->getSectionValue("system", "environment");
+		if( $config->getSectionValue($environment, "show_errors") ) {
 			$view = new Template(PATH_VIEWS_ROOT . "exception.html");
 			TemplateData::set("error", $e);
-			echo $view->parse();
+			echo $view->render();
 		} else {
 			echo "An error occur: Please check the Log Files for more information";
 		}
@@ -64,4 +66,7 @@ try {
 	} catch( Exception $e ) {
 		die($e->getMessage());
 	}
+} finally {
+	exit(0);
 }
+

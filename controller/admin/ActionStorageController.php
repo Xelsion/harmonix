@@ -68,10 +68,10 @@ class ActionStorageController extends AController {
 		TemplateData::set("actor_list", App::getInstanceOf(ActorRepository::class)->find());
 
 		$view = new Template(PATH_VIEWS . "action_storage/index.html");
-		TemplateData::set("view", $view->parse());
+		TemplateData::set("view", $view->render());
 
 		$template = new Template(PATH_VIEWS . "template.html");
-		return new HtmlResponse($template->parse());
+		return new HtmlResponse($template->render());
 	}
 
 	/**

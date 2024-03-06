@@ -22,6 +22,8 @@ class SessionModel extends Session {
 
 	public bool $_rotate_session = false;
 
+	public bool $use_cookies = false;
+
 	// Defines if the cookie will be encrypted or not
 	public bool $encryption = false;
 
@@ -54,8 +56,9 @@ class SessionModel extends Session {
 	 * @throws SystemException
 	 */
 	public function __construct(Configuration $config) {
-		$cookie_settings = $config->getSection("cookie");
+		$cookie_settings = $config->getSection("session");
 		$rotate_session = $config->getSectionValue("security", "rotate_session");
+		$this->use_cookies = (bool)$config->getSectionValue("session", "use_cookies");
 		if( !is_null($rotate_session) ) {
 			$this->_rotate_session = (bool)$rotate_session;
 		}
@@ -124,7 +127,11 @@ class SessionModel extends Session {
 				$this->expired = $date_time->format("Y-m-d H:i:s");
 				$actor = App::getInstanceOf(ActorModel::class, null, ["id" => $this->actor_id]);
 				$mvc_repo->updateSession($this);
-				$this->writeCookie();
+				if( $this->use_cookies ) {
+					$this->writeCookie();
+				} else {
+					$this->writeSession();
+				}
 			}
 			return $actor;
 		} catch( Exception $e ) {
@@ -160,8 +167,11 @@ class SessionModel extends Session {
 				$this->ip = $_SERVER["REMOTE_ADDR"];
 				$this->expired = $date_time->format("Y-m-d H:i:s");
 				$mvc_repo->createSession($this);
-
-				$this->writeCookie();
+				if( $this->use_cookies ) {
+					$this->writeCookie();
+				} else {
+					$this->writeSession();
+				}
 				return true;
 			}
 			$this->error = "E-Mail/Password is incorrect!";
@@ -184,9 +194,13 @@ class SessionModel extends Session {
 			if( $this->as_actor > 0 ) {
 				$this->as_actor = 0;
 				$mvc_repo->updateSession($this);
-				$this->writeCookie();
-			} else {
-				$session_id = ($this->encryption) ? StringHelper::decrypt($_COOKIE[$this->cookie_name]) : $_COOKIE[$this->cookie_name];
+				if( $this->use_cookies ) {
+					$this->writeCookie();
+				} else {
+					$this->writeSession();
+				}
+			} else if( $this->use_cookies ) {
+				$session_id = ($this->encryption) ? StringHelper::decrypt($_COOKIE[$this->cookie_name], session_id()) : $_COOKIE[$this->cookie_name];
 				if( isset($_COOKIE[$this->cookie_name]) && $session_id === $this->id ) {
 					$date_time = new DateTime();
 					$date_time->setTimestamp(time() - 3600);
@@ -194,6 +208,11 @@ class SessionModel extends Session {
 					$this->actor_id = 0;
 					$this->expired = $date_time->format('Y-m-d H:i:s');
 					$this->writeCookie();
+				}
+			} else {
+				$session_id = ($this->encryption) ? StringHelper::decrypt($_SESSION[$this->cookie_name], session_id()) : $_SESSION[$this->cookie_name];
+				if( isset($_SESSION[$this->cookie_name]) && $session_id === $this->id ) {
+					unset($_SESSION[$this->cookie_name]);
 				}
 			}
 			redirect("/");
@@ -219,6 +238,16 @@ class SessionModel extends Session {
 			'samesite' => $this->cookie_same_site
 		);
 		setcookie($this->cookie_name, $session_id, $cookie_options);
+	}
+
+	/**
+	 * Writes the current session from the browser
+	 * @return void
+	 * @throws SystemException
+	 */
+	public function writeSession(): void {
+		$session_id = ($this->encryption) ? StringHelper::encrypt($this->id, session_id()) : $this->id;
+		$_SESSION[$this->cookie_name] = $session_id;
 	}
 
 	/**

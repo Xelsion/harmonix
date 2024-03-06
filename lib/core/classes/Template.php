@@ -44,7 +44,7 @@ class Template extends TemplateData {
 	 *
 	 * @return string
 	 */
-	public function parse(): string {
+	public function render(): string {
 		ob_start();
 		require($this->file_path);
 		return ob_get_clean();

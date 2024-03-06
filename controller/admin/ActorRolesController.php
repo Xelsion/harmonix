@@ -51,9 +51,9 @@ class ActorRolesController extends AController {
 		TemplateData::set("role_tree", $actor_roles_tree);
 
 		$template = new Template(PATH_VIEWS . "template.html");
-		TemplateData::set("view", $view->parse());
+		TemplateData::set("view", $view->render());
 
-		return new HtmlResponse($template->parse());
+		return new HtmlResponse($template->render());
 	}
 
 	/**
@@ -67,9 +67,9 @@ class ActorRolesController extends AController {
 		TemplateData::set("option_list", $this->role_repository->getAll());
 
 		$template = new Template(PATH_VIEWS . "template.html");
-		TemplateData::set("view", $view->parse());
+		TemplateData::set("view", $view->render());
 
-		$content = $template->parse();
+		$content = $template->render();
 		return new HtmlResponse($content);
 	}
 
@@ -115,9 +115,9 @@ class ActorRolesController extends AController {
 		TemplateData::set("option_list", $this->role_repository->find(array(["id", "!=", $role->id])));
 
 		$template = new Template(PATH_VIEWS . "template.html");
-		TemplateData::set("view", $view->parse());
+		TemplateData::set("view", $view->render());
 
-		$content = $template->parse();
+		$content = $template->render();
 		return new HTMLResponse($content);
 	}
 

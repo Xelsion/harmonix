@@ -13,17 +13,17 @@ $actor = TemplateData::get('actor');
 $snippet = new Template(PATH_VIEWS . "snippets/access_permission.html");
 ?>
 <div class="container-fluid">
-    <h1>Benutzer Rollen f&uuml;r: <?= $actor->first_name . " " . $actor->last_name ?></h1>
-    <form action="/actors/roles/<?= $actor->id ?>" method="POST" class="needs-validation" style="width: 80%;" novalidate>
+	<h1>Benutzer Rollen f&uuml;r: <?= $actor->first_name . " " . $actor->last_name ?></h1>
+	<form action="/actors/roles/<?= $actor->id ?>" method="POST" class="needs-validation" style="width: 80%;" novalidate>
 		<?= HtmlHelper::generateFormToken() ?>
-		<?= $snippet->parse() ?>
-        <div class="row clearfix">
-            <div class="col-md">
-                <a href="/actors" class="button button-default float-start"><?= $lang->getValue("translations", "cancel") ?></a>
-            </div>
-            <div class="col-md">
-                <button type="submit" name="update" class="button button-positiv float-end"><?= $lang->getValue("translations", "save") ?></button>
-            </div>
-        </div>
-    </form>
+		<?= $snippet->render() ?>
+		<div class="row clearfix">
+			<div class="col-md">
+				<a href="/actors" class="button button-default float-start"><?= $lang->getValue("translations", "cancel") ?></a>
+			</div>
+			<div class="col-md">
+				<button type="submit" name="update" class="button button-positiv float-end"><?= $lang->getValue("translations", "save") ?></button>
+			</div>
+		</div>
+	</form>
 </div>

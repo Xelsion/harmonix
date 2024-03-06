@@ -9,8 +9,8 @@ use lib\core\ConnectionManager;
 use lib\core\exceptions\SystemException;
 
 /**
- * The Configuration type setAsSingleton
- * Collect all the configurations and stores them in an array
+ * The GarbageCollector
+ * Deletes outdated and unnecessary data from the database
  *
  * @author Markus Schröder <xelsion@gmail.com>
  * @version 1.0.0;

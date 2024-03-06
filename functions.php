@@ -1,6 +1,6 @@
 <?php
 
-use lib\helper\StringHelper;
+use JetBrains\PhpStorm\NoReturn;
 
 /**
  * The class autoloader function
@@ -17,40 +17,32 @@ spl_autoload_register(static function($class_name) {
 }, true, true);
 
 /**
- * Generates a token and saves it into the session
- * returns a hidden form field with the token to match it later
+ * Returns the directory path of the given namespace
  *
- * @return string
- */
-function createCsrfToken(): string {
-	$token = StringHelper::getGuID();
-	$_SESSION['csrf_token'] = $token;
-	return '<input type="hidden" name="csrf_token" value="' . $token . '" />';
-}
-
-/**
  * @param string $namespace
  * @return string
  */
 function Namespace2Path(string $namespace): string {
 	if( DIRECTORY_SEPARATOR === "/" ) {
-		$namespace = str_replace("\\", DIRECTORY_SEPARATOR, $namespace);
+		$path = str_replace("\\", DIRECTORY_SEPARATOR, $namespace);
 	} else {
-		$namespace = str_replace("/", DIRECTORY_SEPARATOR, $namespace);
+		$path = str_replace("/", DIRECTORY_SEPARATOR, $namespace);
 	}
-	return $namespace;
+	return $path;
 }
 
 /**
+ * Returns the namespace of the given path
+ *
  * @param string $path
  * @return string
  */
 function Path2Namespace(string $path): string {
-	$path = str_replace(array(".." . DIRECTORY_SEPARATOR, ".php"), "", $path);
+	$namespace = str_replace(array(".." . DIRECTORY_SEPARATOR, ".php"), "", $path);
 	if( DIRECTORY_SEPARATOR === "/" ) {
-		$path = str_replace("/", "\\", $path);
+		$namespace = str_replace("/", "\\", $namespace);
 	}
-	return $path;
+	return $namespace;
 }
 
 /**
@@ -104,14 +96,16 @@ function valuesAreIdentical(mixed $value1, mixed $value2): bool {
  * @param string $url
  * @return void
  */
+#[NoReturn]
 function redirect(string $url): void {
 	header("Location: https://" . $_SERVER["HTTP_HOST"] . $url);
-	die();
+	exit(0);
 }
 
 /**
  * @param $message
  * @return void
+ * @noinspection ForgottenDebugOutputInspection
  */
 function print_debug($message): void {
 	if( $message === null ) {

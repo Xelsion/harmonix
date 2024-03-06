@@ -40,56 +40,51 @@ class Logger extends File {
 	 *
 	 * @throws \lib\core\exceptions\SystemException
 	 */
-	public function log(string $file, int $line, string $message, array $backtrace = array()): bool {
-		$ts = new DateTime();
-		// Crate the log string
-		$log = sprintf("[%s] %s\n", $ts->format("H:i:s"), $message);
-		$log .= sprintf("\t=>\tFile: %s [Line %d]\n", $file, $line);
-		if( !empty($backtrace) ) {
-			foreach( $backtrace as $trace ) {
-				$args = array();
-				// Go through all arguments and getInstanceOf a representable string for it
-				if( isset($trace["args"]) ) {
-					foreach( $trace["args"] as $arg ) {
-						if( is_object($arg) ) {
-							$args[] = get_class($arg);
-						} else {
-							$args[] = $arg;
+	public function log(string $file_name, int $line_nr, string $message, array $backtrace = array()): bool {
+		try {
+			$ts = new DateTime();
+			// Crate the log string
+			$log = sprintf("[%s] %s\n", $ts->format("H:i:s"), $message);
+			$log .= sprintf("\t=>\tFile: %s [Line %d]\n", $file_name, $line_nr);
+			if( !empty($backtrace) ) {
+				foreach( $backtrace as $trace ) {
+					$args = array();
+					// Go through all arguments and getInstanceOf a representable string for it
+					if( isset($trace["args"]) ) {
+						foreach( $trace["args"] as $arg ) {
+							if( is_object($arg) ) {
+								$args[] = get_class($arg);
+							} else {
+								$args[] = $arg;
+							}
 						}
 					}
-				}
-				$string_args = "";
-				if( !empty($args) ) {
-					try {
+					$string_args = "";
+					if( !empty($args) ) {
 						$string_args = json_encode($args, JSON_THROW_ON_ERROR);
 						$string_args = str_replace("\\\\", "\\", $string_args);
-					} catch( Exception $e ) {
-						throw new SystemException(__FILE__, __LINE__, "can't encode JSON data", $e->getCode(), $e->getPrevious());
 					}
-
+					// Add the trace to the log string
+					$class = $trace['class'] ?? '';
+					$type = $trace['type'] ?? '';
+					$function = $trace['function'] ?? '';
+					$line = (isset($trace['line'])) ? (int)$trace['line'] : 0;
+					$log .= sprintf("\t=>\tTrace: %s%s%s(%s) [Line %d]\n", $class, $type, $function, $string_args, $line);
 				}
-				// Add the trace to the log string
-				$class = $trace['class'] ?? '';
-				$type = $trace['type'] ?? '';
-				$function = $trace['function'] ?? '';
-				$line = (isset($trace['line'])) ? (int)$trace['line'] : 0;
-				$log .= sprintf("\t=>\tTrace: %s%s%s(%s) [Line %d]\n", $class, $type, $function, $string_args, $line);
 			}
-		}
 
-		// Sets the actual file path
-		$this->file_path = $this->getLogPath($this->log_type);
-		$path_parts = pathinfo($this->file_path);
-		// Create all necessary folders
-		if( !file_exists($path_parts["dirname"]) && !mkdir($path_parts["dirname"], 0660, true) && !is_dir($path_parts["dirname"]) ) {
-			throw new SystemException(__FILE__, __LINE__, sprintf('Directory "%s" was not created', $path_parts["dirname"]));
+			// Sets the actual file path
+			$this->file_path = $this->getLogPath($this->log_type);
+			return $this->append($log);
+		} catch( Exception $e ) {
+			throw new SystemException(__FILE__, __LINE__, "Logger: Can't encode JSON data", $e->getCode(), $e->getPrevious());
 		}
-		return $this->append($log);
 	}
 
 	/**
 	 * Returns the path with a formatted file name
-	 * folder structure: {log directory}/{year}/{month_name}/{day-weekday}_{file name from constructor}
+	 * folder structure: logs/{log directory}/{year}/{month_name}/{day-weekday}.log
+	 * e.g. logs/debug/2022/august/12-Mon.log
 	 *
 	 * @param string $log_type
 	 * @return string

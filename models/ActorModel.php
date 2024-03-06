@@ -43,6 +43,7 @@ class ActorModel extends Actor {
 					$this->first_name = $actor_data["first_name"];
 					$this->last_name = $actor_data["last_name"];
 					$this->email = $actor_data["email"];
+					$this->email_verified = (bool)$actor_data["email_verified"];
 					$this->password = $actor_data["password"];
 					$this->login_fails = (int)$actor_data["login_fails"];
 					$this->login_disabled = (bool)$actor_data["login_disabled"];

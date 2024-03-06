@@ -1,4 +1,5 @@
 <?php
+
 namespace lib\core\classes;
 
 /**
@@ -10,34 +11,34 @@ namespace lib\core\classes;
  */
 class Analyser extends StopWatch {
 
-    /* The timers */
-    private array $entries = [];
+	/* The timers */
+	private array $entries = [];
 
-    /**
-     * Adds a time for the given key with the given label
-     *
-     * @param string $info
-     * @return Analyser
-     */
-    public function add(string $info): Analyser {
-        if( $this->is_running ) {
-            $this->stop();
-        }
-        $this->entries[] = [
-            "time" => $this->getMeasuredTime()->format("ms", 4),
-            "info" => $info,
-            "backtrace" => debug_backtrace()
-        ];
-        return $this;
-    }
+	/**
+	 * Adds a time for the given key with the given label
+	 *
+	 * @param string $info
+	 * @return Analyser
+	 */
+	public function add(string $info): Analyser {
+		if( $this->is_running ) {
+			$this->stop();
+		}
+		$this->entries[] = [
+			"time"      => $this->getLastMeasuredTime()->format("ms", 4),
+			"info"      => $info,
+			"backtrace" => debug_backtrace()
+		];
+		return $this;
+	}
 
-    /**
-     * Returns the entries
-     *
-     * @return array
-     */
-    public function getEntries(): array {
-        return $this->entries;
-    }
+	/**
+	 * Returns the entries
+	 *
+	 * @return array
+	 */
+	public function getEntries(): array {
+		return $this->entries;
+	}
 
 }

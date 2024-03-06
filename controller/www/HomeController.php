@@ -30,9 +30,9 @@ class HomeController extends AController {
 		$view = new Template(PATH_VIEWS . "home/index.html");
 		TemplateData::set("test", "hallo");
 		$template = new Template(PATH_VIEWS . "template.html");
-		TemplateData::set("view", $view->parse());
+		TemplateData::set("view", $view->render());
 
-		return new HtmlResponse($template->parse());
+		return new HtmlResponse($template->render());
 	}
 
 }

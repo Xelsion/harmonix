@@ -12,94 +12,94 @@ $actor_list = TemplateData::get("actor_list");
 $pagination = TemplateData::get("pagination");
 ?>
 <div class="container-fluid">
-    <h1>Benutzer</h1>
-    <form action="/actors/search" method="POST">
+	<h1>Benutzer</h1>
+	<form action="/actors/search" method="POST">
 		<?= HtmlHelper::generateFormToken() ?>
-        <div class="row">
-            <div class="col text-end pt-2"><label for="search-field">Suchbegriff</label></div>
-            <div class="col-3"><input id="search-field" type="text" name="search_string" value=""/></div>
-            <div class="col-auto">
-                <input type="submit" name="" value="<?= $lang->getValue("translations", "search") ?>" class="button button-default"/>
-            </div>
-        </div>
-    </form>
-    <table class="table table-dark table-striped">
-        <tr>
-            <th>ID</th>
-            <th class="col-md-2">E-Mail</th>
-            <th>Vorname</th>
-            <th>Nachname</th>
-            <th class="col-md-3 text-end">Optionen</th>
-        </tr>
+		<div class="row">
+			<div class="col text-end pt-2"><label for="search-field">Suchbegriff</label></div>
+			<div class="col-3"><input id="search-field" type="text" name="search_string" value=""/></div>
+			<div class="col-auto">
+				<input type="submit" name="" value="<?= $lang->getValue("translations", "search") ?>" class="button button-default"/>
+			</div>
+		</div>
+	</form>
+	<table class="table table-dark table-striped">
+		<tr>
+			<th>ID</th>
+			<th class="col-md-2">E-Mail</th>
+			<th>Vorname</th>
+			<th>Nachname</th>
+			<th class="col-md-3 text-end">Optionen</th>
+		</tr>
 		<?php foreach( $actor_list as $actor ):
 			$row_style = ($actor->deleted === NULL) ? '' : ' style="color: #cc3737; text-decoration: line-through;"'
 			?>
-            <tr>
-                <td class="align-middle"<?= $row_style ?>><?= escaped_string($actor->id) ?></td>
-                <td class="align-middle"<?= $row_style ?>><?= escaped_string($actor->email) ?></td>
-                <td class="align-middle"<?= $row_style ?>><?= escaped_string($actor->first_name) ?></td>
-                <td class="align-middle"<?= $row_style ?>><?= escaped_string($actor->last_name) ?></td>
-                <td class="text-nowrap align-middle text-end">
-                    <form action="https://www.harmonix.de" target="_blank" method="POST" class="minimized">
-                        <input type="hidden" name="actor_id" value="<?= $actor->id ?>"/>
-                        <button type="submit" name="login_as" class="button button-default"><?= $lang->getValue("phrases", "login_as") ?></button>
-                    </form>
-                    <a href="/actors/roles/<?= $actor->id ?>" class="button button-default"><?= $lang->getValue("translations", "roles") ?></a>
-                    <a href="/actors/<?= $actor->id ?>" class="button button-default"><?= $lang->getValue("translations", "edit") ?></a>
+			<tr>
+				<td class="align-middle"<?= $row_style ?>><?= escaped_string($actor->id) ?></td>
+				<td class="align-middle"<?= $row_style ?>><?= escaped_string($actor->email) ?><?= ($actor->email_verified) ? ' &#10004;' : '' ?></td>
+				<td class="align-middle"<?= $row_style ?>><?= escaped_string($actor->first_name) ?></td>
+				<td class="align-middle"<?= $row_style ?>><?= escaped_string($actor->last_name) ?></td>
+				<td class="text-nowrap align-middle text-end">
+					<form action="https://www.harmonix.de" target="_blank" method="POST" class="minimized">
+						<input type="hidden" name="actor_id" value="<?= $actor->id ?>"/>
+						<button type="submit" name="login_as" class="button button-default"><?= $lang->getValue("phrases", "login_as") ?></button>
+					</form>
+					<a href="/actors/roles/<?= $actor->id ?>" class="button button-default"><?= $lang->getValue("translations", "roles") ?></a>
+					<a href="/actors/<?= $actor->id ?>" class="button button-default"><?= $lang->getValue("translations", "edit") ?></a>
 					<?php if( $actor->deleted === null ) { ?>
-                        <button class="button button-negativ" onclick="$('#delete-target').attr('action', '/actors/delete/<?= $actor->id ?>')" data-bs-toggle="modal" data-bs-target="#confirm-delete"><?= $lang->getValue("translations", "deactivate") ?></button>
+						<button class="button button-negativ" onclick="$('#delete-target').attr('action', '/actors/delete/<?= $actor->id ?>')" data-bs-toggle="modal" data-bs-target="#confirm-delete"><?= $lang->getValue("translations", "deactivate") ?></button>
 					<?php } else { ?>
-                        <button class="button button-positiv" onclick="$('#undelete-target').attr('action', '/actors/undelete/<?= $actor->id ?>')" data-bs-toggle="modal" data-bs-target="#confirm-undelete"><?= $lang->getValue("translations", "activate") ?></button>
+						<button class="button button-positiv" onclick="$('#undelete-target').attr('action', '/actors/undelete/<?= $actor->id ?>')" data-bs-toggle="modal" data-bs-target="#confirm-undelete"><?= $lang->getValue("translations", "activate") ?></button>
 					<?php } ?>
 
-                </td>
-            </tr>
+				</td>
+			</tr>
 		<?php endforeach; ?>
-    </table>
-    <form action="/actors" method="POST" style="padding-bottom: 15px;">
+	</table>
+	<form action="/actors" method="POST" style="padding-bottom: 15px;">
 		<?= HtmlHelper::generateFormToken() ?>
 		<?= $pagination ?>
-    </form>
+	</form>
 </div>
 
 <div class="modal fade" id="confirm-delete" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h1 class="modal-title fs-5" id="exampleModalLabel">Achtung!!!</h1>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                Soll dieser Actor wieder deaktiviert werden?
-            </div>
-            <div class="modal-footer">
-                <form id="delete-target" action="" method="POST" style="background-color: transparent;">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h1 class="modal-title fs-5" id="exampleModalLabel">Achtung!!!</h1>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body">
+				Soll dieser Actor wieder deaktiviert werden?
+			</div>
+			<div class="modal-footer">
+				<form id="delete-target" action="" method="POST" style="background-color: transparent;">
 					<?= RequestMethod::DELETE->toInputString() ?>
-                    <button type="button" class="button button-default float-left" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" class="button button-negativ float-right">Deaktivieren</button>
-                </form>
-            </div>
-        </div>
-    </div>
+					<button type="button" class="button button-default float-left" data-bs-dismiss="modal">Close</button>
+					<button type="submit" class="button button-negativ float-right">Deaktivieren</button>
+				</form>
+			</div>
+		</div>
+	</div>
 </div>
 
 <div class="modal fade" id="confirm-undelete" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h1 class="modal-title fs-5" id="exampleModalLabel">Achtung!!!</h1>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                Soll dieser Actor wieder aktiviert werden?
-            </div>
-            <div class="modal-footer">
-                <form id="undelete-target" action="" method="POST" style="background-color: transparent;">
-                    <button type="button" class="button button-default float-left" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" class="button button-positiv float-right">aktivieren</button>
-                </form>
-            </div>
-        </div>
-    </div>
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h1 class="modal-title fs-5" id="exampleModalLabel">Achtung!!!</h1>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body">
+				Soll dieser Actor wieder aktiviert werden?
+			</div>
+			<div class="modal-footer">
+				<form id="undelete-target" action="" method="POST" style="background-color: transparent;">
+					<button type="button" class="button button-default float-left" data-bs-dismiss="modal">Close</button>
+					<button type="submit" class="button button-positiv float-right">aktivieren</button>
+				</form>
+			</div>
+		</div>
+	</div>
 </div>
 

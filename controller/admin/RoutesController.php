@@ -33,10 +33,10 @@ class RoutesController extends AController {
 		TemplateData::set("conflicts", $linq_list);
 
 		$template = new Template(PATH_VIEWS . "template.html");
-		TemplateData::set("view", $view->parse());
+		TemplateData::set("view", $view->render());
 
-		$content = $template->parse();
+		$content = $template->render();
 		return new HtmlResponse($content);
 	}
-	
+
 }

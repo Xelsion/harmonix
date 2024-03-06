@@ -9,7 +9,7 @@ use lib\core\exceptions\SystemException;
 use Traversable;
 
 /**
- * The LinqList class
+ * The Enumerable class
  *
  * @author Markus Schröder <xelsion@gmail.com>
  * @version 1.0.0;
@@ -72,6 +72,7 @@ class Enumerable implements IteratorAggregate {
 	public function hasNext(): bool {
 		return $this->iterator->valid();
 	}
+
 
 	/**
 	 * Return if the given entry is in the list or not

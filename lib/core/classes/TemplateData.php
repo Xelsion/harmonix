@@ -113,7 +113,7 @@ class TemplateData {
 		$system_message = new Template(PATH_VIEWS_ROOT . "snippets/system_message.html");
 		self::set("system_message_type", $type->toString());
 		self::set("system_message", $message);
-		static::$system_message = $system_message->parse();
+		static::$system_message = $system_message->render();
 	}
 
 	/**

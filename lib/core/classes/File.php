@@ -36,7 +36,6 @@ class File {
 	 */
 	public function __construct(string $file_path = "") {
 		if( $file_path !== "" && file_exists($file_path) ) {
-
 			$this->file_path = $file_path;
 			$this->file_name = basename($file_path);
 			if( function_exists("mime_content_type") && is_callable("mime_content_type") ) {
@@ -95,24 +94,6 @@ class File {
 	}
 
 	/**
-	 * Adds the given $content to the end of the files content.
-	 * Return true if successful and false if not
-	 *
-	 * @param string $content
-	 * @return bool
-	 * @throws SystemException
-	 */
-	public function append(string $content): bool {
-		$path_parts = pathinfo($this->file_path);
-		// Create all necessary folders
-		if( !file_exists($path_parts["dirname"]) && !mkdir($path_parts["dirname"], 0777, true) && !is_dir($path_parts["dirname"]) ) {
-			throw new SystemException(__FILE__, __LINE__, sprintf('Directory "%s" was not created', $path_parts["dirname"]));
-		}
-
-		return file_put_contents($this->file_path, $content, FILE_APPEND);
-	}
-
-	/**
 	 * writes the current content to the current file.
 	 * Return true if successful and false if not
 	 *
@@ -121,23 +102,8 @@ class File {
 	 */
 	public function save(): bool {
 		$path_parts = pathinfo($this->file_path);
-		// Create all necessary folders
-		if( !file_exists($path_parts["dirname"]) && !mkdir($path_parts["dirname"], 0777, true) && !is_dir($path_parts["dirname"]) ) {
-			throw new SystemException(__FILE__, __LINE__, sprintf('Directory "%s" was not created', $path_parts["dirname"]));
-		}
-
+		$this->createIfNotExists($path_parts["dirname"]);
 		return file_put_contents($this->file_path, $this->file_content);
-	}
-
-	/**
-	 * Deletes the current file from the disc
-	 *
-	 * @return void
-	 */
-	public function delete(): void {
-		if( file_exists($this->file_path) ) {
-			unlink($this->file_path);
-		}
 	}
 
 	/**
@@ -150,12 +116,33 @@ class File {
 	 */
 	public function saveAs(string $file_path): bool {
 		$path_parts = pathinfo($file_path);
-		// Create all necessary folders
-		if( !file_exists($path_parts["dirname"]) && !mkdir($path_parts["dirname"], 0777, true) && !is_dir($path_parts["dirname"]) ) {
-			throw new SystemException(__FILE__, __LINE__, sprintf('Directory "%s" was not created', $path_parts["dirname"]));
-		}
-
+		$this->createIfNotExists($path_parts["dirname"]);
 		return file_put_contents($file_path, $this->file_content);
+	}
+
+	/**
+	 * Adds the given $content to the end of the files content.
+	 * Return true if successful and false if not
+	 *
+	 * @param string $content
+	 * @return bool
+	 * @throws SystemException
+	 */
+	public function append(string $content): bool {
+		$path_parts = pathinfo($this->file_path);
+		$this->createIfNotExists($path_parts["dirname"]);
+		return file_put_contents($this->file_path, $content, FILE_APPEND);
+	}
+
+	/**
+	 * Deletes the current file from the disc
+	 *
+	 * @return void
+	 */
+	public function delete(): void {
+		if( file_exists($this->file_path) ) {
+			unlink($this->file_path);
+		}
 	}
 
 	/**
@@ -214,8 +201,8 @@ class File {
 		if( function_exists("mime_content_type") && is_callable("mime_content_type") ) {
 			$mime_type = mime_content_type($file_path);
 		} else if( function_exists("finfo_open") && is_callable("finfo_open") ) {
-			$finfo = finfo_open(FILEINFO_MIME_TYPE);
-			$mime_type = finfo_file($finfo, $file_path);
+			$file_info = finfo_open(FILEINFO_MIME_TYPE);
+			$mime_type = finfo_file($file_info, $file_path);
 		}
 		return $mime_type;
 	}
@@ -240,6 +227,19 @@ class File {
 	 */
 	private function isBase64(string $content): bool {
 		return (base64_encode(base64_decode($content, true)) === $content);
+	}
+
+	/**
+	 * Creates all directories in the given path if not exists
+	 *
+	 * @param string $path
+	 * @return void
+	 * @throws SystemException
+	 */
+	public function createIfNotExists(string $path): void {
+		if( !file_exists($path) && !mkdir($path, 0660, true) && !is_dir($path) ) {
+			throw new SystemException(__FILE__, __LINE__, sprintf("Cant create Directory '%s'", $path));
+		}
 	}
 
 }

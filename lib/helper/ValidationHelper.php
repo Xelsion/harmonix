@@ -5,10 +5,19 @@ namespace lib\helper;
 use lib\App;
 
 class ValidationHelper {
-	private const regex_street = '/^[a-zA-Z|ÖÜÄöäüß]+([\s|-]?[A-Za-z|ÖÜÄöäüß]+)*\.?$/u';
+
+	private const regex_street = '/^\d*[a-zA-Z|ÖÜÄöäüß]+([\s|-]?[A-Za-z|ÖÜÄöäüß]+)*\.?$/u';
 	private const regex_street_nr = '/^\d+[a-z]?\s?(-\s?\d+[a-z]?)?$/';
+	private const regex_street_complete = '/^\d*[a-zA-Z|ÖÜÄöäüß]+([\s|-]?[A-Za-z|ÖÜÄöäüß]+)*\.?\s\d+[a-z]?\s?(-\s?\d+[a-z]?)?$/u';
 	private const regex_zipcode = '/^\d{5}$/';
 	private const regex_city = '/^[a-zA-Z|ÖÄÜöäüß]+([\s|-]?[A-Za-z|ÖÜÄöäüß]+)*$/u';
+	private const regex_phone_county_code = '/^\+\d{1,3}$/';
+	private const regex_phone_city_code = '/^(\(\d{2,5}\)|-?\d{2,5})$/';
+	private const regex_phone_number = '/^-?\d{3,9}(-\d{1,5})?$/';
+	private const regex_phone_complete = '/^\+\d{1,3}\s?(\(\d{2,5}\)|-?\d{2,5})\s?-?\d{3,9}(-\d{1,5})?$/';
+	private const regex_mobil_prefix = '/^\d{3,5}$/';
+	private const regex_mobil_number = '/^\d{3,9}$/';
+	private const regex_mobil_complete = '/^\d{3,5}\s\d{3,9}$/';
 
 	public static function isValidEmail(string $value): bool {
 		return filter_var($value, FILTER_VALIDATE_EMAIL);
@@ -20,6 +29,14 @@ class ValidationHelper {
 
 	public static function isValidInteger(string $value): bool {
 		return filter_var($value, FILTER_VALIDATE_INT);
+	}
+
+	public static function isValidBoolean(string $value): bool {
+		return filter_var($value, FILTER_VALIDATE_BOOL);
+	}
+
+	public static function isValidStreetComplete(string $value): bool {
+		return (bool)preg_match(self::regex_street_complete, $value);
 	}
 
 	public static function isValidStreet(string $value): bool {
@@ -36,6 +53,34 @@ class ValidationHelper {
 
 	public static function isValidCity(string $value): bool {
 		return (bool)preg_match(self::regex_city, $value);
+	}
+
+	public static function isValidPhoneCountryCode(string $value): bool {
+		return (bool)preg_match(self::regex_phone_county_code, $value);
+	}
+
+	public static function isValidPhoneCityCode(string $value): bool {
+		return (bool)preg_match(self::regex_phone_city_code, $value);
+	}
+
+	public static function isValidPhoneNumber(string $value): bool {
+		return (bool)preg_match(self::regex_phone_number, $value);
+	}
+
+	public static function isValidPhoneComplete(string $value): bool {
+		return (bool)preg_match(self::regex_phone_complete, $value);
+	}
+
+	public static function isValidMobilPrefix(string $value): bool {
+		return (bool)preg_match(self::regex_mobil_prefix, $value);
+	}
+
+	public static function isValidMobilNumber(string $value): bool {
+		return (bool)preg_match(self::regex_mobil_number, $value);
+	}
+
+	public static function isValidMobilComplete(string $value): bool {
+		return (bool)preg_match(self::regex_mobil_complete, $value);
 	}
 
 	public static function isValidPassword(string $value): bool {

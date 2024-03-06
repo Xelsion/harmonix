@@ -17,7 +17,11 @@ class StringHelper {
 	private static string $allowed_password_characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ123456789-_$!%@#&=?";
 	private static string $enc_key = 'Q#?9Q=M-&m$@o>>7\ZC$:~?:oRx%@uubnH>YrNwLjt,ieoLK;Mw%,xn2NPhs*c2<>SZQV&NbQA5W_vN;p=UVVd^vHWK&e`;xp9Mpr`azgvUXPph~Zd*2Eh/zx-5,dMmm';
 	private static string $enc_ciphering = "AES-128-CTR";
-	private static string $enc_iv = '5657372598585078';
+	private static string $enc_iv = '5653179598585278';
+
+	private static string $enc_hash_algo = "sha256";
+	private static int $enc_hash_length = 32;
+	private static int $enc_option = OPENSSL_RAW_DATA;
 
 	/**
 	 * Shortens the given string to the given length
@@ -190,20 +194,24 @@ class StringHelper {
 	 * Encrypts a string and returns the encrypted string
 	 *
 	 * @param string $string
-	 *
+	 * @param string $salt
 	 * @return string
+	 * @throws SystemException
 	 */
-	public static function encrypt(string $string): string {
-		if( function_exists('openssl_get_cipher_methods') ) {
-			$ciphers = openssl_get_cipher_methods(true);
+	public static function encrypt(string $string, string $salt = ""): string {
+		try {
+			if( function_exists('openssl_cipher_iv_length') && is_callable('openssl_cipher_iv_length') ) {
+				$enc_key = self::$enc_key . $salt;
+				$iv_length = openssl_cipher_iv_length(self::$enc_ciphering);
+				$iv = random_bytes($iv_length);
+				$ciphertext_raw = openssl_encrypt($string, self::$enc_ciphering, $enc_key, self::$enc_option, $iv);
+				$hmac = hash_hmac(self::$enc_hash_algo, $ciphertext_raw, $enc_key, true);
+				return $iv . $hmac . $ciphertext_raw;
+			}
+			return $string;
+		} catch( Exception $e ) {
+			throw new SystemException($e->getFile(), $e->getLine(), $e->getMessage(), $e->getCode(), $e->getPrevious());
 		}
-		if( function_exists('openssl_cipher_iv_length') ) {
-			openssl_cipher_iv_length(self::$enc_ciphering);
-		}
-		$options = 0;
-
-		/** @noinspection EncryptionInitializationVectorRandomnessInspection */
-		return openssl_encrypt($string, self::$enc_ciphering, static::$enc_key, $options, static::$enc_iv);
 	}
 
 	/**
@@ -213,11 +221,49 @@ class StringHelper {
 	 *
 	 * @return string
 	 */
-	public static function decrypt(string $string): string {
-		openssl_cipher_iv_length(self::$enc_ciphering);
-		$options = 0;
-		return openssl_decrypt($string, self::$enc_ciphering, static::$enc_key, $options, static::$enc_iv);
+	public static function decrypt(string $string, string $salt = ""): string {
+		if( function_exists('openssl_cipher_iv_length') && is_callable('openssl_cipher_iv_length') ) {
+			$enc_key = self::$enc_key . $salt;
+			$iv_length = openssl_cipher_iv_length(self::$enc_ciphering);
+			$iv = substr($string, 0, $iv_length);
+			$hmac = substr($string, $iv_length, self::$enc_hash_length);
+			$ciphertext_raw = substr($string, $iv_length + self::$enc_hash_length);
+			$original_plaintext = openssl_decrypt($ciphertext_raw, self::$enc_ciphering, $enc_key, self::$enc_option, $iv);
+			$calc_mac = hash_hmac(self::$enc_hash_algo, $ciphertext_raw, $enc_key, true);
+			if( function_exists('hash_equals') ) {
+				if( hash_equals($hmac, $calc_mac) ) {
+					return $original_plaintext;
+				}
+			} else if( self::hash_equals_custom($hmac, $calc_mac) ) {
+				return $original_plaintext;
+			}
+		}
+		return $string;
 	}
+
+	/**
+	 * (Optional)
+	 * hash_equals() function poly-filling.
+	 * PHP 5.6+ timing attack safe comparison
+	 */
+	public static function hash_equals_custom($knownString, $userString): bool {
+		if( function_exists('mb_strlen') ) {
+			$kLen = mb_strlen($knownString, '8bit');
+			$uLen = mb_strlen($userString, '8bit');
+		} else {
+			$kLen = strlen($knownString);
+			$uLen = strlen($userString);
+		}
+		if( $kLen !== $uLen ) {
+			return false;
+		}
+		$result = 0;
+		for( $i = 0; $i < $kLen; $i++ ) {
+			$result |= (ord($knownString[$i]) ^ ord($userString[$i]));
+		}
+		return 0 === $result;
+	}
+
 
 	/**
 	 * Returns the current server domain path without the subdomain

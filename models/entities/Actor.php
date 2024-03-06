@@ -20,6 +20,8 @@ class Actor {
 
 	public string $email = "";
 
+	public bool $email_verified = false;
+
 	public string $password = "";
 
 	public string $first_name = "";

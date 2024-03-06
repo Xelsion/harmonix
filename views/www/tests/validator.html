@@ -6,40 +6,49 @@ use lib\helper\ValidationHelper;
 $value = $_POST['value'] ?? '';
 ?>
 <div class="container-fluid">
-    <form action="\tests/validator" method="POST">
+	<form action="\tests/validator" method="POST">
 		<?= HtmlHelper::generateFormToken() ?>
-        <div class="row">
-            <div class="col">
-                <label for="input">Input</label>
-                <input id="input" type="text" name="value" value="<?= escaped_string($value) ?>"/>
-            </div>
-            <div class="col-1" style="padding-top: 21px;">
-                <input type="submit" name="check" value="check" class="button-default"/>
-            </div>
-        </div>
-    </form>
+		<div class="row">
+			<div class="col">
+				<label for="input">Input</label>
+				<input id="input" type="text" name="value" value="<?= escaped_string($value) ?>"/>
+			</div>
+			<div class="col-1" style="padding-top: 21px;">
+				<input type="submit" name="check" value="check" class="button-default"/>
+			</div>
+		</div>
+	</form>
 	<?php if( isset($_POST['check']) && $value !== "" ) {
 		$check["is valid Integer"] = ValidationHelper::isValidInteger($value);
 		$check["is valid Numeric"] = ValidationHelper::isValidNumeric($value);
+		$check["is valid Boolean"] = ValidationHelper::isValidBoolean($value);
 		$check["is valid E-Mail"] = ValidationHelper::isValidEmail($value);
 		$check["is valid Street"] = ValidationHelper::isValidStreet($value);
 		$check["is valid Street Nr."] = ValidationHelper::isValidStreetNr($value);
+		$check["is valid Street + Nr."] = ValidationHelper::isValidStreetComplete($value);
 		$check["is valid Zipcode"] = ValidationHelper::isValidZipcode($value);
 		$check["is valid City"] = ValidationHelper::isValidCity($value);
 		$check["is valid Password"] = ValidationHelper::isValidPassword($value);
+		$check["is valid Phone Country Code"] = ValidationHelper::isValidPhoneCountryCode($value);
+		$check["is valid Phone City Code"] = ValidationHelper::isValidPhoneCityCode($value);
+		$check["is valid Phone Number"] = ValidationHelper::isValidPhoneNumber($value);
+		$check["is valid Phone Number Complete"] = ValidationHelper::isValidPhoneComplete($value);
+		$check["is valid Mobil Prefix"] = ValidationHelper::isValidMobilPrefix($value);
+		$check["is valid Mobil Number"] = ValidationHelper::isValidMobilNumber($value);
+		$check["is valid Mobil Complete"] = ValidationHelper::isValidMobilComplete($value);
 		?>
-        <h3 style="margin-top: 30px;">Eingabe: <?= escaped_string($value) ?></h3>
-        <table class="table table-striped">
-            <tr>
-                <th>Bedingung</th>
-                <th style="width: 120px;">Ergebnis</th>
-            </tr>
+		<h3 style="margin-top: 30px;">Eingabe: <?= escaped_string($value) ?></h3>
+		<table class="table table-striped">
+			<tr>
+				<th>Bedingung</th>
+				<th style="width: 120px;">Ergebnis</th>
+			</tr>
 			<?php foreach( $check as $key => $result ) { ?>
-                <tr>
-                    <td><?= $key ?></td>
-                    <td style="color: <?= ($result) ? 'green' : 'red' ?>;"><?php print_debug($result) ?></td>
-                </tr>
+				<tr>
+					<td><?= $key ?></td>
+					<td style="color: <?= ($result) ? 'green' : 'red' ?>;"><?php print_debug($result) ?></td>
+				</tr>
 			<?php } ?>
-        </table>
+		</table>
 	<?php } ?>
 </div>

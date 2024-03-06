@@ -11,10 +11,7 @@ use lib\core\exceptions\SystemException;
  * @author Markus Schröder <xelsion@gmail.com>
  * @version 1.0.0;
  */
-class Configuration {
-
-	// The .ini file
-	private ?File $file = null;
+class Configuration extends File {
 
 	// an array holding all configurations
 	private array $config;
@@ -24,9 +21,9 @@ class Configuration {
 	 * will be called once by the static method getInstanceOf()
 	 * Parses the {configuration}.ini
 	 */
-	public function __construct(string $file) {
-		$this->file = new File($file);
-		$this->config = parse_ini_file($file, true, INI_SCANNER_TYPED);
+	public function __construct(string $file_path) {
+		parent::__construct($file_path);
+		$this->config = parse_ini_file($this->file_path, true, INI_SCANNER_TYPED);
 	}
 
 	/**
@@ -91,8 +88,8 @@ class Configuration {
 			}
 			$content .= "\n";
 		}
-		$this->file->setContent($content);
-		return $this->file->save();
+		$this->setContent($content);
+		return $this->save();
 	}
 
 	/**
@@ -121,7 +118,10 @@ class Configuration {
 		return $section[$key];
 	}
 
-
+	/**
+	 * @param mixed $value
+	 * @return mixed
+	 */
 	public function getFormattedWriteValue(mixed $value): mixed {
 		if( is_bool($value) ) {
 			return ($value) ? 'true' : 'false';

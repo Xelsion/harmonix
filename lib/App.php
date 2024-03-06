@@ -135,7 +135,6 @@ class App {
 		$router = self::getInstanceOf(Router::class);
 		try {
 			$route = $router->getRoute(self::$request);
-
 			if( empty($route) ) { // no route found
 				self::$request->setRequestUri("/error/404");
 				$route = $router->getRoute(self::$request);
@@ -166,7 +165,6 @@ class App {
 			if( self::$auth->hasAccess() ) {
 				// Get the Response obj from the controller
 				$this::$response = call_user_func_array([$controller, $method], $params);
-				$this::$response->setHeaders();
 			} else {
 				redirect("/error/403");
 			}
@@ -182,6 +180,7 @@ class App {
 	 * @return string
 	 */
 	public function getResponseOutput(): string {
+		$this::$response->setHeaders();
 		$output = $this::$response->getOutput();
 		$elapsed_time = self::$analyser->getElapsedTime()->format("ms");
 		$is_cached = (self::$storage->get("is_cached")) ? "true" : "false";
