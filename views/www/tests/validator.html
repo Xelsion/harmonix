@@ -28,6 +28,7 @@ $value = $_POST['value'] ?? '';
 		$check["is valid Street + Nr."] = ValidationHelper::isValidStreetComplete($value);
 		$check["is valid Zipcode"] = ValidationHelper::isValidZipcode($value);
 		$check["is valid City"] = ValidationHelper::isValidCity($value);
+		$check["is valid IBAN"] = ValidationHelper::isValidIban($value);
 		$check["is valid Password"] = ValidationHelper::isValidPassword($value);
 		$check["is valid Phone Country Code"] = ValidationHelper::isValidPhoneCountryCode($value);
 		$check["is valid Phone City Code"] = ValidationHelper::isValidPhoneCityCode($value);

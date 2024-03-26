@@ -55,6 +55,21 @@ class ValidationHelper {
 		return (bool)preg_match(self::regex_city, $value);
 	}
 
+	public static function isValidIban(string $value): bool {
+		$value = strtoupper($value);
+		$value = str_replace([" ", "-"], "", $value);
+		$iban_checksum = substr($value, 0, 4);
+		$iban_value = substr($value, 4);
+		$iban_swapped = $iban_value . $iban_checksum;
+		$chars = str_split($iban_swapped);
+		$as_numbers = "";
+		foreach( $chars as $char ) {
+			$as_numbers .= (preg_match("/[A-Z]/", $char)) ? ord($char) - 55 : $char;
+		}
+		$number = (int)$as_numbers;
+		return (($number % 97) === 1);
+	}
+
 	public static function isValidPhoneCountryCode(string $value): bool {
 		return (bool)preg_match(self::regex_phone_county_code, $value);
 	}
