@@ -149,10 +149,6 @@ class AccessRestrictionRepository extends ARepository {
 	 */
 	public function createObject(AccessRestrictionModel $restriction): void {
 		try {
-			// store this action
-			$storage_repo = App::getInstanceOf(ActionStorageRepository::class);
-			$storage_repo->storeAction("create", "mvc", "access_restrictions", null, $restriction);
-
 			// @formatter:off
             $this->pdo->Insert("access_restrictions")
                 ->Columns(["domain", "controller", "method", "restriction_type", "role_id"])
@@ -178,11 +174,6 @@ class AccessRestrictionRepository extends ARepository {
 	 */
 	public function updateObject(AccessRestrictionModel $restriction): void {
 		try {
-			// store this action
-			$obj_orig = $this->get($restriction->domain, $restriction->controller, $restriction->method);
-			$storage_repo = App::getInstanceOf(ActionStorageRepository::class);
-			$storage_repo->storeAction("update", "mvc", "access_restrictions", $obj_orig, $restriction);
-
 			// @formatter:off
             $this->pdo->Update("access_restrictions")
                 ->Set(["domain", "controller", "method", "restriction_type", "role_id"])
@@ -209,10 +200,6 @@ class AccessRestrictionRepository extends ARepository {
 	 */
 	public function deleteObject(AccessRestrictionModel $restriction): void {
 		try {
-			// store this action
-			$storage_repo = App::getInstanceOf(ActionStorageRepository::class);
-			$storage_repo->storeAction("delete", "mvc", "access_restrictions", $restriction, null);
-
 			// @formatter:off
             $this->pdo->Delete("access_restrictions")
                 ->Where("id=:id")

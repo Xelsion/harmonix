@@ -31,6 +31,7 @@ class HomeController extends AController {
 	 */
 	#[Route("", RequestMethod::GET, RequestMethod::POST)]
 	public function index(): AResponse {
+
 		$cache = App::getInstanceOf(ResponseCache::class);
 		$cache->initCacheFor(__CLASS__, __METHOD__);
 		$cache->addFileCheck(__FILE__);
@@ -40,9 +41,9 @@ class HomeController extends AController {
 			$view = new Template(PATH_VIEWS . "home/index.html");
 
 			$template = new Template(PATH_VIEWS . "template.html");
-			TemplateData::set("view", $view->render());
+			TemplateData::set("view", $view->parse());
 
-			$content = $template->render();
+			$content = $template->parse();
 			$cache->saveContent($content);
 		}
 		return new HtmlResponse($content);

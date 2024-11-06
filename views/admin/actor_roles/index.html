@@ -17,55 +17,55 @@ $role_tree->buildHtmlTree(0, $html);
 $first = true;
 ?>
 <div class="container-fluid">
-    <h1>Rollen</h1>
-    <table class="table table-dark table-striped">
-        <tr>
-            <th>ID</th>
-            <th class="col-md-2">Name</th>
-            <th>Rechte: Alle</th>
-            <th>Rechte: Gruppe</th>
-            <th>Rechte: Eigene</th>
-            <th>Gesch&uuml;tzt</th>
-            <th class="col-md-2 text-end">Optionen</th>
-        </tr>
+	<h1>Rollen</h1>
+	<table class="table table-dark table-striped">
+		<tr>
+			<th>ID</th>
+			<th class="col-md-2">Name</th>
+			<th>Rechte: Alle</th>
+			<th>Rechte: Gruppe</th>
+			<th>Rechte: Eigene</th>
+			<th>Gesch&uuml;tzt</th>
+			<th class="col-md-2 text-end">Optionen</th>
+		</tr>
 		<?php foreach( $tree_array as $actor_role ):
 			$rights = $actor_role->getStringArray();
 			?>
-            <tr>
-                <td class="align-middle"><?= escaped_string($actor_role->id) ?></td>
+			<tr>
+				<td class="align-middle"><?= escaped_string($actor_role->id) ?></td>
 				<?php if( $first ): $first = false; ?>
-                    <td rowspan="100%" class="tree-table"><?= $html ?></td>
+					<td rowspan="100%" class="tree-table"><?= $html ?></td>
 				<?php endif; ?>
-                <td class="align-middle"><?= escaped_string(implode(", ", $rights["all"])) ?></td>
-                <td class="align-middle"><?= escaped_string(implode(", ", $rights["group"])) ?></td>
-                <td class="align-middle"><?= escaped_string(implode(", ", $rights["own"])) ?></td>
-                <td class="align-middle"><?= ($actor_role->is_protected) ? "Ja" : "Nein" ?></td>
-                <td class="text-nowrap align-middle text-end">
-                    <a href="/actor-roles/<?= $actor_role->id ?>" class="button button-default"><?= $lang->getValue("translations", "edit") ?></a>
-                    <button class="button button-negativ" onclick="$('#delete-target').attr('action', '/actor-roles/delete/<?= $actor_role->id ?>')" data-bs-toggle="modal" data-bs-target="#confirm-delete"><?= $lang->getValue("translations", "delete") ?></button>
-                </td>
-            </tr>
+				<td class="align-middle"><?= escaped_string(implode(", ", $rights["all"])) ?></td>
+				<td class="align-middle"><?= escaped_string(implode(", ", $rights["group"])) ?></td>
+				<td class="align-middle"><?= escaped_string(implode(", ", $rights["own"])) ?></td>
+				<td class="align-middle"><?= ($actor_role->is_protected) ? "Ja" : "Nein" ?></td>
+				<td class="text-nowrap align-middle text-end">
+					<a href="/actor-roles/<?= $actor_role->id ?>" class="button button-default"><?= $lang->getValue("translations", "edit") ?></a>
+					<button class="button button-negativ" onclick="$('#delete-target').attr('action', '/actor-roles/delete/<?= $actor_role->id ?>')" data-bs-toggle="modal" data-bs-target="#confirm-delete"><?= $lang->getValue("translations", "delete") ?></button>
+				</td>
+			</tr>
 		<?php endforeach; ?>
-    </table>
+	</table>
 </div>
 
 <div class="modal fade" id="confirm-delete" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h1 class="modal-title fs-5" id="modalLabel">Achtung!!!</h1>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                Sind Sie sicher, das Sie diesen Eintrag l&ouml;schen wollen?
-            </div>
-            <div class="modal-footer">
-                <form id="delete-target" action="" method="POST" style="background-color: transparent;">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h1 class="modal-title fs-5" id="modalLabel">Achtung!!!</h1>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body">
+				Sind Sie sicher, das Sie diesen Eintrag l&ouml;schen wollen?
+			</div>
+			<div class="modal-footer">
+				<form id="delete-target" action="" method="POST" style="background-color: transparent;">
 					<?= RequestMethod::DELETE->toInputString() ?>
-                    <button type="button" class="button button-default float-left" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" class="button button-negativ float-right">Löschen</button>
-                </form>
-            </div>
-        </div>
-    </div>
+					<button type="button" class="button button-default float-left" data-bs-dismiss="modal">Close</button>
+					<button type="submit" class="button button-negativ float-right">L&ouml;schen</button>
+				</form>
+			</div>
+		</div>
+	</div>
 </div>

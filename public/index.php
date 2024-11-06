@@ -32,6 +32,7 @@ mb_detect_order(["UTF-8", "ISO-8859-1", "ASCII"]);
 
 $runtime_logger = new Logger("runtime");
 $config = new Configuration(PATH_ROOT . "application.ini");
+
 try {
 	// getActor output buffering and prevent all direct output
 	ob_start('ob_gzhandler');
@@ -52,7 +53,7 @@ try {
 		if( $config->getSectionValue($environment, "show_errors") ) {
 			$view = new Template(PATH_VIEWS_ROOT . "exception.html");
 			TemplateData::set("error", $e);
-			echo $view->render();
+			echo $view->parse();
 		} else {
 			echo "An error occur: Please check the Log Files for more information";
 		}

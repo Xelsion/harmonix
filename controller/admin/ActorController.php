@@ -69,9 +69,9 @@ class ActorController extends AController {
 		TemplateData::set("pagination", $pagination);
 
 		$template = new Template(PATH_VIEWS . "template.html");
-		TemplateData::set("view", $view->render());
+		TemplateData::set("view", $view->parse());
 
-		return new HtmlResponse($template->render());
+		return new HtmlResponse($template->parse());
 	}
 
 	/**
@@ -97,9 +97,9 @@ class ActorController extends AController {
 		TemplateData::set("actor_list", $results);
 
 		$template = new Template(PATH_VIEWS . "template.html");
-		TemplateData::set("view", $view->render());
+		TemplateData::set("view", $view->parse());
 
-		return new HtmlResponse($template->render());
+		return new HtmlResponse($template->parse());
 	}
 
 	/**
@@ -123,9 +123,9 @@ class ActorController extends AController {
 		TemplateData::set("access_permissions", array());
 
 		$template = new Template(PATH_VIEWS . "template.html");
-		TemplateData::set("view", $view->render());
+		TemplateData::set("view", $view->parse());
 
-		return new HtmlResponse($template->render());
+		return new HtmlResponse($template->parse());
 	}
 
 	/**
@@ -168,9 +168,9 @@ class ActorController extends AController {
 		TemplateData::set("access_permissions", $access_permissions);
 
 		$template = new Template(PATH_VIEWS . "template.html");
-		TemplateData::set("view", $view->render());
+		TemplateData::set("view", $view->parse());
 
-		return new HtmlResponse($template->render());
+		return new HtmlResponse($template->parse());
 	}
 
 	/**
@@ -252,9 +252,9 @@ class ActorController extends AController {
 		TemplateData::set("access_permissions", $this->permission_repository->find([["actor_id", "=", $actor->id]]));
 
 		$template = new Template(PATH_VIEWS . "template.html");
-		TemplateData::set("view", $view->render());
+		TemplateData::set("view", $view->parse());
 
-		return new HtmlResponse($template->render());
+		return new HtmlResponse($template->parse());
 	}
 
 	/**

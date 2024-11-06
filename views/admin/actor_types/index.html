@@ -12,47 +12,47 @@ TemplateData::set("title", "Rollen");
 $role_list = TemplateData::get("result_list");
 ?>
 <div class="container-fluid">
-    <h1>Benutzer-Typen</h1>
-    <table class="table table-dark table-striped">
-        <tr>
-            <th class="col-md-1">ID</th>
-            <th>Name</th>
-            <th class="col-md-2">Gesch&uuml;tzt</th>
-            <th class="col-md-2 text-end">Optionen</th>
-        </tr>
+	<h1>Benutzer-Typen</h1>
+	<table class="table table-dark table-striped">
+		<tr>
+			<th class="col-md-1">ID</th>
+			<th>Name</th>
+			<th class="col-md-2">Gesch&uuml;tzt</th>
+			<th class="col-md-2 text-end">Optionen</th>
+		</tr>
 		<?php foreach( $role_list as $type ): ?>
-            <tr>
-                <td class="align-middle"><?= escaped_string($type->id) ?></td>
-                <td class="align-middle"><?= escaped_string($type->name) ?></td>
-                <td class="align-middle"><?= ($type->is_protected) ? "Ja" : "Nein" ?></td>
-                <td class="text-nowrap align-middle text-end">
-                    <a href="/actor-types/<?= $type->id ?>" class="button button-default"><?= $lang->getValue("translations", "edit") ?></a>
-                    <button class="button button-negativ" onclick="$('#delete-target').attr('action', '/actor-types/delete/<?= $type->id ?>')" data-bs-toggle="modal" data-bs-target="#confirm-delete"><?= $lang->getValue("translations", "delete") ?></button>
-                </td>
-            </tr>
+			<tr>
+				<td class="align-middle"><?= escaped_string($type->id) ?></td>
+				<td class="align-middle"><?= escaped_string($type->name) ?></td>
+				<td class="align-middle"><?= ($type->is_protected) ? "Ja" : "Nein" ?></td>
+				<td class="text-nowrap align-middle text-end">
+					<a href="/actor-types/<?= $type->id ?>" class="button button-default"><?= $lang->getValue("translations", "edit") ?></a>
+					<button class="button button-negativ" onclick="$('#delete-target').attr('action', '/actor-types/delete/<?= $type->id ?>')" data-bs-toggle="modal" data-bs-target="#confirm-delete"><?= $lang->getValue("translations", "delete") ?></button>
+				</td>
+			</tr>
 		<?php endforeach; ?>
-    </table>
+	</table>
 </div>
 
 <div class="modal fade" id="confirm-delete" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h1 class="modal-title fs-5" id="exampleModalLabel">Achtung!!!</h1>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                Sind Sie sicher, das Sie diesen Eintrag löschen wollen?
-            </div>
-            <div class="modal-footer">
-                <form id="delete-target" action="" method="POST" style="background-color: transparent;">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h1 class="modal-title fs-5" id="exampleModalLabel">Achtung!!!</h1>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body">
+				Sind Sie sicher, das Sie diesen Eintrag löschen wollen?
+			</div>
+			<div class="modal-footer">
+				<form id="delete-target" action="" method="POST" style="background-color: transparent;">
 					<?= RequestMethod::DELETE->toInputString() ?>
-                    <button type="button" class="button button-default float-left" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" class="button button-negativ float-right">Löschen</button>
-                </form>
-            </div>
-        </div>
-    </div>
+					<button type="button" class="button button-default float-left" data-bs-dismiss="modal">Close</button>
+					<button type="submit" class="button button-negativ float-right">L&ouml;schen</button>
+				</form>
+			</div>
+		</div>
+	</div>
 </div>
 
 

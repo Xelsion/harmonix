@@ -45,9 +45,9 @@ class ActorTypeController extends AController {
 		TemplateData::set('result_list', $this->type_repository->getAll());
 
 		$template = new Template(PATH_VIEWS . "template.html");
-		TemplateData::set("view", $view->render());
+		TemplateData::set("view", $view->parse());
 
-		return new HtmlResponse($template->render());
+		return new HtmlResponse($template->parse());
 	}
 
 	/**
@@ -63,9 +63,9 @@ class ActorTypeController extends AController {
 		$view = new Template(PATH_VIEWS . "actor_types/create.html");
 
 		$template = new Template(PATH_VIEWS . "template.html");
-		TemplateData::set("view", $view->render());
+		TemplateData::set("view", $view->parse());
 
-		return new HtmlResponse($template->render());
+		return new HtmlResponse($template->parse());
 	}
 
 	/**
@@ -110,9 +110,9 @@ class ActorTypeController extends AController {
 		TemplateData::set("actor_role", App::$curr_actor_role);
 
 		$template = new Template(PATH_VIEWS . "template.html");
-		TemplateData::set("view", $view->render());
+		TemplateData::set("view", $view->parse());
 
-		return new HtmlResponse($template->render());
+		return new HtmlResponse($template->parse());
 	}
 
 	/**

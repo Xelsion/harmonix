@@ -11,7 +11,7 @@ $actor_role = App::$curr_actor_role;
 $config = App::getInstanceOf(Configuration::class);
 
 $view = TemplateData::get("view");
-$view_content = ($view instanceof Template) ? $view->render() : $view;
+$view_content = ($view instanceof Template) ? $view->parse() : $view;
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -97,7 +97,7 @@ $view_content = ($view instanceof Template) ? $view->render() : $view;
 	$debug = new Template(PATH_VIEWS_ROOT . "snippets/debug.html");
 	?>
 	<div id="debug_infos">
-		<?= $debug->render() ?>
+		<?= $debug->parse() ?>
 	</div>
 <?php } ?>
 <footer>

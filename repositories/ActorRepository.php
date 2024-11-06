@@ -310,10 +310,6 @@ class ActorRepository extends ARepository {
 		try {
 			$actor->password = StringHelper::getBCrypt($actor->password);
 
-			// store this action
-			$storage_repo = App::getInstanceOf(ActionStorageRepository::class);
-			$storage_repo->storeAction("create", "mvc", "actors", null, $actor);
-
 			// @formatter:off
 			$this->pdo->Insert("actors")
 				->Columns(["type_id", "email", "password", "first_name", "last_name", "login_fails", "login_disabled"])
@@ -357,11 +353,6 @@ class ActorRepository extends ARepository {
 				} else {
 					$actor->password = $row["password"];
 				}
-
-				// store this action
-				$obj_orig = $this->get($actor->id);
-				$storage_repo = App::getInstanceOf(ActionStorageRepository::class);
-				$storage_repo->storeAction("update", "mvc", "actors", $obj_orig, $actor);
 
 				// @formatter:off
 				$this->pdo->Update("actors")

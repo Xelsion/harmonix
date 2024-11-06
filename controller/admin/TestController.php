@@ -42,9 +42,9 @@ class TestController extends AController {
 			TemplateData::set("routes_list", $all_routes);
 
 			$template = new Template(PATH_VIEWS . "template.html");
-			TemplateData::set("view", $view->render());
+			TemplateData::set("view", $view->parse());
 
-			$content = $template->render();
+			$content = $template->parse();
 
 			$cache->saveContent($content);
 		}

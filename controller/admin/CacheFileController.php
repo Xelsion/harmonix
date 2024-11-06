@@ -36,9 +36,9 @@ class CacheFileController extends AController {
 		TemplateData::set("cache_infos", $cache_infos);
 
 		$template = new Template(PATH_VIEWS . "template.html");
-		TemplateData::set("view", $view->render());
+		TemplateData::set("view", $view->parse());
 
-		return new HtmlResponse($template->render());
+		return new HtmlResponse($template->parse());
 	}
 
 	/**

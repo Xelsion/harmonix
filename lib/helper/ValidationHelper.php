@@ -55,6 +55,7 @@ class ValidationHelper {
 		return (bool)preg_match(self::regex_city, $value);
 	}
 
+	// don't work because this would exceed max_int_value :(
 	public static function isValidIban(string $value): bool {
 		$value = strtoupper($value);
 		$value = str_replace([" ", "-"], "", $value);
@@ -63,6 +64,7 @@ class ValidationHelper {
 		$iban_swapped = $iban_value . $iban_checksum;
 		$chars = str_split($iban_swapped);
 		$as_numbers = "";
+
 		foreach( $chars as $char ) {
 			$as_numbers .= (preg_match("/[A-Z]/", $char)) ? ord($char) - 55 : $char;
 		}

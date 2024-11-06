@@ -13,7 +13,6 @@ Options -Indexes
     RewriteRule "\.css\.gz$" "-" [T=text/css,E=no-gzip:1]
     RewriteRule "\.js\.gz$"  "-" [T=text/javascript,E=no-gzip:1]
 
-
     <FilesMatch "(\.js\.gz|\.css\.gz)$">
       # Serve correct encoding type.
       Header append Content-Encoding gzip
@@ -70,20 +69,20 @@ Options -Indexes
 
     #[SEO] ALWAYS USE HTTPS TO PREVENT DUPLICATED CONTENT (GOOGLE)
     RewriteCond %{SERVER_PORT} 80 [NC]
-    RewriteRule ^(public)?(.*)$ https://%{SERVER_NAME}$2 [R=301,L]
+    RewriteRule ^(.*)$ https://%{SERVER_NAME}$1 [R=301,L]
 
     #[SEO] ALWAYS USE URL'S WITH SUBDOMAIN TO PREVENT DUPLICATED CONTENT (GOOGLE)
     RewriteCond %{HTTP_HOST} !^admin\.
     RewriteCond %{HTTP_HOST} !^www\. [NC]
-    RewriteRule ^(public)?(.*)$ https://www.%{HTTP_HOST}$2 [R=301,L]
+    RewriteRule ^(.*)$ https://www.%{HTTP_HOST}$1 [R=301,L]
 
     #[SEO] REMOVE ENDING SLASHES TO PREVENT DUPLICATED CONTENT (GOOGLE)
     RewriteCond %{REQUEST_FILENAME} !-d
-    RewriteRule ^(public)?(.*)/$ /$2 [R=301,L]
+    RewriteRule ^(.*)/$ /$1 [R=301,L]
 
     #[MVC] REDIRECTS THE REQUEST TO THE HANDLER
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
-    RewriteRule .* public/index.php [L]
+    RewriteRule .* ./index.php [L]
 
 </IfModule>

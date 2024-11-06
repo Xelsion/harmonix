@@ -11,10 +11,9 @@ use lib\helper\MySqlHelper;
 use PDO;
 
 /**
- * The Abstract version of a Repository.
- * A Repository provides all function needed to communicate with the database.
- * Mostly each repository handles a single table but in some cases it could be more than
- * a single table.
+ * A Repository provides all function needed to communicate with the source of the data.
+ * Mostly each repository handles a single source (like a table in a database) but in some cases it could be more than
+ * a single source.
  *
  * @author Markus Schröder <xelsion@gmail.com>
  * @version 1.0.0;

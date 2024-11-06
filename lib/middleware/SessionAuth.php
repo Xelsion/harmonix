@@ -8,7 +8,7 @@ use lib\core\classes\Configuration;
 use lib\helper\StringHelper;
 use models\ActorModel;
 use models\SessionModel;
-use repositories\MVCRepository;
+use repositories\SessionRepository;
 
 /**
  * Class SessionAuth
@@ -57,8 +57,8 @@ class SessionAuth extends AMiddleware {
 		if( $actor->isDeveloper() && ($session->as_actor > 0 || (App::$request->contains("login_as") && App::$request->contains("actor_id"))) ) {
 			$session->as_actor = (App::$request->contains("login_as")) ? (int)App::$request->get("actor_id") : $session->as_actor;
 
-			$repository = App::getInstanceOf(MVCRepository::class);
-			$repository->updateSession($session);
+			$repository = App::getInstanceOf(SessionRepository::class);
+			$repository->updateObject($session);
 			if( $use_cookies ) {
 				$session->writeCookie();
 			} else {

@@ -32,9 +32,9 @@ class TestController extends AController {
 		$view = new Template(PATH_VIEWS . "tests/index.html");
 
 		$template = new Template(PATH_VIEWS . "template.html");
-		TemplateData::set("view", $view->render());
+		TemplateData::set("view", $view->parse());
 
-		return new HtmlResponse($template->render());
+		return new HtmlResponse($template->parse());
 	}
 
 	/**
@@ -47,9 +47,9 @@ class TestController extends AController {
 		$view = new Template(PATH_VIEWS . "tests/charts.html");
 
 		$template = new Template(PATH_VIEWS . "template.html");
-		TemplateData::set("view", $view->render());
+		TemplateData::set("view", $view->parse());
 
-		return new HtmlResponse($template->render());
+		return new HtmlResponse($template->parse());
 	}
 
 	/**
@@ -63,9 +63,9 @@ class TestController extends AController {
 		$view = new Template(PATH_VIEWS . "tests/validator.html");
 
 		$template = new Template(PATH_VIEWS . "template.html");
-		TemplateData::set("view", $view->render());
+		TemplateData::set("view", $view->parse());
 
-		return new HtmlResponse($template->render());
+		return new HtmlResponse($template->parse());
 	}
 
 	/**
@@ -79,9 +79,9 @@ class TestController extends AController {
 		$view = new Template(PATH_VIEWS . "tests/validator.html");
 
 		$template = new Template(PATH_VIEWS . "template.html");
-		TemplateData::set("view", $view->render());
+		TemplateData::set("view", $view->parse());
 
-		return new HtmlResponse($template->render());
+		return new HtmlResponse($template->parse());
 	}
 
 	/**
@@ -98,9 +98,9 @@ class TestController extends AController {
 		TemplateData::set("currency", null);
 
 		$template = new Template(PATH_VIEWS . "template.html");
-		TemplateData::set("view", $view->render());
+		TemplateData::set("view", $view->parse());
 
-		return new HtmlResponse($template->render());
+		return new HtmlResponse($template->parse());
 	}
 
 	/**
@@ -146,9 +146,9 @@ class TestController extends AController {
 		TemplateData::set("currency", $currency);
 
 		$template = new Template(PATH_VIEWS . "template.html");
-		TemplateData::set("view", $view->render());
+		TemplateData::set("view", $view->parse());
 
-		return new HtmlResponse($template->render());
+		return new HtmlResponse($template->parse());
 	}
 
 }

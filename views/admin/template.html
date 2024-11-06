@@ -9,7 +9,7 @@ use lib\helper\HtmlHelper;
 $actor = App::$curr_actor;
 $config = App::getInstanceOf(Configuration::class);
 $view = TemplateData::get("view");
-$view_content = ($view instanceof Template) ? $view->render() : $view;
+$view_content = ($view instanceof Template) ? $view->parse() : $view;
 $ts = time();
 ?>
 <!DOCTYPE html>
@@ -95,7 +95,7 @@ $ts = time();
 <div>
 	<?php if( App::$storage->get("debug_mode") ) {
 		$debug = new Template(PATH_VIEWS_ROOT . "snippets/debug.html");
-		$debug_content = $debug->render();
+		$debug_content = $debug->parse();
 		echo $debug_content;
 	} ?>
 </div>

@@ -61,9 +61,9 @@ class RestrictionController extends AController {
 		TemplateData::set("type_options", $this->restriction_type_repository->getAll());
 
 		$template = new Template(PATH_VIEWS . "template.html");
-		TemplateData::set("view", $view->render());
+		TemplateData::set("view", $view->parse());
 
-		return new HtmlResponse($template->render());
+		return new HtmlResponse($template->parse());
 	}
 
 	/**
@@ -95,9 +95,9 @@ class RestrictionController extends AController {
 		TemplateData::set("type_list", $this->restriction_type_repository->getAll());
 
 		$template = new Template(PATH_VIEWS . "template.html");
-		TemplateData::set("view", $view->render());
+		TemplateData::set("view", $view->parse());
 
-		return new HtmlResponse($template->render());
+		return new HtmlResponse($template->parse());
 	}
 
 	/**
@@ -114,9 +114,9 @@ class RestrictionController extends AController {
 		$view = new Template(PATH_VIEWS . "restrictions/types_create.html");
 
 		$template = new Template(PATH_VIEWS . "template.html");
-		TemplateData::set("view", $view->render());
+		TemplateData::set("view", $view->parse());
 
-		return new HtmlResponse($template->render());
+		return new HtmlResponse($template->parse());
 	}
 
 	/**
@@ -162,9 +162,9 @@ class RestrictionController extends AController {
 		TemplateData::set("type", $type);
 
 		$template = new Template(PATH_VIEWS . "template.html");
-		TemplateData::set("view", $view->render());
+		TemplateData::set("view", $view->parse());
 
-		return new HtmlResponse($template->render());
+		return new HtmlResponse($template->parse());
 	}
 
 	/**
@@ -192,6 +192,29 @@ class RestrictionController extends AController {
 			TemplateData::setSystemMessage("Es ist ein Fehler aufgetreten.", SystemMessageType::ERROR);
 		}
 		return $this->typesUpdate($type);
+	}
+
+	/**
+	 * Deletes the given restriction type object from the db
+	 *
+	 * @param AccessRestrictionTypeModel $type
+	 *
+	 * @return AResponse
+	 *
+	 * @throws SystemException
+	 */
+	#[Route("types/{type_id}", RequestMethod::DELETE)]
+	public function typesDeleteSubmit(AccessRestrictionTypeModel $type): AResponse {
+		if( !App::$curr_actor_role->canDeleteAll() ) {
+			redirect("/error/403");
+		}
+		if( $type->id > 0 ) {
+			$this->restriction_type_repository->deleteObject($type);
+			TemplateData::setSystemMessage("Der Zugriffstyp wurde erfolgreich gelöscht.");
+		} else {
+			TemplateData::setSystemMessage("Es ist ein Fehler aufgetreten.", SystemMessageType::ERROR);
+		}
+		return $this->types();
 	}
 
 	/**

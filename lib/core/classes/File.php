@@ -35,8 +35,8 @@ class File {
 	 * @param string $file_path
 	 */
 	public function __construct(string $file_path = "") {
+		$this->file_path = $file_path;
 		if( $file_path !== "" && file_exists($file_path) ) {
-			$this->file_path = $file_path;
 			$this->file_name = basename($file_path);
 			if( function_exists("mime_content_type") && is_callable("mime_content_type") ) {
 				$this->mime_type = mime_content_type($file_path);

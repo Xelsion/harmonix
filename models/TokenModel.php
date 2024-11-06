@@ -6,8 +6,14 @@ use Exception;
 use lib\App;
 use lib\core\exceptions\SystemException;
 use models\entities\Token;
-use repositories\MVCRepository;
+use repositories\TokenRepository;
 
+/**
+ * The TokenModel
+ *
+ * @author Markus Schröder <xelsion@gmail.com>
+ * @version 1.0.0;
+ */
 class TokenModel extends Token {
 
 	/**
@@ -20,8 +26,8 @@ class TokenModel extends Token {
 	public function __construct(string $id = "") {
 		if( $id !== "" ) {
 			try {
-				$mvc_repo = App::getInstanceOf(MVCRepository::class);
-				$token_data = $mvc_repo->getTokenAsArray($id);
+				$token_repo = App::getInstanceOf(TokenRepository::class);
+				$token_data = $token_repo->getAsArray($id);
 				if( !empty($token_data) ) {
 					$this->id = $token_data["id"];
 					$this->expired = $token_data["expired"];

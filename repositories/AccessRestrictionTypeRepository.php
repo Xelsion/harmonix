@@ -140,10 +140,6 @@ class AccessRestrictionTypeRepository extends ARepository {
 	 */
 	public function createObject(AccessRestrictionTypeModel $restriction_type): void {
 		try {
-			// store this action
-			$storage_repo = App::getInstanceOf(ActionStorageRepository::class);
-			$storage_repo->storeAction("create", "mvc", "access_restriction_types", null, $restriction_type);
-
 			// @formatter:off
             $this->pdo->Insert("access_restriction_types")
                 ->Columns(["name", "include_siblings", "include_children", "include_descendants"])
@@ -168,11 +164,6 @@ class AccessRestrictionTypeRepository extends ARepository {
 	 */
 	public function updateObject(AccessRestrictionTypeModel $restriction_type): void {
 		try {
-			// store this action
-			$obj_orig = $this->get($restriction_type->id);
-			$storage_repo = App::getInstanceOf(ActionStorageRepository::class);
-			$storage_repo->storeAction("update", "mvc", "access_restriction_types", $obj_orig, $restriction_type);
-
 			// @formatter:off
             $this->pdo->Update("access_restriction_types")
                 ->Set(["name", "include_siblings", "include_children", "include_descendants"])
@@ -198,10 +189,6 @@ class AccessRestrictionTypeRepository extends ARepository {
 	 */
 	public function deleteObject(AccessRestrictionTypeModel $restriction_type): void {
 		try {
-			// store this action
-			$storage_repo = App::getInstanceOf(ActionStorageRepository::class);
-			$storage_repo->storeAction("delete", "mvc", "access_restriction_types", $restriction_type, null);
-
 			// @formatter:off
             $this->pdo->Delete("access_restriction_types")
                 ->Where("id=:id")

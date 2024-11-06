@@ -1,25 +1,26 @@
 <?php
 
 use lib\App;
+use lib\core\tree\Menu;
 
-$menu = App::getInstanceOf(\lib\core\tree\Menu::class);
+$menu = App::getInstanceOf(Menu::class);
 $menu->insertMenuItem(100, null, "Home", "/");
 
-$menu->insertMenuItem(200, null, "Benutzer", "/actors");
-$menu->insertMenuItem(201, 200, "Benutzer erstellen", "/actors/create");
-$menu->insertMenuItem(210, 200, "Benutzer-Typen", "/actor-types");
-$menu->insertMenuItem(211, 210, "Benutzer-Typ erstellen", "/actor-types/create");
+$menu->insertMenuItem(200, null, "Configuration", "/config");
 
-$menu->insertMenuItem(300, null, "Rollen", "/actor-roles");
-$menu->insertMenuItem(310, 300, "Rolle erstellen", "/actor-roles/create");
+$menu->insertMenuItem(300, null, "Benutzer", "/actors");
+$menu->insertMenuItem(310, 300, "Benutzer erstellen", "/actors/create");
+$menu->insertMenuItem(320, 300, "Benutzer-Typen", "/actor-types");
+$menu->insertMenuItem(321, 320, "Benutzer-Typ erstellen", "/actor-types/create");
 
-$menu->insertMenuItem(400, null, "Zugriffsrechte", "/restrictions");
-$menu->insertMenuItem(410, 400, "Zugriffs Typen", "/restrictions/types");
-$menu->insertMenuItem(411, 410, "Type erstellen", "/restrictions/types/create");
+$menu->insertMenuItem(400, null, "Rollen", "/actor-roles");
+$menu->insertMenuItem(410, 400, "Rolle erstellen", "/actor-roles/create");
 
-$menu->insertMenuItem(500, null, "Routen", "/routes");
+$menu->insertMenuItem(500, null, "Zugriffsrechte", "/restrictions");
+$menu->insertMenuItem(510, 500, "Zugriffs Typen", "/restrictions/types");
+$menu->insertMenuItem(511, 510, "Type erstellen", "/restrictions/types/create");
 
-$menu->insertMenuItem(600, null, "Cache Files", "/cache");
-$menu->insertMenuItem(700, null, "Benutzer Aktionen", "/action-storage");
+$menu->insertMenuItem(600, null, "Routen", "/routes");
+
+$menu->insertMenuItem(700, null, "Cache Files", "/cache");
 echo $menu->getAsHtml();
-

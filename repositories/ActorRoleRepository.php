@@ -180,10 +180,6 @@ class ActorRoleRepository extends ARepository {
 	 */
 	public function createObject(ActorRoleModel $role): void {
 		try {
-			// store this action
-			$storage_repo = App::getInstanceOf(ActionStorageRepository::class);
-			$storage_repo->storeAction("create", "mvc", "actor_roles", null, $role);
-
 			// @formatter:off
             $this->pdo->Insert("actor_roles")
                 ->Columns(["child_of", "name", "rights_all", "rights_group", "rights_own"])
@@ -213,11 +209,6 @@ class ActorRoleRepository extends ARepository {
 		}
 
 		try {
-			// store this action
-			$obj_orig = $this->get($role->id);
-			$storage_repo = App::getInstanceOf(ActionStorageRepository::class);
-			$storage_repo->storeAction("update", "mvc", "actor_roles", $obj_orig, $role);
-
 			// @formatter:off
             $this->pdo->Update("actor_roles")
                 ->Set(["child_of", "name", "rights_all", "rights_group", "rights_own"])
@@ -253,10 +244,6 @@ class ActorRoleRepository extends ARepository {
 				$child->child_of = $role->child_of;
 				$this->updateObject($child);
 			}
-
-			// store this action
-			$storage_repo = App::getInstanceOf(ActionStorageRepository::class);
-			$storage_repo->storeAction("delete", "mvc", "actor_roles", $role, null);
 
 			// @formatter:off
             $this->pdo->Delete("actor_roles")

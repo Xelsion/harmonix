@@ -3,6 +3,7 @@
 use lib\App;
 use lib\core\classes\Language;
 use lib\core\classes\TemplateData;
+use lib\core\enums\RequestMethod;
 
 $lang = App::getInstanceOf(Language::class);
 
@@ -10,28 +11,49 @@ TemplateData::set("title", "Zugriffstypen");
 $type_list = TemplateData::get("type_list");
 ?>
 <div class="container-fluid">
-    <h1>Zugriffstypen</h1>
-    <table class="table table-dark table-striped">
-        <tr>
-            <th>ID</th>
-            <th class="col-md-2">Name</th>
-            <th>incl. gleiche Obergruppe</th>
-            <th>incl. direkter Untergruppen</th>
-            <th>incl. aller Untergruppen</th>
-            <th class="col-md-2 text-end">Optionen</th>
-        </tr>
+	<h1>Zugriffstypen</h1>
+	<table class="table table-dark table-striped">
+		<tr>
+			<th>ID</th>
+			<th class="col-md-2">Name</th>
+			<th>incl. gleiche Obergruppe</th>
+			<th>incl. direkter Untergruppen</th>
+			<th>incl. aller Untergruppen</th>
+			<th class="col-md-2 text-end">Optionen</th>
+		</tr>
 		<?php foreach( $type_list as $type ): ?>
-            <tr>
-                <td class="align-middle"><?= escaped_string($type->id) ?></td>
-                <td class="align-middle"><?= escaped_string($type->name) ?></td>
-                <td class="align-middle"><?= escaped_string($type->include_siblings) ?></td>
-                <td class="align-middle"><?= escaped_string($type->include_children) ?></td>
-                <td class="align-middle"><?= escaped_string($type->include_descendants) ?></td>
-                <td class="text-nowrap align-middle text-end">
-                    <a href="/restrictions/types/<?= $type->id ?>" class="button button-default"><?= $lang->getValue("translations", "edit") ?></a>
-                    <a href="/restrictions/types/delete/<?= $type->id ?>" class="button button-negativ"><?= $lang->getValue("translations", "delete") ?></a>
-                </td>
-            </tr>
+			<tr>
+				<td class="align-middle"><?= escaped_string($type->id) ?></td>
+				<td class="align-middle"><?= escaped_string($type->name) ?></td>
+				<td class="align-middle"><?= escaped_string($type->include_siblings) ?></td>
+				<td class="align-middle"><?= escaped_string($type->include_children) ?></td>
+				<td class="align-middle"><?= escaped_string($type->include_descendants) ?></td>
+				<td class="text-nowrap align-middle text-end">
+					<a href="/restrictions/types/<?= $type->id ?>" class="button button-default"><?= $lang->getValue("translations", "edit") ?></a>
+					<button class="button button-negativ" onclick="$('#delete-target').attr('action', '/restrictions/types/<?= $type->id ?>')" data-bs-toggle="modal" data-bs-target="#confirm-delete"><?= $lang->getValue("translations", "delete") ?></button>
+				</td>
+			</tr>
 		<?php endforeach; ?>
-    </table>
+	</table>
+</div>
+
+<div class="modal fade" id="confirm-delete" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h1 class="modal-title fs-5" id="modalLabel">Achtung!!!</h1>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body">
+				Sind Sie sicher, das Sie diesen Eintrag l&ouml;schen wollen?
+			</div>
+			<div class="modal-footer">
+				<form id="delete-target" action="" method="POST" style="background-color: transparent;">
+					<?= RequestMethod::DELETE->toInputString() ?>
+					<button type="button" class="button button-default float-left" data-bs-dismiss="modal">Close</button>
+					<button type="submit" class="button button-negativ float-right">L&ouml;schen</button>
+				</form>
+			</div>
+		</div>
+	</div>
 </div>

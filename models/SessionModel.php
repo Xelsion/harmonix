@@ -10,7 +10,7 @@ use lib\core\exceptions\SystemException;
 use lib\helper\StringHelper;
 use models\entities\Session;
 use repositories\ActorRepository;
-use repositories\MVCRepository;
+use repositories\SessionRepository;
 
 /**
  * The SessionModel
@@ -92,8 +92,8 @@ class SessionModel extends Session {
 		}
 
 		try {
-			$mvc_repo = App::getInstanceOf(MVCRepository::class);
-			$session_data = $mvc_repo->getSessionAsArray($session_id);
+			$session_repo = App::getInstanceOf(SessionRepository::class);
+			$session_data = $session_repo->getAsArray($session_id);
 			if( !empty($session_data) ) {
 				$this->id = $session_data["id"];
 				$this->actor_id = (int)$session_data["actor_id"];
@@ -117,7 +117,7 @@ class SessionModel extends Session {
 	 */
 	public function getActor(): ActorModel {
 		try {
-			$mvc_repo = App::getInstanceOf(MVCRepository::class);
+			$session_repo = App::getInstanceOf(SessionRepository::class);
 			$actor = App::getInstanceOf(ActorModel::class);
 			// do we have an actor?
 			if( $this->actor_id > 0 ) {
@@ -126,7 +126,7 @@ class SessionModel extends Session {
 				$this->ip = $_SERVER["REMOTE_ADDR"];
 				$this->expired = $date_time->format("Y-m-d H:i:s");
 				$actor = App::getInstanceOf(ActorModel::class, null, ["id" => $this->actor_id]);
-				$mvc_repo->updateSession($this);
+				$session_repo->updateObject($this);
 				if( $this->use_cookies ) {
 					$this->writeCookie();
 				} else {
@@ -151,7 +151,7 @@ class SessionModel extends Session {
 	public function login(string $email, string $password): bool {
 		$permanent = (App::$request->contains("permanent_login") && App::$request->get("permanent_login") === "yes");
 		try {
-			$mvc_repo = App::getInstanceOf(MVCRepository::class);
+			$session_repo = App::getInstanceOf(SessionRepository::class);
 			$actor_repo = App::getInstanceOf(ActorRepository::class);
 			$actor = $actor_repo->getByLogin($email);
 			if( $actor->id > 0 && password_verify($password, $actor->password) ) {
@@ -166,7 +166,7 @@ class SessionModel extends Session {
 				$this->actor_id = $actor->id;
 				$this->ip = $_SERVER["REMOTE_ADDR"];
 				$this->expired = $date_time->format("Y-m-d H:i:s");
-				$mvc_repo->createSession($this);
+				$session_repo->createObject($this);
 				if( $this->use_cookies ) {
 					$this->writeCookie();
 				} else {
@@ -190,10 +190,10 @@ class SessionModel extends Session {
 	 */
 	public function logout(): void {
 		try {
-			$mvc_repo = App::getInstanceOf(MVCRepository::class);
+			$session_repo = App::getInstanceOf(SessionRepository::class);
 			if( $this->as_actor > 0 ) {
 				$this->as_actor = 0;
-				$mvc_repo->updateSession($this);
+				$session_repo->updateObject($this);
 				if( $this->use_cookies ) {
 					$this->writeCookie();
 				} else {
@@ -204,7 +204,7 @@ class SessionModel extends Session {
 				if( isset($_COOKIE[$this->cookie_name]) && $session_id === $this->id ) {
 					$date_time = new DateTime();
 					$date_time->setTimestamp(time() - 3600);
-					$mvc_repo->deleteSession($this);
+					$session_repo->deleteObject($this);
 					$this->actor_id = 0;
 					$this->expired = $date_time->format('Y-m-d H:i:s');
 					$this->writeCookie();
@@ -225,6 +225,7 @@ class SessionModel extends Session {
 	 * Writes the current session into the browser cookies
 	 *
 	 * @return void
+	 * @throws SystemException
 	 */
 	public function writeCookie(): void {
 		$date_time = DateTime::createFromFormat("Y-m-d H:i:s", $this->expired);
