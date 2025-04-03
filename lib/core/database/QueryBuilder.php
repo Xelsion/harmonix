@@ -16,6 +16,7 @@ use PDOStatement;
  * @version 1.0.0;
  */
 class QueryBuilder extends PDO {
+	
 	protected PDOStatement $stmt;
 	protected string $query_type = "";
 	protected string $sql = "";
@@ -129,7 +130,7 @@ class QueryBuilder extends PDO {
 	 * @return $this
 	 * @throws SystemException
 	 */
-	public function Join(string $table): QueryBuilder {
+	public function innerJoin(string $table): QueryBuilder {
 		if( $this->sql === "" ) {
 			throw new SystemException(__FILE__, __LINE__, "Error in query Syntax");
 		}
