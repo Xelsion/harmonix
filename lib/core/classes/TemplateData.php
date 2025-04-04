@@ -47,6 +47,17 @@ class TemplateData {
 	}
 
 	/**
+	 * Checks if the given key exists in the data array and
+	 * returns true if it exists else false
+	 *
+	 * @param $key
+	 * @return bool
+	 */
+	public static function contains($key): bool {
+		return array_key_exists($key, static::$data);
+	}
+
+	/**
 	 * Adds the given css to the headers css array
 	 *
 	 * @param string $value
