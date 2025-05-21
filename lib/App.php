@@ -13,6 +13,7 @@ use lib\core\classes\Configuration;
 use lib\core\classes\GarbageCollector;
 use lib\core\classes\KeyValuePairs;
 use lib\core\classes\Language;
+use lib\core\classes\Logger;
 use lib\core\classes\TemplateData;
 use lib\core\ClassManager;
 use lib\core\ConnectionManager;
@@ -39,6 +40,9 @@ class App {
 
 	// The class manager with dependency injection
 	private static ClassManager $class_manager;
+
+	// The global debug logger
+	public static Logger $debugger;
 
 	// The current request
 	public static Request $request;
@@ -71,8 +75,10 @@ class App {
 	 * @throws SystemException
 	 */
 	public function __construct() {
+
 		self::$ob_cache = new ObjectCache();
 		self::$class_manager = new ClassManager();
+		self::$debugger = new Logger("debug");
 		self::$config = new Configuration(PATH_ROOT . "application.ini");
 		self::$analyser = self::getInstanceOf(Analyser::class);
 		self::$storage = self::getInstanceOf(KeyValuePairs::class);
