@@ -14,21 +14,12 @@ use lib\core\attributes\PrimaryKey;
 class AccessRestriction {
 	#[PrimaryKey]
 	public int $id = 0;
-
 	public string $domain = "";
-
 	public ?string $controller = null;
-
 	public ?string $method = null;
-
 	public int $restriction_type = 0;
-
 	public int $role_id = 0;
-
 	public string $created = "";
-
 	public ?string $updated = null;
-
 	public ?string $deleted = null;
-
 }

@@ -14,15 +14,9 @@ use lib\core\attributes\PrimaryKey;
 class ActorType {
 	#[PrimaryKey]
 	public int $id = 0;
-
 	public string $name = "";
-
 	public bool $is_protected = false;
-
 	public string $created = "";
-
 	public ?string $updated = null;
-
 	public ?string $deleted = null;
-
 }

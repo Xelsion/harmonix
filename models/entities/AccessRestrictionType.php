@@ -14,19 +14,11 @@ use lib\core\attributes\PrimaryKey;
 class AccessRestrictionType {
 	#[PrimaryKey]
 	public int $id = 0;
-
 	public string $name = "";
-
 	public int $include_siblings = 0;
-
 	public int $include_children = 0;
-
 	public int $include_descendants = 0;
-
 	public string $created = "";
-
 	public ?string $updated = null;
-
 	public ?string $deleted = null;
-
 }

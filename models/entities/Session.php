@@ -14,16 +14,10 @@ use lib\core\attributes\PrimaryKey;
 class Session {
 	#[PrimaryKey]
 	public string $id = "";
-
 	public int $actor_id = 0;
 	public int $as_actor = 0;
-
 	public string $ip = "";
-
 	public string $expired = "";
-
 	public string $created = "";
-
 	public ?string $updated = null;
-
 }

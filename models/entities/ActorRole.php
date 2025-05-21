@@ -14,25 +14,14 @@ use lib\core\attributes\PrimaryKey;
 class ActorRole {
 	#[PrimaryKey]
 	public int $id = 0;
-
 	public ?int $child_of = null;
-
 	public string $name = "";
-
 	public int $rights_all = 0b0000;
-
 	public int $rights_group = 0b0000;
-
 	public int $rights_own = 0b0000;
-
 	public bool $is_default = false;
-
 	public bool $is_protected = false;
-
 	public string $created = "";
-
 	public ?string $updated = null;
-
 	public ?string $deleted = null;
-
 }

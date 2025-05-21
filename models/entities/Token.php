@@ -15,5 +15,4 @@ class Token {
 	#[PrimaryKey]
 	public string $id = "";
 	public string $expired = "";
-
 }
