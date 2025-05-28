@@ -62,7 +62,12 @@ enum HttpResponseCode: int {
 	case NotExtended = 510;
 	case NetworkAuthenticationRequired = 511;
 
-	public static function fromCode($code): HttpResponseCode {
+	/**
+	 * Returns the HttpResponseCode from the given int
+	 * @param int $code
+	 * @return HttpResponseCode
+	 */
+	public static function fromCode(int $code): HttpResponseCode {
 		return match ($code) {
 			200 => self::Ok,
 			201 => self::Created,
@@ -124,6 +129,11 @@ enum HttpResponseCode: int {
 		};
 	}
 
+	/**
+	 * Returns the status code as string
+	 *
+	 * @return string
+	 */
 	public function toString(): string {
 		return match ($this) {
 			self::Ok => "HTTP/1.1 200 Ok",
@@ -185,6 +195,4 @@ enum HttpResponseCode: int {
 			self::NetworkAuthenticationRequired => "HTTP/1.1 511 Network Authentication Required"
 		};
 	}
-
-
 }

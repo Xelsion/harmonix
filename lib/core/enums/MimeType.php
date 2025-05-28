@@ -78,6 +78,12 @@ enum MimeType {
 	case BIN;
 	case UNKNOWN;
 
+	/**
+	 * Returns the MimeType from a file extension
+	 *
+	 * @param string $extension
+	 * @return MimeType
+	 */
 	public static function fromExtension(string $extension): MimeType {
 		return match (strtolower($extension)) {
 			"7z" => self::_7Z,
@@ -156,6 +162,11 @@ enum MimeType {
 		};
 	}
 
+	/**
+	 * Returns the MimeType as string
+	 *
+	 * @return string
+	 */
 	public function toString(): string {
 		return match ($this) {
 			self::_7Z => "application/x-7z-compressed",

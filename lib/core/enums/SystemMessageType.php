@@ -9,6 +9,11 @@ enum SystemMessageType: int {
 	case WARNING = 3;
 	case INFO = 4;
 
+	/**
+	 * Returns the SystemMessageType as string
+	 *
+	 * @return string
+	 */
 	public function toString(): string {
 		return match ($this) {
 			self::SUCCESS => "success",

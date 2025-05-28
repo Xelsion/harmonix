@@ -9,6 +9,11 @@ enum RequestMethod: int {
 	case PUT = 3;
 	case DELETE = 4;
 
+	/**
+	 * Returns the RequestMethod as string
+	 *
+	 * @return string
+	 */
 	public function toString(): string {
 		return match ($this) {
 			self::ANY => "ANY",
@@ -19,6 +24,11 @@ enum RequestMethod: int {
 		};
 	}
 
+	/**
+	 * Return the RequestMethod as an HTML hidden field
+	 *
+	 * @return string
+	 */
 	public function toInputString(): string {
 		$input_template = '<input type="hidden" name="request_method" value="%s">';
 		return match ($this) {
