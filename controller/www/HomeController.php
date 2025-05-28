@@ -21,7 +21,7 @@ class HomeController extends AController {
 	/**
 	 * Shows the landing page
 	 *
-	 * @return \lib\core\blueprints\AResponse
+	 * @return AResponse
 	 *
 	 * @throws SystemException
 	 */
