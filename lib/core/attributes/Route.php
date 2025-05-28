@@ -5,6 +5,16 @@ namespace lib\core\attributes;
 use Attribute;
 use lib\core\enums\RequestMethod;
 
+/**
+ * The Attribute class Route.
+ * This class is used to define Route within a controller class.
+ * The Router class uses this attribute to register all routes
+ *
+ * @see Route
+ *
+ * @author Markus Schröder <xelsion@gmail.com>
+ * @version 1.0.0;
+ */
 #[Attribute]
 class Route {
 
