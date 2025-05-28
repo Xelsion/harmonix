@@ -51,7 +51,6 @@ $pagination = TemplateData::get("pagination");
 					<?php } else { ?>
 						<button class="button button-positiv" onclick="$('#undelete-target').attr('action', '/actors/undelete/<?= $actor->id ?>')" data-bs-toggle="modal" data-bs-target="#confirm-undelete"><?= $lang->getValue("translations", "activate") ?></button>
 					<?php } ?>
-
 				</td>
 			</tr>
 		<?php endforeach; ?>
