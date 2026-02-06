@@ -31,19 +31,23 @@ class HomeController extends AController {
 	 */
 	#[Route("", RequestMethod::GET, RequestMethod::POST)]
 	public function index(): AResponse {
+		$environment = APP::$config->getSectionValue("system", "environment");
 
+		$cache_enabled = (bool)APP::$config->getSectionValue($environment, "cache");
 		$cache = App::getInstanceOf(ResponseCache::class);
 		$cache->initCacheFor(__CLASS__, __METHOD__);
 		$cache->addFileCheck(__FILE__);
-		if( $cache->isUpToDate() ) {
+		if( $cache_enabled && $cache->isUpToDate() ) {
 			$content = $cache->getContent();
-		} else {
-			$view = new Template(PATH_VIEWS . "home/index.html");
+			return new HtmlResponse($content);
+		}
+		$view = new Template(PATH_VIEWS . "home/index.html");
 
-			$template = new Template(PATH_VIEWS . "template.html");
-			TemplateData::set("view", $view->parse());
+		$template = new Template(PATH_VIEWS . "template.html");
+		TemplateData::set("view", $view->parse());
 
-			$content = $template->parse();
+		$content = $template->parse();
+		if( $cache_enabled ) {
 			$cache->saveContent($content);
 		}
 		return new HtmlResponse($content);

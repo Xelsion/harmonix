@@ -5,15 +5,8 @@ namespace lib\core\response_types;
 use lib\core\blueprints\AResponse;
 use lib\core\enums\HttpResponseCode;
 
-/**
- * A Response for HTML content
- *
- * @author Markus Schröder <xelsion@gmail.com>
- * @version 1.0.0;
- */
-class HtmlResponse extends AResponse {
+class TextResponse extends AResponse {
 
-	// the default status for HTML status headers
 	public HttpResponseCode $status_code;
 
 	/**
@@ -29,8 +22,8 @@ class HtmlResponse extends AResponse {
 	}
 
 	/**
-	 * Sets the headers status code of this response
-	 * @param int $status_code
+	 * Sets the header status code of this response
+	 * @param HttpResponseCode $status_code
 	 * @return void
 	 */
 	public function withHeader(HttpResponseCode $status_code): void {
@@ -43,7 +36,7 @@ class HtmlResponse extends AResponse {
 	public function setHeaders(): void {
 		header($this->status_code->toString());
 		header("Cache-Control: no-cache, must-revalidate");
-		header("Content-Type: text/html; charset=UTF-8");
+		header("Content-Type: text/plain; charset=UTF-8");
 	}
 
 }

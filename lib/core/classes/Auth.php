@@ -128,8 +128,8 @@ class Auth {
 	 * @throws SystemException
 	 */
 	private function getRestriction(?string $controller, ?string $method, string $domain = SUB_DOMAIN): array {
-		$controller = $controller ?? "null";
-		$method = $method ?? "null";
+		$controller = $controller ?? "";
+		$method = $method ?? "";
 
 		$role_id = ActorRole::Guest->value;
 		$restriction_type = 1;
@@ -137,17 +137,20 @@ class Auth {
 			$entry = $this->restriction_setup[$domain][$controller][$method];
 			$role_id = $entry["role_id"];
 			$restriction_type = $entry["restriction_type"];
-		} elseif( isset($this->restriction_setup[$domain][$controller]["null"]) ) {
-			$entry = $this->restriction_setup[$domain][$controller]["null"];
+		} elseif( isset($this->restriction_setup[$domain][$controller][""]) ) {
+			$entry = $this->restriction_setup[$domain][$controller][""];
 			$role_id = $entry["role_id"];
 			$restriction_type = $entry["restriction_type"];
-		} else if( isset($this->restriction_setup[$domain]["null"]["null"]) ) {
-			$entry = $this->restriction_setup[$domain]["null"]["null"];
+		} else if( isset($this->restriction_setup[$domain][""][""]) ) {
+			$entry = $this->restriction_setup[$domain][""][""];
 			$role_id = $entry["role_id"];
 			$restriction_type = $entry["restriction_type"];
 		}
 
-		return ["role" => App::getInstanceOf(ActorRoleModel::class, null, ["id" => $role_id]), "type" => App::getInstanceOf(AccessRestrictionTypeModel::class, null, ["id" => $restriction_type])];
+		return [
+			"role" => App::getInstanceOf(ActorRoleModel::class, null, ["id" => $role_id]),
+			"type" => App::getInstanceOf(AccessRestrictionTypeModel::class, null, ["id" => $restriction_type])
+		];
 	}
 
 	/**
@@ -158,9 +161,12 @@ class Auth {
 		$repository = App::getInstanceOf(AccessRestrictionRepository::class);
 		$restrictions = $repository->getAll();
 		foreach( $restrictions as $entry ) {
-			$controller = $entry->controller ?? "null";
-			$method = $entry->method ?? "null";
-			$this->restriction_setup[$entry->domain][$controller][$method] = ["role_id" => $entry->role_id, "restriction_type" => $entry->restriction_type];
+			$controller = $entry->controller ?? "";
+			$method = $entry->method ?? "";
+			$this->restriction_setup[$entry->domain][$controller][$method] = [
+				"role_id" => $entry->role_id,
+				"restriction_type" => $entry->restriction_type
+			];
 		}
 	}
 }

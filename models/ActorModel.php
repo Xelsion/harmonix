@@ -97,13 +97,13 @@ class ActorModel extends Actor {
 				}
 
 				// check if there is a permission setClass for this controller if so return the actor role
-				if( isset($this->permissions[$domain][$controller][null]) ) {
-					return $this->permissions[$domain][$controller][null];
+				if( isset($this->permissions[$domain][$controller][""]) ) {
+					return $this->permissions[$domain][$controller][""];
 				}
 
 				// check if there is a permission setClass for this domain if so return the actor role
-				if( isset($this->permissions[$domain][null][null]) ) {
-					return $this->permissions[$domain][null][null];
+				if( isset($this->permissions[$domain][""][""]) ) {
+					return $this->permissions[$domain][""][""];
 				}
 			}
 
@@ -147,7 +147,7 @@ class ActorModel extends Actor {
 			$access_permission_repo = App::getInstanceOf(AccessPermissionRepository::class);
 			$permissions = $access_permission_repo->getAccessPermissionFor($this);
 			foreach( $permissions as $permission ) {
-				$this->permissions[$permission->domain][$permission->controller][$permission->method] = $permission->getRole();
+				$this->permissions[$permission->domain][$permission->controller ?? ""][$permission->method ?? ""] = $permission->getRole();
 			}
 		} catch( Exception $e ) {
 			throw new SystemException(__FILE__, __LINE__, $e->getMessage(), $e->getCode(), $e->getPrevious());

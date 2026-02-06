@@ -9,6 +9,7 @@ use lib\classes\GeoCoordinate;
 use lib\core\attributes\Route;
 use lib\core\blueprints\AController;
 use lib\core\blueprints\AResponse;
+use lib\core\classes\File;
 use lib\core\classes\Template;
 use lib\core\classes\TemplateData;
 use lib\core\enums\RequestMethod;
@@ -145,6 +146,26 @@ class TestController extends AController {
 		TemplateData::set("timespan", $timespan);
 		TemplateData::set("currency", $currency);
 
+		$template = new Template(PATH_VIEWS . "template.html");
+		TemplateData::set("view", $view->parse());
+
+		return new HtmlResponse($template->parse());
+	}
+
+	/**
+	 * @return AResponse
+	 * @throws SystemException
+	 */
+	#[Route("base64", RequestMethod::GET, RequestMethod::POST)]
+	public function File2Base64(): AResponse {
+		if( App::$request->contains("upload") ) {
+			$upload = App::$request->get("upload");
+
+			$file = new File($upload["tmp_name"]);
+			$base64 = base64_encode($file->getContent());
+			TemplateData::set("base64", $base64);
+		}
+		$view = new Template(PATH_VIEWS . "tests/base64.html");
 		$template = new Template(PATH_VIEWS . "template.html");
 		TemplateData::set("view", $view->parse());
 

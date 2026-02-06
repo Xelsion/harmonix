@@ -40,7 +40,7 @@ $pagination = TemplateData::get("pagination");
 				<td class="align-middle"<?= $row_style ?>><?= escaped_string($actor->first_name) ?></td>
 				<td class="align-middle"<?= $row_style ?>><?= escaped_string($actor->last_name) ?></td>
 				<td class="text-nowrap align-middle text-end">
-					<form action="https://www.harmonix.de" target="_blank" method="POST" class="minimized">
+					<form action="https://www.<?= App::$config->getSectionValue("system", "domain_name") ?>" target="_blank" method="POST" class="minimized">
 						<input type="hidden" name="actor_id" value="<?= $actor->id ?>"/>
 						<button type="submit" name="login_as" class="button button-default"><?= $lang->getValue("phrases", "login_as") ?></button>
 					</form>

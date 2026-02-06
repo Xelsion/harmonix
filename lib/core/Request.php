@@ -44,7 +44,13 @@ class Request extends KeyValuePairs {
 			}
 		}
 
-		$this->request_uri = $_SERVER["REQUEST_URI"] ?? "";
+		$request_parts = explode("?", $_SERVER["REQUEST_URI"]);
+		if( count($request_parts) > 1 ) {
+			$request = $request_parts[0];
+		} else {
+			$request = $_SERVER["REQUEST_URI"];
+		}
+		$this->request_uri = $request ?? "";
 		$this->request_method = ($this->contains("request_method")) ? strtoupper($this->get("request_method")) : $_SERVER['REQUEST_METHOD'] ?? "";
 	}
 

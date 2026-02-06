@@ -179,7 +179,7 @@ class StringHelper {
 			}
 
 			// Fallback (PHP 4.2+)
-			mt_srand((double)microtime() * 10000);
+			mt_srand((float)microtime() * 10000);
 			$char_id = strtolower(md5(uniqid(mt_rand(), true)));
 			$hyphen = chr(45);                  // "-"
 			$lbrace = $trim ? "" : chr(123);    // "{"

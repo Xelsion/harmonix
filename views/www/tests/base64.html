@@ -1,0 +1,18 @@
+<?php
+
+use lib\core\classes\TemplateData;
+
+$base64 = TemplateData::get("base64") ?? null;
+?>
+<form action="/tests/base64" method="post" enctype="multipart/form-data">
+	<div>
+		<label for="upload">Datei</label>
+		<input id="upload" type="file" name="upload"/>
+	</div>
+	<div>
+		<input type="submit" name="submit"/>
+	</div>
+</form>
+<?php if( $base64 !== null ) : ?>
+	<div><?= $base64 ?></div>
+<?php endif; ?>

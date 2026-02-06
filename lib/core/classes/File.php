@@ -26,7 +26,7 @@ class File {
 	public string $mime_type = "";
 
 	// The file size in bytes
-	public int $file_size = 0;
+	public float $file_size = 0.0;
 
 	/**
 	 * The constructor

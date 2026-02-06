@@ -48,7 +48,7 @@ class RestrictionController extends AController {
 		$access_restrictions = $this->restriction_repository->getAll();
 		$current_restrictions = array();
 		foreach( $access_restrictions as $restriction ) {
-			$current_restrictions[$restriction->domain][$restriction->controller][$restriction->method] = array(
+			$current_restrictions[$restriction->domain][$restriction->controller ?? ""][$restriction->method ?? ""] = array(
 				"role" => $restriction->role_id,
 				"type" => $restriction->restriction_type
 			);
@@ -228,12 +228,12 @@ class RestrictionController extends AController {
 		$restrictions = array();
 		foreach( $_POST['restriction'] as $domain => $entry_domain ) {
 			if( (int)$entry_domain["role"] > 0 && (int)$entry_domain["type"] > 0 ) {
-				$restrictions[$domain][null][null] = array($entry_domain["role"], $entry_domain["type"]);
+				$restrictions[$domain][""][""] = array($entry_domain["role"], $entry_domain["type"]);
 			}
 			foreach( $entry_domain["controller"] as $controller => $entry_controller ) {
 				$controller = str_replace("-", "\\", $controller);
 				if( (int)$entry_controller["role"] > 0 && (int)$entry_controller["type"] > 0 ) {
-					$restrictions[$domain][$controller][null] = array(
+					$restrictions[$domain][$controller][""] = array(
 						$entry_controller["role"],
 						$entry_controller["type"]
 					);
@@ -255,8 +255,8 @@ class RestrictionController extends AController {
 				foreach( $methods as $method => $entry ) {
 					$restriction = new AccessRestrictionModel();
 					$restriction->domain = $domain;
-					$restriction->controller = ($controller !== "") ? $controller : null;
-					$restriction->method = ($method !== "") ? $method : null;
+					$restriction->controller = $controller ?? "";
+					$restriction->method = $method ?? "";
 					$restriction->role_id = $entry[0];
 					$restriction->restriction_type = $entry[1];
 					$this->restriction_repository->createObject($restriction);
