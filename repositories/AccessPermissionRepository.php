@@ -43,17 +43,14 @@ class AccessPermissionRepository extends ARepository {
 			// @formatter:off
             $access_permission = $this->pdo->Select()
                 ->From("access_permission")
-                ->Where("actor_id=:actor_id")
-                    ->And("role_id=:role_id")
-                    ->And("domain=:domain")
-                    ->And("controller=:controller")
-                    ->And("method=:method")
+                ->Where([
+					"actor_id" => $actor_id,
+                    "role_id" => $role_id,
+                    "domain" => $domain,
+                    "controller" => $controller,
+                    "method" => $method
+				])
                 ->prepareStatement()
-                    ->withParam(":actor_id", $actor_id, PDO::PARAM_INT)
-                    ->withParam(":role_id", $role_id, PDO::PARAM_INT)
-                    ->withParam(":domain", $domain)
-                    ->withParam(":controller", $controller)
-                    ->withParam(":method", $method)
                 ->fetchMode(PDO::FETCH_CLASS, AccessPermissionModel::class)
                 ->execute()
                 ->fetch()
@@ -82,17 +79,14 @@ class AccessPermissionRepository extends ARepository {
 			// @formatter:off
 			$access_permission = $this->pdo->Select()
 				->From("access_permission")
-				->Where("actor_id=:actor_id")
-					->And("role_id=:role_id")
-					->And("domain=:domain")
-					->And("controller=:controller")
-					->And("method=:method")
+				->Where([
+					"actor_id" => $actor_id,
+					"role_id" => $role_id,
+					"domain" => $domain,
+					"controller" => $controller,
+					"method" => $method
+				])
 				->prepareStatement()
-					->withParam(":actor_id", $actor_id, PDO::PARAM_INT)
-					->withParam(":role_id", $role_id, PDO::PARAM_INT)
-					->withParam(":domain", $domain)
-					->withParam(":controller", $controller)
-					->withParam(":method", $method)
 				->execute()
 				->fetch()
 			;
@@ -135,9 +129,8 @@ class AccessPermissionRepository extends ARepository {
 			// @formatter:off
 			return $this->pdo->Select()
 				->From("access_permissions")
-				->Where("actor_id=:actor_id")
+				->Where(["actor_id" => $actor->id])
 				->prepareStatement()
-					->withParam(":actor_id", $actor->id, PDO::PARAM_INT)
 				->fetchMode(PDO::FETCH_CLASS, AccessPermissionModel::class)
 				->execute()
 				->fetchAll()
@@ -157,9 +150,8 @@ class AccessPermissionRepository extends ARepository {
 		try {
 			// @formatter:off
 			$this->pdo->Delete("access_permissions")
-				->Where("actor_id=:actor_id")
+				->Where(["actor_id" => $actor->id])
 				->prepareStatement()
-				->withParam(":actor_id", $actor->id, PDO::PARAM_INT)
 				->execute()
 			;
 			// @formatter:on
@@ -208,13 +200,14 @@ class AccessPermissionRepository extends ARepository {
 		try {
 			// @formatter:off
 			$this->pdo->Insert("access_permissions")
-				->Columns(["actor_id", "role_id", "domain", "controller", "method"])
+				->Values([
+					"actor_id" => $permission->actor_id,
+					"role_id" => $permission->role_id,
+					"domain" => $permission->domain,
+					"controller" => $permission->controller,
+					"method" => $permission->method,
+				])
 				->prepareStatement()
-					->withParam(':actor_id', $permission->actor_id, PDO::PARAM_INT)
-					->withParam(':role_id', $permission->role_id, PDO::PARAM_INT)
-					->withParam(':domain', $permission->domain)
-					->withParam(':controller', $permission->controller)
-					->withParam(':method', $permission->method)
 				->execute()
 			;
 			// @formatter:on
@@ -226,7 +219,6 @@ class AccessPermissionRepository extends ARepository {
 	/**
 	 * @param AccessPermission $permission
 	 * @return void
-	 * @throws SystemException
 	 */
 	public function updateObject(AccessPermission $permission): void {
 		// no updating required
@@ -240,18 +232,15 @@ class AccessPermissionRepository extends ARepository {
 	public function deleteObject(AccessPermission $permission): void {
 		try {
 			// @formatter:off
-			$this->pdo->Delete("access_permissions")
-				->Where("actor_id=:actor_id")
-					->And("role_id=:role_id")
-					->And("domain=:domain")
-					->And("controller=:controller")
-					->And("method=:method")
+			$this->pdo->Delete()->From("access_permissions")
+				->Where([
+					"actor_id" => $permission->actor_id,
+					"role_id" => $permission->role_id,
+					"domain" => $permission->domain,
+					"controller" => $permission->controller,
+					"method" => $permission->method
+				])
 				->prepareStatement()
-					->withParam(':actor_id', $permission->actor_id, PDO::PARAM_INT)
-					->withParam(':role_id', $permission->role_id, PDO::PARAM_INT)
-					->withParam(':domain', $permission->domain)
-					->withParam(':controller', $permission->controller)
-					->withParam(':method', $permission->method)
 				->execute()
 			;
 			// @formatter:on

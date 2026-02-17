@@ -8,7 +8,6 @@ use lib\core\blueprints\ARepository;
 use lib\core\ConnectionManager;
 use lib\core\exceptions\SystemException;
 use models\ActorRoleModel;
-use models\entities\ActorRole;
 use PDO;
 
 /**
@@ -38,9 +37,8 @@ class ActorRoleRepository extends ARepository {
 			// @formatter:off
             $actor_role = $this->pdo->Select()
                 ->From("actor_roles")
-                ->Where("id=:id")
+                ->Where(["id" => $id])
                 ->prepareStatement()
-                    ->withParam(":id", $id, PDO::PARAM_INT)
                 ->fetchMode(PDO::FETCH_CLASS, ActorRoleModel::class)
                 ->execute()
                 ->fetch()
@@ -65,9 +63,8 @@ class ActorRoleRepository extends ARepository {
 			// @formatter:off
             $actor_role = $this->pdo->Select()
                 ->From("actor_roles")
-                ->Where("id=:id")
+                ->Where(["id" => $id])
                 ->prepareStatement()
-                    ->withParam(":id", $id, PDO::PARAM_INT)
                 ->execute()
                 ->fetch()
             ;
@@ -88,6 +85,7 @@ class ActorRoleRepository extends ARepository {
 	public function getAll(): array {
 		try {
 			// @formatter:off
+			$this->pdo->Select();
             return $this->pdo->Select()
                 ->From("actor_roles")
                 ->prepareStatement()
@@ -129,9 +127,8 @@ class ActorRoleRepository extends ARepository {
 			// @formatter:off
 			return $this->pdo->Select()
 				->From("actor_roles")
-				->Where("child_of=:id")
+				->Where(["child_of" =>  $id])
 				->prepareStatement()
-					->withParam(":id", $id, PDO::PARAM_INT)
 				->fetchMode(PDO::FETCH_CLASS, ActorRoleModel::class)
 				->execute()
 				->fetchAll()
@@ -174,7 +171,7 @@ class ActorRoleRepository extends ARepository {
 	}
 
 	/**
-	 * @param ActorRole $role
+	 * @param ActorRoleModel $role
 	 * @return void
 	 * @throws SystemException
 	 */
@@ -182,13 +179,14 @@ class ActorRoleRepository extends ARepository {
 		try {
 			// @formatter:off
             $this->pdo->Insert("actor_roles")
-                ->Columns(["child_of", "name", "rights_all", "rights_group", "rights_own"])
+                ->Values([
+					"child_of" => $role->child_of,
+	                "name" => $role->name,
+	                "rights_all" => $role->rights_all,
+	                "rights_group" => $role->rights_group,
+	                "rights_own" => $role->rights_own,
+                ])
                 ->prepareStatement()
-                    ->withParam(':child_of', $role->child_of, PDO::PARAM_INT)
-                    ->withParam(':name', $role->name)
-                    ->withParam(':rights_all', $role->rights_all, PDO::PARAM_INT)
-                    ->withParam(':rights_group', $role->rights_group, PDO::PARAM_INT)
-                    ->withParam(':rights_own', $role->rights_own, PDO::PARAM_INT)
                 ->execute()
             ;
 	        // @formatter:on
@@ -199,7 +197,7 @@ class ActorRoleRepository extends ARepository {
 	}
 
 	/**
-	 * @param ActorRole $role
+	 * @param ActorRoleModel $role
 	 * @return void
 	 * @throws SystemException
 	 */
@@ -211,15 +209,15 @@ class ActorRoleRepository extends ARepository {
 		try {
 			// @formatter:off
             $this->pdo->Update("actor_roles")
-                ->Set(["child_of", "name", "rights_all", "rights_group", "rights_own"])
-                ->Where("id=:id")
+                ->Values([
+					"child_of" => $role->child_of,
+	                "name" => $role->name,
+	                "rights_all" => $role->rights_all,
+	                "rights_group" => $role->rights_group,
+	                "rights_own" => $role->rights_own,
+                ])
+                ->Where(["id" => $role->id])
                 ->prepareStatement()
-                    ->withParam(':id', $role->id, PDO::PARAM_INT)
-                    ->withParam(':child_of', $role->child_of, PDO::PARAM_INT)
-                    ->withParam(':name', $role->name)
-                    ->withParam(':rights_all', $role->rights_all, PDO::PARAM_INT)
-                    ->withParam(':rights_group', $role->rights_group, PDO::PARAM_INT)
-                    ->withParam(':rights_own', $role->rights_own, PDO::PARAM_INT)
                 ->execute()
             ;
 	        // @formatter:on
@@ -229,7 +227,7 @@ class ActorRoleRepository extends ARepository {
 	}
 
 	/**
-	 * @param ActorRole $role
+	 * @param ActorRoleModel $role
 	 * @return void
 	 * @throws SystemException
 	 */
@@ -246,10 +244,9 @@ class ActorRoleRepository extends ARepository {
 			}
 
 			// @formatter:off
-            $this->pdo->Delete("actor_roles")
-                ->Where("id=:id")
+            $this->pdo->Delete()->From("actor_roles")
+                ->Where(["id" => $role->id])
                 ->prepareStatement()
-                    ->withParam(':id', $role->id, PDO::PARAM_INT)
                 ->execute()
             ;
 	        // @formatter:on

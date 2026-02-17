@@ -5,6 +5,7 @@ namespace lib\core\resolver;
 use lib\core\ClassManager;
 use lib\core\exceptions\SystemException;
 use ReflectionException;
+use ReflectionNamedType;
 use ReflectionParameter;
 
 /**
@@ -43,15 +44,34 @@ class ParameterResolver {
 	public function getArguments(): array {
 		// loop through the parameters
 		return array_map(function(ReflectionParameter $param) {
-			// if an additional arg that was passed in return that value
-			if( array_key_exists($param->getName(), $this->args) ) {
-				return $this->args[$param->getName()];
+			$name = $param->getName();
+
+			// 1. Priorität: Manuell übergebene Argumente (Named Arguments)
+			if( array_key_exists($name, $this->args) ) {
+				return $this->args[$name];
 			}
-			// if the parameter is a class, resolve it and return it
-			// otherwise return the default value
-			return ($param->getType() && !$param->getType()->isBuiltin())
-				? $this->getClassInstance($param->getType()->getName())
-				: $param->getDefaultValue();
+
+			$type = $param->getType();
+
+			// 2. Priorität: Klassen-Instanziierung (Dependency Injection)
+			// Prüfen, ob es ein NamedType ist (Union/Intersection Types ignorieren wir für Autowiring)
+			if( $type instanceof ReflectionNamedType && !$type->isBuiltin() ) {
+				return $this->getClassInstance($type->getName());
+			}
+
+			// 3. Priorität: Default-Werte
+			if( $param->isDefaultValueAvailable() ) {
+				return $param->getDefaultValue();
+			}
+
+			// 4. Fallback: Nullable Types
+			if( $param->allowsNull() ) {
+				return null;
+			}
+
+			// 5. Error-Handling: Parameter nicht auflösbar
+			throw new SystemException(__FILE__, __LINE__, sprintf("Unresolvable dependency [%s] in class %s", $name, $param->getDeclaringClass()
+				?->getName() ?? 'unknown'));
 		}, $this->parameters);
 	}
 
@@ -66,6 +86,6 @@ class ParameterResolver {
 	 * @throws SystemException
 	 */
 	protected function getClassInstance(string $namespace): object {
-		return (new ClassResolver($this->class_manager, $namespace))->getInstance();
+		return new ClassResolver($this->class_manager, $namespace)->getInstance();
 	}
 }

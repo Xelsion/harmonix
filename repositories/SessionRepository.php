@@ -38,9 +38,8 @@ class SessionRepository extends ARepository {
 			// @formatter:off
 			$session = $this->pdo->Select()
 				->From("sessions")
-				->Where("id=:id")
+				->Where(["id" => $id])
 				->prepareStatement()
-					->withParam(':id', $id)
 				->fetchMode(PDO::FETCH_CLASS, SessionModel::class)
 				->execute()
 				->fetch()
@@ -65,9 +64,8 @@ class SessionRepository extends ARepository {
 			// @formatter:off
 			$result = $this->pdo->Select()
 				->From("sessions")
-				->Where("id=:id")
+				->Where(["id" => $id])
 				->prepareStatement()
-					->withParam(':id', $id)
 				->execute()
 				->fetch()
 			;
@@ -111,12 +109,13 @@ class SessionRepository extends ARepository {
 		try {
 			// @formatter:off
 			$this->pdo->Insert("sessions")
-				->Columns(["id", "actor_id", "ip", "expired"])
+				->Values([
+					"id" => $session->id,
+					"actor_id" => $session->actor_id,
+					"ip" => $session->ip,
+					"expired" => $session->expired,
+				])
 				->prepareStatement()
-					->withParam(':id', $session->id)
-					->withParam(':actor_id', $session->actor_id, PDO::PARAM_INT)
-					->withParam(':ip', $session->ip)
-					->withParam(':expired', $session->expired)
 				->execute()
 			;
 			// @formatter:on
@@ -141,15 +140,15 @@ class SessionRepository extends ARepository {
 			}
 			// @formatter:off
 			$this->pdo->Update("sessions")
-				->Set(["id", "actor_id", "as_actor", "ip", "expired"])
-				->Where("id=:curr_id")
+				->Values([
+					"id" => $session->id,
+					"actor_id" => $session->actor_id,
+					"as_actor" => $session->as_actor,
+					"ip" => $session->ip,
+					"expired" => $session->expired,
+				])
+				->Where(["id" => $curr_id])
 				->prepareStatement()
-					->withParam(':id', $session->id)
-					->withParam(':curr_id', $curr_id)
-					->withParam(':actor_id', $session->actor_id, PDO::PARAM_INT)
-					->withParam(':as_actor', $session->as_actor, PDO::PARAM_INT)
-					->withParam(':ip', $session->ip)
-					->withParam(':expired', $session->expired)
 				->execute()
 			;
 			// @formatter:on
@@ -169,10 +168,9 @@ class SessionRepository extends ARepository {
 		}
 		try {
 			// @formatter:off
-			$this->pdo->Delete("sessions")
-				->Where("id=:id")
+			$this->pdo->Delete()->From("sessions")
+				->Where(["id" => $session->id])
 				->prepareStatement()
-					->withParam(":id", $session->id)
 				->execute()
 			;
 			// @formatter:on

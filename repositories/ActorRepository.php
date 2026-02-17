@@ -45,9 +45,8 @@ class ActorRepository extends ARepository {
 			// @formatter:off
 			$actor = $this->pdo->Select()
 				->From("actors")
-				->Where("id=:id")
+				->Where(["id" => $id])
 				->prepareStatement()
-					->withParam(":id", $id, PDO::PARAM_INT)
 				->fetchMode(PDO::FETCH_INTO, App::getInstanceOf(ActorModel::class))
 				->execute()
 				->fetch()
@@ -74,9 +73,8 @@ class ActorRepository extends ARepository {
 			// @formatter:off
 			$actor = $this->pdo->Select()
 				->From("actors")
-				->Where("id=:id")
+				->Where(["id" => $id])
 				->prepareStatement()
-					->withParam(":id", $id, PDO::PARAM_INT)
 				->execute()
 				->fetch()
 			;
@@ -102,11 +100,12 @@ class ActorRepository extends ARepository {
 			// @formatter:off
 			$actor = $this->pdo->Select()
 				->From("actors")
-				->Where("email=:email")
-					->And("login_disabled=0")
-					->And("deleted")->isNull()
+				->Where([
+					"email" => $email,
+					"login_disabled" => 0,
+					"deleted" => ["IS" => null]
+				])
 				->prepareStatement()
-					->withParam(":email", $email)
 				->fetchMode(PDO::FETCH_CLASS, ActorModel::class)
 				->execute()
 				->fetch()
@@ -192,15 +191,13 @@ class ActorRepository extends ARepository {
 				// @formatter:off
 				$result = $this->pdo->Select("role_id")
 					->From("access_permissions")
-					->Where("actor_id=:actor_id")
-						->And("domain=:domain")
-						->And("controller=:controller")
-						->And("method=:method=:method")
+					->Where([
+						"actor_id" => $actor->id,
+						"domain" => $domain,
+						"controller" => $controller,
+						"method" => $method
+					])
 					->prepareStatement()
-						->withParam(":actor_id", $actor->id, PDO::PARAM_INT)
-						->withParam(":domain", $domain)
-						->withParam(":controller", $controller)
-						->withParam(":method", $method)
 					->execute()
 					->fetch()
 				;
@@ -213,13 +210,12 @@ class ActorRepository extends ARepository {
 				// @formatter:off
 				$result = $this->pdo->Select("role_id")
 					->From("access_permissions")
-					->Where("actor_id=:actor_id")
-						->And("domain=:domain")
-						->And("controller=:controller")
+					->Where([
+						"actor_id" => $actor->id,
+						"domain" => $domain,
+						"controller" => $controller,
+					])
 					->prepareStatement()
-						->withParam(":actor_id", $actor->id, PDO::PARAM_INT)
-						->withParam(":domain", $domain)
-						->withParam(":controller", $controller)
 					->execute()
 					->fetch()
 				;
@@ -232,11 +228,11 @@ class ActorRepository extends ARepository {
 				// @formatter:off
 				$result = $this->pdo->Select("role_id")
 					->From("access_permissions")
-					->Where("actor_id=:actor_id")
-						->And("domain=:domain")
+					->Where([
+						"actor_id" => $actor->id,
+						"domain" => $domain,
+					])
 					->prepareStatement()
-						->withParam(":actor_id", $actor->id, PDO::PARAM_INT)
-						->withParam(":domain", $domain)
 					->execute()
 					->fetch()
 				;
@@ -248,7 +244,7 @@ class ActorRepository extends ARepository {
 				// @formatter:off
 				$result = $this->pdo->Select("id")
 					->From("actor_roles")
-					->Where("is_default=1")
+					->Where(["is_default" => 1])
 					->prepareStatement()
 					->execute()
 					->fetch()
@@ -278,9 +274,8 @@ class ActorRepository extends ARepository {
 			// @formatter:off
 			return $this->pdo->Select()
 				->From("access_permissions")
-				->Where("actor_id=:actor_id")
+				->Where(["actor_id" => $actor->id])
 				->prepareStatement()
-					->withParam(":actor_id", $actor->id, PDO::PARAM_INT)
 				->fetchMode(PDO::FETCH_CLASS, AccessPermissionModel::class)
 				->execute()
 				->fetchAll()
@@ -302,7 +297,7 @@ class ActorRepository extends ARepository {
 	}
 
 	/**
-	 * @param Actor $actor
+	 * @param ActorModel $actor
 	 * @return void
 	 * @throws SystemException
 	 */
@@ -312,15 +307,16 @@ class ActorRepository extends ARepository {
 
 			// @formatter:off
 			$this->pdo->Insert("actors")
-				->Columns(["type_id", "email", "password", "first_name", "last_name", "login_fails", "login_disabled"])
+				->Values([
+					"type_id" => $actor->type_id,
+					"email" => $actor->email,
+					"password" => $actor->password,
+					"first_name" => $actor->first_name,
+					"last_name" => $actor->last_name,
+					"login_fails" => $actor->login_fails,
+					"login_disabled" => $actor->login_disabled,
+				])
 				->prepareStatement()
-					->withParam(':type_id', $actor->type_id)
-					->withParam(':email', $actor->email)
-					->withParam(':password', $actor->password)
-					->withParam(':first_name', $actor->first_name)
-					->withParam(':last_name', $actor->last_name)
-					->withParam(':login_fails', $actor->login_fails, PDO::PARAM_INT)
-					->withParam(':login_disabled', $actor->login_disabled, PDO::PARAM_INT)
 				->execute()
 			;
 			// @formatter:on
@@ -331,7 +327,7 @@ class ActorRepository extends ARepository {
 	}
 
 	/**
-	 * @param Actor $actor
+	 * @param ActorModel $actor
 	 * @return void
 	 * @throws SystemException
 	 */
@@ -340,9 +336,8 @@ class ActorRepository extends ARepository {
 			// @formatter:off
 			$row = $this->pdo->Select("password")
 				->From("actors")
-				->Where("id=:id")
+				->Where(["id" => $actor->id])
 				->prepareStatement()
-					->withParam(':id', $actor->id, PDO::PARAM_INT)
 				->execute()
 				->fetch()
 			;
@@ -356,17 +351,17 @@ class ActorRepository extends ARepository {
 
 				// @formatter:off
 				$this->pdo->Update("actors")
-					->Set(["email", "password", "first_name", "last_name", "login_fails", "login_disabled", "deleted"])
-					->Where("id=:id")
+					->Values([
+						"email" => $actor->email,
+						"password" => $actor->password,
+						"first_name" => $actor->first_name,
+						"last_name" => $actor->last_name,
+						"login_fails" => $actor->login_fails,
+						"login_disabled" => $actor->login_disabled,
+						"deleted" => $actor->deleted,
+					])
+					->Where(["id" => $actor->id])
 					->prepareStatement()
-						->withParam(':id', $actor->id, PDO::PARAM_INT)
-						->withParam(':email', $actor->email)
-						->withParam(':password', $actor->password)
-						->withParam(':first_name', $actor->first_name)
-						->withParam(':last_name', $actor->last_name)
-						->withParam(':login_fails', $actor->login_fails, PDO::PARAM_INT)
-						->withParam(':login_disabled', $actor->login_disabled, PDO::PARAM_INT)
-						->withParam(':deleted', $actor->deleted)
 					->execute()
 				;
 				// @formatter:on
@@ -390,12 +385,12 @@ class ActorRepository extends ARepository {
 			try {
 				// @formatter:off
 				$this->pdo->Update("actors")
-					->Set(["deleted", "login_disabled"])
-					->Where("id=:id")
+					->Values([
+						"deleted" => new DateTime()->format("Y-m-d H:i:s"),
+						"login_disabled" => 1
+					])
+					->Where(["id" => $actor->id])
 					->prepareStatement()
-						->withParam(':id', $actor->id, PDO::PARAM_INT)
-						->withParam(':login_disabled', 1, PDO::PARAM_INT)
-						->withParam(':deleted', (new DateTime())->format("Y-m-d H:i:s"))
 					->execute()
 				;
 				// @formatter:on
@@ -418,12 +413,12 @@ class ActorRepository extends ARepository {
 			try {
 				// @formatter:off
 				$this->pdo->Update("actors")
-					->Set(["deleted", "login_disabled"])
-					->Where("id=:id")
+					->Values([
+						"deleted" => null,
+						"login_disabled" => 0
+					])
+					->Where(["id" => $actor->id])
 					->prepareStatement()
-						->withParam(':id', $actor->id, PDO::PARAM_INT)
-						->withParam(':login_disabled', 0, PDO::PARAM_INT)
-						->withParam(':deleted', null, PDO::PARAM_NULL)
 					->execute()
 				;
 				// @formatter:on

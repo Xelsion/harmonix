@@ -8,7 +8,6 @@ use lib\core\blueprints\ARepository;
 use lib\core\ConnectionManager;
 use lib\core\exceptions\SystemException;
 use models\AccessRestrictionTypeModel;
-use models\entities\AccessRestrictionType;
 use PDO;
 
 /**
@@ -38,9 +37,8 @@ class AccessRestrictionTypeRepository extends ARepository {
 			// @formatter:off
             $restriction_type = $this->pdo->Select()
                 ->From("access_restriction_types")
-                ->Where("id=:id")
+                ->Where(["id" => $id])
                 ->prepareStatement()
-                    ->withParam(":id", $id)
                 ->fetchMode(PDO::FETCH_CLASS, AccessRestrictionTypeModel::class)
                 ->execute()
                 ->fetch()
@@ -65,9 +63,8 @@ class AccessRestrictionTypeRepository extends ARepository {
 			// @formatter:off
             $restriction_type = $this->pdo->Select()
                 ->From("access_restriction_types")
-                ->Where("id=:id")
+                ->Where(["id" => $id])
                 ->prepareStatement()
-                    ->withParam(":id", $id)
                 ->execute()
                 ->fetch()
             ;
@@ -134,7 +131,7 @@ class AccessRestrictionTypeRepository extends ARepository {
 
 
 	/**
-	 * @param AccessRestrictionType $restriction_type
+	 * @param AccessRestrictionTypeModel $restriction_type
 	 * @return void
 	 * @throws SystemException
 	 */
@@ -142,12 +139,13 @@ class AccessRestrictionTypeRepository extends ARepository {
 		try {
 			// @formatter:off
             $this->pdo->Insert("access_restriction_types")
-                ->Columns(["name", "include_siblings", "include_children", "include_descendants"])
+                ->Values([
+					"name" => $restriction_type->name,
+	                "include_siblings" => $restriction_type->include_siblings,
+	                "include_children" => $restriction_type->include_children,
+	                "include_descendants" => $restriction_type->include_descendants,
+                ])
                 ->prepareStatement()
-                    ->withParam(':name', $restriction_type->name)
-                    ->withParam(':include_siblings', $restriction_type->include_siblings, PDO::PARAM_INT)
-                    ->withParam(':include_children', $restriction_type->include_children, PDO::PARAM_INT)
-                    ->withParam(':include_descendants', $restriction_type->include_descendants, PDO::PARAM_INT)
                 ->execute()
             ;
 	        // @formatter:on
@@ -158,7 +156,7 @@ class AccessRestrictionTypeRepository extends ARepository {
 	}
 
 	/**
-	 * @param AccessRestrictionType $restriction_type
+	 * @param AccessRestrictionTypeModel $restriction_type
 	 * @return void
 	 * @throws SystemException
 	 */
@@ -166,14 +164,14 @@ class AccessRestrictionTypeRepository extends ARepository {
 		try {
 			// @formatter:off
             $this->pdo->Update("access_restriction_types")
-                ->Set(["name", "include_siblings", "include_children", "include_descendants"])
-                ->Where("id=:id")
+                ->Values([
+					"name" => $restriction_type->name,
+	                "include_siblings" => $restriction_type->include_siblings,
+	                "include_children" => $restriction_type->include_children,
+	                "include_descendants" => $restriction_type->include_descendants,
+                ])
+                ->Where(["id" => $restriction_type->id])
                 ->prepareStatement()
-                    ->withParam(':id', $restriction_type->id, PDO::PARAM_INT)
-                    ->withParam(':name', $restriction_type->name)
-                    ->withParam(':include_siblings', $restriction_type->include_siblings, PDO::PARAM_INT)
-                    ->withParam(':include_children', $restriction_type->include_children, PDO::PARAM_INT)
-                    ->withParam(':include_descendants', $restriction_type->include_descendants, PDO::PARAM_INT)
                 ->execute()
             ;
 	        // @formatter:on
@@ -183,17 +181,16 @@ class AccessRestrictionTypeRepository extends ARepository {
 	}
 
 	/**
-	 * @param AccessRestrictionType $restriction_type
+	 * @param AccessRestrictionTypeModel $restriction_type
 	 * @return void
 	 * @throws SystemException
 	 */
 	public function deleteObject(AccessRestrictionTypeModel $restriction_type): void {
 		try {
 			// @formatter:off
-            $this->pdo->Delete("access_restriction_types")
-                ->Where("id=:id")
+            $this->pdo->Delete()->From("access_restriction_types")
+                ->Where(["id" => $restriction_type->id])
                 ->prepareStatement()
-                    ->withParam(':id', $restriction_type->id, PDO::PARAM_INT)
                 ->execute()
             ;
 	        // @formatter:on

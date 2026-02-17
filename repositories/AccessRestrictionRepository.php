@@ -11,6 +11,7 @@ use models\AccessRestrictionModel;
 use models\entities\AccessRestriction;
 use PDO;
 
+
 /**
  * @inheritDoc
  *
@@ -40,13 +41,12 @@ class AccessRestrictionRepository extends ARepository {
 			// @formatter:off
             $access_restriction = $this->pdo->Select()
                 ->From("access_restrictions")
-                ->Where("domain=:domain")
-                    ->And("controller=:controller")
-                    ->And("method=:method")
+                ->Where([
+					"domain" => $domain,
+                    "controller" => $controller,
+                    "method" => $method
+				])
                 ->prepareStatement()
-                    ->withParam(":domain", $domain)
-                    ->withParam(":controller", $controller)
-                    ->withParam(":method", $method)
                 ->fetchMode(PDO::FETCH_CLASS, AccessRestrictionModel::class)
                 ->execute()
                 ->fetch()
@@ -73,9 +73,8 @@ class AccessRestrictionRepository extends ARepository {
 			// @formatter:off
             $access_restriction = $this->pdo->Select()
 	            ->From("access_restrictions")
-                ->Where("id=:id")
+                ->Where(["id" => $id])
                 ->PrepareStatement()
-                    ->WithParam(":id", $id)
                 ->execute()
 	            ->fetch()
             ;
@@ -143,7 +142,7 @@ class AccessRestrictionRepository extends ARepository {
 	}
 
 	/**
-	 * @param AccessRestriction $restriction
+	 * @param AccessRestrictionModel $restriction
 	 * @return void
 	 * @throws SystemException
 	 */
@@ -151,13 +150,14 @@ class AccessRestrictionRepository extends ARepository {
 		try {
 			// @formatter:off
             $this->pdo->Insert("access_restrictions")
-                ->Columns(["domain", "controller", "method", "restriction_type", "role_id"])
+                ->Values([
+					"domain" => $restriction->domain,
+	                "controller" => $restriction->controller,
+	                "method" => $restriction->method,
+	                "restriction_type" => $restriction->restriction_type,
+	                "role_id" => $restriction->role_id,
+                ])
                 ->prepareStatement()
-                    ->withParam(':domain', $restriction->domain)
-                    ->withParam(':controller', $restriction->controller)
-                    ->withParam(':method', $restriction->method)
-                    ->withParam(':restriction_type', $restriction->restriction_type, PDO::PARAM_INT)
-                    ->withParam(':role_id', $restriction->role_id, PDO::PARAM_INT)
                 ->execute()
             ;
 	        // @formatter:on
@@ -176,15 +176,15 @@ class AccessRestrictionRepository extends ARepository {
 		try {
 			// @formatter:off
             $this->pdo->Update("access_restrictions")
-                ->Set(["domain", "controller", "method", "restriction_type", "role_id"])
-                ->Where("id=:id")
+                ->Values([
+					"domain" => $restriction->domain,
+	                "controller" => $restriction->controller,
+	                "method" => $restriction->method,
+	                "restriction_type" => $restriction->restriction_type,
+	                "role_id" => $restriction->role_id,
+                ])
+                ->Where(["id" => $restriction->id])
                 ->prepateStatement()
-                    ->withParam(':id', $restriction->id, PDO::PARAM_INT)
-                    ->withParam(':domain', $restriction->domain)
-                    ->withParam(':controller', $restriction->controller)
-                    ->withParam(':method', $restriction->method)
-                    ->withParam(':restriction_type', $restriction->restriction_type, PDO::PARAM_INT)
-                    ->withParam(':role_id', $restriction->role_id, PDO::PARAM_INT)
                 ->execute()
             ;
 	        // @formatter:on
@@ -201,10 +201,9 @@ class AccessRestrictionRepository extends ARepository {
 	public function deleteObject(AccessRestrictionModel $restriction): void {
 		try {
 			// @formatter:off
-            $this->pdo->Delete("access_restrictions")
-                ->Where("id=:id")
+            $this->pdo->Delete()->From("access_restrictions")
+                ->Where(["id" => $restriction->id])
                 ->prepareStatement()
-                    ->withParam(':id', $restriction->id, PDO::PARAM_INT)
                 ->execute()
             ;
 	        // @formatter:on

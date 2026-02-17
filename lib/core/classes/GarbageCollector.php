@@ -51,7 +51,7 @@ readonly class GarbageCollector {
 		try {
 			$pdo = $this->connectionManager->getConnection("mvc");
 			$pdo->prepareQuery("DELETE FROM sessions WHERE expired<:date");
-			$pdo->bindParam("date", $today->format("Y-m-d H:i:s"));
+			$pdo->setData(["date" => $today->format("Y-m-d H:i:s")]);
 			$pdo->execute();
 		} catch( Exception $e ) {
 			throw new SystemException($e->getFile(), $e->getLine(), $e->getMessage(), $e->getCode(), $e->getPrevious());
@@ -68,7 +68,7 @@ readonly class GarbageCollector {
 		try {
 			$pdo = $this->connectionManager->getConnection("mvc");
 			$pdo->prepareQuery("DELETE FROM action_storage WHERE created<:date");
-			$pdo->bindParam("date", $lifetime->format("Y-m-d H:i:s"));
+			$pdo->setData(["date" => $lifetime->format("Y-m-d H:i:s")]);
 			$pdo->execute();
 		} catch( Exception $e ) {
 			throw new SystemException($e->getFile(), $e->getLine(), $e->getMessage(), $e->getCode(), $e->getPrevious());
@@ -87,7 +87,7 @@ readonly class GarbageCollector {
 		try {
 			$pdo = $this->connectionManager->getConnection("mvc");
 			$pdo->prepareQuery("DELETE FROM tokens WHERE expired<:date");
-			$pdo->bindParam("date", $today->format("Y-m-d H:i:s"));
+			$pdo->setData(["date" => $today->format("Y-m-d H:i:s")]);
 			$pdo->execute();
 		} catch( Exception $e ) {
 			throw new SystemException($e->getFile(), $e->getLine(), $e->getMessage(), $e->getCode(), $e->getPrevious());

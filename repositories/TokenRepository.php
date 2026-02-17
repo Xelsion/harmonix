@@ -38,9 +38,8 @@ class TokenRepository extends ARepository {
 			// @formatter:off
 			return $this->pdo->Select()
 				->From("tokens")
-				->Where("id=:id")
+				->Where(["id" => $id])
 				->prepareStatement()
-					->withParam(":id", $id)
 				->fetchMode(PDO::FETCH_CLASS, Token::class)
 				->execute()
 				->fetch()
@@ -61,9 +60,8 @@ class TokenRepository extends ARepository {
 			// @formatter:off
 			return $this->pdo->Select()
 				->From("tokens")
-				->Where("id=:id")
+				->Where(["id" => $id])
 				->prepareStatement()
-					->withParam(":id", $id)
 				->execute()
 			;
 			// @formatter:on
@@ -101,10 +99,11 @@ class TokenRepository extends ARepository {
 		try {
 			// @formatter:off
 			$this->pdo->Insert("tokens")
-				->Columns(["id", "expired"])
+				->Values([
+					"id" => $token->id,
+					"expired" => $token->expired,
+				])
 				->prepareStatement()
-					->withParam(":id", $token->id)
-					->withParam(":expired", $token->expired)
 				->execute()
 			;
 			// @formatter:on
@@ -125,11 +124,9 @@ class TokenRepository extends ARepository {
 		try {
 			// @formatter:off
 			$this->pdo->Update("tokens")
-				->Set(["expired"])
-				->Where("id=:id")
+				->Values(["expired" => $token->expired])
+				->Where(["id" => $token->id])
 				->prepareStatement()
-					->withParam(":id", $token->id)
-					->withParam(":expired", $token->expired)
 				->execute()
 			;
 			// @formatter:on
@@ -149,10 +146,9 @@ class TokenRepository extends ARepository {
 		}
 		try {
 			// @formatter:off
-			$this->pdo->Delete("tokens")
-				->Where("id=:id")
+			$this->pdo->Delete()->From("tokens")
+				->Where(["id" => $token->id])
 				->prepareStatement()
-					->withParam(":id", $token->id)
 				->execute()
 			;
 			// @formatter:on

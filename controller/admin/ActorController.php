@@ -63,8 +63,8 @@ class ActorController extends AController {
 
 		$pagination = "";
 		HTMLHelper::getPagination($params['page'], $this->actor_repository->getNumRows(), $params['limit'], $pagination);
-
 		$view = new Template(PATH_VIEWS . "actor/index.html");
+
 		TemplateData::set("actor_list", $this->actor_repository->find(array(), $params['order'], $params['direction'], $params['limit'], $params['page']));
 		TemplateData::set("pagination", $pagination);
 
@@ -87,14 +87,19 @@ class ActorController extends AController {
 		$results = array();
 		if( $search_string !== null ) {
 			$results = $this->actor_repository->find([
-				["first_name", "LIKE", '%' . $search_string . '%'],
-				["OR", "last_name", "LIKE", '%' . $search_string . '%'],
-				["OR", "email", "LIKE", '%' . $search_string . '%'],
+				"first_name" => ["LIKE" => $search_string],
+				"OR"         => [
+					"last_name" => ["LIKE" => $search_string],
+					"OR"        => [
+						"email" => ["LIKE" => $search_string]
+					]
+				]
 			]);
 		}
 		$view = new Template(PATH_VIEWS . "actor/search.html");
 		TemplateData::set("search_string", $search_string);
 		TemplateData::set("actor_list", $results);
+
 
 		$template = new Template(PATH_VIEWS . "template.html");
 		TemplateData::set("view", $view->parse());
@@ -249,7 +254,7 @@ class ActorController extends AController {
 		TemplateData::set("actor", $actor);
 		TemplateData::set("routes", App::getInstanceOf(Router::class)->getSortedRoutes());
 		TemplateData::set("role_options", $this->role_repository->getAll());
-		TemplateData::set("access_permissions", $this->permission_repository->find([["actor_id", "=", $actor->id]]));
+		TemplateData::set("access_permissions", $this->permission_repository->find(["actor_id" => $actor->id]));
 
 		$template = new Template(PATH_VIEWS . "template.html");
 		TemplateData::set("view", $view->parse());

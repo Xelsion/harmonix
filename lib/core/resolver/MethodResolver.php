@@ -45,11 +45,22 @@ class MethodResolver {
 	 * @throws SystemException
 	 */
 	public function getValue(): mixed {
-		// getInstanceOf the class method reflection class
-		$method = new ReflectionMethod($this->instance, $this->method);
-		// find and resolve the method arguments
-		$argumentResolver = new ParameterResolver($this->class_manager, $method->getParameters(), $this->args);
-		// call the method with the injected arguments
-		return $method->invokeArgs($this->instance, $argumentResolver->getArguments());
+		// Sicherstellen, dass die Methode existiert, bevor Reflection angeworfen wird
+		if( !method_exists($this->instance, $this->method) ) {
+			throw new SystemException(__FILE__, __LINE__, sprintf("Method %s::%s() does not exist.", $this->instance::class, $this->method));
+		}
+
+		$refMethod = new ReflectionMethod($this->instance, $this->method);
+
+		// Sicherheitscheck: Nur öffentliche Methoden erlauben (oder explizit zugänglich machen)
+		if( !$refMethod->isPublic() ) {
+			throw new SystemException(__FILE__, __LINE__, sprintf("Method %s::%s() is not public and cannot be resolved via DI.", $this->instance::class, $this->method));
+		}
+
+		// Nutzt den verbesserten ParameterResolver für die Methoden-Argumente
+		$argumentResolver = new ParameterResolver($this->class_manager, $refMethod->getParameters(), $this->args);
+
+		// Aufruf mit den aufgelösten Argumenten
+		return $refMethod->invokeArgs($this->instance, $argumentResolver->getArguments());
 	}
 }

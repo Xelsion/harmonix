@@ -3,12 +3,8 @@
 namespace lib\core\blueprints;
 
 use Exception;
-use lib\App;
-use lib\core\ConnectionManager;
 use lib\core\database\PDOConnection;
 use lib\core\exceptions\SystemException;
-use lib\helper\MySqlHelper;
-use PDO;
 
 /**
  * A Repository provides all function needed to communicate with the source of the data.
@@ -35,33 +31,23 @@ abstract class ARepository {
 	 */
 	public function findIn(string $table_name, string $class_name, array $conditions = array(), ?string $order = "", ?string $direction = "asc", int $limit = 0, int $page = 1): array {
 		try {
-			$results = array();
-			$cm = App::getInstanceOf(ConnectionManager::class);
-			$pdo = $cm->getConnection("mvc");
-			if( !is_null($pdo) ) {
-				$params = array();
-
-				$query = "SELECT * FROM " . $table_name;
-				if( !empty($conditions) ) {
-					$params = MySqlHelper::addQueryConditions($query, $conditions);
-				}
-				if( $order !== "" ) {
-					MySqlHelper::addQueryOrder($query, $order, $direction);
-				}
-				if( $limit > 0 ) {
-					$params = array_merge($params, MySqlHelper::addQueryLimit($query, $limit, $page));
-				}
-
-				$pdo->prepareQuery($query);
-				foreach( $params as $key => $value ) {
-					$pdo->bindParam(":" . $key, $value, MySqlHelper::getParamType($value));
-				}
-				$pdo->setFetchMode(PDO::FETCH_CLASS, $class_name);
-
-				$results = $pdo->execute()->fetchAll();
+			if( is_null($this->pdo) || !isset($this->pdo) ) {
+				throw new SystemException(__FILE__, __LINE__, self::class . ": pdo not set!");
+			}
+			$qb = $this->pdo->Select()->From($table_name);
+			if( !empty($conditions) ) {
+				$qb->Where($conditions);
+			}
+			if( !empty($order) ) {
+				$qb->OrderBy($order, strtoupper((string)$direction));
 			}
 
-			return $results;
+			if( $limit > 0 ) {
+				$offset = ($page - 1) * $limit;
+				$qb->Limit($limit, $offset);
+			}
+			$stmt = $qb->prepareStatement()->fetchMode(\PDO::FETCH_CLASS, $class_name)->execute();
+			return $stmt->fetchAll();
 		} catch( Exception $e ) {
 			throw new SystemException($e->getFile(), $e->getLine(), $e->getMessage(), $e->getCode(), $e->getPrevious());
 		}

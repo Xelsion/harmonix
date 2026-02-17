@@ -84,7 +84,7 @@ class ActorRoleModel extends ActorRole {
 	 */
 	public function getChildren(): array {
 		try {
-			return App::getInstanceOf(ActorRoleRepository::class)->find([["child_of", "=", $this->id]]);
+			return App::getInstanceOf(ActorRoleRepository::class)->find(["child_of" => $this->id]);
 		} catch( Exception $e ) {
 			throw new SystemException(__FILE__, __LINE__, $e->getMessage(), $e->getCode(), $e->getPrevious());
 		}

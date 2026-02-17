@@ -21,6 +21,9 @@ class ClassResolver {
 	protected string $namespace;
 	protected array $args;
 
+	// Statischer Stack, um zirkuläre Abhängigkeiten über Instanzen hinweg zu tracken
+	protected static array $resolving = [];
+
 	/**
 	 * The class constructor
 	 *
@@ -43,36 +46,47 @@ class ClassResolver {
 	 * @throws SystemException
 	 */
 	public function getInstance(): object {
-		// check for container entry
+		// 1. Container-Check (Singletons / Bindings)
 		if( $this->class_manager->has($this->namespace) ) {
 			$binding = $this->class_manager->get($this->namespace);
-
-			// return if there is a container instance / setAsSingleton
 			if( is_object($binding) ) {
 				return $binding;
 			}
-			// sets the namespace to the bound container namespace
 			$this->namespace = $binding;
 		}
-		// create a reflection class
-		$refClass = new ReflectionClass($this->namespace);
 
-		// getInstanceOf the constructor
-		$constructor = $refClass->getConstructor();
-
-		// check constructor exists and is accessible
-		if( $constructor && $constructor->isPublic() ) {
-			// check constructor contains parameters and resolve them
-			if( count($constructor->getParameters()) > 0 ) {
-				$argumentResolver = new ParameterResolver($this->class_manager, $constructor->getParameters(), $this->args);
-				// resolve the constructor arguments
-				$this->args = $argumentResolver->getArguments();
-			}
-			// create the new instance with the constructor arguments
-			return $refClass->newInstanceArgs($this->args);
+		// 2. Circular Dependency Schutz
+		if( isset(self::$resolving[$this->namespace]) ) {
+			throw new SystemException(__FILE__, __LINE__, "Circular dependency detected while resolving: " . $this->namespace);
 		}
-		// no arguments so create the new instance without calling the constructor
-		return $refClass->newInstanceWithoutConstructor();
+		self::$resolving[$this->namespace] = true;
+
+		try {
+			$refClass = new ReflectionClass($this->namespace);
+
+			// 3. Instanziierungsschutz
+			if( !$refClass->isInstantiable() ) {
+				throw new SystemException(__FILE__, __LINE__, "Class {$this->namespace} is not instantiable (Abstract or Private Constructor).");
+			}
+			$constructor = $refClass->getConstructor();
+
+			// 4. Konstruktor-Auflösung
+			if( $constructor && $constructor->isPublic() ) {
+				$params = $constructor->getParameters();
+
+				if( count($params) > 0 ) {
+					$argumentResolver = new ParameterResolver($this->class_manager, $params, $this->args);
+					return $refClass->newInstanceArgs($argumentResolver->getArguments());
+				}
+				return $refClass->newInstance();
+			}
+
+			// 5. Fallback für Klassen ohne (öffentlichen) Konstruktor
+			return $refClass->newInstanceWithoutConstructor();
+		} finally {
+			// WICHTIG: Stack nach Auflösung wieder frei geben
+			unset(self::$resolving[$this->namespace]);
+		}
 	}
 
 }

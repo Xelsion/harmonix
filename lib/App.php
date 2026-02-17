@@ -19,6 +19,7 @@ use lib\core\ClassManager;
 use lib\core\ConnectionManager;
 use lib\core\exceptions\SystemException;
 use lib\core\Request;
+use lib\core\resolver\MethodResolver;
 use lib\core\Router;
 use lib\core\tree\RoleTree;
 use models\ActorModel;
@@ -75,7 +76,6 @@ class App {
 	 * @throws SystemException
 	 */
 	public function __construct() {
-
 		self::$ob_cache = new ObjectCache();
 		self::$class_manager = new ClassManager();
 		self::$debugger = new Logger("debug");
@@ -139,6 +139,7 @@ class App {
 
 		// Try to getInstanceOf the responsible route for this requested uri
 		$router = self::getInstanceOf(Router::class);
+
 		try {
 			$route = $router->getRoute(self::$request);
 			if( empty($route) ) { // no route found
@@ -170,7 +171,13 @@ class App {
 			// Has the current actor access to this request?
 			if( self::$auth->hasAccess() ) {
 				// Get the Response obj from the controller
-				$this::$response = call_user_func_array([$controller, $method], $params);
+				try {
+					$resolver = new MethodResolver(self::$class_manager, $controller, $method, $params);
+					$this::$response = $resolver->getValue();
+				} catch( Exception $e ) {
+					throw new SystemException(__FILE__, __LINE__, "Method Injection failed: " . $e->getMessage());
+				}
+				//$this::$response = self::getInstanceOf($controller::class, $method, $params);
 			} else {
 				redirect("/error/403");
 			}

@@ -8,7 +8,6 @@ use lib\core\blueprints\ARepository;
 use lib\core\ConnectionManager;
 use lib\core\exceptions\SystemException;
 use models\ActorTypeModel;
-use models\entities\ActorType;
 use PDO;
 
 /**
@@ -38,9 +37,8 @@ class ActorTypeRepository extends ARepository {
 			// @formatter:off
             $actor_type = $this->pdo->Select()
                 ->From("actor_types")
-                ->Where("id=:id")
+                ->Where(["id" => $id])
                 ->prepareStatement()
-                    ->withParam(":id", $id)
                 ->fetchMode(PDO::FETCH_CLASS, ActorTypeModel::class)
                 ->execute()
                 ->fetch()
@@ -65,9 +63,8 @@ class ActorTypeRepository extends ARepository {
 			// @formatter:off
             $actor_type = $this->pdo->Select()
                 ->From("actor_types")
-                ->Where("id=:id")
+                ->Where(["id" => $id])
                 ->prepareStatement()
-                    ->withParam(":id", $id)
                 ->execute()
                 ->fetch()
             ;
@@ -133,7 +130,7 @@ class ActorTypeRepository extends ARepository {
 	}
 
 	/**
-	 * @param ActorType $type
+	 * @param ActorTypeModel $type
 	 * @return void
 	 * @throws SystemException
 	 */
@@ -141,9 +138,8 @@ class ActorTypeRepository extends ARepository {
 		try {
 			// @formatter:off
             $this->pdo->Insert("actor_types")
-                ->Columns(["name"])
+                ->Values(["name" => $type->name])
                 ->prepareStatement()
-                    ->withParam(':name', $type->name)
                 ->execute()
             ;
 	        // @formatter:on
@@ -154,7 +150,7 @@ class ActorTypeRepository extends ARepository {
 	}
 
 	/**
-	 * @param ActorType $type
+	 * @param ActorTypeModel $type
 	 * @return void
 	 * @throws SystemException
 	 */
@@ -165,11 +161,9 @@ class ActorTypeRepository extends ARepository {
 		try {
 			// @formatter:off
             $this->pdo->Update("actor_types")
-                ->Columns(["name"])
-                ->Where("id=:id")
+                ->Values(["name" => $type->name])
+                ->Where(["id" => $type->id])
                 ->prepareStatement()
-                    ->withParam(':id', $type->id, PDO::PARAM_INT)
-                    ->withParam(':name', $type->name)
                 ->execute()
             ;
 	        // @formatter:on
@@ -179,7 +173,7 @@ class ActorTypeRepository extends ARepository {
 	}
 
 	/**
-	 * @param ActorType $type
+	 * @param ActorTypeModel $type
 	 * @return void
 	 * @throws SystemException
 	 */
@@ -189,10 +183,9 @@ class ActorTypeRepository extends ARepository {
 		}
 		try {
 			// @formatter:off
-            $this->pdo->Delete("actor_types")
-                ->Where("id=:id")
+            $this->pdo->Delete()->From("actor_types")
+                ->Where(["id" => $type->id])
                 ->prepareStatement()
-                    ->withParam(':id', $type->id, PDO::PARAM_INT)
                 ->execute()
             ;
 	        // @formatter:on
