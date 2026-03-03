@@ -31,8 +31,12 @@ class TemplateData {
 	 * @param $key
 	 * @param $value
 	 */
-	public static function set($key, $value): void {
-		static::$data[$key] = $value;
+	public static function set(string $key, mixed $value, bool $raw_html = false): void {
+		if( is_string($value) && !$raw_html ) {
+			self::$data[$key] = self::escapeValue($value);
+			return;
+		}
+		self::$data[$key] = $value;
 	}
 
 	/**
@@ -42,7 +46,7 @@ class TemplateData {
 	 * @param $key
 	 * @return mixed|null
 	 */
-	public static function get($key): mixed {
+	public static function get(string $key): mixed {
 		return static::$data[$key] ?? null;
 	}
 
@@ -53,7 +57,7 @@ class TemplateData {
 	 * @param $key
 	 * @return bool
 	 */
-	public static function contains($key): bool {
+	public static function contains(string $key): bool {
 		return array_key_exists($key, static::$data);
 	}
 
@@ -133,5 +137,21 @@ class TemplateData {
 	public static function getSystemMessage(): mixed {
 		return static::$system_message;
 	}
+
+
+	private static function escapeValue(mixed $value): mixed {
+		if( is_string($value) ) {
+			return escaped_string($value);
+		}
+
+		if( is_array($value) ) {
+			foreach( $value as $k => $v ) {
+				$value[$k] = self::escapeValue($v);
+			}
+		}
+
+		return $value;
+	}
+
 
 }

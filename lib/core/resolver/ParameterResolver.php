@@ -46,30 +46,30 @@ class ParameterResolver {
 		return array_map(function(ReflectionParameter $param) {
 			$name = $param->getName();
 
-			// 1. Priorität: Manuell übergebene Argumente (Named Arguments)
+			// check if named argument exists
 			if( array_key_exists($name, $this->args) ) {
 				return $this->args[$name];
 			}
 
 			$type = $param->getType();
 
-			// 2. Priorität: Klassen-Instanziierung (Dependency Injection)
-			// Prüfen, ob es ein NamedType ist (Union/Intersection Types ignorieren wir für Autowiring)
+			// Class initiation (Dependency Injection)
+			// check if it is a named type (Union/Intersection ignored for autowiring)
 			if( $type instanceof ReflectionNamedType && !$type->isBuiltin() ) {
 				return $this->getClassInstance($type->getName());
 			}
 
-			// 3. Priorität: Default-Werte
+			// check for default values
 			if( $param->isDefaultValueAvailable() ) {
 				return $param->getDefaultValue();
 			}
 
-			// 4. Fallback: Nullable Types
+			// check for nullable values
 			if( $param->allowsNull() ) {
 				return null;
 			}
 
-			// 5. Error-Handling: Parameter nicht auflösbar
+			// param not resolvable
 			throw new SystemException(__FILE__, __LINE__, sprintf("Unresolvable dependency [%s] in class %s", $name, $param->getDeclaringClass()
 				?->getName() ?? 'unknown'));
 		}, $this->parameters);

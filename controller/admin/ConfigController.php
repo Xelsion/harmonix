@@ -27,7 +27,7 @@ class ConfigController extends AController {
 		TemplateData::set("config_data", $config_data);
 
 		$template = new Template(PATH_VIEWS . "template.html");
-		TemplateData::set("view", $view->parse());
+		TemplateData::set("view", $view->parse(), true);
 
 		return new HtmlResponse($template->parse());
 	}

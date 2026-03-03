@@ -22,8 +22,8 @@ $role_list = TemplateData::get("result_list");
 		</tr>
 		<?php foreach( $role_list as $type ): ?>
 			<tr>
-				<td class="align-middle"><?= escaped_string($type->id) ?></td>
-				<td class="align-middle"><?= escaped_string($type->name) ?></td>
+				<td class="align-middle"><?= $type->id ?></td>
+				<td class="align-middle"><?= $type->name ?></td>
 				<td class="align-middle"><?= ($type->is_protected) ? "Ja" : "Nein" ?></td>
 				<td class="text-nowrap align-middle text-end">
 					<a href="/actor-types/<?= $type->id ?>" class="button button-default"><?= $lang->getValue("translations", "edit") ?></a>

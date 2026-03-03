@@ -72,10 +72,10 @@ class ClassManager {
 			}
 
 			if( !is_null($method) && $method !== "" ) {
-				return (new MethodResolver($this, $namespace, $method, $args))->getValue();
+				return new MethodResolver($this, $namespace, $method, $args)->getValue();
 			}
 
-			return (new ClassResolver($this, $namespace, $args))->getInstance();
+			return new ClassResolver($this, $namespace, $args)->getInstance();
 		} catch( ReflectionException $e ) {
 			throw new SystemException($e->getFile(), $e->getLine(), $e->getMessage(), $e->getCode(), $e->getPrevious());
 		}

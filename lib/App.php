@@ -60,7 +60,7 @@ class App {
 	// The Auth depending on the current actor role and the current request restrictions
 	public static Auth $auth;
 
-	// The analyser contains entries witch time measured aspects of the framework
+	// The analyzer contains entries witch time measured aspects of the framework
 	public static Analyser $analyser;
 
 	// The global accessible key=>value storage for the application
@@ -139,7 +139,6 @@ class App {
 
 		// Try to getInstanceOf the responsible route for this requested uri
 		$router = self::getInstanceOf(Router::class);
-
 		try {
 			$route = $router->getRoute(self::$request);
 			if( empty($route) ) { // no route found

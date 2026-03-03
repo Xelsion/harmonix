@@ -54,7 +54,8 @@ class CacheFile extends File {
 			parent::__construct($cache_file);
 			$this->cache_age = new DateTime();
 			if( file_exists($this->file_path) ) {
-				$this->cache_age->setTimestamp(filemtime($cache_file));
+				$mtime = @filemtime($cache_file);
+				$this->cache_age->setTimestamp($mtime !== false ? $mtime : 0);
 			} else {
 				$this->cache_age->setTimestamp(0);
 			}
@@ -71,10 +72,8 @@ class CacheFile extends File {
 		parent::__construct($cache_file);
 		$this->cache_age = new DateTime();
 		if( file_exists($this->file_path) ) {
-			$creation_time = filectime($cache_file);
-			$modification_time = filemtime($cache_file);
-			$time = ($modification_time > $creation_time) ? $modification_time : $creation_time;
-			$this->cache_age->setTimestamp($time);
+			$mtime = @filemtime($cache_file);
+			$this->cache_age->setTimestamp($mtime !== false ? $mtime : 0);
 		} else {
 			$this->cache_age->setTimestamp(0);
 		}
@@ -117,6 +116,10 @@ class CacheFile extends File {
 			$this->setContent($content);
 		}
 		$this->save();
+
+		$mtime = @filemtime($this->file_path);
+		$this->cache_age = new DateTime();
+		$this->cache_age->setTimestamp($mtime !== false ? $mtime : 0);
 	}
 
 	/**

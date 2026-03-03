@@ -33,7 +33,7 @@ class TestController extends AController {
 		$view = new Template(PATH_VIEWS . "tests/index.html");
 
 		$template = new Template(PATH_VIEWS . "template.html");
-		TemplateData::set("view", $view->parse());
+		TemplateData::set("view", $view->parse(), true);
 
 		return new HtmlResponse($template->parse());
 	}
@@ -48,7 +48,7 @@ class TestController extends AController {
 		$view = new Template(PATH_VIEWS . "tests/charts.html");
 
 		$template = new Template(PATH_VIEWS . "template.html");
-		TemplateData::set("view", $view->parse());
+		TemplateData::set("view", $view->parse(), true);
 
 		return new HtmlResponse($template->parse());
 	}
@@ -64,7 +64,7 @@ class TestController extends AController {
 		$view = new Template(PATH_VIEWS . "tests/validator.html");
 
 		$template = new Template(PATH_VIEWS . "template.html");
-		TemplateData::set("view", $view->parse());
+		TemplateData::set("view", $view->parse(), true);
 
 		return new HtmlResponse($template->parse());
 	}
@@ -80,7 +80,7 @@ class TestController extends AController {
 		$view = new Template(PATH_VIEWS . "tests/validator.html");
 
 		$template = new Template(PATH_VIEWS . "template.html");
-		TemplateData::set("view", $view->parse());
+		TemplateData::set("view", $view->parse(), true);
 
 		return new HtmlResponse($template->parse());
 	}
@@ -99,7 +99,7 @@ class TestController extends AController {
 		TemplateData::set("currency", null);
 
 		$template = new Template(PATH_VIEWS . "template.html");
-		TemplateData::set("view", $view->parse());
+		TemplateData::set("view", $view->parse(), true);
 
 		return new HtmlResponse($template->parse());
 	}
@@ -111,8 +111,8 @@ class TestController extends AController {
 	#[Route("math", RequestMethod::POST)]
 	public function mathSubmit(): AResponse {
 		$distance = null;
-		if( App::$request->contains("distance") ) {
-			$coords = App::$request->get("coord");
+		$coords = (App::$request->contains("coords")) ? App::$request->get("coords") : array();
+		if( !empty($coords) && App::$request->contains("distance") ) {
 			$long1 = (float)$coords[0]["long"];
 			$lat1 = (float)$coords[0]["lat"];
 			$long2 = (float)$coords[1]["long"];
@@ -142,12 +142,13 @@ class TestController extends AController {
 		}
 
 		$view = new Template(PATH_VIEWS . "tests/math.html");
+		TemplateData::set("coords", $coords);
 		TemplateData::set("distance", $distance);
 		TemplateData::set("timespan", $timespan);
 		TemplateData::set("currency", $currency);
 
 		$template = new Template(PATH_VIEWS . "template.html");
-		TemplateData::set("view", $view->parse());
+		TemplateData::set("view", $view->parse(), true);
 
 		return new HtmlResponse($template->parse());
 	}
@@ -167,7 +168,7 @@ class TestController extends AController {
 		}
 		$view = new Template(PATH_VIEWS . "tests/base64.html");
 		$template = new Template(PATH_VIEWS . "template.html");
-		TemplateData::set("view", $view->parse());
+		TemplateData::set("view", $view->parse(), true);
 
 		return new HtmlResponse($template->parse());
 	}

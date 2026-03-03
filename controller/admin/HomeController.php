@@ -44,7 +44,7 @@ class HomeController extends AController {
 		$view = new Template(PATH_VIEWS . "home/index.html");
 
 		$template = new Template(PATH_VIEWS . "template.html");
-		TemplateData::set("view", $view->parse());
+		TemplateData::set("view", $view->parse(), true);
 
 		$content = $template->parse();
 		if( $cache_enabled ) {

@@ -23,11 +23,11 @@ $type_list = TemplateData::get("type_list");
 		</tr>
 		<?php foreach( $type_list as $type ): ?>
 			<tr>
-				<td class="align-middle"><?= escaped_string($type->id) ?></td>
-				<td class="align-middle"><?= escaped_string($type->name) ?></td>
-				<td class="align-middle"><?= escaped_string($type->include_siblings) ?></td>
-				<td class="align-middle"><?= escaped_string($type->include_children) ?></td>
-				<td class="align-middle"><?= escaped_string($type->include_descendants) ?></td>
+				<td class="align-middle"><?= $type->id ?></td>
+				<td class="align-middle"><?= $type->name ?></td>
+				<td class="align-middle"><?= $type->include_siblings ?></td>
+				<td class="align-middle"><?= $type->include_children ?></td>
+				<td class="align-middle"><?= $type->include_descendants ?></td>
 				<td class="text-nowrap align-middle text-end">
 					<a href="/restrictions/types/<?= $type->id ?>" class="button button-default"><?= $lang->getValue("translations", "edit") ?></a>
 					<button class="button button-negativ" onclick="$('#delete-target').attr('action', '/restrictions/types/<?= $type->id ?>')" data-bs-toggle="modal" data-bs-target="#confirm-delete"><?= $lang->getValue("translations", "delete") ?></button>

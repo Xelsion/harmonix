@@ -28,17 +28,21 @@ class ConnectionManager {
 
 	/**
 	 * the class constructor
+	 * @throws SystemException
 	 */
 	public function __construct(Configuration $config) {
-		$connections = $config->getSection("connections");
+		$connections = $config->getSection("connections") ?? array();
 		foreach( $connections as $key => $conn ) {
-			$connection = match ($conn["type"]) {
+			$type = $conn["type"] ?? null;
+			$connection = match ($type) {
 				"postgres" => new PostgresConnection(),
 				"mssql" => new MsSqlConnection(),
 				"mysql" => new MySqlConnection(),
 				default => null
 			};
-
+			if( is_null($connection) ) {
+				throw new SystemException(__FILE__, __LINE__, "ConnectionManager: invalid connection type '$type' for connection '$key'");
+			}
 			if( $connection instanceof ADBConnection ) {
 				$connection->host = $conn["host"];
 				$connection->port = (int)$conn["port"];
@@ -77,11 +81,11 @@ class ConnectionManager {
 	 * @param string $key
 	 * @param bool $singleton default true
 	 *
-	 * @return mixed|PDOConnection
+	 * @return PDOConnection
 	 *
 	 * @throws SystemException
 	 */
-	public function getConnection(string $key, bool $singleton = true): mixed {
+	public function getConnection(string $key, bool $singleton = true): PDOConnection {
 		// is the connection already active?
 		if( isset($this->_active_connections[$key]) && $singleton ) {
 			return $this->_active_connections[$key];
@@ -103,15 +107,6 @@ class ConnectionManager {
 			}
 		} else {
 			throw new SystemException(__FILE__, __LINE__, "ConnectionManager: [" . $key . "] connection not found");
-		}
-	}
-
-	/**
-	 * Close all active connections
-	 */
-	public function __destruct() {
-		foreach( $this->_active_connections as $connection ) {
-			$connection = null;
 		}
 	}
 

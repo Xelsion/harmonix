@@ -51,7 +51,7 @@ class ActorRolesController extends AController {
 		TemplateData::set("role_tree", $actor_roles_tree);
 
 		$template = new Template(PATH_VIEWS . "template.html");
-		TemplateData::set("view", $view->parse());
+		TemplateData::set("view", $view->parse(), true);
 
 		return new HtmlResponse($template->parse());
 	}
@@ -63,11 +63,15 @@ class ActorRolesController extends AController {
 	 */
 	#[Route("create", RequestMethod::GET)]
 	public function create(bool $cache_refresh = false): AResponse {
+		if( !App::$curr_actor_role->canCreateAll() ) {
+			redirect("/error/403");
+		}
+
 		$view = new Template(PATH_VIEWS . "actor_roles/create.html");
 		TemplateData::set("option_list", $this->role_repository->getAll());
 
 		$template = new Template(PATH_VIEWS . "template.html");
-		TemplateData::set("view", $view->parse());
+		TemplateData::set("view", $view->parse(), true);
 
 		$content = $template->parse();
 		return new HtmlResponse($content);
@@ -92,7 +96,6 @@ class ActorRolesController extends AController {
 		} else {
 			TemplateData::setSystemMessage("Es ist ein Fehler aufgetreten.", SystemMessageType::ERROR);
 		}
-
 		return $this->create();
 	}
 
@@ -115,7 +118,7 @@ class ActorRolesController extends AController {
 		TemplateData::set("option_list", $this->role_repository->find(array(["id" => ["!=", $role->id]])));
 
 		$template = new Template(PATH_VIEWS . "template.html");
-		TemplateData::set("view", $view->parse());
+		TemplateData::set("view", $view->parse(), true);
 
 		$content = $template->parse();
 		return new HTMLResponse($content);

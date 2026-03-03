@@ -32,7 +32,7 @@ class PDOConnection {
 	public array $table_infos = [];
 	protected int $db_version;
 	protected DbType $db_type;
-	private string $db_name = "";
+	private string $db_name;
 
 	/**
 	 * The Constructor
@@ -52,8 +52,6 @@ class PDOConnection {
 			throw new SystemException(__FILE__, __LINE__, "QueryBuilder does not support MsSQL version " . $this->db_version);
 		}
 	}
-
-	// ==================== Dynamische Delegation ====================
 
 	/**
 	 * Calls a QueryBuilder method.
@@ -89,8 +87,6 @@ class PDOConnection {
 		// return the $result from the QueryBuilder
 		return $result;
 	}
-
-	// ==================== Spezielle Hilfsfunktionen ====================
 
 	/**
 	 * Prepares the given query
@@ -130,12 +126,13 @@ class PDOConnection {
 			throw new SystemException(__FILE__, __LINE__, "No query prepared");
 		}
 		try {
+			App::$analyser->start();
 			$this->qb->stmt->execute();
 		} catch( PDOException $e ) {
 			$this->logger->log(__FILE__, __LINE__, $e->getMessage() . "\n\t=>\t[SQL] " . $this->getFinalizedQuery());
 			throw new SystemException(__FILE__, __LINE__, $e->getMessage(), $e->getCode(), $e->getPrevious());
 		}
-		//App::$analyser->stop()->add($this->getFinalizedQuery());
+		App::$analyser->stop()->add($this->getFinalizedQuery());
 		return $this->qb->stmt;
 	}
 
@@ -193,8 +190,6 @@ class PDOConnection {
 		}
 	}
 
-	// ==================== Tabelleninfos ====================
-
 	/**
 	 * Checks if the table information are loaded and loads then f necessary
 	 *
@@ -207,6 +202,19 @@ class PDOConnection {
 			$this->collectTableInfos($this->db_name);
 			$this->table_infos_loaded = true;
 		}
+	}
+
+	/**
+	 * Try to return the last modification time of the given table.
+	 *
+	 * @param string $table_name
+	 * @return int
+	 */
+	public function getModificationTimeOfTable(string $table_name): int {
+		if( array_key_exists($table_name, $this->table_infos) ) {
+			return $this->table_infos[$table_name]["modified"];
+		}
+		return 0;
 	}
 
 
@@ -262,8 +270,6 @@ class PDOConnection {
 			];
 		}
 	}
-
-	// ==================== Version & Typ ====================
 
 	/**
 	 * Returns the database version

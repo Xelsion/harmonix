@@ -61,7 +61,7 @@ class RestrictionController extends AController {
 		TemplateData::set("type_options", $this->restriction_type_repository->getAll());
 
 		$template = new Template(PATH_VIEWS . "template.html");
-		TemplateData::set("view", $view->parse());
+		TemplateData::set("view", $view->parse(), true);
 
 		return new HtmlResponse($template->parse());
 	}
@@ -95,7 +95,7 @@ class RestrictionController extends AController {
 		TemplateData::set("type_list", $this->restriction_type_repository->getAll());
 
 		$template = new Template(PATH_VIEWS . "template.html");
-		TemplateData::set("view", $view->parse());
+		TemplateData::set("view", $view->parse(), true);
 
 		return new HtmlResponse($template->parse());
 	}
@@ -114,7 +114,7 @@ class RestrictionController extends AController {
 		$view = new Template(PATH_VIEWS . "restrictions/types_create.html");
 
 		$template = new Template(PATH_VIEWS . "template.html");
-		TemplateData::set("view", $view->parse());
+		TemplateData::set("view", $view->parse(), true);
 
 		return new HtmlResponse($template->parse());
 	}
@@ -162,7 +162,7 @@ class RestrictionController extends AController {
 		TemplateData::set("type", $type);
 
 		$template = new Template(PATH_VIEWS . "template.html");
-		TemplateData::set("view", $view->parse());
+		TemplateData::set("view", $view->parse(), true);
 
 		return new HtmlResponse($template->parse());
 	}

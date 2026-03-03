@@ -1,4 +1,5 @@
 <?php
+
 namespace lib\core\blueprints;
 
 use lib\core\classes\Configuration;
@@ -18,21 +19,21 @@ use lib\core\classes\Configuration;
  */
 abstract class AController {
 
-    protected static ?bool $caching = null;
+	protected static ?bool $caching = null;
 
-    /**
-     * The class constructor
-     *
-     * @param Configuration $config
-     */
-    public function __construct(Configuration $config) {
-        if( self::$caching === null ) {
-            $environment = $config->getSectionValue("system", "environment");
-            self::$caching = (bool)$config->getSectionValue($environment, "caching");
-        }
-    }
+	/**
+	 * The class constructor
+	 *
+	 * @param Configuration $config
+	 */
+	public function __construct(Configuration $config) {
+		if( self::$caching === null ) {
+			$environment = $config->getSectionValue("system", "environment");
+			self::$caching = (bool)$config->getSectionValue($environment, "caching");
+		}
+	}
 
 	public function __toString(): string {
-		return __CLASS__;
+		return static::class;
 	}
 }

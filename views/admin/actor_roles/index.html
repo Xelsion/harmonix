@@ -32,13 +32,13 @@ $first = true;
 			$rights = $actor_role->getStringArray();
 			?>
 			<tr>
-				<td class="align-middle"><?= escaped_string($actor_role->id) ?></td>
+				<td class="align-middle"><?= $actor_role->id ?></td>
 				<?php if( $first ): $first = false; ?>
 					<td rowspan="100%" class="tree-table"><?= $html ?></td>
 				<?php endif; ?>
-				<td class="align-middle"><?= escaped_string(implode(", ", $rights["all"])) ?></td>
-				<td class="align-middle"><?= escaped_string(implode(", ", $rights["group"])) ?></td>
-				<td class="align-middle"><?= escaped_string(implode(", ", $rights["own"])) ?></td>
+				<td class="align-middle"><?= implode(", ", $rights["all"]) ?></td>
+				<td class="align-middle"><?= implode(", ", $rights["group"]) ?></td>
+				<td class="align-middle"><?= implode(", ", $rights["own"]) ?></td>
 				<td class="align-middle"><?= ($actor_role->is_protected) ? "Ja" : "Nein" ?></td>
 				<td class="text-nowrap align-middle text-end">
 					<a href="/actor-roles/<?= $actor_role->id ?>" class="button button-default"><?= $lang->getValue("translations", "edit") ?></a>

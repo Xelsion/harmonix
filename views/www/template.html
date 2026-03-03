@@ -40,7 +40,7 @@ $view_content = ($view instanceof Template) ? $view->parse() : $view;
 		<?php include(PATH_VIEWS . "main_menu.html") ?>
 		<div id="actor-menu">
 			<div class="has-children">
-				<span onclick="$('#actor-menu-dropdown').toggle();" class="menu-item"><?= ($actor->id > 0) ? escaped_string($actor->first_name . " " . $actor->last_name) : "Profile" ?></span>
+				<span onclick="$('#actor-menu-dropdown').toggle();" class="menu-item"><?= ($actor->id > 0) ? $actor->first_name . " " . $actor->last_name : "Profile" ?></span>
 			</div>
 			<div id="actor-menu-dropdown" style="">
 				<menu>
@@ -103,8 +103,8 @@ $view_content = ($view instanceof Template) ? $view->parse() : $view;
 <footer>
 	<div class="row text-end" style="margin: 0;">
 		<div class="col"></div>
-		<div class="col-3"><b>Harmonix</b> by: <?= escaped_string(AUTHOR) ?>
-			<b>version</b>: <?= escaped_string(MVC_VERSION) ?></div>
+		<div class="col-3"><b>Harmonix</b> by: <?= AUTHOR ?>
+			<b>version</b>: <?= MVC_VERSION ?></div>
 		<div class="col-1"><b>Cached</b>: {{is_cached}}</div>
 		<div class="col-1"><b>build in</b>: {{build_time}}</div>
 	</div>

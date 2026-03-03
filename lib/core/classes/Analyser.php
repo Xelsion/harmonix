@@ -12,7 +12,7 @@ namespace lib\core\classes;
 class Analyser extends StopWatch {
 
 	/* The timers */
-	private array $entries = [];
+	private array $entries = array();
 
 	/**
 	 * Adds a time for the given key with the given label
@@ -20,7 +20,7 @@ class Analyser extends StopWatch {
 	 * @param string $info
 	 * @return Analyser
 	 */
-	public function add(string $info): Analyser {
+	public function add(string $info): static {
 		if( $this->is_running ) {
 			$this->stop();
 		}

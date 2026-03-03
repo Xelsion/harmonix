@@ -27,7 +27,7 @@ class StopWatch {
 	 *
 	 * @return $this
 	 */
-	public function start(): StopWatch {
+	public function start(): static {
 		$now = $this->getTime();
 		if( $this->start_time === 0.0 ) {
 			$this->activation_time = $now;
@@ -42,12 +42,12 @@ class StopWatch {
 	 *
 	 * @return $this
 	 */
-	public function stop(): StopWatch {
+	public function stop(): static {
 		if( $this->is_running ) {
 			$this->stop_time = $this->getTime();
 			$stopped_time = $this->stop_time - $this->start_time;
 			$this->measured_times[] = [
-				"start"   => $this->stop_time,
+				"start"   => $this->start_time,
 				"stop"    => $this->stop_time,
 				"elapsed" => $stopped_time
 			];
@@ -62,7 +62,7 @@ class StopWatch {
 	 *
 	 * @return $this
 	 */
-	public function reset(): StopWatch {
+	public function reset(): static {
 		$this->start_time = 0.0;
 		$this->stop_time = 0.0;
 		$this->measured_times = [];
@@ -76,7 +76,7 @@ class StopWatch {
 	 *
 	 * @return $this
 	 */
-	public function getLastMeasuredTime(): StopWatch {
+	public function getLastMeasuredTime(): static {
 		$this->return_value = 0.0;
 		if( $this->is_running ) {
 			$this->stop();
@@ -104,7 +104,7 @@ class StopWatch {
 	 *
 	 * @return $this
 	 */
-	public function getTotalMeasuredTime(): StopWatch {
+	public function getTotalMeasuredTime(): static {
 		if( $this->is_running ) {
 			$this->stop();
 		}
@@ -117,7 +117,7 @@ class StopWatch {
 	 *
 	 * @return $this
 	 */
-	public function getElapsedTime(): StopWatch {
+	public function getElapsedTime(): static {
 		$this->return_value = 0.0;
 		if( $this->activation_time > 0 ) {
 			$this->return_value = ($this->getTime() - $this->activation_time);
