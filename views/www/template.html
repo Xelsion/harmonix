@@ -40,7 +40,7 @@ $view_content = ($view instanceof Template) ? $view->parse() : $view;
 		<?php include(PATH_VIEWS . "main_menu.html") ?>
 		<div id="actor-menu">
 			<div class="has-children">
-				<span onclick="$('#actor-menu-dropdown').toggle();" class="menu-item"><?= ($actor->id > 0) ? $actor->first_name . " " . $actor->last_name : "Profile" ?></span>
+				<span onclick="$('#actor-menu-dropdown').toggle();" class="menu-item"><?= ($actor->id > 0) ? $actor->first_name . " " . $actor->last_name : "Login" ?></span>
 			</div>
 			<div id="actor-menu-dropdown" style="">
 				<menu>

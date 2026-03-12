@@ -121,30 +121,36 @@ class TestController extends AController {
 			$distance = GeoHelper::getFormattedDistance($distance);
 		}
 
-		$timespan = null;
-		if( App::$request->contains("timespan") ) {
-			try {
-				$start_date = new DateTime(App::$request->get("start_date"));
-				$end_date = new DateTime(App::$request->get("end_date"));
+		try {
+			$timespan = null;
+			$start_date = (App::$request->contains("start_date")) ? new DateTime(App::$request->get("start_date")) : null;
+			$end_date = (App::$request->contains("end_date")) ? new DateTime(App::$request->get("end_date")) : null;
+			if( $start_date !== null && $end_date !== null ) {
 				$timespan = DateHelper::getTimeBetween($start_date, $end_date);
-			} catch( Exception $e ) {
-				throw new SystemException($e->getFile(), $e->getLine(), $e->getMessage(), $e->getCode(), $e->getPrevious());
+				$start_date = $start_date->format("Y-m-d");
+				$end_date = $end_date->format("Y-m-d");
 			}
+		} catch( Exception $e ) {
+			throw new SystemException($e->getFile(), $e->getLine(), $e->getMessage(), $e->getCode(), $e->getPrevious());
 		}
 
-		$currency = null;
-		if( App::$request->contains("currency") ) {
-			try {
-				$currency = MathHelper::getRoundedCurrency(App::$request->get("numeric_value"));
-			} catch( Exception $e ) {
-				throw new SystemException($e->getFile(), $e->getLine(), $e->getMessage(), $e->getCode(), $e->getPrevious());
+		try {
+			$currency = null;
+			$numeric_value = (App::$request->contains("numeric_value")) ? App::$request->get("numeric_value") : null;
+			if( $numeric_value !== null ) {
+				$currency = MathHelper::getRoundedCurrency($numeric_value);
 			}
+		} catch( Exception $e ) {
+			throw new SystemException($e->getFile(), $e->getLine(), $e->getMessage(), $e->getCode(), $e->getPrevious());
 		}
 
 		$view = new Template(PATH_VIEWS . "tests/math.html");
 		TemplateData::set("coords", $coords);
 		TemplateData::set("distance", $distance);
 		TemplateData::set("timespan", $timespan);
+		TemplateData::set("start_date", $start_date);
+		TemplateData::set("end_date", $end_date);
+		TemplateData::set("numeric_value", $numeric_value);
 		TemplateData::set("currency", $currency);
 
 		$template = new Template(PATH_VIEWS . "template.html");

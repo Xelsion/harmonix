@@ -1,13 +1,15 @@
 <?php
 
-use lib\App;
 use lib\core\classes\TemplateData;
 use lib\helper\DateHelper;
 
+$coords = TemplateData::get('coords');
 $distance = TemplateData::get('distance');
 $timespan = TemplateData::get('timespan');
+$start_date = TemplateData::get('start_date');
+$end_date = TemplateData::get('end_date');
+$numeric_value = TemplateData::get('numeric_value');
 $currency = TemplateData::get('currency');
-$coords = TemplateData::get('coords');
 ?>
 <div class="container-fluid">
 	<h1>Math Helper</h1>
@@ -54,15 +56,15 @@ $coords = TemplateData::get('coords');
 			<form action="/tests/math" method="POST">
 				<div class="row">
 					<label for="start_date">Start Datum</label>
-					<input id="start_date" type="date" name="start_date" value="<?= App::$request->get("start_date") ?>" required="required"/>
+					<input id="start_date" type="date" name="start_date" value="<?= $start_date ?>" required="required"/>
 				</div>
 				<div class="row">
 					<label for="end_date">End Datum</label>
-					<input id="end_date" type="date" name="end_date" value="<?= App::$request->get("end_date") ?>" required="required"/>
+					<input id="end_date" type="date" name="end_date" value="<?= $end_date ?>" required="required"/>
 				</div>
 				<div class="row row">
 					<div class="col">Zeitraum</div>
-					<div class="col"><?= ($timespan === null) ? "" : DateHelper::getFormattedTimespan($timespan) ?>
+					<div class="col"><?= ($timespan !== null) ? DateHelper::getFormattedTimespan($timespan) : "" ?>
 					</div>
 				</div>
 				<div>
@@ -77,7 +79,7 @@ $coords = TemplateData::get('coords');
 			<form action="/tests/math" method="POST">
 				<div class="row">
 					<label for="numeric-value">Numerischer Wert</label>
-					<input id="numeric-value" type="text" name="numeric_value" value="<?= App::$request->get("numeric_value") ?>" required="required"/>
+					<input id="numeric-value" type="text" name="numeric_value" value="<?= $numeric_value ?>" required="required"/>
 				</div>
 				<div class="row row">
 					<div class="col">Als W&auml;hrung</div>

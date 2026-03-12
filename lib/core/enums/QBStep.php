@@ -14,4 +14,5 @@ enum QBStep: int {
 	case HAVING = 8;
 	case ORDER_BY = 9;
 	case LIMIT = 10;
+	case RETURNING = 11;
 }

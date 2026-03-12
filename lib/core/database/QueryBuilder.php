@@ -23,8 +23,8 @@ class QueryBuilder {
 	protected ?DbType $db_type;
 	private bool $required_order = false;
 	private bool $order_is_set = false;
-
 	private int $param_counter = 0;
+
 
 	public function __construct(PDO $pdo, ?DbType $db_type = null) {
 		$this->pdo = $pdo;
@@ -312,6 +312,28 @@ class QueryBuilder {
 	}
 
 	/**
+	 * @param mixed $columns
+	 * @return $this
+	 * @throws SystemException
+	 */
+	public function GroupBy(mixed $columns): static {
+		$this->checkSQL(QBStep::GROUP_BY);
+		$this->after_wheres[] = is_array($columns) ? " GROUP BY " . implode(", ", $columns) : " GROUP BY " . $columns;
+		return $this;
+	}
+
+	/**
+	 * @param string $condition
+	 * @return $this
+	 * @throws SystemException
+	 */
+	public function Having(string $condition): static {
+		$this->checkSQL(QBStep::HAVING);
+		$this->after_wheres[] = " HAVING " . $condition;
+		return $this;
+	}
+
+	/**
 	 * @param int $limit
 	 * @param int $offset
 	 * @return $this
@@ -335,24 +357,19 @@ class QueryBuilder {
 	}
 
 	/**
-	 * @param mixed $columns
+	 * @param mixed|null $columns
 	 * @return $this
 	 * @throws SystemException
 	 */
-	public function GroupBy(mixed $columns): static {
-		$this->checkSQL(QBStep::GROUP_BY);
-		$this->after_wheres[] = is_array($columns) ? " GROUP BY " . implode(", ", $columns) : " GROUP BY " . $columns;
-		return $this;
-	}
-
-	/**
-	 * @param string $condition
-	 * @return $this
-	 * @throws SystemException
-	 */
-	public function Having(string $condition): static {
-		$this->checkSQL(QBStep::HAVING);
-		$this->after_wheres[] = " HAVING " . $condition;
+	public function Returning(mixed $columns = null): static {
+		$this->checkSQL(QBStep::RETURNING);
+		if( is_null($columns) ) {
+			$this->after_wheres[] = " RETURNING *";
+		} else if( is_array($columns) ) {
+			$this->after_wheres[] = " RETURNING " . implode(", ", $columns);
+		} else {
+			$this->after_wheres[] = " RETURNING " . $columns;
+		}
 		return $this;
 	}
 
@@ -382,7 +399,7 @@ class QueryBuilder {
 				$this->sql .= " (" . implode(", ", $cols) . ") VALUES (:" . implode(", :", $cols) . ")";
 				break;
 			case QueryType::UPDATE:
-				$this->sql .= " SET " . implode(", ", array_map(fn($c) => "$c=:$c", $cols));
+				$this->sql .= " SET " . implode(", ", array_map(static fn($c) => "$c=:$c", $cols));
 				break;
 			default:
 		}
@@ -484,59 +501,95 @@ class QueryBuilder {
 	 */
 	private function checkSQL(QBStep $step): void {
 		$order_error = false;
+		$err_msg = "";
+
+		if( $this->curr_step->value !== QBStep::NONE->value && $this->query_type->value === QueryType::TRUNCATE->value ) {
+			throw new SystemException(__FILE__, __LINE__, $err_msg = "TRUNCATE does not allow additional SQL parameters");
+		}
+
 		switch( $step ) {
 			case(QBStep::START):
 				if( $this->curr_step->value !== QBStep::NONE->value ) {
 					$order_error = true;
+					$err_msg = "A SQL must start with a SELECT, INSERT, UPDATE, DELETE or TRUNCATE";
 				}
 				break;
 			case(QBStep::VALUES):
 				if( ($this->query_type->value === QueryType::INSERT->value || $this->query_type->value === QueryType::UPDATE->value) && $this->curr_step->value !== QBStep::START->value ) {
 					$order_error = true;
+					$err_msg = "VALUES can be set directly after INSERT or UPDATE";
 				}
 				break;
 			case(QBStep::FROM):
 				if( ($this->query_type->value === QueryType::SELECT->value || $this->query_type->value === QueryType::DELETE->value) && $this->curr_step->value !== QBStep::START->value ) {
+					$err_msg = "FROM can be set directly after SELECT or DELETE";
 					$order_error = true;
 				}
 				break;
 			case(QBStep::JOIN):
-				if( $this->curr_step->value !== QBStep::FROM->value ) {
+				if( $this->curr_step->value !== QBStep::FROM->value && $this->curr_step->value !== QBStep::JOIN->value ) {
 					$order_error = true;
+					$err_msg = "JOINS can be set directly after FROM|JOIN";
 				}
 				break;
 			case(QBStep::WHERE):
 				if( ($this->query_type->value === QueryType::SELECT->value || $this->query_type->value === QueryType::DELETE->value) && !($this->curr_step->value >= QBStep::FROM->value && $this->curr_step->value <= QBStep::WHERE_ADDS->value) ) {
+					$err_msg = "WHERE can be set after FROM|JOIN in an SELECT|DELETE statement";
 					$order_error = true;
 				} else if( $this->query_type->value === QueryType::UPDATE->value && !($this->curr_step->value >= QBStep::VALUES->value && $this->curr_step->value <= QBStep::WHERE_ADDS->value) ) {
+					$err_msg = "WHERE can be set after VALUES in an UPDATE statement";
 					$order_error = true;
 				}
 				break;
 			case(QBStep::WHERE_ADDS):
-				if( $this->query_type->value === QueryType::SELECT->value && !($this->curr_step->value >= QBStep::WHERE->value && $this->curr_step->value <= QBStep::WHERE_ADDS->value) ) {
+				if( ($this->query_type->value === QueryType::SELECT->value || $this->query_type->value === QueryType::UPDATE->value || $this->query_type->value === QueryType::DELETE->value) && !($this->curr_step->value >= QBStep::WHERE->value && $this->curr_step->value <= QBStep::WHERE_ADDS->value) ) {
+					$err_msg = "AND|OR can be set after WHERE|OR|AND in an SELECT|UPDATE|DELETE statement";
 					$order_error = true;
 				}
 				break;
 			case(QBStep::GROUP_BY):
-				if( $this->query_type->value === QueryType::SELECT->value && !($this->curr_step->value >= QBStep::FROM->value && $this->curr_step->value <= QBStep::WHERE_ADDS->value) ) {
+				if( $this->query_type->value === QueryType::SELECT->value && !($this->curr_step->value >= QBStep::WHERE->value && $this->curr_step->value <= QBStep::WHERE_ADDS->value) ) {
 					$order_error = true;
+					$err_msg = "GROUP BY can be set after WHERE|OR|AND";
 				}
 				break;
 			case(QBStep::HAVING):
-				if( $this->query_type->value === QueryType::SELECT->value && !($this->curr_step->value >= QBStep::FROM->value && $this->curr_step->value <= QBStep::GROUP_BY->value) ) {
+				if( $this->query_type->value === QueryType::SELECT->value && !($this->curr_step->value === QBStep::GROUP_BY->value) ) {
 					$order_error = true;
+					$err_msg = "HAVING can be set directly after GROUP BY in a SELECT STATEMENT";
 				}
 				break;
 			case(QBStep::ORDER_BY):
 				if( $this->query_type->value === QueryType::SELECT->value && !($this->curr_step->value >= QBStep::FROM->value && $this->curr_step->value <= QBStep::HAVING->value) ) {
 					$order_error = true;
+					$err_msg = "ORDER BY can be set after FROM -> HAVING in a SELECT STATEMENT";
 				}
 				$this->order_is_set = true;
 				break;
 			case(QBStep::LIMIT):
 				if( $this->query_type->value === QueryType::SELECT->value && !($this->curr_step->value >= QBStep::FROM->value && $this->curr_step->value <= QBStep::ORDER_BY->value) ) {
 					$order_error = true;
+					$err_msg = "LIMIT can be set after FROM -> ORDER BY";
 				} elseif( $this->db_type->value === DbType::MsSQL->value && !$this->order_is_set ) {
+					$err_msg = "In MsSQL for a LIMIT an ORDER BY must be set";
+					$order_error = true;
+				} elseif( $this->db_type->value === DbType::Postgres->value && $this->query_type->value !== QueryType::SELECT->value ) {
+					$err_msg = "In Postgres LIMIT is only allowed in a SELECT statement";
+					$order_error = true;
+				}
+				break;
+			case(QBStep::RETURNING):
+				if( $this->db_type->value !== DbType::Postgres->value ) {
+					$err_msg = "RETURNING can be used in Postgres only";
+					$order_error = true;
+				} elseif( $this->query_type->value === QueryType::SELECT->value ) {
+					$err_msg = "RETURNING can not be used in a SELECT|TRUNCATE statement";
+					$order_error = true;
+				} elseif( ($this->query_type->value === QueryType::INSERT->value || $this->query_type->value === QueryType::UPDATE->value) && !($this->curr_step->value >= QBStep::VALUES->value) ) {
+					$err_msg = "RETURNING can only be used after VALUES in a INSERT|UPDATE statement";
+					$order_error = true;
+				} elseif( $this->query_type->value === QueryType::DELETE->value && !($this->curr_step->value >= QBStep::FROM->value) ) {
+					$err_msg = "RETURNING can only be used after FROM in a DELETE statement";
 					$order_error = true;
 				}
 				break;
@@ -544,7 +597,7 @@ class QueryBuilder {
 				throw new SystemException(__FILE__, __LINE__, "unknown query step.");
 		}
 		if( $order_error ) {
-			throw new SystemException(__FILE__, __LINE__, "Query order error.");
+			throw new SystemException(__FILE__, __LINE__, "Query order error: " . $err_msg);
 		}
 		$this->curr_step = $step;
 	}
