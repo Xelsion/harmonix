@@ -71,6 +71,7 @@ class Auth {
 		if( $controller instanceof AController ) {
 			$controller = get_class($controller);
 		}
+
 		$actor_role = App::$curr_actor->getRole($controller, $method, $domain);
 		$restriction = $this->getRestriction($controller, $method, $domain);
 		$restriction_role = $restriction["role"];

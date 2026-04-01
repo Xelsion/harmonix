@@ -29,7 +29,7 @@ class StopWatch {
 	 */
 	public function start(): static {
 		$now = $this->getTime();
-		if( $this->start_time === 0.0 ) {
+		if( $this->activation_time === 0.0 ) {
 			$this->activation_time = $now;
 		}
 		$this->start_time = $now;
@@ -63,6 +63,7 @@ class StopWatch {
 	 * @return $this
 	 */
 	public function reset(): static {
+		$this->activation_time = 0.0;
 		$this->start_time = 0.0;
 		$this->stop_time = 0.0;
 		$this->measured_times = [];

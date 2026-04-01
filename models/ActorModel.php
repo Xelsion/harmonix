@@ -24,6 +24,8 @@ class ActorModel extends Actor {
 
 	public array $data = array();
 
+	private ?ActorRoleModel $cachedDefaultRole = null;
+
 	/**
 	 * The class constructor
 	 * If id is 0 it will return an empty actor
@@ -108,14 +110,17 @@ class ActorModel extends Actor {
 			}
 
 			// actor object is not loaded, so we return the default actor role
-			$actor_role_repo = App::getInstanceOf(ActorRoleRepository::class);
-			$result = $actor_role_repo->find(["is_default" => 1]);
-			if( count($result) === 1 ) {
-				return $result[0];
+			if( $this->cachedDefaultRole !== null ) {
+				return $this->cachedDefaultRole;
 			}
 
+			$actor_role_repo = App::getInstanceOf(ActorRoleRepository::class);
+			$result = $actor_role_repo->find(["is_default" => 1]);
+
+			$this->cachedDefaultRole = (count($result) === 1) ? $result[0] : App::getInstanceOf(ActorRoleModel::class);
+
 			// if no default actor role could be found return an empty actor role
-			return App::getInstanceOf(ActorRoleModel::class);
+			return $this->cachedDefaultRole;
 		} catch( Exception $e ) {
 			throw new SystemException(__FILE__, __LINE__, $e->getMessage(), $e->getCode(), $e->getPrevious());
 		}

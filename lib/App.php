@@ -14,10 +14,10 @@ use lib\core\classes\GarbageCollector;
 use lib\core\classes\KeyValuePairs;
 use lib\core\classes\Language;
 use lib\core\classes\Logger;
-use lib\core\classes\TemplateData;
 use lib\core\ClassManager;
 use lib\core\ConnectionManager;
 use lib\core\exceptions\SystemException;
+use lib\core\ModuleManager;
 use lib\core\Request;
 use lib\core\resolver\MethodResolver;
 use lib\core\Router;
@@ -41,6 +41,8 @@ class App {
 
 	// The class manager with dependency injection
 	private static ClassManager $class_manager;
+
+	private static ModuleManager $module_manager;
 
 	// The global debug logger
 	public static Logger $debugger;
@@ -88,6 +90,9 @@ class App {
 		self::setAsSingleton(Request::class, self::getInstanceOf(Request::class));
 		self::setAsSingleton(Router::class, Router::getInstance());
 		self::setAsSingleton(Language::class, Language::getInstance());
+		self::$module_manager = self::getInstanceOf(ModuleManager::class);
+		self::$module_manager->loadModules(PATH_ROOT . "modules");
+		self::$module_manager->boot();
 
 		self::$request = self::getInstanceOf(Request::class);
 		self::$curr_actor = self::getInstanceOf(ActorModel::class);
@@ -122,16 +127,22 @@ class App {
 		$debug = self::$config->getSectionValue($environment, "debug");
 		self::$storage->set("debug_mode", (bool)$debug);
 		self::$storage->set("is_cached", false);
-
-		self::$analyser->start();
+		self::$module_manager->runOnStart();
 
 		// some classes need a db connections to be initialized, we do them now
 		self::setAsSingleton(RoleTree::class, RoleTree::getInstance());
+		// add middlewares from modules
+		foreach( self::$module_manager->getMiddleware() as $mw ) {
+			$this->addMiddleware($mw);
+		}
 
 		// process all middlewares
 		foreach( $this->middleware as $middleware ) {
 			(self::getInstanceOf($middleware))->invoke();
 		}
+
+		// module hook 'beforeRouting'
+		self::$module_manager->runBeforeRouting();
 
 		// clear the garbage
 		$gc = self::getInstanceOf(GarbageCollector::class);
@@ -173,10 +184,12 @@ class App {
 				try {
 					$resolver = new MethodResolver(self::$class_manager, $controller, $method, $params);
 					$this::$response = $resolver->getValue();
+
+					// module hook 'afterRouting'
+					self::$module_manager->runAfterRouting();
 				} catch( Exception $e ) {
 					throw new SystemException(__FILE__, __LINE__, "Method Injection failed: " . $e->getMessage());
 				}
-				//$this::$response = self::getInstanceOf($controller::class, $method, $params);
 			} else {
 				redirect("/error/403");
 			}
@@ -192,15 +205,14 @@ class App {
 	 * @return string
 	 */
 	public function getResponseOutput(): string {
-		$this::$response->setHeaders();
-		$output = $this::$response->getOutput();
-		$elapsed_time = self::$analyser->getElapsedTime()->format("ms");
-		$is_cached = (self::$storage->get("is_cached")) ? "true" : "false";
-		return str_replace(array(
-			"{{system_message}}",
-			"{{build_time}}",
-			"{{is_cached}}"
-		), array(TemplateData::getSystemMessage(), $elapsed_time, $is_cached), $output);
+		$response = $this::$response;
+		$response->setHeaders();
+		$output = $response->getOutput();
+
+		// module hook 'beforeResponse'
+		self::$module_manager->runBeforeResponse($output);
+
+		return $output;
 	}
 
 	/**

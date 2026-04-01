@@ -6,6 +6,7 @@ use lib\core\enums\DbType;
 use lib\core\enums\QBStep;
 use lib\core\enums\QueryType;
 use lib\core\exceptions\SystemException;
+use lib\helper\StringHelper;
 use PDO;
 use PDOStatement;
 
@@ -21,8 +22,10 @@ class QueryBuilder {
 	protected array $where_clauses = [];
 	protected array $after_wheres = [];
 	protected ?DbType $db_type;
+	private bool $join_open = false;
 	private bool $required_order = false;
 	private bool $order_is_set = false;
+	private bool $alias_possible = false;
 	private int $param_counter = 0;
 
 
@@ -114,6 +117,7 @@ class QueryBuilder {
 			$this->sql .= " FROM " . implode(", ", $tables);
 		} else {
 			$this->sql .= " FROM " . $tables;
+			$this->alias_possible = true;
 		}
 		return $this;
 	}
@@ -126,6 +130,7 @@ class QueryBuilder {
 	public function innerJoin(string $table): static {
 		$this->checkSQL(QBStep::JOIN);
 		$this->sql .= " INNER JOIN " . $table;
+		$this->alias_possible = true;
 		return $this;
 	}
 
@@ -137,6 +142,7 @@ class QueryBuilder {
 	public function leftJoin(string $table): static {
 		$this->checkSQL(QBStep::JOIN);
 		$this->sql .= " LEFT JOIN " . $table;
+		$this->alias_possible = true;
 		return $this;
 	}
 
@@ -148,6 +154,7 @@ class QueryBuilder {
 	public function rightJoin(string $table): static {
 		$this->checkSQL(QBStep::JOIN);
 		$this->sql .= " RIGHT JOIN " . $table;
+		$this->alias_possible = true;
 		return $this;
 	}
 
@@ -157,9 +164,12 @@ class QueryBuilder {
 	 * @throws SystemException
 	 */
 	public function As(string $alias): static {
+		$this->checkSQL(QBStep::AS);
 		$this->sql .= " AS " . $alias;
+		$this->alias_possible = false;
 		return $this;
 	}
+
 
 	// ==================== Where ====================
 
@@ -193,6 +203,23 @@ class QueryBuilder {
 	public function Or(array $conditions): static {
 		$this->checkSQL(QBStep::WHERE_ADDS);
 		$this->where_clauses[] = ['logic' => 'OR', 'data' => $conditions];
+		return $this;
+	}
+
+	/**
+	 * @param string|array $conditions
+	 * @return $this
+	 * @throws SystemException
+	 */
+	public function On(string|array $conditions): static {
+		$this->checkSQL(QBStep::JOIN_ON);
+		if( is_array($conditions) && !empty($conditions) ) {
+			$this->sql .= " ON " . $this->compileConditions($conditions);
+		} else if( !StringHelper::isNullOrEmpty($conditions) ) {
+			$this->sql .= " ON " . $conditions;
+		} else {
+			throw new SystemException(__FILE__, __LINE__, "ON must contain at least one condition");
+		}
 		return $this;
 	}
 
@@ -503,8 +530,16 @@ class QueryBuilder {
 		$order_error = false;
 		$err_msg = "";
 
+		if( !$this->alias_possible && $step->value !== QBStep::AS->value ) {
+			$this->alias_possible = false;
+		}
+
 		if( $this->curr_step->value !== QBStep::NONE->value && $this->query_type->value === QueryType::TRUNCATE->value ) {
 			throw new SystemException(__FILE__, __LINE__, $err_msg = "TRUNCATE does not allow additional SQL parameters");
+		}
+
+		if( $this->join_open && $step->value !== QBStep::JOIN_ON->value && $step->value !== QBStep::AS->value ) {
+			throw new SystemException(__FILE__, __LINE__, $err_msg = "After a JOIN|AS is a ON required");
 		}
 
 		switch( $step ) {
@@ -527,9 +562,25 @@ class QueryBuilder {
 				}
 				break;
 			case(QBStep::JOIN):
-				if( $this->curr_step->value !== QBStep::FROM->value && $this->curr_step->value !== QBStep::JOIN->value ) {
+				if( $this->curr_step->value !== QBStep::FROM->value && $this->curr_step->value !== QBStep::JOIN_ON->value ) {
 					$order_error = true;
-					$err_msg = "JOINS can be set directly after FROM|JOIN";
+					$err_msg = "JOINS can be set directly after FROM|ON";
+				} else {
+					$this->join_open = true;
+				}
+				break;
+			case(QBStep::JOIN_ON):
+				if( !$this->join_open ) {
+					$order_error = true;
+					$err_msg = "ON can be set directly after JOINS";
+				} else {
+					$this->join_open = false;
+				}
+				break;
+			case(QBStep::AS):
+				if( !$this->alias_possible ) {
+					$order_error = true;
+					$err_msg = "AS can be set after FROM|JOINS";
 				}
 				break;
 			case(QBStep::WHERE):
@@ -563,8 +614,9 @@ class QueryBuilder {
 				if( $this->query_type->value === QueryType::SELECT->value && !($this->curr_step->value >= QBStep::FROM->value && $this->curr_step->value <= QBStep::HAVING->value) ) {
 					$order_error = true;
 					$err_msg = "ORDER BY can be set after FROM -> HAVING in a SELECT STATEMENT";
+				} else {
+					$this->order_is_set = true;
 				}
-				$this->order_is_set = true;
 				break;
 			case(QBStep::LIMIT):
 				if( $this->query_type->value === QueryType::SELECT->value && !($this->curr_step->value >= QBStep::FROM->value && $this->curr_step->value <= QBStep::ORDER_BY->value) ) {

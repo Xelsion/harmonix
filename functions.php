@@ -38,11 +38,7 @@ function Namespace2Path(string $namespace): string {
  * @return string
  */
 function Path2Namespace(string $path): string {
-	$namespace = str_replace(array(".." . DIRECTORY_SEPARATOR, ".php"), "", $path);
-	if( DIRECTORY_SEPARATOR === "/" ) {
-		$namespace = str_replace("/", "\\", $namespace);
-	}
-	return $namespace;
+	return str_replace(array(".." . DIRECTORY_SEPARATOR, ".php", "/"), array("", "", "\\"), $path);
 }
 
 /**

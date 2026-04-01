@@ -48,7 +48,7 @@ class Router {
 	 * @throws ReflectionException
 	 * @throws SystemException
 	 */
-	private function registerController(string $sub_domain, string $directory): void {
+	public function registerController(string $sub_domain, string $directory): void {
 		$path = $directory . $sub_domain . DIRECTORY_SEPARATOR;
 		$files = scandir($path);
 		foreach( $files as $file ) {
