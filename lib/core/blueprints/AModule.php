@@ -5,6 +5,14 @@ namespace lib\core\blueprints;
 use lib\core\classes\Configuration;
 use lib\core\classes\Template;
 
+
+/**
+ * A Module is an extension for the framework or the output.
+ * It is integrated int different stage of the App flow
+ *
+ * @author Markus Schröder <xelsion@gmail.com>
+ * @version 1.0.0;
+ */
 abstract class AModule {
 
 	protected Configuration $config;
@@ -25,37 +33,69 @@ abstract class AModule {
 
 	abstract public function allowedSubDomains(): array;
 
-	/** Wird nach dem Laden ausgeführt */
+	/**
+	 * The boot method is called when the Modul is initiated
+	 */
 	abstract public function boot(): void;
 
-	/** Controller-Verzeichnisse als [subdomain, path] */
+	/**
+	 * Can return a collection of Controllers which will be added be the Routing System
+	 * @return array
+	 */
 	public function controllerDirectories(): array {
 		return [];
 	}
 
-	/** Registrierung von Services im DI */
+	/**
+	 * Can return a collection of classes which will be added the to class list of the App
+	 * @return array
+	 */
 	public function registerServices(): array {
 		return [];
 	}
 
-	/** Registrierung von Middleware */
+	/**
+	 * Can return a collection of Middleware which will be added to the middleware of the App
+	 * @return array
+	 */
 	public function registerMiddleware(): array {
 		return [];
 	}
 
-	/** Optional: Event Hooks */
+	/**
+	 * onStant() will be called at the most early point in the flow of the App
+	 * @return void
+	 */
 	public function onStart(): void {
 
 	}
 
+	/**
+	 * onBeforeRouting() will be called before the Router process the request
+	 * @return void
+	 */
 	public function onBeforeRouting(): void {
 
 	}
 
+	/**
+	 * onAfterRouting() will be called after the Router has process the request and
+	 * contains the route array of the processed request.
+	 *
+	 * @param array $route
+	 * @return void
+	 */
 	public function onAfterRouting(array $route): void {
 
 	}
 
+	/**
+	 * onBeforeResponse() will be called right before the framework give the response to the caller
+	 * abd it has the current Template of the response in the parameters
+	 *
+	 * @param Template $template
+	 * @return void
+	 */
 	public function onBeforeResponse(Template $template): void {
 
 	}

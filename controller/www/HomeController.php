@@ -17,6 +17,7 @@ use lib\core\response_types\HtmlResponse;
  */
 #[Route("/")]
 class HomeController extends AController {
+
 	/**
 	 * Shows the landing page
 	 *

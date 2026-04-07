@@ -20,8 +20,6 @@ class Enumerable implements IteratorAggregate {
 
 	protected int $index = -1;
 
-	protected array $data = [];
-
 	protected function __construct(array $data = []) {
 		$this->iterator = new ArrayIterator($data);
 	}
@@ -40,7 +38,7 @@ class Enumerable implements IteratorAggregate {
 	 * @return void
 	 * @throws SystemException
 	 */
-	public function each(callable $callback): void {
+	public function forEach(callable $callback): void {
 		$this->iterator->rewind();
 		foreach( $this->iterator as $key => $value ) {
 			try {
@@ -50,29 +48,6 @@ class Enumerable implements IteratorAggregate {
 			}
 		}
 	}
-
-	/**
-	 * Returns the next element in the list
-	 *
-	 * @return mixed
-	 */
-	public function getNext(): mixed {
-		if( $this->hasNext() ) {
-			$this->iterator->next();
-			return $this->iterator->current();
-		}
-		return false;
-	}
-
-	/**
-	 * Checks if there are more elements in the list
-	 *
-	 * @return bool
-	 */
-	public function hasNext(): bool {
-		return $this->iterator->valid();
-	}
-
 
 	/**
 	 * Return if the given entry is in the list or not
@@ -94,8 +69,13 @@ class Enumerable implements IteratorAggregate {
 		return $was_found;
 	}
 
+	/**
+	 * Return if the iterator is empty or not
+	 *
+	 * @return bool
+	 */
 	public function isEmpty(): bool {
-		return empty($this->data);
+		return ($this->iterator->count() === 0);
 	}
 
 }

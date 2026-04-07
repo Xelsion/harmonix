@@ -11,6 +11,12 @@ use lib\core\exceptions\SystemException;
 use ReflectionClass;
 use ReflectionException;
 
+/**
+ * This class will handle all modules the calls the methods of all modules at the right stage of the App flow
+ *
+ * @author Markus Schröder <xelsion@gmail.com>
+ * @version 1.0.0;
+ */
 class ModuleManager {
 
 	protected ClassManager $container;
@@ -25,12 +31,21 @@ class ModuleManager {
 		'beforeResponse' => [],
 	];
 
+	/**
+	 * The constructor of this class
+	 *
+	 * @param ClassManager $cm
+	 * @param Configuration $config
+	 */
 	public function __construct(ClassManager $cm, Configuration $config) {
 		$this->container = $cm;
 		$this->config = $config;
 	}
 
 	/**
+	 * Loads all Module.php file from the given director + subdirectories add registers the given module methods at the
+	 * right flow points
+	 *
 	 * @param string $path
 	 * @return void
 	 * @throws SystemException
@@ -95,6 +110,8 @@ class ModuleManager {
 	}
 
 	/**
+	 * The boo()t method calls all module->boot() methods
+	 *
 	 * @return void
 	 * @throws exceptions\SystemException
 	 */
@@ -121,6 +138,11 @@ class ModuleManager {
 	}
 
 	/* ------------- module getter ------------- */
+	/**
+	 * Returns all Middleware classes from all modules
+	 *
+	 * @return array
+	 */
 	public function getMiddleware(): array {
 		$mw = [];
 		foreach( $this->modules as $module ) {
@@ -132,6 +154,12 @@ class ModuleManager {
 		return $mw;
 	}
 
+	/**
+	 * Returns the Config file by the given modul name
+	 *
+	 * @param string $moduleName
+	 * @return array|null
+	 */
 	public function getModuleConfig(string $moduleName): ?array {
 		foreach( $this->modules as $module ) {
 			if( $module->moduleName === $moduleName ) {
@@ -142,24 +170,46 @@ class ModuleManager {
 	}
 
 	/* ------------- module hooks ------------- */
+	/**
+	 * Calls the onStart() method of alle modules
+	 *
+	 * @return void
+	 */
 	public function runOnStart(): void {
 		foreach( $this->events['start'] as $module ) {
 			$module->onStart();
 		}
 	}
 
+	/**
+	 * Calls the onBeforeRouting() method of alle modules
+	 *
+	 * @return void
+	 */
 	public function runBeforeRouting(): void {
 		foreach( $this->events['beforeRouting'] as $module ) {
 			$module->onBeforeRouting();
 		}
 	}
 
+	/**
+	 * Calls the onAfterRouting() method of alle modules
+	 *
+	 * @param array $route
+	 * @return void
+	 */
 	public function runAfterRouting(array $route): void {
 		foreach( $this->events['afterRouting'] as $module ) {
 			$module->onAfterRouting($route);
 		}
 	}
 
+	/**
+	 * Calls the onBeforeResponse() method of alle modules
+	 *
+	 * @param Template $template
+	 * @return void
+	 */
 	public function runBeforeResponse(Template $template): void {
 		foreach( $this->events['beforeResponse'] as $module ) {
 			$module->onBeforeResponse($template);

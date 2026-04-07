@@ -10,6 +10,7 @@ use lib\core\attributes\Route;
 use lib\core\blueprints\AController;
 use lib\core\blueprints\AResponse;
 use lib\core\classes\File;
+use lib\core\classes\LinqList;
 use lib\core\classes\Template;
 use lib\core\classes\TemplateData;
 use lib\core\enums\RequestMethod;
@@ -176,6 +177,27 @@ class TestController extends AController {
 		$template = new Template(PATH_VIEWS . "template.html");
 		TemplateData::set("view", $view->parse(), true);
 
+		return new HtmlResponse($template);
+	}
+
+	/**
+	 * @return AResponse
+	 * @throws SystemException
+	 */
+	#[Route("linq", RequestMethod::GET, RequestMethod::POST)]
+	public function linq(): AResponse {
+		$min = 42;
+		$max = 63;
+		$ll = new LinqList();
+		for( $i = 0; $i < 100; $i++ ) {
+			$ll->add($i + 1);
+		}
+		$results = $ll->where(fn($e) => $e < $max && $e > $min)->select(fn($e) => $e . " Jahre")->distinct()->getAll();
+
+		$view = new Template(PATH_VIEWS . "tests/linq.html");
+		TemplateData::set("results", $results);
+		TemplateData::set("view", $view->parse(), true);
+		$template = new Template(PATH_VIEWS . "template.html");
 		return new HtmlResponse($template);
 	}
 

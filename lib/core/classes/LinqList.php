@@ -61,13 +61,12 @@ class LinqList extends Enumerable {
 	 * @param callable|null $callable $callable
 	 * @return LinqList
 	 */
-	public function where(callable $callable = null): LinqList {
+	public function where(?callable $callable = null): self {
 		$this->temp = [];
 		if( $callable instanceof Closure ) {
 			foreach( $this->iterator as $key => $entry ) {
-				$return_value = $callable($entry, $key, $this);
-				if( $return_value ) {
-					$this->temp[] = $return_value;
+				if( $callable($entry, $key, $this) ) {
+					$this->temp[] = $entry;
 				}
 			}
 		} else {
@@ -77,6 +76,26 @@ class LinqList extends Enumerable {
 	}
 
 	/**
+	 * Applies the given function to each element of the results
+	 *
+	 * @param callable $callable
+	 * @return $this
+	 */
+	public function select(callable $callable): self {
+		if( !empty($this->temp) ) {
+			foreach( $this->temp as $key => $value ) {
+				$this->temp[$key] = $callable($value, $key, $this);
+			}
+		} else {
+			foreach( $this->iterator as $key => $value ) {
+				$this->temp[] = $callable($value, $key, $this);
+			}
+		}
+		return $this;
+	}
+
+
+	/**
 	 * Sorts the results by the given column if the values are arrays or objects in the given order direction
 	 * or if the values are standard-types like string or int that will be sort in the given direction
 	 *
@@ -84,7 +103,7 @@ class LinqList extends Enumerable {
 	 * @param bool $ascending
 	 * @return $this
 	 */
-	public function orderBy(string $col = "", bool $ascending = true): LinqList {
+	public function orderBy(string $col = "", bool $ascending = true): self {
 		if( !empty($this->temp) ) {
 			if( $col !== "" ) {
 				$first_element = $this->temp[array_key_first($this->temp)];
@@ -122,22 +141,22 @@ class LinqList extends Enumerable {
 	}
 
 	/**
-	 * Returns one element rom the search results
-	 * Throws an exception if more than one element is found
+	 * Remove any duplicated entry
 	 *
-	 * @return mixed
-	 * @throws SystemException
+	 * @return $this
 	 */
-	public function getOne(): mixed {
-		if( count($this->temp) === 1 ) {
-			$result = $this->temp[array_key_first($this->temp)];
-			$this->temp = [];
-			return $result;
-		}
-		if( count($this->temp) > 1 ) {
-			throw new SystemException(__FILE__, __LINE__, "Multiple values found!");
-		}
-		return null;
+	public function distinct(): self {
+		$this->temp = array_values(array_unique($this->temp, SORT_REGULAR));
+		return $this;
+	}
+
+	/**
+	 * Returns the number of matching elements
+	 *
+	 * @return int
+	 */
+	public function count(): int {
+		return count($this->temp);
 	}
 
 	/**
@@ -152,11 +171,30 @@ class LinqList extends Enumerable {
 	}
 
 	/**
+	 * Returns one element rom the search results
+	 * Throws an exception if more than one element is found
+	 *
+	 * @return mixed
+	 * @throws SystemException
+	 */
+	public function getOneOrNull(): mixed {
+		if( count($this->temp) === 1 ) {
+			$result = $this->temp[array_key_first($this->temp)];
+			$this->temp = [];
+			return $result;
+		}
+		if( count($this->temp) > 1 ) {
+			throw new SystemException(__FILE__, __LINE__, "Multiple values found!");
+		}
+		return null;
+	}
+
+	/**
 	 * Returns the first element rom the search results
 	 *
 	 * @return mixed
 	 */
-	public function getFirst(): mixed {
+	public function getFirstOrNull(): mixed {
 		if( count($this->temp) > 0 ) {
 			$result = $this->temp[0];
 			$this->temp = [];
