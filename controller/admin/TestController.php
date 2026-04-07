@@ -6,7 +6,6 @@ use lib\App;
 use lib\core\attributes\Route;
 use lib\core\blueprints\AController;
 use lib\core\blueprints\AResponse;
-use lib\core\cache\types\ResponseCache;
 use lib\core\classes\Template;
 use lib\core\classes\TemplateData;
 use lib\core\enums\RequestMethod;
@@ -26,29 +25,14 @@ class TestController extends AController {
 	 */
 	#[Route("/", RequestMethod::GET)]
 	public function index(): AResponse {
-		$cache = App::getInstanceOf(ResponseCache::class);
-		$cache->initCacheFor(__METHOD__);
-		$cache->addFileCheck(__FILE__);
-		$cache->addFileCheck(PATH_VIEWS . "template.html");
-		$cache->addFileCheck(PATH_VIEWS . "test/index.html");
+		$all_routes = array();
+		(App::getInstanceOf(Router::class))->getAllRoutes(PATH_CONTROLLER_ROOT, $all_routes);
 
-		if( $cache->isUpToDate() ) {
-			$content = $cache->getContent();
-		} else {
-			$all_routes = array();
-			(App::getInstanceOf(Router::class))->getAllRoutes(PATH_CONTROLLER_ROOT, $all_routes);
+		$view = new Template(PATH_VIEWS . "test/index.html");
+		TemplateData::set("routes_list", $all_routes);
 
-			$view = new Template(PATH_VIEWS . "test/index.html");
-			TemplateData::set("routes_list", $all_routes);
-
-			$template = new Template(PATH_VIEWS . "template.html");
-			TemplateData::set("view", $view->parse(), true);
-
-			$content = $template->parse();
-
-			$cache->saveContent($content);
-		}
-
-		return new HtmlResponse($content);
+		$template = new Template(PATH_VIEWS . "template.html");
+		TemplateData::set("view", $view->parse(), true);
+		return new HtmlResponse($template);
 	}
 }

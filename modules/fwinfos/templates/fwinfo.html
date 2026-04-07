@@ -1,0 +1,15 @@
+<?php
+
+use lib\core\classes\TemplateData;
+
+$is_cached = TemplateData::get("is_cached");
+$build_time = TemplateData::get("build_time");
+?>
+<div class="row text-end" style="margin: 0;">
+	<div class="col"></div>
+	<div class="col-3"><b>Harmonix</b> by: <?= AUTHOR ?>
+		<b>version</b>: <?= MVC_VERSION ?></div>
+	<div class="col-1"><b>Cached</b>: <?= $is_cached ?></div>
+	<div class="col-1"><b>build in</b>:<?= $build_time ?></div>
+</div>
+<div class="cleaner"></div>

@@ -149,7 +149,7 @@ class AccessPermissionRepository extends ARepository {
 	public function deleteAccessPermissionFor(Actor $actor): void {
 		try {
 			// @formatter:off
-			$this->pdo->Delete("access_permissions")
+			$this->pdo->Delete()->From("access_permissions")
 				->Where(["actor_id" => $actor->id])
 				->prepareStatement()
 				->execute()

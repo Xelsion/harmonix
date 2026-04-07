@@ -1,119 +1,61 @@
 <?php
 
-use lib\App;
-use lib\core\classes\Configuration;
 use lib\core\classes\Template;
 use lib\core\classes\TemplateData;
-use lib\helper\HtmlHelper;
 
-$actor = App::$curr_actor;
-$config = App::getInstanceOf(Configuration::class);
 $view = TemplateData::get("view");
 $view_content = ($view instanceof Template) ? $view->parse() : $view;
-$ts = time();
+$menu_template = new Template(PATH_VIEWS . "template_parts/main_menu.html");
+$actor_menu = new Template(PATH_VIEWS . "template_parts/actor_menu.html");
+
+TemplateData::addToHook("head_meta", '<meta charset="UTF-8"/>');
+TemplateData::addToHook("head_meta", '<meta name="viewport" content="width=device-width, initial-scale=1"/>');
+TemplateData::addToHook("head_css", '<link rel="stylesheet" href="' . PATH_SRC . 'bootstrap-5.3.2/css/bootstrap.min.css"/>');
+TemplateData::addToHook("head_css", '<link rel="stylesheet" href="' . PATH_SRC . 'bootstrap-5.3.2/css/bootstrap-utilities.min.css"/>');
+TemplateData::addToHook("head_css", '<link rel="stylesheet" href="' . PATH_CSS . 'styles.css"/>');
+TemplateData::addToHook("head_js", '<script src="' . PATH_SRC . 'bootstrap-5.3.2/js/bootstrap.bundle.min.js"></script>');
+TemplateData::addToHook("head_js", '<script src="' . PATH_SRC . 'jquery/jquery-3.7.1.min.js"></script>');
+TemplateData::addTemplateToHook("nav", $menu_template);
+TemplateData::addTemplateToHook("nav", $actor_menu);
+if( TemplateData::getSystemMessage() !== null ) {
+	TemplateData::addToHook("main_top", TemplateData::getSystemMessage());
+}
+TemplateData::addToHook("main", $view_content);
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<meta charset="UTF-8"/>
-	<meta name="viewport" content="width=device-width, initial-scale=1"/>
-	<title><?= TemplateData::get("title") ?? "Home" ?></title>
-	<link rel="stylesheet" href="<?= PATH_SRC ?>bootstrap-5.3.2/css/bootstrap.min.css"/>
-	<link rel="stylesheet" href="<?= PATH_SRC ?>bootstrap-5.3.2/css/bootstrap-utilities.min.css"/>
-	<link rel="stylesheet" href="<?= PATH_CSS ?>styles.css"/>
-	<?php foreach( TemplateData::getHeaderCss() as $css_file ) { ?>
-		<link rel="stylesheet" href="<?= $css_file ?>"/>
-	<?php } ?>
-	<script src="<?= PATH_SRC ?>bootstrap-5.3.2/js/bootstrap.bundle.min.js"></script>
-	<script src="<?= PATH_SRC ?>jquery/jquery-3.7.1.min.js"></script>
-	<script src="<?= PATH_JS ?>main.js?ts=<?= $ts ?>"></script>
-	<?php foreach( TemplateData::getHeaderScripts() as $script_file => $async ) { ?>
-		<?php if( $async ) { ?>
-			<script async src="<?= $script_file ?>"></script>
-		<?php } else { ?>
-			<script src="<?= $script_file ?>"></script>
-		<?php } ?>
-	<?php } ?>
+	<title></title>
+	<?= TemplateData::getHook("head_meta"); ?>
+	<?= TemplateData::getHook("head_css"); ?>
+	<?= TemplateData::getHook("head_js"); ?>
 </head>
 <body>
+<?= TemplateData::getHook("body_top"); ?>
+<?= TemplateData::getHook("header_before"); ?>
 <header>
-	<nav id="navigation">
-		<?php include(PATH_VIEWS . "main_menu.html") ?>
-		<div id="actor-menu">
-			<div class="has-children">
-				<span onclick="$('#actor-menu-dropdown').toggle();" class="menu-item"><?= ($actor->id > 0) ? escaped_string($actor->first_name . " " . $actor->last_name) : "Profile" ?></span>
-			</div>
-			<div id="actor-menu-dropdown" style="">
-				<menu>
-					<?php if( $actor->id === 0 ): ?>
-						<li>
-							<form action="<?= $_SERVER["REQUEST_URI"] ?>" method="POST">
-								<?= HtmlHelper::generateFormToken() ?>
-								<div class="form-row">
-									<label>
-										<input type="email" name="email" value="" placeholder="E-Mail"/>
-									</label>
-								</div>
-								<div class="form-row">
-									<label>
-										<input type="password" name="password" value="" placeholder="Password" autocomplete="new-password"/>
-									</label>
-								</div>
-								<?php if( $config->getSectionValue("security", "permanent_login") ) { ?>
-									<div class="form-row form-check">
-										<input id="perma_login" class="form-check-input" type="checkbox" name="permanent_login" value="yes"/>
-										<label for="perma_login" class="form-check-label font-monospace">eingeloggt bleiben?</label>
-									</div>
-								<?php } ?>
-								<div class="form-row">
-									<button type="submit" name="login" class="button-positiv">Login</button>
-								</div>
-							</form>
-						</li>
-					<?php else: ?>
-						<li>
-							<a href="https://www.<?= App::$config->getSectionValue("system", "domain_name") ?>">www-Bereich</a>
-						</li>
-						<li>
-							<form action="/" method="POST">
-								<?= HtmlHelper::generateFormToken() ?>
-								<button type="submit" name="logout" class="button-link">Logout</button>
-							</form>
-						</li>
-					<?php endif; ?>
-				</menu>
-			</div>
-		</div>
-		<div class="cleaner"></div>
-	</nav>
+	<?= TemplateData::getHook("header"); ?>
 </header>
+<?= TemplateData::getHook("header_after"); ?>
+<?= TemplateData::getHook("nav_before"); ?>
+<?php if( TemplateData::hasHook("nav") ): ?>
+	<nav id="navigation"><?= TemplateData::getHook("nav"); ?></nav>
+<?php endif; ?>
+<?= TemplateData::getHook("nav_after"); ?>
+<?= TemplateData::getHook("main_before"); ?>
 <main>
-	{{system_message}}
-	<?= $view_content ?>
+	<?= TemplateData::getHook("main_top"); ?>
+	<?= TemplateData::getHook("main"); ?>
+	<?= TemplateData::getHook("main_bottom"); ?>
 </main>
-<div>
-	<?php if( App::$storage->get("debug_mode") ) {
-		$debug = new Template(PATH_VIEWS_ROOT . "snippets/debug.html");
-		$debug_content = $debug->parse();
-		echo $debug_content;
-	} ?>
-</div>
+<?= TemplateData::getHook("body"); ?>
+<?= TemplateData::getHook("main_after"); ?>
+<?= TemplateData::getHook("footer_before"); ?>
 <footer>
-	<div class="row text-end" style="margin: 0;">
-		<div class="col"></div>
-		<div class="col-3"><b>Harmonix</b> by: <?= escaped_string(AUTHOR) ?>
-			<b>version</b>: <?= escaped_string(MVC_VERSION) ?></div>
-		<div class="col-1"><b>Cached</b>: {{is_cached}}</div>
-		<div class="col-1"><b>build in</b>: {{build_time}}</div>
-	</div>
-	<div class="cleaner"></div>
+	<?= TemplateData::getHook("footer"); ?>
 </footer>
+<?= TemplateData::getHook("footer_after"); ?>
+<?= TemplateData::getHook("body_bottom"); ?>
+<?= TemplateData::getHook("body_js"); ?>
 </body>
-<?php foreach( TemplateData::getFooterScripts() as $script_file => $async ) { ?>
-	<?php if( $async ) { ?>
-		<script async src="<?= $script_file ?>"></script>
-	<?php } else { ?>
-		<script src="<?= $script_file ?>"></script>
-	<?php } ?>
-<?php } ?>
 </html>

@@ -3,6 +3,7 @@
 namespace lib\helper;
 
 use Exception;
+use lib\App;
 use lib\core\exceptions\SystemException;
 
 /**
@@ -15,9 +16,8 @@ class StringHelper {
 
 	private static string $allowed_characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_$!%";
 	private static string $allowed_password_characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ123456789-_$!%@#&=?";
-	private static string $enc_key = 'Q#?9Q=M-&m$@o>>7\ZC$:~?:oRx%@uubnH>YrNwLjt,ieoLK;Mw%,xn2NPhs*c2<>SZQV&NbQA5W_vN;p=UVVd^vHWK&e`;xp9Mpr`azgvUXPph~Zd*2Eh/zx-5,dMmm';
 	private static string $enc_ciphering = "AES-128-CTR";
-	private static string $enc_iv = '5653179598585278';
+	//private static string $enc_iv = '5653179598585278';
 
 	private static string $enc_hash_algo = "sha256";
 	private static int $enc_hash_length = 32;
@@ -178,13 +178,8 @@ class StringHelper {
 				}
 			}
 
-			// Fallback (PHP 4.2+)
-			mt_srand((float)microtime() * 10000);
-			$char_id = strtolower(md5(uniqid(mt_rand(), true)));
-			$hyphen = chr(45);                  // "-"
-			$lbrace = $trim ? "" : chr(123);    // "{"
-			$rbrace = $trim ? "" : chr(125);    // "}"
-			return $lbrace . substr($char_id, 0, 8) . $hyphen . substr($char_id, 8, 4) . $hyphen . substr($char_id, 12, 4) . $hyphen . substr($char_id, 16, 4) . $hyphen . substr($char_id, 20, 12) . $rbrace;
+			// No GUID support detected
+			throw new SystemException(__FILE__, __LINE__, "No GUID support available!");
 		} catch( Exception $e ) {
 			throw new SystemException($e->getFile(), $e->getLine(), $e->getMessage(), $e->getCode(), $e->getPrevious());
 		}
@@ -200,8 +195,9 @@ class StringHelper {
 	 */
 	public static function encrypt(string $string, string $salt = ""): string {
 		try {
+			$base_key = App::$config->getSectionValue('security', 'enc_key');
 			if( function_exists('openssl_cipher_iv_length') && is_callable('openssl_cipher_iv_length') ) {
-				$enc_key = self::$enc_key . $salt;
+				$enc_key = hash_hmac('sha256', $salt, $base_key, true);
 				$iv_length = openssl_cipher_iv_length(self::$enc_ciphering);
 				$iv = random_bytes($iv_length);
 				$ciphertext_raw = openssl_encrypt($string, self::$enc_ciphering, $enc_key, self::$enc_option, $iv);
@@ -218,12 +214,14 @@ class StringHelper {
 	 * Decrypts an encrypted string and returns the result
 	 *
 	 * @param string $string
-	 *
+	 * @param string $salt
 	 * @return string
+	 * @throws SystemException
 	 */
 	public static function decrypt(string $string, string $salt = ""): string {
+		$base_key = App::$config->getSectionValue('security', 'enc_key');
 		if( function_exists('openssl_cipher_iv_length') && is_callable('openssl_cipher_iv_length') ) {
-			$enc_key = self::$enc_key . $salt;
+			$enc_key = hash_hmac('sha256', $salt, $base_key, true);
 			$iv_length = openssl_cipher_iv_length(self::$enc_ciphering);
 			$iv = substr($string, 0, $iv_length);
 			$hmac = substr($string, $iv_length, self::$enc_hash_length);
@@ -238,7 +236,7 @@ class StringHelper {
 				return $original_plaintext;
 			}
 		}
-		return $string;
+		throw new SystemException(__FILE__, __LINE__, "Invalid encrypted session data");
 	}
 
 	/**

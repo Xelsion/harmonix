@@ -3,8 +3,13 @@
 namespace lib\core;
 
 use lib\App;
+use lib\core\blueprints\AModule;
 use lib\core\classes\Configuration;
+use lib\core\classes\Template;
+use lib\core\enums\Subdomain;
 use lib\core\exceptions\SystemException;
+use ReflectionClass;
+use ReflectionException;
 
 class ModuleManager {
 
@@ -40,13 +45,52 @@ class ModuleManager {
 				"path" => $modulePath,
 				"name" => $name
 			]);
-			$this->modules[] = $module;
 
-			// Events registrieren
-			$this->events['start'][] = $module;
-			$this->events['beforeRouting'][] = $module;
-			$this->events['afterRouting'][] = $module;
-			$this->events['beforeResponse'][] = $module;
+			$allowed = $module->allowedSubDomains();
+			if( !is_array($allowed) || empty($allowed) ) {
+				throw new SystemException(__FILE__, __LINE__, "Module '{$module->moduleName}' returned invalid subdomains");
+			}
+
+			foreach( $allowed as $sd ) {
+				if( !$sd instanceof Subdomain ) {
+					throw new SystemException(__FILE__, __LINE__, "Module '{$module->moduleName}' must return an array of Subdomain enums. eg. Subdomain::ANY");
+				}
+			}
+
+			$allowedStrings = array_map(static fn(Subdomain $sd) => $sd->toString(), $allowed);
+			if( !in_array("*", $allowedStrings, true) && !in_array(SUB_DOMAIN, $allowedStrings, true) ) {
+				// Modul ist für diese Subdomain NICHT erlaubt → überspringen
+				continue;
+			}
+
+
+			$this->modules[] = $module;
+			try {
+				$reflect = new ReflectionClass($module);
+				$hasOnStart = $reflect->getMethod('onStart')->class !== AModule::class;
+				$hasOnBeforeRouting = $reflect->getMethod('onBeforeRouting')->class !== AModule::class;
+				$hasOnAfterRouting = $reflect->getMethod('onAfterRouting')->class !== AModule::class;
+				$hasOnBeforeResponse = $reflect->getMethod('onBeforeResponse')->class !== AModule::class;
+				if( $hasOnStart || $hasOnBeforeRouting || $hasOnAfterRouting || $hasOnBeforeResponse ) {
+					// Events registrieren
+					if( $hasOnStart ) {
+						$this->events['start'][] = $module;
+					}
+					if( $hasOnBeforeRouting ) {
+						$this->events['beforeRouting'][] = $module;
+					}
+					if( $hasOnAfterRouting ) {
+						$this->events['afterRouting'][] = $module;
+					}
+					if( $hasOnBeforeResponse ) {
+						$this->events['beforeResponse'][] = $module;
+					}
+				} else {
+					throw new SystemException(__FILE__, __LINE__, "Module '{$module->moduleName}' has no events");
+				}
+			} catch( ReflectionException $e ) {
+				throw new SystemException(__FILE__, __LINE__, $e->getMessage());
+			}
 		}
 	}
 
@@ -76,37 +120,7 @@ class ModuleManager {
 		}
 	}
 
-	public function runOnStart(): void {
-		foreach( $this->events['start'] as $module ) {
-			$module->onStart();
-		}
-	}
-
-	public function runBeforeRouting(): void {
-		foreach( $this->events['beforeRouting'] as $module ) {
-			$module->onBeforeRouting();
-		}
-	}
-
-	public function runAfterRouting(): void {
-		foreach( $this->events['afterRouting'] as $module ) {
-			$module->onAfterRouting();
-		}
-	}
-
-	public function runBeforeResponse(string &$output): void {
-		foreach( $this->events['beforeResponse'] as $module ) {
-			$module->onBeforeResponse($output);
-		}
-	}
-
-
-	public function runShutdown(): void {
-		foreach( $this->events['shutdown'] as $module ) {
-			$module->onShutdown();
-		}
-	}
-
+	/* ------------- module getter ------------- */
 	public function getMiddleware(): array {
 		$mw = [];
 		foreach( $this->modules as $module ) {
@@ -127,4 +141,28 @@ class ModuleManager {
 		return null;
 	}
 
+	/* ------------- module hooks ------------- */
+	public function runOnStart(): void {
+		foreach( $this->events['start'] as $module ) {
+			$module->onStart();
+		}
+	}
+
+	public function runBeforeRouting(): void {
+		foreach( $this->events['beforeRouting'] as $module ) {
+			$module->onBeforeRouting();
+		}
+	}
+
+	public function runAfterRouting(array $route): void {
+		foreach( $this->events['afterRouting'] as $module ) {
+			$module->onAfterRouting($route);
+		}
+	}
+
+	public function runBeforeResponse(Template $template): void {
+		foreach( $this->events['beforeResponse'] as $module ) {
+			$module->onBeforeResponse($template);
+		}
+	}
 }

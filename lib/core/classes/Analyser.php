@@ -24,10 +24,14 @@ class Analyser extends StopWatch {
 		if( $this->is_running ) {
 			$this->stop();
 		}
+
+		$bt = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 3);
+		$caller = $bt[2];
+		unset($caller["type"]);
 		$this->entries[] = [
 			"time"      => $this->getLastMeasuredTime()->format("ms", 4),
 			"info"      => $info,
-			"backtrace" => debug_backtrace()
+			"backtrace" => $caller
 		];
 		return $this;
 	}

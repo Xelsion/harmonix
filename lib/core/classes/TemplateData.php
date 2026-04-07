@@ -25,6 +25,135 @@ class TemplateData {
 
 	private static ?string $system_message = null;
 
+	private static array $hooks = array();
+
+	private static array $hook_names = array(
+		"head_meta",
+		"head_css",
+		"head_js",
+
+		"body_top",
+		"body",
+		"body_bottom",
+		"body_js",
+
+		"nav_before",
+		"nav",
+		"nav_after",
+
+		"header_before",
+		"header",
+		"header_after",
+
+		"main_before",
+		"main_top",
+		"main",
+		"main_bottom",
+		"main_after",
+
+		"footer_before",
+		"footer",
+		"footer_after"
+	);
+
+	/**
+	 * adds a hook the hook_names
+	 *
+	 * @param string $hook
+	 * @return void
+	 * @throws SystemException
+	 */
+	public static function addHookName(string $hook): void {
+		if( in_array($hook, self::$hook_names, true) ) {
+			throw new SystemException(__FILE__, __LINE__, "Template hook '{$hook}' already exists!");
+		}
+		self::$hook_names[] = $hook;
+	}
+
+	/**
+	 * @param string $hook
+	 * @param string $html
+	 * @return void
+	 * @throws SystemException
+	 */
+	public static function setHook(string $hook, string $html): void {
+		if( !in_array($hook, self::$hook_names, true) ) {
+			throw new SystemException(__FILE__, __LINE__, "Template hook '{$hook}' is not defined in allowed_blocks!");
+		}
+		self::$hooks[$hook] = $html;
+	}
+
+	/**
+	 * @param string $hook
+	 * @return string
+	 * @throws SystemException
+	 */
+	public static function getHook(string $hook): string {
+		if( !in_array($hook, self::$hook_names, true) ) {
+			throw new SystemException(__FILE__, __LINE__, "Template hook '{$hook}' is not defined in allowed_blocks!");
+		}
+		return self::$hooks[$hook] ?? "";
+	}
+
+	/**
+	 * @param string $hook
+	 * @param string $html
+	 * @return void
+	 * @throws SystemException
+	 */
+	public static function addToHook(string $hook, string $html): void {
+		if( !in_array($hook, self::$hook_names, true) ) {
+			throw new SystemException(__FILE__, __LINE__, "Template hook '{$hook}' is not defined in allowed_blocks!");
+		}
+		if( !isset(self::$hooks[$hook]) ) {
+			self::$hooks[$hook] = "";
+		}
+		self::$hooks[$hook] .= $html;
+	}
+
+	/**
+	 * @param string $hook
+	 * @param Template $template
+	 * @return void
+	 * @throws SystemException
+	 */
+	public static function addTemplateToHook(string $hook, Template $template): void {
+		self::addToHook($hook, $template->parse());
+	}
+
+
+	/**
+	 * @param string $hook
+	 * @return void
+	 * @throws SystemException
+	 */
+	public static function renderHook(string $hook): void {
+		if( !in_array($hook, self::$hook_names, true) ) {
+			throw new SystemException(__FILE__, __LINE__, "Template hook '{$hook}' is not defined in allowed_blocks!");
+		}
+		echo self::getHook($hook);
+	}
+
+	/**
+	 * @param string $hook
+	 * @return bool
+	 */
+	public static function hasHook(string $hook): bool {
+		return array_key_exists($hook, self::$hooks);
+	}
+
+	/**
+	 * @param string $hook
+	 * @return void
+	 * @throws SystemException
+	 */
+	public static function clearHook(string $hook): void {
+		if( !in_array($hook, self::$hook_names, true) ) {
+			throw new SystemException(__FILE__, __LINE__, "Template hook '{$hook}' is not defined in allowed_blocks!");
+		}
+		unset(self::$hooks[$hook]);
+	}
+
 	/**
 	 * Adds a key => value pair to the data storage
 	 *

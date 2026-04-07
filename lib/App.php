@@ -93,6 +93,10 @@ class App {
 		self::$module_manager = self::getInstanceOf(ModuleManager::class);
 		self::$module_manager->loadModules(PATH_ROOT . "modules");
 		self::$module_manager->boot();
+		// add middlewares from modules
+		foreach( self::$module_manager->getMiddleware() as $mw ) {
+			$this->addMiddleware($mw);
+		}
 
 		self::$request = self::getInstanceOf(Request::class);
 		self::$curr_actor = self::getInstanceOf(ActorModel::class);
@@ -131,10 +135,6 @@ class App {
 
 		// some classes need a db connections to be initialized, we do them now
 		self::setAsSingleton(RoleTree::class, RoleTree::getInstance());
-		// add middlewares from modules
-		foreach( self::$module_manager->getMiddleware() as $mw ) {
-			$this->addMiddleware($mw);
-		}
 
 		// process all middlewares
 		foreach( $this->middleware as $middleware ) {
@@ -186,7 +186,7 @@ class App {
 					$this::$response = $resolver->getValue();
 
 					// module hook 'afterRouting'
-					self::$module_manager->runAfterRouting();
+					self::$module_manager->runAfterRouting($route);
 				} catch( Exception $e ) {
 					throw new SystemException(__FILE__, __LINE__, "Method Injection failed: " . $e->getMessage());
 				}
@@ -207,12 +207,12 @@ class App {
 	public function getResponseOutput(): string {
 		$response = $this::$response;
 		$response->setHeaders();
-		$output = $response->getOutput();
 
 		// module hook 'beforeResponse'
-		self::$module_manager->runBeforeResponse($output);
+		self::$module_manager->runBeforeResponse($response->template);
 
-		return $output;
+		$response->parseTemplate();
+		return $response->getOutput();
 	}
 
 	/**

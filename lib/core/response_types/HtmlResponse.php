@@ -3,6 +3,7 @@
 namespace lib\core\response_types;
 
 use lib\core\blueprints\AResponse;
+use lib\core\classes\Template;
 use lib\core\enums\HttpResponseCode;
 
 /**
@@ -19,13 +20,15 @@ class HtmlResponse extends AResponse {
 	/**
 	 * The class constructor
 	 *
-	 * @param string $content
+	 * @param Template $template
 	 */
-	public function __construct(string $content = "") {
-		if( $content !== "" ) {
-			$this->setOutput($content);
-		}
+	public function __construct(Template $template) {
+		$this->template = $template;
 		$this->status_code = HttpResponseCode::Ok;
+	}
+
+	public function parseResponse(): void {
+		$this->setOutput($this->template->parse());
 	}
 
 	/**

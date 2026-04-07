@@ -3,6 +3,7 @@
 namespace lib\core\blueprints;
 
 use lib\core\classes\Configuration;
+use lib\core\classes\Template;
 
 abstract class AModule {
 
@@ -21,6 +22,8 @@ abstract class AModule {
 			$this->moduleConfig = parse_ini_file($configFile, true);
 		}
 	}
+
+	abstract public function allowedSubDomains(): array;
 
 	/** Wird nach dem Laden ausgeführt */
 	abstract public function boot(): void;
@@ -49,11 +52,11 @@ abstract class AModule {
 
 	}
 
-	public function onAfterRouting(): void {
+	public function onAfterRouting(array $route): void {
 
 	}
 
-	public function onBeforeResponse(string &$output): void {
+	public function onBeforeResponse(Template $template): void {
 
 	}
 

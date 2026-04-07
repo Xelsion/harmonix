@@ -2,11 +2,9 @@
 
 namespace controller\admin;
 
-use lib\App;
 use lib\core\attributes\Route;
 use lib\core\blueprints\AController;
 use lib\core\blueprints\AResponse;
-use lib\core\cache\types\ResponseCache;
 use lib\core\classes\Template;
 use lib\core\classes\TemplateData;
 use lib\core\enums\RequestMethod;
@@ -31,26 +29,10 @@ class HomeController extends AController {
 	 */
 	#[Route("", RequestMethod::GET, RequestMethod::POST)]
 	public function index(): AResponse {
-		$environment = APP::$config->getSectionValue("system", "environment");
-
-		$cache_enabled = (bool)APP::$config->getSectionValue($environment, "cache");
-		$cache = App::getInstanceOf(ResponseCache::class);
-		$cache->initCacheFor(__CLASS__, __METHOD__);
-		$cache->addFileCheck(__FILE__);
-		if( $cache_enabled && $cache->isUpToDate() ) {
-			$content = $cache->getContent();
-			return new HtmlResponse($content);
-		}
 		$view = new Template(PATH_VIEWS . "home/index.html");
-
 		$template = new Template(PATH_VIEWS . "template.html");
 		TemplateData::set("view", $view->parse(), true);
-
-		$content = $template->parse();
-		if( $cache_enabled ) {
-			$cache->saveContent($content);
-		}
-		return new HtmlResponse($content);
+		return new HtmlResponse($template);
 	}
 
 }

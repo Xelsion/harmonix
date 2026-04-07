@@ -17,7 +17,6 @@ use lib\core\response_types\HtmlResponse;
  */
 #[Route("/")]
 class HomeController extends AController {
-
 	/**
 	 * Shows the landing page
 	 *
@@ -31,7 +30,7 @@ class HomeController extends AController {
 		TemplateData::set("test", "hallo");
 		$template = new Template(PATH_VIEWS . "template.html");
 		TemplateData::set("view", $view->parse(), true);
-		return new HtmlResponse($template->parse());
+		return new HtmlResponse($template);
 	}
 
 }

@@ -29,7 +29,7 @@ class ConfigController extends AController {
 		$template = new Template(PATH_VIEWS . "template.html");
 		TemplateData::set("view", $view->parse(), true);
 
-		return new HtmlResponse($template->parse());
+		return new HtmlResponse($template);
 	}
 
 	/**

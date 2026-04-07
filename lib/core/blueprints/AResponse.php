@@ -1,5 +1,8 @@
 <?php
+
 namespace lib\core\blueprints;
+
+use lib\core\classes\Template;
 
 /**
  * The Abstract version of a Response
@@ -10,14 +13,22 @@ namespace lib\core\blueprints;
 abstract class AResponse {
 
 	// The output content
+	public ?Template $template;
+
 	private string $output;
+
+	public function parseTemplate(): void {
+		if( $this->template !== null ) {
+			$this->output = $this->template->parse();
+		}
+	}
 
 	/**
 	 * Sets the output content of the response_types
 	 *
 	 * @param string $output
 	 */
-	public function setOutput( string $output ): void {
+	public function setOutput(string $output): void {
 		$this->output = $output;
 	}
 
@@ -30,9 +41,9 @@ abstract class AResponse {
 		return $this->output;
 	}
 
-    /**
-     * sets the headers for the response_types
-     */
-    abstract public function setHeaders(): void;
+	/**
+	 * sets the headers for the response_types
+	 */
+	abstract public function setHeaders(): void;
 
 }

@@ -38,7 +38,7 @@ class ErrorController extends AController {
 		$template = new Template(PATH_VIEWS . "template.html");
 		TemplateData::set("view", $view->parse(), true);
 
-		$response = new HtmlResponse($template->parse());
+		$response = new HtmlResponse($template);
 		$response->status_code = $response_code;
 		return $response;
 	}

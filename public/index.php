@@ -20,6 +20,7 @@ use lib\core\classes\TemplateData;
 use lib\helper\StringHelper;
 use lib\middleware\SessionAuth;
 
+
 define("SUB_DOMAIN", explode(".", $_SERVER["HTTP_HOST"])[0]);
 const PATH_ROOT = ".." . DIRECTORY_SEPARATOR;
 
@@ -36,10 +37,10 @@ $runtime_logger = new Logger("runtime");
 $config = new Configuration(PATH_ROOT . "application.ini");
 
 try {
-	// getActor output buffering and prevent all direct output
-	ob_start('ob_gzhandler');
+	// start output buffering and prevent all direct output
+	ob_start();
 
-	// getActor the process
+	// start the process
 	$app = new App();
 	$app->addMiddleware(SessionAuth::class);
 	$app->run();

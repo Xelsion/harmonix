@@ -1,0 +1,59 @@
+<?php
+
+use lib\App;
+use lib\core\classes\Configuration;
+use lib\helper\HtmlHelper;
+
+$actor = App::$curr_actor;
+$actor_role = App::$curr_actor_role;
+$config = App::getInstanceOf(Configuration::class);
+?>
+<div id="actor-menu">
+	<div class="has-children">
+		<span onclick="$('#actor-menu-dropdown').toggle();" class="menu-item"><?= ($actor->id > 0) ? $actor->first_name . " " . $actor->last_name : "Login" ?></span>
+	</div>
+	<div id="actor-menu-dropdown" style="">
+		<menu>
+			<?php if( $actor->id === 0 ): ?>
+				<li>
+					<form action="<?= App::$request->getRequestUri() ?>" method="POST">
+						<?= HtmlHelper::generateFormToken() ?>
+						<div class="form-row">
+							<label>
+								<input type="email" name="email" value="" placeholder="E-Mail"/>
+							</label>
+						</div>
+						<div class="form-row">
+							<label>
+								<input type="password" name="password" value="" placeholder="Password" autocomplete="new-password"/>
+							</label>
+						</div>
+						<?php if( $config->getSectionValue("security", "permanent_login") ) { ?>
+							<div class="form-row form-check">
+								<input id="perma_login" class="form-check-input" type="checkbox" name="permanent_login" value="yes"/>
+								<label for="perma_login" class="form-check-label font-monospace">eingeloggt bleiben?</label>
+							</div>
+						<?php } ?>
+						<div><a href="" class="font-monospace">Passwort vergessen?</a></div>
+						<div class="form-row">
+							<button type="submit" name="login" class="button-positiv-flat">Login</button>
+						</div>
+					</form>
+				</li>
+			<?php else: ?>
+				<?php if( App::$auth->hasAccessTo(controller\admin\HomeController::class, "index", "admin") ) { ?>
+					<li>
+						<a href="https://admin.<?= App::$config->getSectionValue("system", "domain_name") ?>">Admin-Bereich</a>
+					</li>
+				<?php } ?>
+				<li>
+					<form action="/" method="POST">
+						<?= HtmlHelper::generateFormToken() ?>
+						<button type="submit" name="logout" class="button-link">Logout</button>
+					</form>
+				</li>
+			<?php endif; ?>
+		</menu>
+	</div>
+</div>
+<div class="cleaner"></div>

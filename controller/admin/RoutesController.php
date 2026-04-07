@@ -35,9 +35,7 @@ class RoutesController extends AController {
 
 		$template = new Template(PATH_VIEWS . "template.html");
 		TemplateData::set("view", $view->parse(), true);
-
-		$content = $template->parse();
-		return new HtmlResponse($content);
+		return new HtmlResponse($template);
 	}
 
 	/**

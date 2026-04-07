@@ -8,9 +8,10 @@ use JetBrains\PhpStorm\NoReturn;
  * The class file must be in the same directory structure as the namespace is set.
  */
 spl_autoload_register(static function($class_name) {
-	$file_name = Namespace2Path($class_name);
-	if( file_exists(PATH_ROOT . $file_name . ".php") ) {
-		require_once PATH_ROOT . $file_name . ".php";
+	$file_path = Namespace2Path($class_name);
+	$file_name = PATH_ROOT . $file_path . ".php";
+	if( file_exists($file_name) ) {
+		require_once $file_name;
 	} else {
 		echo "failed to find class[{$class_name}] file: {$file_name}<br />";
 	}

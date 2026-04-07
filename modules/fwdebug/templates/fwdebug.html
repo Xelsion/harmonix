@@ -1,0 +1,59 @@
+<?php
+
+use lib\core\classes\TemplateData;
+
+$fwdebug_messages = TemplateData::get("fwdebug_messages");
+$fwdebug_actor = TemplateData::get("fwdebug_actor");
+$fwdebug_controller = TemplateData::get("fwdebug_controller");
+$fwdebug_controller_method = TemplateData::get("fwdebug_controller_method");
+$fwdebug_actor_role = TemplateData::get("fwdebug_actor_role");
+$fwdebug_sql_entries = TemplateData::get('fwdebug_sql_entries');
+?>
+<div class="container-fluid">
+	<table class="table table-dark table-striped">
+		<tr>
+			<th>Type</th>
+			<th>Content</th>
+		</tr>
+		<tr>
+			<td>User</td>
+			<td><?= $fwdebug_actor ?></td>
+		</tr>
+		<tr>
+			<td>Role</td>
+			<td><?= $fwdebug_actor_role ?></td>
+		</tr>
+		<tr>
+			<td>Controller</td>
+			<td><?= $fwdebug_controller ?></td>
+		</tr>
+		<tr>
+			<td>Method</td>
+			<td><?= $fwdebug_controller_method ?></td>
+		</tr>
+	</table>
+	<table class="table table-dark table-striped">
+		<tr>
+			<th>Debug Massages</th>
+		</tr>
+		<?php foreach( $fwdebug_messages as $entry ): ?>
+			<tr>
+				<td><?= $entry ?></td>
+			</tr>
+		<?php endforeach; ?>
+	</table>
+	<table class="table table-dark table-striped">
+		<tr>
+			<th>SQL</th>
+			<th>Caller</th>
+			<th>Query Time</th>
+		</tr>
+		<?php foreach( $fwdebug_sql_entries as $entry ): ?>
+			<tr>
+				<td><?= $entry["info"] ?></td>
+				<td><?php print_debug($entry["backtrace"]) ?></td>
+				<td class="col-1"><?= $entry["time"] ?></td>
+			</tr>
+		<?php endforeach; ?>
+	</table>
+</div>
