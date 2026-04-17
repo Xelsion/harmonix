@@ -44,8 +44,8 @@ class Module extends AModule {
 	 * @return void
 	 * @throws SystemException
 	 */
-	public function onBeforeResponse(Template $template): void {
-		if( $this->debugging ) {
+	public function onBeforeResponse(?Template $template): void {
+		if( $this->debugging && $template !== null ) {
 			TemplateData::set('fwdebug_messages', App::$storage->get("debug"));
 			TemplateData::set('fwdebug_actor', App::$curr_actor->first_name . ' ' . App::$curr_actor->last_name);
 			TemplateData::set('fwdebug_actor_role', App::$curr_actor_role->name);

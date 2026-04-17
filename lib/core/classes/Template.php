@@ -49,5 +49,5 @@ class Template extends TemplateData {
 		require($this->file_path);
 		return ob_get_clean();
 	}
-	
+
 }

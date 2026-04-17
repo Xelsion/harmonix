@@ -114,11 +114,10 @@ class ActorRolesController extends AController {
 		$view = new Template(PATH_VIEWS . "actor_roles/edit.html");
 		TemplateData::set("role", $role);
 		TemplateData::set("actor_role", App::$curr_actor_role);
-		TemplateData::set("option_list", $this->role_repository->find(array(["id" => ["!=", $role->id]])));
-
+		TemplateData::set("option_list", $this->role_repository->find(["id" => ["!=" => $role->id]]));
 		$template = new Template(PATH_VIEWS . "template.html");
 		TemplateData::set("view", $view->parse(), true);
-		
+
 		return new HTMLResponse($template);
 	}
 

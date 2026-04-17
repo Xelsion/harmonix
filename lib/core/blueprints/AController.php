@@ -19,7 +19,7 @@ use lib\core\classes\Configuration;
  */
 abstract class AController {
 
-	protected static ?bool $caching = null;
+	protected static Configuration $config;
 
 	/**
 	 * The class constructor
@@ -27,10 +27,7 @@ abstract class AController {
 	 * @param Configuration $config
 	 */
 	public function __construct(Configuration $config) {
-		if( self::$caching === null ) {
-			$environment = $config->getSectionValue("system", "environment");
-			self::$caching = (bool)$config->getSectionValue($environment, "caching");
-		}
+		self::$config = $config;
 	}
 
 	public function __toString(): string {

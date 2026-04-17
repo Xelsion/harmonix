@@ -1,12 +1,13 @@
 <?php
 
+use lib\core\classes\LinqList;
 use lib\core\classes\TemplateData;
 use lib\core\enums\ErrorType;
 
 TemplateData::set("title", "Routes");
 
-$routes_list = TemplateData::get("routes_list");
-$conflicts = TemplateData::get("conflicts");
+$routes_list = TemplateData::get("routes_list") ?? array();
+$conflicts = TemplateData::get("conflicts") ?? new LinqList();
 ?>
 <div class="container-fluid">
 	<h1>Routes</h1>
@@ -25,7 +26,7 @@ $conflicts = TemplateData::get("conflicts");
 					<?php foreach( $routes as $route ) {
 						$path = $route["path"];
 						$conflict = $conflicts->where(fn($e) => ($e['domain'] === $domain && $e['path'] === $path))
-							->getFirst()
+							->getFirstOrNull()
 						;
 						$has_conflicts = (!is_null($conflict));
 						?>

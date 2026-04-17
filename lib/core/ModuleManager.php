@@ -4,6 +4,7 @@ namespace lib\core;
 
 use lib\App;
 use lib\core\blueprints\AModule;
+use lib\core\blueprints\AResponse;
 use lib\core\classes\Configuration;
 use lib\core\classes\Template;
 use lib\core\enums\Subdomain;
@@ -25,10 +26,11 @@ class ModuleManager {
 	private array $modules = [];
 
 	private array $events = [
-		'start'          => [],
-		'beforeRouting'  => [],
-		'afterRouting'   => [],
-		'beforeResponse' => [],
+		'start'           => [],
+		'beforeRouting'   => [],
+		'afterRouting'    => [],
+		'afterController' => [],
+		'beforeResponse'  => [],
 	];
 
 	/**
@@ -78,15 +80,15 @@ class ModuleManager {
 				continue;
 			}
 
-
 			$this->modules[] = $module;
 			try {
 				$reflect = new ReflectionClass($module);
 				$hasOnStart = $reflect->getMethod('onStart')->class !== AModule::class;
 				$hasOnBeforeRouting = $reflect->getMethod('onBeforeRouting')->class !== AModule::class;
 				$hasOnAfterRouting = $reflect->getMethod('onAfterRouting')->class !== AModule::class;
+				$hasOnAfterController = $reflect->getMethod('onAfterController')->class !== AModule::class;
 				$hasOnBeforeResponse = $reflect->getMethod('onBeforeResponse')->class !== AModule::class;
-				if( $hasOnStart || $hasOnBeforeRouting || $hasOnAfterRouting || $hasOnBeforeResponse ) {
+				if( $hasOnStart || $hasOnBeforeRouting || $hasOnAfterRouting || $hasOnAfterController || $hasOnBeforeResponse ) {
 					// Events registrieren
 					if( $hasOnStart ) {
 						$this->events['start'][] = $module;
@@ -96,6 +98,9 @@ class ModuleManager {
 					}
 					if( $hasOnAfterRouting ) {
 						$this->events['afterRouting'][] = $module;
+					}
+					if( $hasOnAfterController ) {
+						$this->events['afterController'][] = $module;
 					}
 					if( $hasOnBeforeResponse ) {
 						$this->events['beforeResponse'][] = $module;
@@ -205,12 +210,24 @@ class ModuleManager {
 	}
 
 	/**
-	 * Calls the onBeforeResponse() method of alle modules
+	 * Calls the onAfterController() method of alle modules
 	 *
-	 * @param Template $template
+	 * @param array $route
 	 * @return void
 	 */
-	public function runBeforeResponse(Template $template): void {
+	public function runAfterController(?AResponse $response): void {
+		foreach( $this->events['afterController'] as $module ) {
+			$module->onAfterController($response);
+		}
+	}
+
+	/**
+	 * Calls the onBeforeResponse() method of alle modules
+	 *
+	 * @param Template|null $template
+	 * @return void
+	 */
+	public function runBeforeResponse(?Template $template): void {
 		foreach( $this->events['beforeResponse'] as $module ) {
 			$module->onBeforeResponse($template);
 		}

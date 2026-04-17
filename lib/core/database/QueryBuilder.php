@@ -26,8 +26,10 @@ class QueryBuilder {
 	private bool $required_order = false;
 	private bool $order_is_set = false;
 	private bool $alias_possible = false;
+	private bool $alias_required = false;
+	private bool $group_prepared = false;
 	private int $param_counter = 0;
-
+	private int $subquery_count = 0;
 
 	public function __construct(PDO $pdo, ?DbType $db_type = null) {
 		$this->pdo = $pdo;
@@ -47,13 +49,25 @@ class QueryBuilder {
 	public function Select(mixed $columns = null): static {
 		$this->checkSQL(QBStep::START);
 		$this->query_type = QueryType::SELECT;
+		$cols = array();
 		if( is_null($columns) ) {
-			$this->sql = "SELECT *";
+			$cols[] = "*";
 		} elseif( is_array($columns) ) {
-			$this->sql = "SELECT " . implode(", ", $columns);
+			foreach( $columns as $key => $value ) {
+				if( $value instanceof self ) {
+					$sql = $this->addSubquery($value);
+					$cols[] = "({$sql}) AS {$key}";
+				} elseif( is_string($key) ) {
+					$cols[] = "{$value} AS {$key}";
+				} else {
+					$cols[] = $value;
+				}
+			}
 		} else {
-			$this->sql = "SELECT " . $columns;
+			$cols[] = $columns;
 		}
+
+		$this->sql = "SELECT " . implode(", ", $cols);
 		return $this;
 	}
 
@@ -113,7 +127,12 @@ class QueryBuilder {
 	 */
 	public function From(mixed $tables = null): static {
 		$this->checkSQL(QBStep::FROM);
-		if( is_array($tables) ) {
+		if( $tables instanceof self ) {
+			$sql = $this->addSubquery($tables);
+			$this->sql .= " FROM ({$sql})";
+			$this->alias_possible = true;
+			$this->alias_required = true;
+		} elseif( is_array($tables) ) {
 			$this->sql .= " FROM " . implode(", ", $tables);
 		} else {
 			$this->sql .= " FROM " . $tables;
@@ -159,6 +178,23 @@ class QueryBuilder {
 	}
 
 	/**
+	 * @param string|array $conditions
+	 * @return $this
+	 * @throws SystemException
+	 */
+	public function On(string|array $conditions): static {
+		$this->checkSQL(QBStep::JOIN_ON);
+		if( is_array($conditions) && !empty($conditions) ) {
+			$this->sql .= " ON " . $this->compileConditions($conditions);
+		} else if( !StringHelper::isNullOrEmpty($conditions) ) {
+			$this->sql .= " ON " . $conditions;
+		} else {
+			throw new SystemException(__FILE__, __LINE__, "ON must contain at least one condition");
+		}
+		return $this;
+	}
+
+	/**
 	 * @param string $alias
 	 * @return $this
 	 * @throws SystemException
@@ -178,73 +214,98 @@ class QueryBuilder {
 	 * @return $this
 	 * @throws SystemException
 	 */
-	public function Where(array $conditions): static {
+	public function Where(array $conditions = []): static {
 		$this->checkSQL(QBStep::WHERE);
-		$this->where_clauses[] = ['logic' => 'AND', 'data' => $conditions];
-		return $this;
-	}
-
-	/**
-	 * @param array $conditions
-	 * @return $this
-	 * @throws SystemException
-	 */
-	public function And(array $conditions): static {
-		$this->checkSQL(QBStep::WHERE_ADDS);
-		$this->where_clauses[] = ['logic' => 'AND', 'data' => $conditions];
-		return $this;
-	}
-
-	/**
-	 * @param array $conditions
-	 * @return $this
-	 * @throws SystemException
-	 */
-	public function Or(array $conditions): static {
-		$this->checkSQL(QBStep::WHERE_ADDS);
-		$this->where_clauses[] = ['logic' => 'OR', 'data' => $conditions];
-		return $this;
-	}
-
-	/**
-	 * @param string|array $conditions
-	 * @return $this
-	 * @throws SystemException
-	 */
-	public function On(string|array $conditions): static {
-		$this->checkSQL(QBStep::JOIN_ON);
-		if( is_array($conditions) && !empty($conditions) ) {
-			$this->sql .= " ON " . $this->compileConditions($conditions);
-		} else if( !StringHelper::isNullOrEmpty($conditions) ) {
-			$this->sql .= " ON " . $conditions;
+		if( empty($conditions) ) {
+			$this->where_clauses[] = ['logic' => 'AND', 'data' => null];
+			$this->group_prepared = true;
 		} else {
-			throw new SystemException(__FILE__, __LINE__, "ON must contain at least one condition");
+			$this->where_clauses[] = ['logic' => 'AND', 'data' => $conditions];
 		}
+		return $this;
+	}
+
+	/**
+	 * @param array $conditions
+	 * @return $this
+	 * @throws SystemException
+	 */
+	public function And(array $conditions = []): static {
+		$this->checkSQL(QBStep::WHERE_ADDS);
+		if( empty($conditions) ) {
+			$this->where_clauses[] = ['logic' => 'AND', 'data' => null];
+			$this->group_prepared = true;
+		} else {
+			$this->where_clauses[] = ['logic' => 'AND', 'data' => $conditions];
+		}
+		return $this;
+	}
+
+	/**
+	 * @param array $conditions
+	 * @return $this
+	 * @throws SystemException
+	 */
+	public function Or(array $conditions = []): static {
+		$this->checkSQL(QBStep::WHERE_ADDS);
+		if( empty($conditions) ) {
+			$this->where_clauses[] = ['logic' => 'OR', 'data' => null];
+			$this->group_prepared = true;
+		} else {
+			$this->where_clauses[] = ['logic' => 'OR', 'data' => $conditions];
+		}
+		return $this;
+	}
+
+	/**
+	 * @param array $conditions
+	 * @return $this
+	 * @throws SystemException
+	 */
+	public function Group(array $conditions): static {
+		$this->checkSQL(QBStep::GROUP);
+		$this->where_clauses[] = ['logic' => '()', 'data' => $conditions];
 		return $this;
 	}
 
 	/**
 	 * @return string
+	 * @throws SystemException
 	 */
 	protected function compileFinalWhere(): string {
 		if( empty($this->where_clauses) ) {
 			return "";
 		}
-		$finalParts = [];
-		foreach( $this->where_clauses as $index => $clause ) {
-			$compiled = $this->compileConditions($clause['data']);
-			if( $compiled !== "" ) {
-				$prefix = ($index === 0) ? "" : $clause['logic'] . " ";
-				$finalParts[] = $prefix . "(" . $compiled . ")";
+
+		$sql = 'WHERE';
+		$parts = [];
+		$first = true;
+
+		foreach( $this->where_clauses as $clause ) {
+			$logic = $clause['logic'];
+			$data = $clause['data'];
+			if( $logic === '()' ) {
+				// Group erzeugt IMMER ein geklammertes Fragment
+				$fragment = '(' . $this->compileConditions($data) . ')';
+			} else {
+				// AND / OR
+				$fragment = $this->compileConditions($data);
+			}
+			if( $first ) {
+				$parts[] = $fragment;
+				$first = false;
+			} else {
+				$parts[] = "{$logic} {$fragment}";
 			}
 		}
-		return " WHERE " . implode(" ", $finalParts);
+		return " WHERE " . implode(" ", $parts);
 	}
 
 	/**
 	 * @param array $conditions
 	 * @param string $logic
 	 * @return string
+	 * @throws SystemException
 	 */
 	protected function compileConditions(array $conditions, string $logic = 'AND'): string {
 		$parts = [];
@@ -253,7 +314,6 @@ class QueryBuilder {
 				$parts[] = "(" . $this->compileConditions($value, strtoupper($column)) . ")";
 				continue;
 			}
-
 			$placeholder = $this->makePlaceholderName($column);
 
 			if( is_array($value) ) {
@@ -262,52 +322,73 @@ class QueryBuilder {
 				switch( $operator ) {
 					case 'BETWEEN':
 					case 'NOT BETWEEN':
-						$p1 = $placeholder . "_a";
-						$p2 = $placeholder . "_b";
+						$p1 = $placeholder . '_a';
+						$p2 = $placeholder . '_b';
 						$parts[] = "{$column} {$operator} :{$p1} AND :{$p2}";
 						$this->addBindParam($p1, $val[0]);
 						$this->addBindParam($p2, $val[1]);
 						break;
 					case 'IN':
 					case 'NOT IN':
-						$vals = (array)$val;
-						if( count($vals) === 0 ) {
-							$parts[] = ($operator === 'IN') ? '1=0' : '1=1';
-							break;
+						if( $val instanceof self ) {
+							$sql = $this->addSubquery($val);
+							$parts[] = "{$column} {$operator} ({$sql})";
+						} else {
+							$vals = (array)$val;
+							if( count($vals) === 0 ) {
+								$parts[] = ($operator === 'IN') ? '1=0' : '1=1';
+								break;
+							}
+							$placeholders = [];
+							foreach( $vals as $i => $v ) {
+								$p = $placeholder . '_' . $i;
+								$placeholders[] = ":{$p}";
+								$this->addBindParam($p, $v);
+							}
+							$parts[] = "{$column} {$operator} (" . implode(', ', $placeholders) . ")";
 						}
-						$inPlaceholders = [];
-						foreach( (array)$val as $i => $v ) {
-							$p = $placeholder . "_" . $i;
-							$inPlaceholders[] = $p;
-							$this->addBindParam($p, $v);
-						}
-						$parts[] = "{$column} {$operator} (:" . implode(', :', $inPlaceholders) . ")";
-						break;
-					case 'IS':
-					case 'IS NOT':
-						$parts[] = "{$column} {$operator} NULL";
 						break;
 					case 'EXISTS':
 					case 'NOT EXISTS':
-						$subquery = ($val instanceof self) ? $val->sql : $val;
-						$parts[] = "{$operator} ({$subquery})";
+						$sql = $val instanceof self ? $this->addSubquery($val) : $val;
+						$parts[] = "{$operator} ({$sql})";
 						break;
 					case 'RAW':
 						$parts[] = "{$column} {$val}";
 						break;
 					default:
-						$parts[] = "{$column} {$operator} :{$placeholder}";
-						$this->addBindParam($placeholder, $val);
-						break;
+						if( $val instanceof self ) {
+							$sql = $this->addSubquery($val);
+							$parts[] = "{$column} {$operator} ({$sql})";
+						} else {
+							$parts[] = "{$column} {$operator} :{$placeholder}";
+							$this->addBindParam($placeholder, $val);
+						}
 				}
+			} else if( is_null($value) ) {
+				$parts[] = "{$column} IS NULL";
 			} else {
-				$parts[] = is_null($value) ? "{$column} IS NULL" : "{$column} = :{$placeholder}";
-				if( !is_null($value) ) {
-					$this->addBindParam($placeholder, $value);
-				}
+				$parts[] = "{$column} = :{$placeholder}";
+				$this->addBindParam($placeholder, $value);
 			}
 		}
 		return implode(" {$logic} ", $parts);
+	}
+
+	/**
+	 * add a QueryBuilder instance to this query as subquery
+	 * @param QueryBuilder $subquery
+	 * @return string
+	 * @throws SystemException
+	 */
+	private function addSubquery(self $subquery): string {
+		$this->checkSQL(QBStep::SUBQUERY);
+		$subquery->prefixParameters("sq{$this->subquery_count}");
+		foreach( $subquery->params as $k => $v ) {
+			$this->params[$k] = $v;
+		}
+		$this->subquery_count++;
+		return $subquery->sql;
 	}
 
 	// ==================== Order, Limit, Group, Having ====================
@@ -446,6 +527,22 @@ class QueryBuilder {
 	}
 
 	/**
+	 * add a prefix to all parameters
+	 * @param string $prefix
+	 * @return void
+	 */
+	private function prefixParameters(string $prefix): void {
+		$newParams = [];
+		foreach( $this->params as $key => $value ) {
+			$newKey = "{$prefix}_{$key}";
+			$this->sql = str_replace(":{$key}", ":{$newKey}", $this->sql);
+			$newParams[$newKey] = $value;
+		}
+		$this->params = $newParams;
+	}
+
+
+	/**
 	 * @param array $options
 	 * @return $this
 	 * @throws SystemException
@@ -523,12 +620,21 @@ class QueryBuilder {
 
 
 	/**
+	 * @param QBStep $step
 	 * @return void
 	 * @throws SystemException
 	 */
 	private function checkSQL(QBStep $step): void {
 		$order_error = false;
 		$err_msg = "";
+
+		if( $this->alias_required && $step->value !== QBStep::AS->value ) {
+			throw new SystemException(__FILE__, __LINE__, $err_msg = "At this point an alias (As) is required!.");
+		}
+
+		if( $this->group_prepared && $step->value !== QBStep::GROUP->value ) {
+			throw new SystemException(__FILE__, __LINE__, $err_msg = "At this point an Group is required!.");
+		}
 
 		if( !$this->alias_possible && $step->value !== QBStep::AS->value ) {
 			$this->alias_possible = false;
@@ -543,6 +649,73 @@ class QueryBuilder {
 		}
 
 		switch( $step ) {
+			case QBStep::GROUP:
+				if( !$this->group_prepared ) {
+					$order_error = true;
+					$err_msg = "Groups must be initiated with and empty And(), Or() or Where()";
+				} else {
+					$this->group_prepared = false;
+				}
+				break;
+			case QBStep::SUBQUERY:
+				// SELECT
+				if( $this->query_type === QueryType::SELECT && !in_array($this->curr_step, [
+						QBStep::START,
+						QBStep::FROM,
+						QBStep::WHERE,
+						QBStep::WHERE_ADDS,
+						QBStep::HAVING
+					], true) ) {
+					$order_error = true;
+					$err_msg = "Subqueries are only allowed in SELECT, FROM, WHERE or HAVING";
+					break;
+				}
+
+				// INSERT
+				if( $this->query_type === QueryType::INSERT && $this->curr_step === QBStep::VALUES ) {
+					$order_error = true;
+					$err_msg = "Subqueries are not allowed inside INSERT VALUES";
+					break;
+				}
+
+				// UPDATE
+				if( $this->query_type === QueryType::UPDATE && $this->curr_step === QBStep::FROM ) {
+					if( $this->db_type === DbType::Postgres || $this->db_type === DbType::MsSQL ) {
+						break;
+					}
+					$order_error = true;
+					$err_msg = "UPDATE ... FROM subqueries are only supported in PostgreSQL and MSSQL";
+					break;
+				}
+
+				if( $this->query_type === QueryType::UPDATE && !in_array($this->curr_step, [
+						QBStep::VALUES,
+						QBStep::WHERE,
+						QBStep::WHERE_ADDS
+					], true) ) {
+					$order_error = true;
+					$err_msg = "Subqueries in UPDATE statements are only allowed in SET or WHERE clauses";
+					break;
+				}
+
+				// DELETE
+				if( $this->query_type === QueryType::DELETE && !in_array($this->curr_step, [
+						QBStep::WHERE,
+						QBStep::WHERE_ADDS
+					], true) ) {
+					$order_error = true;
+					$err_msg = "Subqueries in DELETE statements are only allowed in WHERE clauses";
+					break;
+				}
+
+
+				// TRUNCATE
+				if( $this->query_type === QueryType::TRUNCATE ) {
+					$order_error = true;
+					$err_msg = "Subqueries are not allowed in TRUNCATE statements";
+					break;
+				}
+				break;
 			case(QBStep::START):
 				if( $this->curr_step->value !== QBStep::NONE->value ) {
 					$order_error = true;
@@ -582,6 +755,7 @@ class QueryBuilder {
 					$order_error = true;
 					$err_msg = "AS can be set after FROM|JOINS";
 				}
+				$this->alias_required = false;
 				break;
 			case(QBStep::WHERE):
 				if( ($this->query_type->value === QueryType::SELECT->value || $this->query_type->value === QueryType::DELETE->value) && !($this->curr_step->value >= QBStep::FROM->value && $this->curr_step->value <= QBStep::WHERE_ADDS->value) ) {
@@ -651,7 +825,9 @@ class QueryBuilder {
 		if( $order_error ) {
 			throw new SystemException(__FILE__, __LINE__, "Query order error: " . $err_msg);
 		}
-		$this->curr_step = $step;
+		if( $step->value >= QBStep::NONE->value ) {
+			$this->curr_step = $step;
+		}
 	}
 
 }

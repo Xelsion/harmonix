@@ -35,8 +35,20 @@ class Router {
 	 * @throws SystemException|ReflectionException
 	 */
 	private function __construct() {
-		$this->registerController("www", PATH_CONTROLLER_ROOT);
-		$this->registerController("admin", PATH_CONTROLLER_ROOT);
+	}
+
+	/**
+	 * @param string $subdomain
+	 * @return bool
+	 * @throws ReflectionException
+	 * @throws SystemException
+	 */
+	public function loadRoutes(string $subdomain): bool {
+		if( file_exists(PATH_CONTROLLER_ROOT . $subdomain) ) {
+			$this->registerController($subdomain, PATH_CONTROLLER_ROOT);
+			return true;
+		}
+		return false;
 	}
 
 	/**

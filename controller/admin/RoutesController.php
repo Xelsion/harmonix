@@ -30,9 +30,9 @@ class RoutesController extends AController {
 		$view = new Template(PATH_VIEWS . "routes/index.html");
 		$conflicts = $this->checkForConflicts();
 		$linq_list = new LinqList($conflicts);
+
 		TemplateData::set("routes_list", App::getInstanceOf(Router::class)->getSortedRoutes());
 		TemplateData::set("conflicts", $linq_list);
-
 		$template = new Template(PATH_VIEWS . "template.html");
 		TemplateData::set("view", $view->parse(), true);
 		return new HtmlResponse($template);

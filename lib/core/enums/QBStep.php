@@ -3,6 +3,8 @@
 namespace lib\core\enums;
 
 enum QBStep: int {
+	case GROUP = -2;
+	case SUBQUERY = -1;
 	case NONE = 0;
 	case START = 1; // Select|Insert|Update|Delete|Truncate
 	case VALUES = 2; // Values|Set values

@@ -5,6 +5,7 @@ use lib\core\classes\TemplateData;
 
 $view = TemplateData::get("view");
 $view_content = ($view instanceof Template) ? $view->parse() : $view;
+
 $menu_template = new Template(PATH_VIEWS . "template_parts/main_menu.html");
 $actor_menu = new Template(PATH_VIEWS . "template_parts/actor_menu.html");
 
@@ -20,7 +21,9 @@ TemplateData::addTemplateToHook("nav", $actor_menu);
 if( TemplateData::getSystemMessage() !== null ) {
 	TemplateData::addToHook("main_top", TemplateData::getSystemMessage());
 }
-TemplateData::addToHook("main", $view_content);
+if( $view_content !== null ) {
+	TemplateData::addToHook("main", $view_content);
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">

@@ -90,13 +90,23 @@ abstract class AModule {
 	}
 
 	/**
+	 * onAfterConroller() will be called after the Controller has returned his AResponse object
+	 *
+	 * @param AResponse|null $response
+	 * @return void
+	 */
+	public function onAfterController(?AResponse $response): void {
+
+	}
+
+	/**
 	 * onBeforeResponse() will be called right before the framework give the response to the caller
 	 * abd it has the current Template of the response in the parameters
 	 *
-	 * @param Template $template
+	 * @param Template|null $template
 	 * @return void
 	 */
-	public function onBeforeResponse(Template $template): void {
+	public function onBeforeResponse(?Template $template): void {
 
 	}
 

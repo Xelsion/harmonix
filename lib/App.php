@@ -89,6 +89,9 @@ class App {
 		self::setAsSingleton(ConnectionManager::class, self::getInstanceOf(ConnectionManager::class));
 		self::setAsSingleton(Request::class, self::getInstanceOf(Request::class));
 		self::setAsSingleton(Router::class, Router::getInstance());
+		self::getInstanceOf(Router::class)->loadRoutes("www");
+		self::getInstanceOf(Router::class)->loadRoutes("admin");
+
 		self::setAsSingleton(Language::class, Language::getInstance());
 		self::$module_manager = self::getInstanceOf(ModuleManager::class);
 		self::$module_manager->loadModules(PATH_ROOT . "modules");
@@ -161,6 +164,7 @@ class App {
 			self::$request->setRequestUri("/error/400");
 			$route = $router->getRoute(self::$request);
 		}
+		self::$module_manager->runAfterRouting($route);
 
 		// Get the controller
 		$controller = $route["controller"];
@@ -185,8 +189,8 @@ class App {
 					$resolver = new MethodResolver(self::$class_manager, $controller, $method, $params);
 					$this::$response = $resolver->getValue();
 
-					// module hook 'afterRouting'
-					self::$module_manager->runAfterRouting($route);
+					// module hook 'afterController'
+					self::$module_manager->runAfterController($this::$response);
 				} catch( Exception $e ) {
 					throw new SystemException(__FILE__, __LINE__, "Method Injection failed: " . $e->getMessage());
 				}
@@ -203,16 +207,19 @@ class App {
 	 * Returns the output from the current AResponse object
 	 *
 	 * @return string
+	 * @throws SystemException
 	 */
 	public function getResponseOutput(): string {
-		$response = $this::$response;
-		$response->setHeaders();
+		if( $this::$response === null ) {
+			throw new SystemException(__FILE__, __LINE__, "Response for request " . self::$request->getRequestUri() . " is empty!");
+		}
+		$this::$response->setHeaders();
 
 		// module hook 'beforeResponse'
-		self::$module_manager->runBeforeResponse($response->template);
+		self::$module_manager->runBeforeResponse($this::$response->template);
 
-		$response->parseTemplate();
-		return $response->getOutput();
+		$this::$response->parseTemplate();
+		return $this::$response->getOutput();
 	}
 
 	/**

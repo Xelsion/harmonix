@@ -27,7 +27,7 @@ class Module extends AModule {
 	 * @return Subdomain[]
 	 */
 	public function allowedSubDomains(): array {
-		return [Subdomain::ANY];
+		return [Subdomain::WWW];
 	}
 
 	/**
@@ -46,11 +46,8 @@ class Module extends AModule {
 		if( $template !== null ) {
 			$this->timer->stop();
 			$elapsed_time = $this->timer->getElapsedTime()->format("ms");
-			$is_cached = "false";
 			TemplateData::addHookName('build_time');
-			TemplateData::addHookName('is_cached');
 			TemplateData::set('build_time', $elapsed_time);
-			TemplateData::set('is_cached', $is_cached);
 			TemplateData::addTemplateToHook('footer', new Template(__DIR__ . '/templates/fwinfo.html'));
 		}
 	}
