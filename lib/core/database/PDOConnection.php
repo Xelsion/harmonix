@@ -148,15 +148,19 @@ class PDOConnection {
 		$sql = $this->qb->sql;
 		$params = $this->qb->params;
 
-
 		uksort($params, fn($a, $b) => strlen($b) <=> strlen($a));
 
 		foreach( $params as $key => $value ) {
 			if( is_null($value) ) {
 				$val = "NULL";
 			} elseif( is_bool($value) ) {
-				$val = $value ? '1' : '0';
-			} elseif( is_numeric($value) ) {
+				$val = match ($this->db_type) {
+					DbType::Postgres => $value ? 'TRUE' : 'FALSE',
+					default => $value ? '1' : '0',
+				};
+			} elseif( $value instanceof DateTime ) {
+				$val = "'" . $value->format('Y-m-d H:i:s') . "'";
+			} elseif( is_int($value) || is_float($value) ) {
 				$val = (string)$value;
 			} else {
 				$val = "'" . str_replace("'", "''", (string)$value) . "'";
@@ -164,7 +168,6 @@ class PDOConnection {
 			$pattern = '/:' . preg_quote($key, '/') . '(?![A-Za-z0-9_])/';
 			$sql = preg_replace($pattern, $val, $sql);
 		}
-
 		return $sql;
 	}
 

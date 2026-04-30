@@ -128,6 +128,10 @@ class StringHelper {
 	 * @return string
 	 */
 	public static function getHighlighted(string $needle, string $string, string $tag = "span", string $class = "hl"): string {
+		if( trim($needle) === "" ) {
+			return $string;
+		}
+
 		$matches = array();
 		preg_match("/" . $needle . "/i", $string, $matches);
 		if( empty($matches) ) {

@@ -30,6 +30,8 @@ class QueryBuilder {
 	private bool $group_prepared = false;
 	private int $param_counter = 0;
 	private int $subquery_count = 0;
+	private array $allowed_operators = ["=", ">", "<", ">=", "<=", "<>", "!=", "LIKE", "NOT LIKE"];
+	private array $allowed_special_operators = ["IN", "NOT IN", "BETWEEN", "NOT BETWEEN", "RAW"];
 
 	public function __construct(PDO $pdo, ?DbType $db_type = null) {
 		$this->pdo = $pdo;
@@ -269,6 +271,8 @@ class QueryBuilder {
 	}
 
 	/**
+	 * Compiles all conditions and adds the resulting sql string to the current sql
+	 *
 	 * @return string
 	 * @throws SystemException
 	 */
@@ -302,81 +306,164 @@ class QueryBuilder {
 	}
 
 	/**
+	 * Compiles the given $conditions and returns them as sql string
+	 *
 	 * @param array $conditions
-	 * @param string $logic
 	 * @return string
 	 * @throws SystemException
 	 */
-	protected function compileConditions(array $conditions, string $logic = 'AND'): string {
+	protected function compileConditions(array $conditions): string {
 		$parts = [];
-		foreach( $conditions as $column => $value ) {
-			if( in_array(strtoupper($column), ['AND', 'OR']) ) {
-				$parts[] = "(" . $this->compileConditions($value, strtoupper($column)) . ")";
+		$currentLogic = 'AND';
+		$expectCondition = true;
+
+		foreach( $conditions as $key => $value ) {
+
+			// AND / OR
+			if( is_string($value) && in_array(strtoupper($value), ['AND', 'OR'], true) ) {
+				if( $expectCondition ) {
+					throw new SystemException(__FILE__, __LINE__, "Operator without left condition");
+				}
+				$currentLogic = strtoupper($value);
+				$expectCondition = true;
 				continue;
 			}
-			$placeholder = $this->makePlaceholderName($column);
 
-			if( is_array($value) ) {
-				$operator = strtoupper((string)key($value));
-				$val = current($value);
-				switch( $operator ) {
-					case 'BETWEEN':
-					case 'NOT BETWEEN':
-						$p1 = $placeholder . '_a';
-						$p2 = $placeholder . '_b';
-						$parts[] = "{$column} {$operator} :{$p1} AND :{$p2}";
-						$this->addBindParam($p1, $val[0]);
-						$this->addBindParam($p2, $val[1]);
-						break;
-					case 'IN':
-					case 'NOT IN':
-						if( $val instanceof self ) {
-							$sql = $this->addSubquery($val);
-							$parts[] = "{$column} {$operator} ({$sql})";
-						} else {
-							$vals = (array)$val;
-							if( count($vals) === 0 ) {
-								$parts[] = ($operator === 'IN') ? '1=0' : '1=1';
-								break;
-							}
-							$placeholders = [];
-							foreach( $vals as $i => $v ) {
-								$p = $placeholder . '_' . $i;
-								$placeholders[] = ":{$p}";
-								$this->addBindParam($p, $v);
-							}
-							$parts[] = "{$column} {$operator} (" . implode(', ', $placeholders) . ")";
-						}
-						break;
-					case 'EXISTS':
-					case 'NOT EXISTS':
-						$sql = $val instanceof self ? $this->addSubquery($val) : $val;
-						$parts[] = "{$operator} ({$sql})";
-						break;
-					case 'RAW':
-						$parts[] = "{$column} {$val}";
-						break;
-					default:
-						if( $val instanceof self ) {
-							$sql = $this->addSubquery($val);
-							$parts[] = "{$column} {$operator} ({$sql})";
-						} else {
-							$parts[] = "{$column} {$operator} :{$placeholder}";
-							$this->addBindParam($placeholder, $val);
-						}
+			// EXISTS / NOT EXISTS
+			if( is_string($key) && in_array(strtoupper($key), ['EXISTS', 'NOT EXISTS'], true) ) {
+				if( !$value instanceof self && (!is_string($value) || trim($value) === '') ) {
+					throw new SystemException(__FILE__, __LINE__, "EXISTS requires subquery or raw SQL");
 				}
-			} else if( is_null($value) ) {
-				$parts[] = "{$column} IS NULL";
-			} else {
-				$parts[] = "{$column} = :{$placeholder}";
-				$this->addBindParam($placeholder, $value);
+				$sql = ($value instanceof self) ? $this->addSubquery($value) : $value;
+				$fragment = strtoupper($key) . " ({$sql})";
+			} elseif( is_int($key) && is_array($value) ) { // Group (numeric Key)
+				$inner = $this->compileConditions($value);
+				if( $inner === "" ) {
+					continue;
+				}
+				$fragment = '(' . $inner . ')';
+			} elseif( is_int($key) ) {
+				throw new SystemException(__FILE__, __LINE__, "Invalid numeric condition");
+			} else { // Normale Condition
+				$fragment = $this->compileSingleCondition($key, $value);
 			}
+
+			// Leere Bedingungen skippen (wichtig!)
+			if( $fragment === '' ) {
+				continue;
+			}
+
+			// add to parts
+			if( empty($parts) ) {
+				$parts[] = $fragment;
+			} else {
+				$parts[] = $currentLogic . ' ' . $fragment;
+			}
+			$expectCondition = false;
+			$currentLogic = 'AND';
 		}
-		return implode(" {$logic} ", $parts);
+
+		// final check
+		if( $expectCondition && !empty($parts) ) {
+			throw new SystemException(__FILE__, __LINE__, "Query cannot end with an operator");
+		}
+		return (is_array($parts) && !empty($parts)) ? implode(' ', $parts) : '';
+	}
+
+	/**
+	 * Analyses the given column and value from a condition and returns a fitting sql string with a placeholder for the value.
+	 * The value will be stored in an internal array for later safe injection.
+	 *
+	 * @param string $column
+	 * @param mixed $value
+	 * @return string
+	 * @throws SystemException
+	 */
+	private function compileSingleCondition(string $column, mixed $value): string {
+		// value IS NULL
+		if( is_null($value) ) {
+			return "{$column} IS NULL";
+		}
+
+		$placeholder = $this->makePlaceholderName($column);
+
+		// =
+		if( !is_array($value) ) {
+			$this->addBindParam($placeholder, $value);
+			return "{$column} = :{$placeholder}";
+		}
+
+		// Operatoren (Array)
+		$operator = strtoupper(trim((string)key($value)));
+		$val = current($value);
+
+		if( !$this->isAllowedOperator($operator) ) {
+			throw new SystemException(__FILE__, __LINE__, "Operator {$operator} is not allowed");
+		}
+
+		// Subquery helper
+		$resolveSubquery = function($v) {
+			return ($v instanceof self) ? $this->addSubquery($v) : $v;
+		};
+
+		switch( $operator ) {
+			case 'BETWEEN':
+			case 'NOT BETWEEN':
+				if( !is_array($val) || count($val) !== 2 ) {
+					throw new SystemException(__FILE__, __LINE__, "BETWEEN requires exactly 2 values");
+				}
+				$p1 = $placeholder . '_a';
+				$p2 = $placeholder . '_b';
+				$this->addBindParam($p1, $val[0]);
+				$this->addBindParam($p2, $val[1]);
+				return "{$column} {$operator} :{$p1} AND :{$p2}";
+
+			case 'IN':
+			case 'NOT IN':
+				if( $val instanceof self ) {
+					return "{$column} {$operator} ({$resolveSubquery($val)})";
+				}
+				$vals = (array)$val;
+				if( count($vals) === 0 ) {
+					return ($operator === 'IN') ? '1=0' : '1=1';
+				}
+				$placeholders = [];
+				foreach( $vals as $i => $v ) {
+					$p = $placeholder . '_' . $i;
+					$placeholders[] = ":{$p}";
+					$this->addBindParam($p, $v);
+				}
+				return "{$column} {$operator} (" . implode(', ', $placeholders) . ")";
+
+			case 'RAW':
+				if( !is_string($val) || trim($val) === '' ) {
+					throw new SystemException(__FILE__, __LINE__, "RAW requires non-empty string");
+				}
+				return "{$column} {$val}";
+
+			// Default operators (=, >, <, LIKE, etc.)
+			default:
+				if( $val instanceof self ) {
+					return "{$column} {$operator} ({$resolveSubquery($val)})";
+				}
+				$this->addBindParam($placeholder, $val);
+				return "{$column} {$operator} :{$placeholder}";
+		}
+	}
+
+	/**
+	 * returns if the given operator is allowed or not
+	 *
+	 * @param string $operator
+	 * @return bool
+	 */
+	private function isAllowedOperator(string $operator): bool {
+		return (in_array(strtoupper($operator), $this->allowed_operators, true) || in_array(strtoupper($operator), $this->allowed_special_operators, true));
 	}
 
 	/**
 	 * add a QueryBuilder instance to this query as subquery
+	 *
 	 * @param QueryBuilder $subquery
 	 * @return string
 	 * @throws SystemException
@@ -550,6 +637,9 @@ class QueryBuilder {
 	public function prepareStatement(array $options = []): static {
 		if( $this->required_order && !$this->order_is_set ) {
 			throw new SystemException(__FILE__, __LINE__, "MSSql requires an order if a limit is set.");
+		}
+		if( ($this->query_type === QueryType::DELETE || $this->query_type === QueryType::UPDATE) && empty($this->where_clauses) ) {
+			throw new SystemException(__FILE__, __LINE__, "Refusing to run unsafe query without WHERE");
 		}
 		$this->sql .= $this->compileFinalWhere();
 		$this->sql .= implode("", $this->after_wheres);

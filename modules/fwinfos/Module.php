@@ -16,18 +16,22 @@ class Module extends AModule {
 	private StopWatch $timer;
 
 	/**
+	 * @return Subdomain[]
+	 */
+	public function allowedSubDomains(): array {
+		return [Subdomain::WWW];
+	}
+
+	public function controllerDirectories(): array {
+		return array("www" => PATH_MODULES . "fwinfos/controller");
+	}
+
+	/**
 	 * @return void
 	 * @throws SystemException
 	 */
 	public function boot(): void {
 		$this->timer = App::getInstanceOf(Analyser::class);
-	}
-
-	/**
-	 * @return Subdomain[]
-	 */
-	public function allowedSubDomains(): array {
-		return [Subdomain::WWW];
 	}
 
 	/**

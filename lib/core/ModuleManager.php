@@ -20,7 +20,6 @@ use ReflectionException;
  */
 class ModuleManager {
 
-	protected ClassManager $container;
 	protected Configuration $config;
 
 	private array $modules = [];
@@ -39,8 +38,7 @@ class ModuleManager {
 	 * @param ClassManager $cm
 	 * @param Configuration $config
 	 */
-	public function __construct(ClassManager $cm, Configuration $config) {
-		$this->container = $cm;
+	public function __construct(Configuration $config) {
 		$this->config = $config;
 	}
 
@@ -67,13 +65,11 @@ class ModuleManager {
 			if( !is_array($allowed) || empty($allowed) ) {
 				throw new SystemException(__FILE__, __LINE__, "Module '{$module->moduleName}' returned invalid subdomains");
 			}
-
 			foreach( $allowed as $sd ) {
 				if( !$sd instanceof Subdomain ) {
 					throw new SystemException(__FILE__, __LINE__, "Module '{$module->moduleName}' must return an array of Subdomain enums. eg. Subdomain::ANY");
 				}
 			}
-
 			$allowedStrings = array_map(static fn(Subdomain $sd) => $sd->toString(), $allowed);
 			if( !in_array("*", $allowedStrings, true) && !in_array(SUB_DOMAIN, $allowedStrings, true) ) {
 				// Modul ist für diese Subdomain NICHT erlaubt → überspringen
@@ -122,15 +118,17 @@ class ModuleManager {
 	 */
 	public function boot(): void {
 		try {
-			$router = Router::getInstance();
+			$router = App::getInstanceOf(Router::class);
 			foreach( $this->modules as $module ) {
 				// DI-Services
-				foreach( $module->registerServices() as $ns => $bind ) {
+				$services = $module->registerServices();
+				foreach( $services as $ns => $bind ) {
 					App::set($ns, $bind);
 				}
 
 				// Controller-Verzeichnisse
-				foreach( $module->controllerDirectories() as [$sub, $dir] ) {
+				$controller = $module->controllerDirectories();
+				foreach( $controller as $sub => $dir ) {
 					$router->registerController($sub, $dir);
 				}
 

@@ -14,8 +14,8 @@ use lib\helper\HtmlHelper;
  */
 class Request extends KeyValuePairs {
 
-	private string $request_uri;
-	private string $request_method;
+	public string $request_uri;
+	public string $request_method;
 
 	/**
 	 * The class constructor

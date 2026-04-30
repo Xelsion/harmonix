@@ -20,6 +20,7 @@ use lib\core\exceptions\SystemException;
 use lib\core\ModuleManager;
 use lib\core\Request;
 use lib\core\resolver\MethodResolver;
+use lib\core\response_types\HtmlResponse;
 use lib\core\Router;
 use lib\core\tree\RoleTree;
 use models\ActorModel;
@@ -89,8 +90,8 @@ class App {
 		self::setAsSingleton(ConnectionManager::class, self::getInstanceOf(ConnectionManager::class));
 		self::setAsSingleton(Request::class, self::getInstanceOf(Request::class));
 		self::setAsSingleton(Router::class, Router::getInstance());
-		self::getInstanceOf(Router::class)->loadRoutes("www");
-		self::getInstanceOf(Router::class)->loadRoutes("admin");
+		self::getInstanceOf(Router::class)->registerController("www", PATH_CONTROLLER_ROOT . "www");
+		self::getInstanceOf(Router::class)->registerController("admin", PATH_CONTROLLER_ROOT . "admin");
 
 		self::setAsSingleton(Language::class, Language::getInstance());
 		self::$module_manager = self::getInstanceOf(ModuleManager::class);
@@ -184,6 +185,7 @@ class App {
 
 			// Has the current actor access to this request?
 			if( self::$auth->hasAccess() ) {
+
 				// Get the Response obj from the controller
 				try {
 					$resolver = new MethodResolver(self::$class_manager, $controller, $method, $params);
@@ -217,8 +219,9 @@ class App {
 
 		// module hook 'beforeResponse'
 		self::$module_manager->runBeforeResponse($this::$response->template);
-
-		$this::$response->parseTemplate();
+		if( $this::$response instanceof HtmlResponse ) {
+			$this::$response->parseTemplate();
+		}
 		return $this::$response->getOutput();
 	}
 

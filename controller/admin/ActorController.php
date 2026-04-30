@@ -87,13 +87,11 @@ class ActorController extends AController {
 		$results = array();
 		if( $search_string !== null ) {
 			$results = $this->actor_repository->find([
-				"first_name" => ["LIKE" => $search_string],
-				"OR"         => [
-					"last_name" => ["LIKE" => $search_string],
-					"OR"        => [
-						"email" => ["LIKE" => $search_string]
-					]
-				]
+				"first_name" => ["LIKE" => $search_string . "%"],
+				"OR",
+				"last_name"  => ["LIKE" => $search_string . "%"],
+				"OR",
+				"email"      => ["LIKE" => $search_string . "%"]
 			]);
 		}
 		$view = new Template(PATH_VIEWS . "actor/search.html");

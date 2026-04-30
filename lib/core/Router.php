@@ -61,7 +61,10 @@ class Router {
 	 * @throws SystemException
 	 */
 	public function registerController(string $sub_domain, string $directory): void {
-		$path = $directory . $sub_domain . DIRECTORY_SEPARATOR;
+		$path = $directory . DIRECTORY_SEPARATOR;
+		if( !file_exists($path) ) {
+			print_debug($path . " not found!");
+		}
 		$files = scandir($path);
 		foreach( $files as $file ) {
 			if( !is_dir($path . $file) ) {
