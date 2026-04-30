@@ -3,7 +3,7 @@
 namespace modules\fwdebug;
 
 use lib\App;
-use lib\core\blueprints\AModule;
+use lib\core\abstracts\AModule;
 use lib\core\classes\Template;
 use lib\core\classes\TemplateData;
 use lib\core\enums\Subdomain;

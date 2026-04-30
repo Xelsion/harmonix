@@ -3,9 +3,9 @@
 namespace lib;
 
 use Exception;
-use lib\core\blueprints\AController;
-use lib\core\blueprints\AMiddleware;
-use lib\core\blueprints\AResponse;
+use lib\core\abstracts\AController;
+use lib\core\abstracts\AMiddleware;
+use lib\core\abstracts\AResponse;
 use lib\core\cache\ObjectCache;
 use lib\core\classes\Analyser;
 use lib\core\classes\Auth;

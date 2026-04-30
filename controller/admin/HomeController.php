@@ -2,9 +2,9 @@
 
 namespace controller\admin;
 
+use lib\core\abstracts\AController;
+use lib\core\abstracts\AResponse;
 use lib\core\attributes\Route;
-use lib\core\blueprints\AController;
-use lib\core\blueprints\AResponse;
 use lib\core\classes\Template;
 use lib\core\classes\TemplateData;
 use lib\core\enums\RequestMethod;
@@ -12,7 +12,7 @@ use lib\core\exceptions\SystemException;
 use lib\core\response_types\HtmlResponse;
 
 /**
- * @see \lib\core\blueprints\AController
+ * @see \lib\core\abstracts\AController
  *
  * @author Markus Schröder <xelsion@gmail.com>
  * @version 1.0.0;
@@ -23,7 +23,7 @@ class HomeController extends AController {
 	/**
 	 * Get the starting site
 	 *
-	 * @return \lib\core\blueprints\AResponse
+	 * @return \lib\core\abstracts\AResponse
 	 *
 	 * @throws SystemException
 	 */

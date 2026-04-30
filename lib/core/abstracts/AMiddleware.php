@@ -1,6 +1,6 @@
 <?php
 
-namespace lib\core\blueprints;
+namespace lib\core\abstracts;
 
 /**
  * A Middleware class is used to do operations before the Controller is called.

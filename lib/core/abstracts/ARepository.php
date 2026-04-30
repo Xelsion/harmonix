@@ -1,6 +1,6 @@
 <?php
 
-namespace lib\core\blueprints;
+namespace lib\core\abstracts;
 
 use Exception;
 use lib\core\database\PDOConnection;

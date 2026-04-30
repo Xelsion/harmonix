@@ -2,7 +2,7 @@
 
 namespace lib\helper;
 
-use lib\classes\GeoCoordinate;
+use lib\structures\GeoCoordinate;
 
 /**
  * The GeoHelper

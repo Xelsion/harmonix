@@ -3,8 +3,8 @@
 namespace lib\core;
 
 use lib\App;
-use lib\core\blueprints\AModule;
-use lib\core\blueprints\AResponse;
+use lib\core\abstracts\AModule;
+use lib\core\abstracts\AResponse;
 use lib\core\classes\Configuration;
 use lib\core\classes\Template;
 use lib\core\enums\Subdomain;

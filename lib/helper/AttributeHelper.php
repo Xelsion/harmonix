@@ -2,9 +2,9 @@
 
 namespace lib\helper;
 
+use lib\core\abstracts\AController;
 use lib\core\attributes\PrimaryKey;
 use lib\core\attributes\Route;
-use lib\core\blueprints\AController;
 use ReflectionAttribute;
 use ReflectionClass;
 use ReflectionException;

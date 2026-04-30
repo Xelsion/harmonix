@@ -3,7 +3,7 @@
 namespace modules\fwinfos;
 
 use lib\App;
-use lib\core\blueprints\AModule;
+use lib\core\abstracts\AModule;
 use lib\core\classes\Analyser;
 use lib\core\classes\StopWatch;
 use lib\core\classes\Template;

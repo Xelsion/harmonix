@@ -4,7 +4,7 @@ namespace lib\core\response_types;
 
 use JsonException;
 use JsonSerializable;
-use lib\core\blueprints\AResponse;
+use lib\core\abstracts\AResponse;
 
 /**
  * The JsonResponse class

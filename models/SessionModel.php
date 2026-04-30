@@ -153,7 +153,7 @@ class SessionModel extends Session {
 		try {
 			$session_repo = App::getInstanceOf(SessionRepository::class);
 			$actor_repo = App::getInstanceOf(ActorRepository::class);
-			$actor = $actor_repo->getByLogin($email);
+			$actor = $actor_repo->getByEmail($email);
 			if( $actor->id > 0 && password_verify($password, $actor->password) ) {
 				$session_id = StringHelper::getGuID();
 				$date_time = new DateTime();

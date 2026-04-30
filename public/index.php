@@ -12,7 +12,7 @@ error_reporting(E_ALL);
 ini_set('display_errors', 'off');
 
 use lib\App;
-use lib\core\blueprints\ALoggableException;
+use lib\core\abstracts\ALoggableException;
 use lib\core\classes\Configuration;
 use lib\core\classes\Logger;
 use lib\core\classes\Template;

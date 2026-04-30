@@ -2,7 +2,7 @@
 
 namespace lib\core\response_types;
 
-use lib\core\blueprints\AResponse;
+use lib\core\abstracts\AResponse;
 use lib\core\classes\Template;
 use lib\core\enums\HttpResponseCode;
 

@@ -3,7 +3,7 @@
 namespace lib\core\classes;
 
 use lib\App;
-use lib\core\blueprints\AController;
+use lib\core\abstracts\AController;
 use lib\core\enums\ActorRole;
 use lib\core\exceptions\SystemException;
 use lib\core\Request;
@@ -165,7 +165,7 @@ class Auth {
 			$controller = $entry->controller ?? "";
 			$method = $entry->method ?? "";
 			$this->restriction_setup[$entry->domain][$controller][$method] = [
-				"role_id" => $entry->role_id,
+				"role_id"          => $entry->role_id,
 				"restriction_type" => $entry->restriction_type
 			];
 		}

@@ -5,7 +5,7 @@ namespace repositories;
 use DateTime;
 use Exception;
 use lib\App;
-use lib\core\blueprints\ARepository;
+use lib\core\abstracts\ARepository;
 use lib\core\ConnectionManager;
 use lib\core\exceptions\SystemException;
 use lib\helper\StringHelper;
@@ -95,7 +95,7 @@ class ActorRepository extends ARepository {
 	 * @return ActorModel
 	 * @throws SystemException
 	 */
-	public function getByLogin(string $email): ActorModel {
+	public function getByEmail(string $email): ActorModel {
 		try {
 			// @formatter:off
 			$actor = $this->pdo->Select()
@@ -103,7 +103,7 @@ class ActorRepository extends ARepository {
 				->Where([
 					"email" => $email,
 					"login_disabled" => 0,
-					"deleted" => ["IS" => null]
+					"deleted" => null
 				])
 				->prepareStatement()
 				->fetchMode(PDO::FETCH_CLASS, ActorModel::class)

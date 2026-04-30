@@ -3,9 +3,9 @@
 namespace controller\admin;
 
 use lib\App;
+use lib\core\abstracts\AController;
+use lib\core\abstracts\AResponse;
 use lib\core\attributes\Route;
-use lib\core\blueprints\AController;
-use lib\core\blueprints\AResponse;
 use lib\core\classes\Configuration;
 use lib\core\classes\Template;
 use lib\core\classes\TemplateData;
@@ -34,7 +34,7 @@ class ActorTypeController extends AController {
 	/**
 	 * Get a list of all actor types
 	 *
-	 * @return \lib\core\blueprints\AResponse
+	 * @return \lib\core\abstracts\AResponse
 	 *
 	 * @throws SystemException
 	 * @throws JsonException
@@ -51,7 +51,7 @@ class ActorTypeController extends AController {
 	}
 
 	/**
-	 * @return \lib\core\blueprints\AResponse
+	 * @return \lib\core\abstracts\AResponse
 	 *
 	 * @throws SystemException
 	 */

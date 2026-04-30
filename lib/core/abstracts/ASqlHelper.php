@@ -1,6 +1,6 @@
 <?php
 
-namespace lib\helper\blueprints;
+namespace lib\core\abstracts;
 
 use lib\core\exceptions\SystemException;
 use PDO;

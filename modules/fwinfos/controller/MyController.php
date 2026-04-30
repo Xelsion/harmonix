@@ -2,9 +2,9 @@
 
 namespace modules\fwinfos\controller;
 
+use lib\core\abstracts\AController;
+use lib\core\abstracts\AResponse;
 use lib\core\attributes\Route;
-use lib\core\blueprints\AController;
-use lib\core\blueprints\AResponse;
 use lib\core\classes\Template;
 use lib\core\classes\TemplateData;
 use lib\core\enums\RequestMethod;

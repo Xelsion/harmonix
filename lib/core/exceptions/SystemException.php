@@ -2,7 +2,7 @@
 
 namespace lib\core\exceptions;
 
-use lib\core\blueprints\ALoggableException;
+use lib\core\abstracts\ALoggableException;
 
 /**
  * The System Exception will be used to catch every exception

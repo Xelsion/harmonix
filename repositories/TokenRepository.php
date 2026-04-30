@@ -4,7 +4,7 @@ namespace repositories;
 
 use Exception;
 use lib\App;
-use lib\core\blueprints\ARepository;
+use lib\core\abstracts\ARepository;
 use lib\core\ConnectionManager;
 use lib\core\exceptions\SystemException;
 use models\entities\Token;

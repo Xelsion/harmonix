@@ -5,10 +5,9 @@ namespace controller\www;
 use DateTime;
 use Exception;
 use lib\App;
-use lib\classes\GeoCoordinate;
+use lib\core\abstracts\AController;
+use lib\core\abstracts\AResponse;
 use lib\core\attributes\Route;
-use lib\core\blueprints\AController;
-use lib\core\blueprints\AResponse;
 use lib\core\classes\File;
 use lib\core\classes\LinqList;
 use lib\core\classes\Template;
@@ -19,6 +18,7 @@ use lib\core\response_types\HtmlResponse;
 use lib\helper\DateHelper;
 use lib\helper\GeoHelper;
 use lib\helper\MathHelper;
+use lib\structures\GeoCoordinate;
 
 
 #[Route("tests")]

@@ -3,7 +3,7 @@
 namespace lib\core;
 
 use Exception;
-use lib\core\blueprints\ADBConnection;
+use lib\core\abstracts\ADBConnection;
 use lib\core\classes\Configuration;
 use lib\core\database\connections\MsSqlConnection;
 use lib\core\database\connections\MySqlConnection;

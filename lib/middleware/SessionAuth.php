@@ -3,7 +3,7 @@
 namespace lib\middleware;
 
 use lib\App;
-use lib\core\blueprints\AMiddleware;
+use lib\core\abstracts\AMiddleware;
 use lib\core\classes\Configuration;
 use lib\helper\StringHelper;
 use models\ActorModel;

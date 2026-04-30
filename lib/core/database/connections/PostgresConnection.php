@@ -2,7 +2,7 @@
 
 namespace lib\core\database\connections;
 
-use lib\core\blueprints\ADBConnection;
+use lib\core\abstracts\ADBConnection;
 use lib\core\enums\DbType;
 use PDO;
 

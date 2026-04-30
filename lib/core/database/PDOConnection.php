@@ -6,7 +6,7 @@ use DateMalformedStringException;
 use DateTime;
 use Exception;
 use lib\App;
-use lib\core\blueprints\ADBConnection;
+use lib\core\abstracts\ADBConnection;
 use lib\core\classes\Logger;
 use lib\core\enums\DbType;
 use lib\core\exceptions\SystemException;

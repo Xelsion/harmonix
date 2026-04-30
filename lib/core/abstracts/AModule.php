@@ -1,6 +1,6 @@
 <?php
 
-namespace lib\core\blueprints;
+namespace lib\core\abstracts;
 
 use lib\core\classes\Configuration;
 use lib\core\classes\Template;

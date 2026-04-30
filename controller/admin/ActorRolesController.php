@@ -3,9 +3,9 @@
 namespace controller\admin;
 
 use lib\App;
+use lib\core\abstracts\AController;
+use lib\core\abstracts\AResponse;
 use lib\core\attributes\Route;
-use lib\core\blueprints\AController;
-use lib\core\blueprints\AResponse;
 use lib\core\classes\Configuration;
 use lib\core\classes\Template;
 use lib\core\classes\TemplateData;
@@ -18,7 +18,7 @@ use models\ActorRoleModel;
 use repositories\ActorRoleRepository;
 
 /**
- * @see \lib\core\blueprints\AController
+ * @see \lib\core\abstracts\AController
  *
  * @author Markus Schröder <xelsion@gmail.com>
  * @version 1.0.0;
