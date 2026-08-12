@@ -39,12 +39,8 @@ class Request extends KeyValuePairs {
 	 * @return bool
 	 */
 	private function isInputAllowed(): bool {
-		if( isset($_SESSION['csrf_token']) && in_array($this->request_method, [
-				'POST',
-				'PUT',
-				'DELETE',
-				'PATCH'
-			], true) ) {
+		$protected_methods = ['POST', 'PUT', 'DELETE'];
+		if( isset($_SESSION['csrf_token']) && in_array($this->request_method, $protected_methods, true) ) {
 			if( isset($_POST['csrf_token']) && HtmlHelper::validateFormToken($_POST['csrf_token']) ) {
 				HtmlHelper::deleteFormToken();
 			} else {
