@@ -2,7 +2,9 @@
 
 namespace lib\core;
 
+use JsonException;
 use lib\core\classes\KeyValuePairs;
+use lib\core\exceptions\SystemException;
 use lib\helper\HtmlHelper;
 
 /**
@@ -24,34 +26,73 @@ class Request extends KeyValuePairs {
 	 * @throws \lib\core\exceptions\SystemException
 	 */
 	public function __construct() {
-		$accept_input = true;
-		if( isset($_POST['csrf_token']) ) {
-			if( !HtmlHelper::validateFormToken($_POST['csrf_token']) ) {
-				$accept_input = false;
-			}
-			HtmlHelper::deleteFormToken();
+		if( $this->isInputAllowed() ) {
+			$this->collectInputData();
 		}
+		$this->request_uri = $this->getCleanedRequestURI();
+		$this->request_method = ($this->contains("request_method")) ? strtoupper($this->get("request_method")) : $_SERVER['REQUEST_METHOD'] ?? "";
+	}
 
-		if( $accept_input ) {
-			foreach( $_GET as $key => $value ) {
-				$this->set($key, $value);
-			}
-			foreach( $_POST as $key => $value ) {
-				$this->set($key, $value);
-			}
-			foreach( $_FILES as $key => $value ) {
-				$this->set($key, $value);
+	/**
+	 * Checks if the input is allowed
+	 *
+	 * @return bool
+	 */
+	private function isInputAllowed(): bool {
+		if( isset($_SESSION['csrf_token']) ) {
+			if( isset($_POST['csrf_token']) && HtmlHelper::validateFormToken($_POST['csrf_token']) ) {
+				HtmlHelper::deleteFormToken();
+			} else {
+				return false;
 			}
 		}
+		return true;
+	}
 
+	/**
+	 * Collects the form data from the request
+	 *
+	 * @param bool $accept_input
+	 * @return void
+	 * @throws SystemException
+	 */
+	private function collectInputData(): void {
+		foreach( $_GET as $key => $value ) {
+			$this->set($key, $value);
+		}
+		foreach( $_POST as $key => $value ) {
+			$this->set($key, $value);
+		}
+		foreach( $_FILES as $key => $value ) {
+			$this->set($key, $value);
+		}
+		$contentType = $_SERVER['HTTP_CONTENT_TYPE'] ?? $_SERVER['CONTENT_TYPE'] ?? '';
+		$json_str = trim(file_get_contents('php://input'));
+		$isJSONHeader = str_contains(strtolower($contentType), "application/json");
+		$isJSONContent = (str_starts_with($json_str, "{") || str_starts_with($json_str, "["));
+		if( $json_str !== "" && ($isJSONHeader || $isJSONContent) ) {
+			try {
+				$json_obj = json_decode($json_str, true, 512, JSON_THROW_ON_ERROR);
+				$this->set('json', $json_obj);
+			} catch( JsonException $e ) {
+				throw new SystemException(__FILE__, __LINE__, $e->getMessage());
+			}
+		}
+	}
+
+	/**
+	 * Clears the request uri from query strings
+	 *
+	 * @return string
+	 */
+	private function getCleanedRequestURI(): string {
 		$request_parts = explode("?", $_SERVER["REQUEST_URI"]);
 		if( count($request_parts) > 1 ) {
 			$request = $request_parts[0];
 		} else {
 			$request = $_SERVER["REQUEST_URI"];
 		}
-		$this->request_uri = $request ?? "";
-		$this->request_method = ($this->contains("request_method")) ? strtoupper($this->get("request_method")) : $_SERVER['REQUEST_METHOD'] ?? "";
+		return $request ?? "";
 	}
 
 	/**

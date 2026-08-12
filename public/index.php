@@ -6,10 +6,10 @@
  * @version 1.0.0;
  */
 declare(strict_types=1);
+
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
-ini_set('display_errors', 'off');
 
 use lib\App;
 use lib\core\abstracts\ALoggableException;
@@ -20,12 +20,12 @@ use lib\core\classes\TemplateData;
 use lib\helper\StringHelper;
 use lib\middleware\SessionAuth;
 
-
-define("SUB_DOMAIN", explode(".", $_SERVER["HTTP_HOST"])[0]);
 const PATH_ROOT = ".." . DIRECTORY_SEPARATOR;
-
-require_once("../constants.php");
 require_once("../functions.php");
+
+define("SUB_DOMAIN", get_subdomain_from_host($_SERVER["HTTP_HOST"]));
+require_once("../constants.php");
+
 
 // Initiate session cookie settings
 ini_set('session.cookie_domain', StringHelper::getDomain());

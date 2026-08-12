@@ -8,7 +8,7 @@ use lib\core\resolver\MethodResolver;
 use ReflectionException;
 
 /**
- * The class manager is a Dependency Injection container.
+ * The class manager is a Dependency-Injection container.
  * Provides an instance of any class with its dependencies, also these
  * dependencies can be injected.
  *
@@ -64,7 +64,6 @@ class ClassManager {
 				if( is_callable($entry) ) {
 					return $entry($this);
 				}
-
 				if( is_object($entry) ) {
 					return $entry;
 				}
@@ -74,7 +73,6 @@ class ClassManager {
 			if( !is_null($method) && $method !== "" ) {
 				return new MethodResolver($this, $namespace, $method, $args)->getValue();
 			}
-
 			return new ClassResolver($this, $namespace, $args)->getInstance();
 		} catch( ReflectionException $e ) {
 			throw new SystemException($e->getFile(), $e->getLine(), $e->getMessage(), $e->getCode(), $e->getPrevious());

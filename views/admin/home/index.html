@@ -10,15 +10,17 @@ $html = ob_get_clean();
 ob_end_clean();
 ?>
 <div class="container-fluid">
-    <h1>Welcome!</h1>
+	<h1>Welcome!</h1>
 	<?php if( App::$curr_actor->isDeveloper() ) { ?>
-        <iframe id="php_info" width="100%" sandbox="allow-same-origin" srcdoc="<?= htmlspecialchars($html) ?>"></iframe>
-        <script>
-            $(function () {
-                let iFrame = $("#php_info");
-                console.log(iFrame.contents().height());
-                iFrame.height(iFrame.contents().height());
-            });
-        </script>
+		<iframe id="php_info" width="100%" sandbox="allow-same-origin" srcdoc="<?= htmlspecialchars($html) ?>"></iframe>
+		<script>
+			$(function () {
+				let iFrame = $("#php_info");
+				iFrame.on("load", function () {
+					let frameHeight = this.contentWindow.document.body.scrollHeight + 40;
+					iFrame.height(frameHeight);
+				});
+			});
+		</script>
 	<?php } ?>
 </div>

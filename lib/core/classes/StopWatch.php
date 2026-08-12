@@ -2,21 +2,25 @@
 
 namespace lib\core\classes;
 
+use lib\core\enums\TimeFormat;
+
 class StopWatch {
 
-	protected bool $is_running = false;
+	private bool $is_running = false;
 
-	public float $activation_time = 0.0;
+	protected int $activation_time = 0;
 
-	public float $start_time = 0.0;
+	protected int $start_time = 0;
 
-	public float $stop_time = 0.0;
+	protected int $stop_time = 0;
 
 	private array $measured_times = array();
 
-	private float $measured_time_total = 0.0;
+	private int $measured_time_total = 0;
 
-	private float $return_value = 0.0;
+	private const string KEY_START = "start";
+	private const string KEY_STOP = "stop";
+	private const string KEY_ELAPSED = "elapsed";
 
 	public function __construct() {
 
@@ -29,7 +33,7 @@ class StopWatch {
 	 */
 	public function start(): static {
 		$now = $this->getTime();
-		if( $this->activation_time === 0.0 ) {
+		if( $this->activation_time === 0 ) {
 			$this->activation_time = $now;
 		}
 		$this->start_time = $now;
@@ -43,13 +47,13 @@ class StopWatch {
 	 * @return $this
 	 */
 	public function stop(): static {
-		if( $this->is_running ) {
+		if( $this->isRunning() ) {
 			$this->stop_time = $this->getTime();
 			$stopped_time = $this->stop_time - $this->start_time;
 			$this->measured_times[] = [
-				"start"   => $this->start_time,
-				"stop"    => $this->stop_time,
-				"elapsed" => $stopped_time
+				self::KEY_START   => $this->start_time,
+				self::KEY_STOP    => $this->stop_time,
+				self::KEY_ELAPSED => $stopped_time
 			];
 			$this->measured_time_total += $stopped_time;
 			$this->is_running = false;
@@ -63,99 +67,142 @@ class StopWatch {
 	 * @return $this
 	 */
 	public function reset(): static {
-		$this->activation_time = 0.0;
-		$this->start_time = 0.0;
-		$this->stop_time = 0.0;
+		$this->activation_time = 0;
+		$this->start_time = 0;
+		$this->stop_time = 0;
 		$this->measured_times = [];
-		$this->measured_time_total = 0.0;
+		$this->measured_time_total = 0;
 		$this->is_running = false;
 		return $this;
 	}
 
 	/**
-	 * Sets the return value to the elapsed time between the last start and stop
-	 *
-	 * @return $this
+	 * Returns if the stop watch is running
+	 * @return bool
 	 */
-	public function getLastMeasuredTime(): static {
-		$this->return_value = 0.0;
-		if( $this->is_running ) {
-			$this->stop();
-		}
-		if( !empty($this->measured_times) ) {
-			$last_measured_time = $this->measured_times[count($this->measured_times) - 1];
-			$this->return_value = $last_measured_time["elapsed"];
-		}
-		return $this;
+	public function isRunning(): bool {
+		return $this->is_running;
 	}
 
 	/**
 	 * Returns all measured time in an array
+	 *
 	 * @return array
 	 */
 	public function getMeasuredTimes(): array {
-		if( $this->is_running ) {
-			$this->stop();
-		}
 		return $this->measured_times;
+	}
+
+	/**
+	 * Returns all measured time in an array with formatted time values
+	 *
+	 * @param TimeFormat $format
+	 * @param int $precision
+	 * @return array
+	 */
+	public function getMeasuredTimesFormatted(TimeFormat $format = TimeFormat::SEC, int $precision = 2): array {
+		return array_map(fn($times): array => [
+			self::KEY_START   => $this->format($times[self::KEY_START], $format, $precision),
+			self::KEY_STOP    => $this->format($times[self::KEY_STOP], $format, $precision),
+			self::KEY_ELAPSED => $this->format($times[self::KEY_ELAPSED], $format, $precision),
+		], $this->measured_times);
+	}
+
+	/**
+	 * Sets the return value to the elapsed time between the last start and stop
+	 *
+	 * @return int
+	 */
+	public function getLastMeasuredTime(): int {
+		if( !empty($this->measured_times) ) {
+			$last_key = array_key_last($this->measured_times);
+			return $this->measured_times[$last_key][self::KEY_ELAPSED];
+		}
+		return 0;
+	}
+
+	/**
+	 * Sets the return value to the elapsed time between the last start and stop with formatted time values
+	 *
+	 * @param TimeFormat $format
+	 * @param int $precision
+	 * @return string
+	 */
+	public function getLastMeasuredTimeFormatted(TimeFormat $format = TimeFormat::SEC, int $precision = 2): string {
+		if( !empty($this->measured_times) ) {
+			$last_key = array_key_last($this->measured_times);
+			return static::format($this->measured_times[$last_key][self::KEY_ELAPSED], $format, $precision);
+		}
+		return static::format(0, $format, $precision);
 	}
 
 	/**
 	 * Sets the return value to a sum of the times between all starts and stops
 	 *
-	 * @return $this
+	 * @return int
 	 */
-	public function getTotalMeasuredTime(): static {
-		if( $this->is_running ) {
-			$this->stop();
-		}
-		$this->return_value = $this->measured_time_total;
-		return $this;
+	public function getTotalMeasuredTime(): int {
+		return $this->measured_time_total;
+	}
+
+	/**
+	 * Sets the return value to a sum of the times between all starts and stops with formatted time values
+	 *
+	 * @param TimeFormat $format
+	 * @param int $precision
+	 * @return string
+	 */
+	public function getTotalMeasuredTimeFormatted(TimeFormat $format = TimeFormat::SEC, int $precision = 2): string {
+		return static::format($this->measured_time_total, $format, $precision);
 	}
 
 	/**
 	 * Sets the return value the actual time and the time the stopwatch was started the first time
 	 *
-	 * @return $this
+	 * @return int
 	 */
-	public function getElapsedTime(): static {
-		$this->return_value = 0.0;
+	public function getElapsedTime(): int {
 		if( $this->activation_time > 0 ) {
-			$this->return_value = ($this->getTime() - $this->activation_time);
+			return $this->getTime() - $this->activation_time;
 		}
-		return $this;
+		return 0;
+	}
+
+	/**
+	 * Sets the return value the actual time and the time the stopwatch was started the first time with formatted time values
+	 *
+	 * @param TimeFormat $format
+	 * @param int $precision
+	 * @return string
+	 */
+	public function getElapsedTimeFormatted(TimeFormat $format = TimeFormat::SEC, int $precision = 2): string {
+		if( $this->activation_time > 0 ) {
+			return static::format(($this->getTime() - $this->activation_time), $format, $precision);
+		}
+		return static::format(0, $format, $precision);
 	}
 
 	/**
 	 * Returns the return value in the given time format:
-	 * valid time formats art: µs, ms, s, m and h
+	 * valid time formats art: µs, ms, s, m and h default is ns
 	 *
-	 * @param string $format
+	 * @param int $time
+	 * @param TimeFormat $format
 	 * @param int $precision
 	 * @return string
 	 */
-	public function format(string $format = "s", int $precision = 2): string {
-		$secToMilliSec = 1000;
-		$secToMicroSec = $secToMilliSec * 1000;
-		$secToMinutes = 60;
-		$secToHours = $secToMinutes * 60;
-		$number = match ($format) {
-			"µs" => round($this->return_value * $secToMicroSec, $precision),
-			"ms" => round($this->return_value * $secToMilliSec, $precision),
-			"m" => round($this->return_value / $secToMinutes, $precision),
-			"h" => round($this->return_value / $secToHours, $precision),
-			default => round($this->return_value, $precision)
-		};
-		return number_format($number, $precision, ",", ".") . $format;
+	public static function format(int $time, TimeFormat $format = TimeFormat::SEC, int $precision = 2): string {
+		$number = (float)$time / $format->getDivider();
+		return number_format($number, $precision, ",", ".") . " " . $format->toString();
 	}
 
 	/**
-	 * Returns the actual time in seconds
+	 * Returns the actual time in nanoseconds
 	 *
-	 * @return float
+	 * @return int
 	 */
-	protected function getTime(): float {
-		return microtime(true);
+	protected function getTime(): int {
+		return hrtime(true);
 	}
 
 }

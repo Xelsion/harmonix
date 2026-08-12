@@ -132,7 +132,7 @@ class PDOConnection {
 			$this->logger->log(__FILE__, __LINE__, $e->getMessage() . "\n\t=>\t[SQL] " . $this->getFinalizedQuery());
 			throw new SystemException(__FILE__, __LINE__, $e->getMessage(), $e->getCode(), $e->getPrevious());
 		}
-		App::$analyser->stop()->add($this->getFinalizedQuery());
+		App::$analyser->stop()->add($this->getFinalizedQuery(), true);
 		return $this->qb->stmt;
 	}
 

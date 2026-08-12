@@ -29,7 +29,7 @@ class ModuleManager {
 		'beforeRouting'   => [],
 		'afterRouting'    => [],
 		'afterController' => [],
-		'beforeResponse'  => [],
+		'beforeResponse'  => []
 	];
 
 	/**
@@ -70,9 +70,10 @@ class ModuleManager {
 					throw new SystemException(__FILE__, __LINE__, "Module '{$module->moduleName}' must return an array of Subdomain enums. eg. Subdomain::ANY");
 				}
 			}
+
 			$allowedStrings = array_map(static fn(Subdomain $sd) => $sd->toString(), $allowed);
+			// is this Modul for this Subdomain? if not ...
 			if( !in_array("*", $allowedStrings, true) && !in_array(SUB_DOMAIN, $allowedStrings, true) ) {
-				// Modul ist für diese Subdomain NICHT erlaubt → überspringen
 				continue;
 			}
 
@@ -85,7 +86,7 @@ class ModuleManager {
 				$hasOnAfterController = $reflect->getMethod('onAfterController')->class !== AModule::class;
 				$hasOnBeforeResponse = $reflect->getMethod('onBeforeResponse')->class !== AModule::class;
 				if( $hasOnStart || $hasOnBeforeRouting || $hasOnAfterRouting || $hasOnAfterController || $hasOnBeforeResponse ) {
-					// Events registrieren
+					// Events registration
 					if( $hasOnStart ) {
 						$this->events['start'][] = $module;
 					}

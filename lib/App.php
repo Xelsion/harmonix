@@ -130,6 +130,7 @@ class App {
 	 * @throws SystemException - if no valid controller and its method was found
 	 */
 	public function run(): void {
+
 		// Initiate general settings
 		$environment = self::$config->getSectionValue("system", "environment");
 		$debug = self::$config->getSectionValue($environment, "debug");

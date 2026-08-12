@@ -130,4 +130,13 @@ function obj2Array(object $obj): array {
 	return $obj_params;
 }
 
+function get_subdomain_from_host(string $host): string {
+	$host = strtolower(trim($host));
+	$host = rtrim($host, ".");
+	$host = explode(":", $host)[0];
+	$parts = explode(".", $host);
+	$subdomain = $parts[0] ?? "www";
+	return ($subdomain !== "") ? $subdomain : "www";
+}
+
 

@@ -113,12 +113,17 @@ class TestController extends AController {
 	public function mathSubmit(): AResponse {
 		$distance = null;
 		$coords = (App::$request->contains("coords")) ? App::$request->get("coords") : array();
+		$radius = null;
 		if( !empty($coords) && App::$request->contains("distance") ) {
 			$long1 = (float)$coords[0]["long"];
 			$lat1 = (float)$coords[0]["lat"];
 			$long2 = (float)$coords[1]["long"];
 			$lat2 = (float)$coords[1]["lat"];
-			$distance = GeoHelper::getDistanceBetween(new GeoCoordinate($long1, $lat1), new GeoCoordinate($long2, $lat2));
+			$radius = (float)App::$request->get("radius");
+			if( $radius === 0.0 ) {
+				$radius = 6378.38;
+			}
+			$distance = GeoHelper::getPlanetaryDistanceBetween(new GeoCoordinate($long1, $lat1), new GeoCoordinate($long2, $lat2), $radius);
 			$distance = GeoHelper::getFormattedDistance($distance);
 		}
 
@@ -144,9 +149,9 @@ class TestController extends AController {
 		} catch( Exception $e ) {
 			throw new SystemException($e->getFile(), $e->getLine(), $e->getMessage(), $e->getCode(), $e->getPrevious());
 		}
-
 		$view = new Template(PATH_VIEWS . "tests/math.html");
 		TemplateData::set("coords", $coords);
+		TemplateData::set("radius", $radius);
 		TemplateData::set("distance", $distance);
 		TemplateData::set("timespan", $timespan);
 		TemplateData::set("start_date", $start_date);

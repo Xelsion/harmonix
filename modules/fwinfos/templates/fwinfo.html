@@ -2,7 +2,7 @@
 
 use lib\core\classes\TemplateData;
 
-$build_time = TemplateData::get("build_time");
+$build_time = TemplateData::get("build_time") ?? "0.0 ms";
 ?>
 <div class="row text-end" style="margin: 0;">
 	<div class="col"></div>

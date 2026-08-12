@@ -29,7 +29,7 @@ abstract class ALoggableException extends Exception {
 	 * @param Throwable|null $previous - the previous throwable object (optional)
 	 * @throws SystemException
 	 */
-	public function __construct(string $file, int $line, string $message, mixed $code = 0, Throwable $previous = null) {
+	public function __construct(string $file, int $line, string $message, mixed $code = 0, ?Throwable $previous = null) {
 		parent::__construct($message, (int)$code, $previous);
 		$this->file = $file;
 		$this->line = $line;

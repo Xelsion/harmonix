@@ -9,6 +9,7 @@ use lib\core\classes\StopWatch;
 use lib\core\classes\Template;
 use lib\core\classes\TemplateData;
 use lib\core\enums\Subdomain;
+use lib\core\enums\TimeFormat;
 use lib\core\exceptions\SystemException;
 
 class Module extends AModule {
@@ -49,7 +50,7 @@ class Module extends AModule {
 	public function onBeforeResponse(?Template $template): void {
 		if( $template !== null ) {
 			$this->timer->stop();
-			$elapsed_time = $this->timer->getElapsedTime()->format("ms");
+			$elapsed_time = $this->timer->getElapsedTimeFormatted(TimeFormat::MILLI);
 			TemplateData::addHookName('build_time');
 			TemplateData::set('build_time', $elapsed_time);
 			TemplateData::addTemplateToHook('footer', new Template(__DIR__ . '/templates/fwinfo.html'));

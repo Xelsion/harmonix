@@ -10,26 +10,27 @@ if( is_array($debug_messages) ) {
 }
 
 $analyser_entries = App::$analyser->getEntries();
+$total_time = 0.0;
 ?>
 <div class="container-fluid">
-    <table class="table table-dark table-striped">
-        <tr>
-            <th>Label</th>
-            <th>Backtrace</th>
-            <th>Needed Time</th>
-        </tr>
+	<table class="table table-dark table-striped">
+		<tr>
+			<th>Label</th>
+			<th>Backtrace</th>
+			<th>Needed Time</th>
+		</tr>
 		<?php foreach( $analyser_entries as $entry ): ?>
-            <tr>
-                <td><?= $entry["info"] ?></td>
-                <td>
+			<tr>
+				<td><?= $entry["info"] ?></td>
+				<td>
 					<?php foreach( $entry["backtrace"] as $trace ): ?>
-                        <div><?= ($trace["class"] ?? '') . "->" . $trace["function"] ?></div>
+						<div><?= ($trace["class"] ?? '') . "->" . $trace["function"] ?></div>
 					<?php endforeach; ?>
-                </td>
-                <td class="col-1"><?= $entry["time"] ?></td>
-            </tr>
+				</td>
+				<td class="col-1"><?= $entry["time_formatted"] ?></td>
+			</tr>
 		<?php endforeach; ?>
-    </table>
+	</table>
 </div>
 
 

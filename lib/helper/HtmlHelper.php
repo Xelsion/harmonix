@@ -104,39 +104,52 @@ readonly class HtmlHelper {
 	}
 
 	/**
+	 * Creates a new session token and returns it as a hidden input field
+	 *
 	 * @return string
 	 */
 	public static function generateFormToken(): string {
 		try {
-			if( !isset($_SESSION["form_token"]) ) {
-				$token = StringHelper::getGuID();
-				$_SESSION["form_token"] = $token;
+			if( !isset($_SESSION["csrf_token"]) ) {
+				$token = bin2hex(random_bytes(32));
+				$_SESSION["csrf_token"] = $token;
 			} else {
-				$token = $_SESSION["form_token"];
+				$token = $_SESSION["csrf_token"];
 			}
-			return '<input type="hidden" name="csrf_token" value="' . $token . '" />';
+			return '<input type="hidden" name="csrf_token" value="' . htmlspecialchars($token, ENT_QUOTES, 'UTF-8') . '" />';
 		} catch( Exception ) {
 			return "";
 		}
 	}
 
 	/**
+	 * Deletes the current session token
+	 *
 	 * @return void
 	 */
 	public static function deleteFormToken(): void {
-		if( isset($_SESSION["form_token"]) ) {
-			unset($_SESSION["form_token"]);
+		if( isset($_SESSION["csrf_token"]) ) {
+			unset($_SESSION["csrf_token"]);
 		}
 	}
 
 	/**
-	 * @param string $id
+	 * Validates the given token against the current session token
+	 *
+	 * @param string $token
 	 * @return bool
 	 */
-	public static function validateFormToken(string $id): bool {
-		return (isset($_SESSION["form_token"]) && $id === $_SESSION["form_token"]);
+	public static function validateFormToken(string $token): bool {
+		return (isset($_SESSION["csrf_token"]) && hash_equals($_SESSION["csrf_token"], trim($token)));
 	}
 
+	/**
+	 * Returns the html input field for the given field name and value
+	 * @param string $field_name
+	 * @param mixed $value
+	 * @param array $value_set
+	 * @return string
+	 */
 	public static function getUserInputFor(string $field_name, mixed $value, array $value_set = []): string {
 		$field = "";
 		if( !empty($value_set) ) {

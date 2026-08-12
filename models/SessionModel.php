@@ -90,7 +90,6 @@ class SessionModel extends Session {
 		if( $session_id === "" ) {
 			return;
 		}
-
 		try {
 			$session_repo = App::getInstanceOf(SessionRepository::class);
 			$session_data = $session_repo->getAsArray($session_id);

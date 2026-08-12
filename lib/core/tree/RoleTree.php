@@ -32,11 +32,13 @@ class RoleTree extends TreeWalker {
 			$node = new RoleNode($role);
 			$this->addNode($node);
 		}
+
 	}
 
 	/**
 	 * The initializer for this class
 	 *
+	 * @param bool $force_reload
 	 * @return RoleTree
 	 */
 	public static function getInstance(bool $force_reload = false): RoleTree {

@@ -641,6 +641,7 @@ class QueryBuilder {
 		if( ($this->query_type === QueryType::DELETE || $this->query_type === QueryType::UPDATE) && empty($this->where_clauses) ) {
 			throw new SystemException(__FILE__, __LINE__, "Refusing to run unsafe query without WHERE");
 		}
+
 		$this->sql .= $this->compileFinalWhere();
 		$this->sql .= implode("", $this->after_wheres);
 		$this->stmt = $this->pdo->prepare($this->sql, $options);

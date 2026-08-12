@@ -1,10 +1,12 @@
 <?php
 
 use lib\core\classes\TemplateData;
+use lib\helper\HtmlHelper;
 
 $base64 = TemplateData::get("base64") ?? null;
 ?>
 <form action="/tests/base64" method="post" enctype="multipart/form-data">
+	<?= HtmlHelper::generateFormToken() ?>
 	<div>
 		<label for="upload">Datei</label>
 		<input id="upload" type="file" name="upload"/>
@@ -14,5 +16,5 @@ $base64 = TemplateData::get("base64") ?? null;
 	</div>
 </form>
 <?php if( $base64 !== null ) : ?>
-	<div><?= $base64 ?></div>
+	<div class="container-fluid"><?= $base64 ?></div>
 <?php endif; ?>

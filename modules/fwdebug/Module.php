@@ -11,7 +11,7 @@ use lib\core\exceptions\SystemException;
 
 class Module extends AModule {
 
-	private bool $debugging = true;
+	private bool $debugging = false;
 
 	/**
 	 * @return void

@@ -85,7 +85,6 @@ class ActorRoleRepository extends ARepository {
 	public function getAll(): array {
 		try {
 			// @formatter:off
-			$this->pdo->Select();
             return $this->pdo->Select()
                 ->From("actor_roles")
                 ->prepareStatement()
