@@ -15,9 +15,7 @@ class TextResponse extends AResponse {
 	 * @param string $content
 	 */
 	public function __construct(string $content = "") {
-		if( $content !== "" ) {
-			$this->setOutput($content);
-		}
+		$this->setOutput($content);
 		$this->status_code = HttpResponseCode::Ok;
 	}
 
@@ -31,7 +29,7 @@ class TextResponse extends AResponse {
 	}
 
 	/**
-	 * @inherite
+	 * @inherit
 	 */
 	public function setHeaders(): void {
 		header($this->status_code->toString());

@@ -32,8 +32,8 @@ class HtmlResponse extends AResponse {
 	}
 
 	/**
-	 * Sets the headers status code of this response
-	 * @param int $status_code
+	 * Sets the header status code of this response
+	 * @param HttpResponseCode $status_code
 	 * @return void
 	 */
 	public function withHeader(HttpResponseCode $status_code): void {
@@ -41,7 +41,7 @@ class HtmlResponse extends AResponse {
 	}
 
 	/**
-	 * @inherite
+	 * @inherit
 	 */
 	public function setHeaders(): void {
 		header($this->status_code->toString());

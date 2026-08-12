@@ -5,6 +5,8 @@ namespace lib\core\response_types;
 use JsonException;
 use JsonSerializable;
 use lib\core\abstracts\AResponse;
+use lib\core\enums\HttpResponseCode;
+use lib\core\exceptions\SystemException;
 
 /**
  * The JsonResponse class
@@ -15,35 +17,40 @@ use lib\core\abstracts\AResponse;
  */
 class JsonResponse extends AResponse implements JsonSerializable {
 	// the default status for html status headers
-	public int $status_code = 200;
+	public HttpResponseCode $status_code;
 
-	// a parameter which will be used for the JsonSerializable implementation
+	// The internal raw payload data
 	private mixed $value;
+
+	/**
+	 * @param mixed|null $content
+	 * @throws SystemException
+	 */
+	public function __construct(mixed $content = null) {
+		$this->status_code = HttpResponseCode::Ok;
+		if( $content !== null ) {
+			$this->setOutput($content);
+		}
+	}
+
+	/**
+	 * Sets the header status code of this response.
+	 * Matches the implementation of HtmlResponse and TextResponse.
+	 *
+	 * @param HttpResponseCode $status_code
+	 * @return void
+	 */
+	public function withHeader(HttpResponseCode $status_code): void {
+		$this->status_code = $status_code;
+	}
 
 	/**
 	 * @inherite
 	 */
 	public function setHeaders(): void {
+		header($this->status_code->toString());
+		header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
 		header("Content-Type: application/json; charset=utf-8");
-		switch( $this->status_code ) {
-			case 400:
-				header("HTTP/1.1 400 Bad Request");
-				break;
-			case 401:
-				header("HTTP/1.1 401 Unauthorized");
-				break;
-			case 403:
-				header("HTTP/1.1 403 Forbidden");
-				break;
-			case 404:
-				header("HTTP/1.1 404 Not Found");
-				break;
-			case 500:
-				header("HTTP/1.1 500 Internal Server Error");
-				break;
-			default:
-				header("HTTP/1.1 200 OK");
-		}
 	}
 
 	/**
@@ -51,11 +58,17 @@ class JsonResponse extends AResponse implements JsonSerializable {
 	 *
 	 * @param mixed $output
 	 * @return void
-	 * @throws JsonException
+	 * @throws SystemException
 	 */
 	public function setOutput(mixed $output): void {
-		$this->value = $output;
-		parent::setOutput(json_encode($this->jsonSerialize(), JSON_THROW_ON_ERROR));
+		try {
+			$this->value = $output;
+
+			$json_string = json_encode($this->jsonSerialize(), JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE | JSON_PRESERVE_ZERO_FRACTION);
+			parent::setOutput($json_string);
+		} catch( JsonException $e ) {
+			throw new SystemException(__FILE__, __LINE__, $e->getMessage());
+		}
 	}
 
 	/**
@@ -64,6 +77,9 @@ class JsonResponse extends AResponse implements JsonSerializable {
 	 * @return mixed
 	 */
 	public function jsonSerialize(): mixed {
+		if( $this->value instanceof JsonSerializable ) {
+			return $this->value->jsonSerialize();
+		}
 		return $this->value;
 	}
 }

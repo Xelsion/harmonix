@@ -26,11 +26,11 @@ class Request extends KeyValuePairs {
 	 * @throws \lib\core\exceptions\SystemException
 	 */
 	public function __construct() {
+		$this->request_method = isset($_POST['request_method']) ? strtoupper($_POST['request_method']) : ($_SERVER['REQUEST_METHOD'] ?? "");
 		if( $this->isInputAllowed() ) {
 			$this->collectInputData();
 		}
 		$this->request_uri = $this->getCleanedRequestURI();
-		$this->request_method = ($this->contains("request_method")) ? strtoupper($this->get("request_method")) : $_SERVER['REQUEST_METHOD'] ?? "";
 	}
 
 	/**
@@ -39,7 +39,12 @@ class Request extends KeyValuePairs {
 	 * @return bool
 	 */
 	private function isInputAllowed(): bool {
-		if( isset($_SESSION['csrf_token']) ) {
+		if( isset($_SESSION['csrf_token']) && in_array($this->request_method, [
+				'POST',
+				'PUT',
+				'DELETE',
+				'PATCH'
+			], true) ) {
 			if( isset($_POST['csrf_token']) && HtmlHelper::validateFormToken($_POST['csrf_token']) ) {
 				HtmlHelper::deleteFormToken();
 			} else {
@@ -86,13 +91,8 @@ class Request extends KeyValuePairs {
 	 * @return string
 	 */
 	private function getCleanedRequestURI(): string {
-		$request_parts = explode("?", $_SERVER["REQUEST_URI"]);
-		if( count($request_parts) > 1 ) {
-			$request = $request_parts[0];
-		} else {
-			$request = $_SERVER["REQUEST_URI"];
-		}
-		return $request ?? "";
+		$uri = $_SERVER["REQUEST_URI"] ?? "";
+		return explode("?", $uri)[0];
 	}
 
 	/**
@@ -139,6 +139,8 @@ class Request extends KeyValuePairs {
 	 * @return array
 	 */
 	public function getRequestParts(): array {
-		return preg_split("/\//", $this->getRequestUri(), -1, PREG_SPLIT_NO_EMPTY);
+		return explode('/', $this->getRequestUri())
+				|> array_filter(...)
+				|> array_values(...);
 	}
 }

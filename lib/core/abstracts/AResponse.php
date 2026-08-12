@@ -15,7 +15,7 @@ abstract class AResponse {
 	// The output content
 	public ?Template $template;
 
-	private string $output;
+	private string $output = "";
 
 	public function parseTemplate(): void {
 		if( $this->template !== null ) {

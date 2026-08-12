@@ -16,11 +16,8 @@ class StringHelper {
 
 	private static string $allowed_characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_$!%";
 	private static string $allowed_password_characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ123456789-_$!%@#&=?";
-	private static string $enc_ciphering = "AES-128-CTR";
-	//private static string $enc_iv = '5653179598585278';
-
-	private static string $enc_hash_algo = "sha256";
-	private static int $enc_hash_length = 32;
+	private static string $enc_ciphering = "AES-256-GCM";
+	private static int $tag_length = 16;
 	private static int $enc_option = OPENSSL_RAW_DATA;
 
 	/**
@@ -37,34 +34,24 @@ class StringHelper {
 	 * @return string
 	 */
 	public static function getShortString(string $string, int $length, string $suffix = "", bool $no_word_break = false): string {
-		$result = $string;
-		if( strlen($string) > $length ) {
-			if( $suffix !== "" ) {
-				$length -= strlen($suffix);
-			}
-			$result = "";
-			if( $no_word_break ) {
-				$temp = "";
-				$words = explode(" ", $string);
-				while( !empty($words) ) {
-					$word = array_shift($words);
-					if( $temp === "" ) {
-						$temp .= $word;
-					} else {
-						$temp .= " " . $word;
-					}
-					if( strlen($temp) < $length ) {
-						$result = $temp;
-						continue;
-					}
-					break;
-				}
-			} else {
-				$result = substr($string, 0, $length - 1);
-			}
-			$result .= $suffix;
+		if( mb_strlen($string) <= $length ) {
+			return $string;
 		}
-		return $result;
+
+		if( $suffix !== "" ) {
+			$length -= mb_strlen($suffix);
+		}
+
+		if( $no_word_break ) {
+			// Cuts off text and rolls back to the last space character
+			$truncated = mb_substr($string, 0, $length + 1);
+			$last_space = mb_strrpos($truncated, ' ');
+			if( $last_space !== false ) {
+				return mb_substr($truncated, 0, $last_space) . $suffix;
+			}
+		}
+
+		return mb_substr($string, 0, $length) . $suffix;
 	}
 
 	/**
@@ -80,19 +67,18 @@ class StringHelper {
 	 * @throws Exception
 	 */
 	public static function getRandomString(int $length = 16, string $prefix = "", string $suffix = ""): string {
-		$index_start = 0;
-		$index_end = strlen(self::$allowed_characters) - 1;
+		$length -= (mb_strlen($prefix) + mb_strlen($suffix));
+		if( $length <= 0 ) {
+			return $prefix . $suffix;
+		}
+
+		$index_end = mb_strlen(self::$allowed_characters) - 1;
 		$random_string = "";
-		if( $prefix !== "" ) {
-			$length -= strlen($prefix);
-		}
-		if( $suffix !== "" ) {
-			$length -= strlen($suffix);
-		}
+
 		for( $i = 0; $i < $length; $i++ ) {
-			$random_index = random_int($index_start, $index_end);
-			$random_string .= self::$allowed_characters[$random_index];
+			$random_string .= self::$allowed_characters[random_int(0, $index_end)];
 		}
+
 		return $prefix . $random_string . $suffix;
 	}
 
@@ -106,19 +92,17 @@ class StringHelper {
 	 * @throws Exception
 	 */
 	public static function getRandomPassword(int $length = 8): string {
-		$index_start = 0;
-		$index_end = strlen(self::$allowed_password_characters) - 1;
+		$index_end = mb_strlen(self::$allowed_password_characters) - 1;
 		$result = "";
 		for( $i = 0; $i < $length; $i++ ) {
-			$random_index = random_int($index_start, $index_end);
-			$result .= self::$allowed_password_characters[$random_index];
+			$result .= self::$allowed_password_characters[random_int(0, $index_end)];
 		}
 		return $result;
 	}
 
 	/**
-	 * Puts a <span> around the given $needle in the given string and returns the
-	 * result
+	 * Puts a <span> around the given $needle in the given string and returns the result.
+	 * Secure against XSS.
 	 *
 	 * @param string $needle
 	 * @param string $string
@@ -129,19 +113,17 @@ class StringHelper {
 	 */
 	public static function getHighlighted(string $needle, string $string, string $tag = "span", string $class = "hl"): string {
 		if( trim($needle) === "" ) {
-			return $string;
+			return htmlspecialchars($string, ENT_QUOTES, 'UTF-8');
 		}
+		$safe_string = htmlspecialchars($string, ENT_QUOTES, 'UTF-8');
+		$safe_needle = htmlspecialchars($needle, ENT_QUOTES, 'UTF-8');
 
-		$matches = array();
-		preg_match("/" . $needle . "/i", $string, $matches);
-		if( empty($matches) ) {
-			return $string;
-		}
-		foreach( $matches as $match ) {
-			$html_replacement = sprintf('<%s class="%s">%s</%s>', $tag, $class, $match, $tag);
-			$string = preg_replace('/' . $match . '/', $html_replacement, $string);
-		}
-		return $string;
+		$quoted_needle = preg_quote($safe_needle, '/');
+
+		// Replaces all matches case-insensitively and properly wraps them in HTML tags
+		return preg_replace_callback('/' . $quoted_needle . '/i', static function($matches) use ($tag, $class) {
+			return sprintf('<%s class="%s">%s</%s>', $tag, $class, $matches[0], $tag);
+		}, $safe_string);
 	}
 
 	/**
@@ -200,18 +182,22 @@ class StringHelper {
 	public static function encrypt(string $string, string $salt = ""): string {
 		try {
 			$base_key = App::$config->getSectionValue('security', 'enc_key');
-			if( function_exists('openssl_cipher_iv_length') && is_callable('openssl_cipher_iv_length') ) {
-				$enc_key = hash_hmac('sha256', $salt, $base_key, true);
-				$iv_length = openssl_cipher_iv_length(self::$enc_ciphering);
-				$iv = random_bytes($iv_length);
-				$ciphertext_raw = openssl_encrypt($string, self::$enc_ciphering, $enc_key, self::$enc_option, $iv);
-				$hmac = hash_hmac(self::$enc_hash_algo, $ciphertext_raw, $enc_key, true);
-				return $iv . $hmac . $ciphertext_raw;
-			}
-			return $string;
+			$enc_key = hash_hmac('sha256', $salt, $base_key, true);
+
+			$iv_length = openssl_cipher_iv_length(self::$enc_ciphering);
+			$iv = random_bytes($iv_length);
+
+			// AES-GCM requires a reference variable for the authentication tag
+			$tag = "";
+
+			$ciphertext = openssl_encrypt($string, self::$enc_ciphering, $enc_key, self::$enc_option, $iv, $tag, "", self::$tag_length);
+
+			// Append IV and Authentication Tag directly to the data stream
+			return $iv . $tag . $ciphertext;
 		} catch( Exception $e ) {
 			throw new SystemException($e->getFile(), $e->getLine(), $e->getMessage(), $e->getCode(), $e->getPrevious());
 		}
+
 	}
 
 	/**
@@ -223,47 +209,26 @@ class StringHelper {
 	 * @throws SystemException
 	 */
 	public static function decrypt(string $string, string $salt = ""): string {
-		$base_key = App::$config->getSectionValue('security', 'enc_key');
-		if( function_exists('openssl_cipher_iv_length') && is_callable('openssl_cipher_iv_length') ) {
+		try {
+			$base_key = App::$config->getSectionValue('security', 'enc_key');
 			$enc_key = hash_hmac('sha256', $salt, $base_key, true);
-			$iv_length = openssl_cipher_iv_length(self::$enc_ciphering);
-			$iv = substr($string, 0, $iv_length);
-			$hmac = substr($string, $iv_length, self::$enc_hash_length);
-			$ciphertext_raw = substr($string, $iv_length + self::$enc_hash_length);
-			$original_plaintext = openssl_decrypt($ciphertext_raw, self::$enc_ciphering, $enc_key, self::$enc_option, $iv);
-			$calc_mac = hash_hmac(self::$enc_hash_algo, $ciphertext_raw, $enc_key, true);
-			if( function_exists('hash_equals') ) {
-				if( hash_equals($hmac, $calc_mac) ) {
-					return $original_plaintext;
-				}
-			} else if( self::hash_equals_custom($hmac, $calc_mac) ) {
-				return $original_plaintext;
-			}
-		}
-		throw new SystemException(__FILE__, __LINE__, "Invalid encrypted session data");
-	}
 
-	/**
-	 * (Optional)
-	 * hash_equals() function poly-filling.
-	 * PHP 5.6+ timing attack safe comparison
-	 */
-	public static function hash_equals_custom($knownString, $userString): bool {
-		if( function_exists('mb_strlen') ) {
-			$kLen = mb_strlen($knownString, '8bit');
-			$uLen = mb_strlen($userString, '8bit');
-		} else {
-			$kLen = strlen($knownString);
-			$uLen = strlen($userString);
+			$iv_length = openssl_cipher_iv_length(self::$enc_ciphering);
+
+			$iv = substr($string, 0, $iv_length);
+			$tag = substr($string, $iv_length, self::$tag_length);
+			$ciphertext = substr($string, $iv_length + self::$tag_length);
+
+			$plaintext = openssl_decrypt($ciphertext, self::$enc_ciphering, $enc_key, self::$enc_option, $iv, $tag);
+
+			if( $plaintext === false ) {
+				throw new SystemException(__FILE__, __LINE__, "Decryption failed or data was tampered with.");
+			}
+
+			return $plaintext;
+		} catch( Exception $e ) {
+			throw new SystemException(__FILE__, __LINE__, "Invalid encrypted payload or authentication signature failed.");
 		}
-		if( $kLen !== $uLen ) {
-			return false;
-		}
-		$result = 0;
-		for( $i = 0; $i < $kLen; $i++ ) {
-			$result |= (ord($knownString[$i]) ^ ord($userString[$i]));
-		}
-		return 0 === $result;
 	}
 
 
@@ -273,18 +238,29 @@ class StringHelper {
 	 * @return string
 	 */
 	public static function getDomain(): string {
-		$path = $url_parts = parse_url($_SERVER["SERVER_NAME"], PHP_URL_PATH);
-		if( $url_parts === false ) {
-			return "";
+		$rawHost = $_SERVER['HTTP_HOST'] ?? $_SERVER['SERVER_NAME'] ?? '';
+		if( $rawHost === '' ) {
+			return '';
 		}
-		$matches = array();
-		if( preg_match("/^([a-z0-9]+)\.([a-zA-Z0-9]+)\.([a-z-A-Z0-9]+)$/", $path, $matches) ) {
-			return "." . $matches[2] . "." . $matches[3];
+
+		// Remove port mapping if present (e.g., localhost:8080 -> localhost)
+		$host = explode(':', $rawHost)[0];
+		$parts = explode('.', $host);
+		$count = count($parts);
+
+		// Handle localhost or raw IP addresses
+		if( $count === 1 || filter_var($host, FILTER_VALIDATE_IP) ) {
+			return $host;
 		}
-		if( preg_match("/^([a-zA-Z0-9]+)\.([a-z-A-Z0-9]+)$/", $path, $matches) ) {
-			return "." . $matches[1] . "." . $matches[2];
+
+		// Detect multi-segment TLDs (e.g., co.uk, com.de, org.at)
+		$two_letter_tlds = ['co', 'com', 'org', 'net', 'gov', 'edu', 'ac'];
+		if( $count >= 3 && in_array($parts[$count - 2], $two_letter_tlds, true) ) {
+			return '.' . $parts[$count - 3] . '.' . $parts[$count - 2] . '.' . $parts[$count - 1];
 		}
-		return "";
+
+		// Standard domain fallback (e.g., www.example.com -> .example.com)
+		return '.' . $parts[$count - 2] . '.' . $parts[$count - 1];
 	}
 
 	/**

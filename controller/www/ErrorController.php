@@ -32,7 +32,7 @@ class ErrorController extends AController {
 	 */
 	#[Route("{error_code}", RequestMethod::ANY)]
 	public function error(int $error_code): AResponse {
-		$response_code = HttpResponseCode::fromCode($error_code);
+		$response_code = HttpResponseCode::from($error_code);
 		$view = new Template(PATH_VIEWS . "error/display.html");
 		TemplateData::set("title", $response_code->toString());
 
