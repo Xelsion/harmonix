@@ -16,12 +16,14 @@ class LinqList extends Enumerable {
 
 	private array $temp = [];
 
+	private bool $selective = false;
+
 	/**
 	 * @throws SystemException
 	 */
 	public function __construct(array $data = []) {
 		if( !empty($data) && !$this->isValidData($data) ) {
-			throw new SystemException(__FILE__, __LINE__, "LinqList elements must be of the same type");
+			throw new SystemException(__FILE__, __LINE__, "LinqList elements must be of the same type and structure");
 		}
 		parent::__construct($data);
 	}
@@ -35,7 +37,7 @@ class LinqList extends Enumerable {
 	 */
 	public function add(mixed $value): void {
 		if( !$this->isValidValue($value) ) {
-			throw new SystemException(__FILE__, __LINE__, "LinqList elements must be of the same type");
+			throw new SystemException(__FILE__, __LINE__, "LinqList elements must be of the same type and structure");
 		}
 		$this->iterator->append($value);
 	}
@@ -47,11 +49,10 @@ class LinqList extends Enumerable {
 	 * @return void
 	 */
 	public function remove(mixed $entry): void {
-		foreach( $this->iterator as $key => $value ) {
-			if( valuesAreIdentical($entry, $value) ) {
-				$this->iterator->offsetUnset($key);
-				break;
-			}
+		$array = $this->iterator->getArrayCopy();
+		$key = array_find_key($array, static fn($value) => valuesAreIdentical($entry, $value));
+		if( $key !== null ) {
+			$this->iterator->offsetUnset($key);
 		}
 	}
 
@@ -62,6 +63,7 @@ class LinqList extends Enumerable {
 	 * @return LinqList
 	 */
 	public function where(?callable $callable = null): self {
+		$this->selective = true;
 		$this->temp = [];
 		if( $callable instanceof Closure ) {
 			foreach( $this->iterator as $key => $entry ) {
@@ -82,6 +84,7 @@ class LinqList extends Enumerable {
 	 * @return $this
 	 */
 	public function select(callable $callable): self {
+		$this->selective = true;
 		if( !empty($this->temp) ) {
 			foreach( $this->temp as $key => $value ) {
 				$this->temp[$key] = $callable($value, $key, $this);
@@ -104,6 +107,9 @@ class LinqList extends Enumerable {
 	 * @return $this
 	 */
 	public function orderBy(string $col = "", bool $ascending = true): self {
+		if( !$this->selective && empty($this->temp) ) {
+			$this->temp = $this->iterator->getArrayCopy();
+		}
 		if( !empty($this->temp) ) {
 			if( $col !== "" ) {
 				$first_element = $this->temp[array_key_first($this->temp)];
@@ -146,6 +152,9 @@ class LinqList extends Enumerable {
 	 * @return $this
 	 */
 	public function distinct(): self {
+		if( !$this->selective && empty($this->temp) ) {
+			$this->temp = $this->iterator->getArrayCopy();
+		}
 		$this->temp = array_values(array_unique($this->temp, SORT_REGULAR));
 		return $this;
 	}
@@ -156,67 +165,80 @@ class LinqList extends Enumerable {
 	 * @return int
 	 */
 	public function count(): int {
+		if( !$this->selective && empty($this->temp) ) {
+			$this->temp = $this->iterator->getArrayCopy();
+		}
 		return count($this->temp);
 	}
 
 	/**
-	 * Returns all elements of the search result
+	 * Returns all elements of the search result or the entire list if no selection was made
 	 *
 	 * @return array
 	 */
 	public function getAll(): array {
+		if( !$this->selective && empty($this->temp) ) {
+			$this->temp = $this->iterator->getArrayCopy();
+		}
 		$results = $this->temp;
 		$this->temp = [];
+		$this->selective = false;
 		return $results;
 	}
 
 	/**
-	 * Returns one element rom the search results
+	 * Returns one element from the search results
 	 * Throws an exception if more than one element is found
 	 *
 	 * @return mixed
 	 * @throws SystemException
 	 */
 	public function getOneOrNull(): mixed {
-		if( count($this->temp) === 1 ) {
-			$result = $this->temp[array_key_first($this->temp)];
-			$this->temp = [];
-			return $result;
+		if( !$this->selective ) {
+			throw new SystemException(__FILE__, __LINE__, "No selection was made!");
 		}
 		if( count($this->temp) > 1 ) {
 			throw new SystemException(__FILE__, __LINE__, "Multiple values found!");
 		}
-		return null;
-	}
-
-	/**
-	 * Returns the first element rom the search results
-	 *
-	 * @return mixed
-	 */
-	public function getFirstOrNull(): mixed {
-		if( count($this->temp) > 0 ) {
-			$result = $this->temp[0];
+		if( count($this->temp) === 1 ) {
+			$result = $this->temp[array_key_first($this->temp)];
 			$this->temp = [];
+			$this->selective = false;
 			return $result;
 		}
 		return null;
 	}
 
 	/**
-	 * Checks if the all elements in data have the same type or if they are array the same structure
+	 * Returns the first element from the search results or from the entire list if no selection was made
+	 *
+	 * @return mixed
+	 */
+	public function getFirstOrNull(): mixed {
+		if( !$this->selective && empty($this->temp) ) {
+			$this->temp = $this->iterator->getArrayCopy();
+		}
+		if( count($this->temp) > 0 ) {
+			$result = $this->temp[0];
+			$this->temp = [];
+			$this->selective = false;
+			return $result;
+		}
+		return null;
+	}
+
+	/**
+	 * Checks if the all elements in data have the same type or if they are an array of the same structure
 	 *
 	 * @param array $data
 	 * @return bool
 	 */
 	private function isValidData(array $data): bool {
-		$first_entry = $data[0];
-		foreach( $data as $entry ) {
-			if( !$this->ofSameObjectType($first_entry, $entry) ) {
-				return false;
-			}
+		if( $this->iterator->count() === 0 ) {
+			return true;
 		}
-		return true;
+		$first_entry = $data[array_key_first($data)];
+		return array_all($data, fn($entry) => $this->ofSameObjectType($first_entry, $entry));
 	}
 
 	/**
@@ -229,11 +251,10 @@ class LinqList extends Enumerable {
 		if( $this->iterator->count() === 0 ) {
 			return true;
 		}
-		$first_entry = $this->iterator->current();
-		if( !$this->ofSameObjectType($first_entry, $value) ) {
-			return false;
-		}
-		return true;
+
+		$array = $this->iterator->getArrayCopy();
+		$first_entry = $array[array_key_first($array)];
+		return $this->ofSameObjectType($first_entry, $value);
 	}
 
 	/**
@@ -254,15 +275,13 @@ class LinqList extends Enumerable {
 		if( $type1 === "array" ) {
 			$keys1 = array_keys($entry1);
 			$keys2 = array_keys($entry2);
-			if( !empty(array_diff($keys1, $keys2)) ) {
+			if( count($keys1) !== count($keys2) || !empty(array_diff($keys1, $keys2)) ) {
 				return false;
 			}
 			$values1 = array_values($entry1);
 			$values2 = array_values($entry2);
-			foreach( $values1 as $key => $value ) {
-				if( getType($value) !== getType($values2[$key]) ) {
-					return false;
-				}
+			if( array_any($values1, static fn($value, $key) => getType($value) !== getType($values2[$key])) ) {
+				return false;
 			}
 		}
 		return true;

@@ -5,7 +5,6 @@ namespace lib\core\abstracts;
 use lib\core\classes\Configuration;
 use lib\core\classes\Template;
 
-
 /**
  * A Module is an extension for the framework or the output.
  * It is integrated int different stage of the App flow

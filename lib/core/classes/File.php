@@ -44,9 +44,21 @@ class File {
 				$this->mime_type = $this->getMimeType();
 			}
 			$this->file_size = filesize($file_path);
-			$this->read();
 		}
+	}
 
+	/**
+	 * Checks if the file exists and reads its content if it does.
+	 * Return true if successful and false if not
+	 *
+	 * @return self
+	 */
+	public function read(): self {
+		if( $this->exists() && is_readable($this->file_path) ) {
+			$this->file_content = file_get_contents($this->file_path);
+			$this->file_size = (float)strlen($this->file_content);
+		}
+		return $this;
 	}
 
 	/**
@@ -59,15 +71,15 @@ class File {
 
 	/**
 	 * @param string $content
-	 * @return $this
+	 * @return self
 	 */
-	public function setContent(string $content): File {
+	public function setContent(string $content): self {
 		if( $this->isBase64($content) ) {
 			$this->file_content = base64_decode($content);
 		} else {
 			$this->file_content = $content;
 		}
-		$this->file_size = strlen($this->file_content) * 0.67;
+		$this->file_size = (float)strlen($this->file_content);
 		return $this;
 	}
 
@@ -77,20 +89,10 @@ class File {
 	 * @return string
 	 */
 	public function getContent(): string {
-		return $this->file_content;
-	}
-
-	/**
-	 * Checks if the file exists and reads its content if it does.
-	 * Return true if successful and false if not
-	 *
-	 * @return File
-	 */
-	public function read(): File {
-		if( $this->exists() && is_readable($this->file_path) ) {
-			$this->file_content = file_get_contents($this->file_path);
+		if( $this->file_content === "" && file_exists($this->file_path) ) {
+			$this->read();
 		}
-		return $this;
+		return $this->file_content;
 	}
 
 	/**
@@ -101,9 +103,19 @@ class File {
 	 * @throws SystemException
 	 */
 	public function save(): bool {
+		if( $this->file_content === "" && file_exists($this->file_path) ) {
+			$this->read();
+		}
 		$path_parts = pathinfo($this->file_path);
 		$this->createIfNotExists($path_parts["dirname"]);
-		return file_put_contents($this->file_path, $this->file_content);
+		$result = file_put_contents($this->file_path, $this->file_content);
+		if( $result !== false ) {
+			$this->file_size = (float)$result;
+			$this->file_name = basename($this->file_path);
+			$this->mime_type = $this->getMimeType();
+			return true;
+		}
+		return false;
 	}
 
 	/**
@@ -115,9 +127,11 @@ class File {
 	 * @throws SystemException
 	 */
 	public function saveAs(string $file_path): bool {
-		$path_parts = pathinfo($file_path);
-		$this->createIfNotExists($path_parts["dirname"]);
-		return file_put_contents($file_path, $this->file_content);
+		if( $this->file_content === "" && file_exists($this->file_path) ) {
+			$this->read();
+		}
+		$this->file_path = $file_path;
+		return $this->save();
 	}
 
 	/**
@@ -142,6 +156,11 @@ class File {
 	public function delete(): void {
 		if( file_exists($this->file_path) ) {
 			unlink($this->file_path);
+			$this->file_path = "";
+			$this->file_name = "";
+			$this->file_content = "";
+			$this->mime_type = "";
+			$this->file_size = 0.0;
 		}
 	}
 
@@ -170,7 +189,7 @@ class File {
 	 */
 	public function GetMimeType(): string {
 		$mime_type = $this->getMimeTypeByContent($this->file_path);
-		if( $mime_type === "unknown" ) {
+		if( $mime_type === "unknown" && $this->file_name !== "" ) {
 			$mime_type = $this->getMimeTypeByExtension($this->file_name);
 		}
 		return $mime_type;
@@ -199,10 +218,13 @@ class File {
 	public function getMimeTypeByContent(string $file_path): string {
 		$mime_type = "unknown";
 		if( function_exists("mime_content_type") && is_callable("mime_content_type") ) {
-			$mime_type = mime_content_type($file_path);
-		} else if( function_exists("finfo_open") && is_callable("finfo_open") ) {
+			$mime_type = mime_content_type($file_path) ?: "unknown";
+		}
+
+		if( $mime_type === "unknown" && function_exists("finfo_open") && is_callable("finfo_open") ) {
 			$file_info = finfo_open(FILEINFO_MIME_TYPE);
 			$mime_type = finfo_file($file_info, $file_path);
+			$mime_type = $mime_type ?: "unknown";
 		}
 		return $mime_type;
 	}
@@ -226,6 +248,9 @@ class File {
 	 * @return bool
 	 */
 	private function isBase64(string $content): bool {
+		if( strlen($content) < 128 ) {
+			return false;
+		}
 		return (base64_encode(base64_decode($content, true)) === $content);
 	}
 
@@ -237,7 +262,7 @@ class File {
 	 * @throws SystemException
 	 */
 	public function createIfNotExists(string $path): void {
-		if( !file_exists($path) && !mkdir($path, 0660, true) && !is_dir($path) ) {
+		if( !file_exists($path) && !mkdir($path, 0770, true) && !is_dir($path) ) {
 			throw new SystemException(__FILE__, __LINE__, sprintf("Cant create Directory '%s'", $path));
 		}
 	}

@@ -22,11 +22,11 @@ abstract class ALoggableException extends Exception {
 	/**
 	 * The constructor
 	 *
-	 * @param string $file - the filename where the exception was thrown
-	 * @param int $line - the line in where the exception was thrown
-	 * @param string $message - the exception message
-	 * @param int $code - the exception code (optional)
-	 * @param Throwable|null $previous - the previous throwable object (optional)
+	 * @param string $file the filename where the exception was thrown
+	 * @param int $line the line in where the exception was thrown
+	 * @param string $message the exception message
+	 * @param int $code the exception code (optional)
+	 * @param Throwable|null $previous the previous throwable object (optional)
 	 * @throws SystemException
 	 */
 	public function __construct(string $file, int $line, string $message, mixed $code = 0, ?Throwable $previous = null) {

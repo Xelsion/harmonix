@@ -56,17 +56,8 @@ class Enumerable implements IteratorAggregate {
 	 * @return bool
 	 */
 	public function contains($entry): bool {
-		$index = $this->iterator->key();
-		$this->iterator->rewind();
-		$was_found = false;
-		foreach( $this->iterator as $value ) {
-			if( valuesAreIdentical($entry, $value) ) {
-				$was_found = true;
-				break;
-			}
-		}
-		$this->iterator->seek($index);
-		return $was_found;
+		$array = $this->iterator->getArrayCopy();
+		return array_any($array, static fn($value) => valuesAreIdentical($entry, $value));
 	}
 
 	/**
