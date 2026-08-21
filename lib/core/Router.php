@@ -123,11 +123,11 @@ class Router {
 				if( is_null($method) ) {
 					$method = "index";
 				}
-				$regex = str_replace("/", "\/", $route->path);
-				$regex = preg_replace("/{id}/", "([0-9]+)", $regex);
-				$regex = preg_replace("/{uuid}/", "([a-f0-9-]{36})", $regex);
-				$regex = preg_replace("/{[a-zA-Z|_-]+_id}/", "([0-9]+)", $regex);
-				$regex = preg_replace("/{[a-zA-Z|_-]+}/", "([\w]+)", $regex);
+				$regex = str_replace("/", "\/", $route->path)
+						|> (static fn($x) => preg_replace("/{id}/", "([0-9]+)", $x))
+						|> (static fn($x) => preg_replace("/{uuid}/", "([a-f0-9-]{36})", $x))
+						|> (static fn($x) => preg_replace("/{[a-zA-Z|_-]+_id}/", "([0-9]+)", $x))
+						|> (static fn($x) => preg_replace("/{[a-zA-Z|_-]+}/", "([\w]+)", $x));
 				$this->routes[$sub_domain][$request_method][$route->path] = array(
 					"controller" => $class,
 					'method'     => $method,

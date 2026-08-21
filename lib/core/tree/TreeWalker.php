@@ -1,4 +1,5 @@
 <?php
+
 namespace lib\core\tree;
 
 /**
@@ -25,7 +26,7 @@ class TreeWalker {
 	 *
 	 * @param TreeNode $node
 	 */
-	public function addNode( TreeNode $node ): void {
+	public function addNode(TreeNode $node): void {
 		$this->nodes[$node->id] = $node;
 		ksort($this->nodes);
 	}
@@ -37,21 +38,21 @@ class TreeWalker {
 	 * @param int $node_id
 	 * @return TreeNode|null
 	 */
-	public function getNode( int $node_id ): ?TreeNode {
+	public function getNode(int $node_id): ?TreeNode {
 		return $this->nodes[$node_id] ?? null;
 	}
 
-    /**
-     * Returns the parent node of the node with the given
-     * id or null if it contains no parent
-     *
-     * @param int $node_id
-     * @return TreeNode|null
-     */
-    public function getParentOf( int $node_id ): ?TreeNode {
-        $node = $this->getNode($node_id);
-        return ( !is_null($node) ) ? $this->getNode($node->child_of) : null;
-    }
+	/**
+	 * Returns the parent node of the node with the given
+	 * id or null if it contains no parent
+	 *
+	 * @param int $node_id
+	 * @return TreeNode|null
+	 */
+	public function getParentOf(int $node_id): ?TreeNode {
+		$node = $this->getNode($node_id);
+		return (!is_null($node)) ? $this->getNode($node->child_of) : null;
+	}
 
 	/**
 	 * Returns true id the node by the given id das
@@ -60,9 +61,9 @@ class TreeWalker {
 	 * @param int|null $node_id
 	 * @return bool
 	 */
-	public function hasChildren( ?int $node_id ): bool {
+	public function hasChildren(?int $node_id): bool {
 		$children = $this->getChildrenOf($node_id);
-		return ( !empty($children) );
+		return (!empty($children));
 	}
 
 	/**
@@ -72,34 +73,30 @@ class TreeWalker {
 	 * @param int|null $node_id
 	 * @return array
 	 */
-	public function getChildrenOf( ?int $node_id ): array {
-		$children = array();
-		foreach( $this->nodes as $id => $current_node ) {
-			if( (int)$current_node->child_of === (int)$node_id ) {
-				$children[$id] = $current_node;
-			}
-		}
-		return $children;
+	public function getChildrenOf(?int $node_id): array {
+		return array_filter($this->nodes, static function($current_node) use ($node_id) {
+			return (int)$current_node->child_of === (int)$node_id;
+		});
 	}
 
-    /**
-     * Checks if the first node is an ancestor of the second node
-     *
-     * @param int $node_id
-     * @param int $descendant_id
-     * @return bool
-     */
-    public function isNodeAncestorOf( int $node_id, int $descendant_id ) : bool {
-        $curr_node = $descendant_id;
-        $parent_node = $this->getParentOf($curr_node);
-        while( !is_null($parent_node) ) {
-            if( $parent_node->id === $node_id ) {
-                return true;
-            }
-            $parent_node = $this->getParentOf($parent_node->id);
-        }
-        return false;
-    }
+	/**
+	 * Checks if the first node is an ancestor of the second node
+	 *
+	 * @param int $node_id
+	 * @param int $descendant_id
+	 * @return bool
+	 */
+	public function isNodeAncestorOf(int $node_id, int $descendant_id): bool {
+		$curr_node = $descendant_id;
+		$parent_node = $this->getParentOf($curr_node);
+		while( !is_null($parent_node) ) {
+			if( $parent_node->id === $node_id ) {
+				return true;
+			}
+			$parent_node = $this->getParentOf($parent_node->id);
+		}
+		return false;
+	}
 
 	/**
 	 * Returns all ancestor nodes of the node with the given id
@@ -108,7 +105,7 @@ class TreeWalker {
 	 * @param int $node_id
 	 * @return array
 	 */
-	public function getAncestorsOf( int $node_id ): array {
+	public function getAncestorsOf(int $node_id): array {
 		$ancestors = array();
 		$parent = $this->getParentOf($node_id);
 		while( $parent !== null ) {
@@ -118,52 +115,52 @@ class TreeWalker {
 		return $ancestors;
 	}
 
-    /**
-     * Checks if the first node is a descendant of the second node
-     *
-     * @param int $node_id
-     * @param int $ancestor_id
-     * @return bool
-     */
-    public function isNodeDescendantOf( int $node_id, int $ancestor_id ) : bool {
-        return $this->isNodeAncestorOf($ancestor_id, $node_id);
-    }
+	/**
+	 * Checks if the first node is a descendant of the second node
+	 *
+	 * @param int $node_id
+	 * @param int $ancestor_id
+	 * @return bool
+	 */
+	public function isNodeDescendantOf(int $node_id, int $ancestor_id): bool {
+		return $this->isNodeAncestorOf($ancestor_id, $node_id);
+	}
 
-    /**
-     * Returns all descendant nodes of the node with the given id
-     * or an empty array if it contains none
-     *
-     * @param int $node_id
-     * @param array $results
-     * @return array
-     */
-    public function getDescendantsOf( int $node_id, array &$results = array() ): array {
-        $descendants = $results;
-        $curr_children = $this->getChildrenOf($node_id);
-        foreach( $curr_children as $id => $child ) {
-            $descendants[$id] = $child;
-            if( $child->hasChildren() ) {
-                $this->getDescendantsOf($child->id, $descendants);
-            }
-        }
-        return $descendants;
-    }
+	/**
+	 * Returns all descendant nodes of the node with the given id
+	 * or an empty array if it contains none
+	 *
+	 * @param int $node_id
+	 * @param array $results
+	 * @return array
+	 */
+	public function getDescendantsOf(int $node_id, array &$results = array()): array {
+		$descendants = $results;
+		$curr_children = $this->getChildrenOf($node_id);
+		foreach( $curr_children as $id => $child ) {
+			$descendants[$id] = $child;
+			if( $child->hasChildren() ) {
+				$this->getDescendantsOf($child->id, $descendants);
+			}
+		}
+		return $descendants;
+	}
 
-    /**
-     * Checks if the first node is a sibling of the second node
-     *
-     * @param int $node_id
-     * @param int $sibling_id
-     * @return bool
-     */
-    public function isNodeSiblingOf( int $node_id, int $sibling_id) : bool {
-        $node1 = $this->getNode($node_id);
-        $node2 = $this->getNode($sibling_id);
-        if( !is_null($node1) && !is_null($node2) ) {
-            return ( $node1->child_of === $node2->child_of);
-        }
-        return false;
-    }
+	/**
+	 * Checks if the first node is a sibling of the second node
+	 *
+	 * @param int $node_id
+	 * @param int $sibling_id
+	 * @return bool
+	 */
+	public function isNodeSiblingOf(int $node_id, int $sibling_id): bool {
+		$node1 = $this->getNode($node_id);
+		$node2 = $this->getNode($sibling_id);
+		if( !is_null($node1) && !is_null($node2) ) {
+			return ($node1->child_of === $node2->child_of);
+		}
+		return false;
+	}
 
 	/**
 	 * Returns all sibling nodes of the node with the given id
@@ -174,7 +171,7 @@ class TreeWalker {
 	 * @param bool $exclude_self
 	 * @return array
 	 */
-	public function getSiblingsOf( int $node_id, bool $exclude_self = true ): array {
+	public function getSiblingsOf(int $node_id, bool $exclude_self = true): array {
 		$siblings = array();
 		$node = $this->getNode($node_id);
 		if( !is_null($node) ) {

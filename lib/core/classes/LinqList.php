@@ -68,7 +68,7 @@ class LinqList extends Enumerable {
 		if( $callable instanceof Closure ) {
 			foreach( $this->iterator as $key => $entry ) {
 				if( $callable($entry, $key, $this) ) {
-					$this->temp[] = $entry;
+					$this->temp[$key] = $entry;
 				}
 			}
 		} else {
@@ -91,7 +91,7 @@ class LinqList extends Enumerable {
 			}
 		} else {
 			foreach( $this->iterator as $key => $value ) {
-				$this->temp[] = $callable($value, $key, $this);
+				$this->temp[$key] = $callable($value, $key, $this);
 			}
 		}
 		return $this;
@@ -155,7 +155,7 @@ class LinqList extends Enumerable {
 		if( !$this->selective && empty($this->temp) ) {
 			$this->temp = $this->iterator->getArrayCopy();
 		}
-		$this->temp = array_values(array_unique($this->temp, SORT_REGULAR));
+		$this->temp = array_unique($this->temp, SORT_REGULAR);
 		return $this;
 	}
 
@@ -275,7 +275,7 @@ class LinqList extends Enumerable {
 		if( $type1 === "array" ) {
 			$keys1 = array_keys($entry1);
 			$keys2 = array_keys($entry2);
-			if( count($keys1) !== count($keys2) || !empty(array_diff($keys1, $keys2)) ) {
+			if( !empty(array_diff($keys1, $keys2)) || count($keys1) !== count($keys2) ) {
 				return false;
 			}
 			$values1 = array_values($entry1);

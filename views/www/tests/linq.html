@@ -1,8 +1,27 @@
 <?php
 
 use lib\core\classes\TemplateData;
+use lib\helper\HtmlHelper;
 
+$min = TemplateData::get("min");
+$max = TemplateData::get("max");
 $results = TemplateData::get("results");
 ?>
-<div>Linq Lists</div>
+<form action="/tests/linq" method="post">
+	<?= HtmlHelper::generateFormToken() ?>
+	<div class="row">
+		<div class="col-5">
+			<label for="min">Min</label>
+			<input id="min" type="number" name="min" value="<?= $min ?>"/>
+		</div>
+		<div class="col-5">
+			<label for="max">Max</label>
+			<input id="max" type="number" name="max" value="<?= $max ?>"/>
+		</div>
+		<div class="col" style="padding-top: 21px;">
+			<input type="submit" value="Search"/>
+		</div>
+	</div>
+</form>
+<div>Results</div>
 <?php print_debug($results); ?>

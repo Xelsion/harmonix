@@ -191,15 +191,20 @@ class TestController extends AController {
 	 */
 	#[Route("linq", RequestMethod::GET, RequestMethod::POST)]
 	public function linq(): AResponse {
-		$min = 42;
-		$max = 63;
+		$min = (App::$request->contains("min")) ? (int)App::$request->get("min") : 1;
+		$max = (App::$request->contains("max")) ? (int)App::$request->get("max") : 100;
 		$ll = new LinqList();
 		for( $i = 0; $i < 100; $i++ ) {
 			$ll->add($i + 1);
 		}
-		$results = $ll->where(fn($e) => $e < $max && $e > $min)->select(fn($e) => $e . " Jahre")->distinct()->getAll();
-
+		$results = $ll->where(fn($e) => $e <= $max && $e >= $min)
+			->select(fn($e) => $e . " Jahre")
+			->distinct()
+			->getAll()
+		;
 		$view = new Template(PATH_VIEWS . "tests/linq.html");
+		TemplateData::set("min", $min);
+		TemplateData::set("max", $max);
 		TemplateData::set("results", $results);
 		TemplateData::set("view", $view->parse(), true);
 		$template = new Template(PATH_VIEWS . "template.html");

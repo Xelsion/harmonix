@@ -8,7 +8,6 @@ use lib\core\attributes\Route;
 use ReflectionAttribute;
 use ReflectionClass;
 use ReflectionException;
-use ReflectionObject;
 
 /**
  * The AttributeHelper class
@@ -22,12 +21,16 @@ readonly class AttributeHelper {
 	/**
 	 * Try to get the primary keys of an entity and returns them
 	 *
-	 * @param string $entity
-	 * @return array
+	 * @param class-string $entity
+	 * @return list<array{
+	 *     type: ?string,
+	 *     name: string
+	 * }>
+	 * @throws ReflectionException
 	 */
 	public static function getPrimaryKeysOfEntity(string $entity): array {
 		$primary_keys = [];
-		$reflection = new ReflectionObject(new $entity());
+		$reflection = new ReflectionClass($entity);
 		$properties = $reflection->getProperties();
 		foreach( $properties as $property ) {
 			$attributes = $property->getAttributes(PrimaryKey::class);

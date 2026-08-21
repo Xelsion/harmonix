@@ -31,7 +31,7 @@ abstract class ARepository {
 	 */
 	public function findIn(string $table_name, string $class_name, array $conditions = array(), ?string $order = "", ?string $direction = "asc", int $limit = 0, int $page = 1): array {
 		try {
-			if( is_null($this->pdo) || !isset($this->pdo) ) {
+			if( !isset($this->pdo) ) {
 				throw new SystemException(__FILE__, __LINE__, self::class . ": pdo not set!");
 			}
 			$qb = $this->pdo->Select()->From($table_name);
