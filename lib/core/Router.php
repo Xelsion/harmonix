@@ -32,7 +32,6 @@ class Router {
 	 * will be called once by the static method getInstanceOf()
 	 * calls the method initController()
 	 *
-	 * @throws SystemException|ReflectionException
 	 */
 	private function __construct() {
 	}
@@ -147,7 +146,7 @@ class Router {
 	 * @return bool
 	 */
 	public function hasRoute(string $path): bool {
-		$request_method = App::$request->getRequestMethod()->toString();
+		$request_method = $App::$request->request_method->toString();
 		if( isset($this->routes[SUB_DOMAIN][$request_method][$path]) ) {
 			return true;
 		}
@@ -157,7 +156,7 @@ class Router {
 
 	/**
 	 * The getRoute method will check the given $request
-	 * for a valid Controller and the requested method
+	 * for a valid Controller, and the requested method
 	 * the returned array will be like:
 	 * ["controller" => {Controller instance}, "method" => {Methode name}, "params" => {Array of formatted args}]
 	 *
@@ -168,12 +167,12 @@ class Router {
 	 * @throws SystemException
 	 */
 	public function getRoute(Request $request): ?array {
-		return $this->getRouteArray($request->getRequestUri(), $request->getRequestMethod()->toString());
+		return $this->getRouteArray($request->request_uri, $request->request_method->toString());
 	}
 
 	/**
 	 * The getRoute method will check the given $url
-	 * for a valid Controller and the requested method
+	 * for a valid Controller, and the requested method
 	 * the returned array will be like:
 	 * ["controller" => {Controller instance}, "method" => {Methode name}, "params" => {Array of formatted args}]
 	 *
@@ -264,7 +263,7 @@ class Router {
 			}
 		}
 
-		// if nothing was found try to find a matching route for the request with the request method 'ANY'
+		// if nothing was found, try to find a matching route for the request with the request method 'ANY'
 		if( $request_method !== RequestMethod::ANY->toString() ) {
 			return $this->getRouteArray($request, RequestMethod::ANY->toString());
 		}
@@ -292,7 +291,7 @@ class Router {
 	}
 
 	/**
-	 * Checks if the needed parameters of the controller method
+	 * Checks if the necessary parameter of the controller method
 	 * matches the given parameters in the request.
 	 * Also checks the type of the parameters and tries to convert
 	 * the request parameter into the required method parameter type
@@ -325,7 +324,7 @@ class Router {
 				// Check if the parameters match the expected type and converts it
 				switch( $arg_type ) {
 					case "bool":
-						$valid_boolean = $bool = filter_var($params[$i], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+						$valid_boolean = filter_var($params[$i], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
 						if( !is_null($valid_boolean) ) {
 							$result[$arg_name] = $valid_boolean;
 						} else {
@@ -343,7 +342,7 @@ class Router {
 						$result[$arg_name] = $params[$i];
 						break;
 					default:
-						// looks like we have an object type parameter lets try to create it with this parameter
+						// looks like we have an object type parameter let's try to create it with this parameter
 						try {
 							$class_reflection = new ReflectionMethod($arg_type, "__construct");
 							$constructor_args = $class_reflection->getParameters();
@@ -365,7 +364,7 @@ class Router {
 		}
 
 		// Check if we have a valid number of parameters.
-		// If so return them
+		// If so, return them
 		if( $num_params < $min_args || $num_params > $max_args ) {
 			throw new SystemException(__FILE__, __LINE__, "Router: Param count mismatch for method[" . $controller . "->" . $method . "]");
 		}

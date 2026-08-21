@@ -24,11 +24,13 @@ class Request extends KeyValuePairs {
 	 * The class constructor
 	 * sets the current requested uri
 	 * calls the method initController()
-	 * @throws \lib\core\exceptions\SystemException
+	 * @throws SystemException
 	 */
 	public function __construct() {
 		if( isset($_POST['request_method']) ) {
 			$this->request_method = RequestMethod::fromString($_POST['request_method']);
+		} else if( isset($_SERVER['REQUEST_METHOD']) ) {
+			$this->request_method = RequestMethod::fromString($_SERVER['REQUEST_METHOD']);
 		} else {
 			$this->request_method = RequestMethod::GET;
 		}
@@ -58,7 +60,6 @@ class Request extends KeyValuePairs {
 	/**
 	 * Collects the form data from the request
 	 *
-	 * @param bool $accept_input
 	 * @return void
 	 * @throws SystemException
 	 */
@@ -97,34 +98,6 @@ class Request extends KeyValuePairs {
 	}
 
 	/**
-	 * Returns the requested uri
-	 *
-	 * @param string $uri
-	 * @return void
-	 */
-	public function setRequestUri(string $uri): void {
-		$this->request_uri = $uri;
-	}
-
-	/**
-	 * Returns the requested uri
-	 *
-	 * @return string
-	 */
-	public function getRequestUri(): string {
-		return $this->request_uri;
-	}
-
-	/**
-	 * Returns the requested method
-	 *
-	 * @return string
-	 */
-	public function getRequestMethod(): RequestMethod {
-		return $this->request_method;
-	}
-
-	/**
 	 * Returns the remote IP address
 	 *
 	 * @return string
@@ -140,7 +113,7 @@ class Request extends KeyValuePairs {
 	 * @return array
 	 */
 	public function getRequestParts(): array {
-		return explode('/', $this->getRequestUri())
+		return explode('/', $this->request_uri)
 				|> array_filter(...)
 				|> array_values(...);
 	}

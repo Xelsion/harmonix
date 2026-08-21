@@ -16,7 +16,7 @@ $config = App::getInstanceOf(Configuration::class);
 		<menu>
 			<?php if( $actor->id === 0 ): ?>
 				<li>
-					<form action="<?= App::$request->getRequestUri() ?>" method="POST">
+					<form action="<?= $App::$request->request_uri ?>" method="POST">
 						<?= HtmlHelper::generateFormToken() ?>
 						<div class="form-row">
 							<label>

@@ -158,12 +158,12 @@ class App {
 		try {
 			$route = $router->getRoute(self::$request);
 			if( empty($route) ) { // no route found
-				self::$request->setRequestUri("/error/404");
+				$self::$request->request_uri = "/error/404";
 				$route = $router->getRoute(self::$request);
 			}
 		} catch( Exception $e ) { // route was found but with mismatching arguments
 			self::$storage->set("message", $e->getMessage());
-			self::$request->setRequestUri("/error/400");
+			$self::$request->request_uri = "/error/400";
 			$route = $router->getRoute(self::$request);
 		}
 		self::$module_manager->runAfterRouting($route);
@@ -202,7 +202,7 @@ class App {
 			}
 		} else {
 			// No valid controller found
-			throw new SystemException(__FILE__, __LINE__, "Controller for request " . self::$request->getRequestUri() . " cant be found!");
+			throw new SystemException(__FILE__, __LINE__, "Controller for request " . $self::$request->request_uri . " cant be found!");
 		}
 	}
 
@@ -214,7 +214,7 @@ class App {
 	 */
 	public function getResponseOutput(): string {
 		if( $this::$response === null ) {
-			throw new SystemException(__FILE__, __LINE__, "Response for request " . self::$request->getRequestUri() . " is empty!");
+			throw new SystemException(__FILE__, __LINE__, "Response for request " . $self::$request->request_uri . " is empty!");
 		}
 		$this::$response->setHeaders();
 
