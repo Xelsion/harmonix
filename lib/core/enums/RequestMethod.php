@@ -24,6 +24,16 @@ enum RequestMethod: int {
 		};
 	}
 
+	public static function fromString(string $value): self {
+		return match (strtoupper($value)) {
+			"ANY" => self::ANY,
+			"POST" => self::POST,
+			"PUT" => self::PUT,
+			"DELETE" => self::DELETE,
+			default => self::GET
+		};
+	}
+
 	/**
 	 * Return the RequestMethod as an HTML hidden field
 	 *

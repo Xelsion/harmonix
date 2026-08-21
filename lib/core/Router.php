@@ -147,7 +147,7 @@ class Router {
 	 * @return bool
 	 */
 	public function hasRoute(string $path): bool {
-		$request_method = App::$request->getRequestMethod();
+		$request_method = App::$request->getRequestMethod()->toString();
 		if( isset($this->routes[SUB_DOMAIN][$request_method][$path]) ) {
 			return true;
 		}
@@ -168,7 +168,7 @@ class Router {
 	 * @throws SystemException
 	 */
 	public function getRoute(Request $request): ?array {
-		return $this->getRouteArray($request->getRequestUri(), $request->getRequestMethod());
+		return $this->getRouteArray($request->getRequestUri(), $request->getRequestMethod()->toString());
 	}
 
 	/**

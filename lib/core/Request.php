@@ -4,6 +4,7 @@ namespace lib\core;
 
 use JsonException;
 use lib\core\classes\KeyValuePairs;
+use lib\core\enums\RequestMethod;
 use lib\core\exceptions\SystemException;
 use lib\helper\HtmlHelper;
 
@@ -17,7 +18,7 @@ use lib\helper\HtmlHelper;
 class Request extends KeyValuePairs {
 
 	public string $request_uri;
-	public string $request_method;
+	public RequestMethod $request_method;
 
 	/**
 	 * The class constructor
@@ -26,7 +27,11 @@ class Request extends KeyValuePairs {
 	 * @throws \lib\core\exceptions\SystemException
 	 */
 	public function __construct() {
-		$this->request_method = isset($_POST['request_method']) ? strtoupper($_POST['request_method']) : ($_SERVER['REQUEST_METHOD'] ?? "");
+		if( isset($_POST['request_method']) ) {
+			$this->request_method = RequestMethod::fromString($_POST['request_method']);
+		} else {
+			$this->request_method = RequestMethod::GET;
+		}
 		if( $this->isInputAllowed() ) {
 			$this->collectInputData();
 		}
@@ -40,7 +45,7 @@ class Request extends KeyValuePairs {
 	 */
 	private function isInputAllowed(): bool {
 		$protected_methods = ['POST', 'PUT', 'DELETE'];
-		if( isset($_SESSION['csrf_token']) && in_array($this->request_method, $protected_methods, true) ) {
+		if( isset($_SESSION['csrf_token']) && in_array($this->request_method->toString(), $protected_methods, true) ) {
 			if( isset($_POST['csrf_token']) && HtmlHelper::validateFormToken($_POST['csrf_token']) ) {
 				HtmlHelper::deleteFormToken();
 			} else {
@@ -115,7 +120,7 @@ class Request extends KeyValuePairs {
 	 *
 	 * @return string
 	 */
-	public function getRequestMethod(): string {
+	public function getRequestMethod(): RequestMethod {
 		return $this->request_method;
 	}
 
