@@ -127,6 +127,7 @@ class Router {
 						|> (static fn($x) => preg_replace("/{uuid}/", "([a-f0-9-]{36})", $x))
 						|> (static fn($x) => preg_replace("/{[a-zA-Z|_-]+_id}/", "([0-9]+)", $x))
 						|> (static fn($x) => preg_replace("/{[a-zA-Z|_-]+}/", "([\w]+)", $x));
+
 				$this->routes[$sub_domain][$request_method][$route->path] = array(
 					"controller" => $class,
 					'method'     => $method,
@@ -146,7 +147,7 @@ class Router {
 	 * @return bool
 	 */
 	public function hasRoute(string $path): bool {
-		$request_method = $App::$request->request_method->toString();
+		$request_method = App::$request->request_method->toString();
 		if( isset($this->routes[SUB_DOMAIN][$request_method][$path]) ) {
 			return true;
 		}
