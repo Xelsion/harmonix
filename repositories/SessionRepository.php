@@ -136,7 +136,7 @@ class SessionRepository extends ARepository {
 		try {
 			$curr_id = $session->id;
 			if( $session->_rotate_session ) {
-				$session->id = StringHelper::getGuID();
+				$session->id = StringHelper::generateUUIDv7();
 			}
 			// @formatter:off
 			$this->pdo->Update("sessions")

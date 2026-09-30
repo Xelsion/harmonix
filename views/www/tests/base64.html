@@ -15,6 +15,10 @@ $base64 = TemplateData::get("base64") ?? null;
 		<input type="submit" name="submit"/>
 	</div>
 </form>
-<?php if( $base64 !== null ) : ?>
-	<div class="container-fluid"><?= $base64 ?></div>
-<?php endif; ?>
+<div class="container-fluid">
+	<?php if( $base64 !== null ) : ?>
+		<div><label for="base64">Base64</label></div>
+		<div><textarea id="base64" class="auto-resize"><?= $base64 ?></textarea></div>
+	<?php endif; ?>
+</div>
+

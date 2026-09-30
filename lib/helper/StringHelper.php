@@ -5,6 +5,7 @@ namespace lib\helper;
 use Exception;
 use lib\App;
 use lib\core\exceptions\SystemException;
+use Random\RandomException;
 
 /**
  * Functions that helps with strings
@@ -144,32 +145,39 @@ class StringHelper {
 	 * @return string
 	 * @throws SystemException
 	 */
-	public static function getGuID(bool $trim = true): string {
+	public static function generateUUIDv4(bool $trim = true): string {
 		try {
-			// Windows
-			if( function_exists('com_create_guid') === true && is_callable('com_create_guid') ) {
-				if( $trim === true ) {
-					return trim(com_create_guid(), '{}');
-				}
-				return com_create_guid();
-			}
-
-			// OSX/Linux
-			if( function_exists('random_bytes') === true && is_callable('random_bytes') ) {
-				$data = random_bytes(16);
-				if( $data ) {
-					$data[6] = chr(ord($data[6]) & 0x0f | 0x40);    // setClass version to 0100
-					$data[8] = chr(ord($data[8]) & 0x3f | 0x80);    // setClass bits 6-7 to 10
-					return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
-				}
-			}
-
-			// No GUID support detected
-			throw new SystemException(__FILE__, __LINE__, "No GUID support available!");
+			$data = random_bytes(16);
+			$data[6] = chr(ord($data[6]) & 0x0f | 0x40);    // set version to 0100 (v4)
+			$data[8] = chr(ord($data[8]) & 0x3f | 0x80);    // set bits 6-7 to 10 (RFC variant)
+			$uuid = vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
+			return $trim ? trim($uuid, '{}') : $uuid;
 		} catch( Exception $e ) {
-			throw new SystemException($e->getFile(), $e->getLine(), $e->getMessage(), $e->getCode(), $e->getPrevious());
+			throw new SystemException(__FILE__, __LINE__, $e->getMessage(), $e->getCode(), $e->getPrevious());
 		}
 	}
+
+	/**
+	 * Generiert eine standardkonforme UUIDv7 gemäß RFC 9562.
+	 * Format: 018f2f1a-3b74-7a99-8c1f-4b2a8d119e67
+	 * @throws SystemException
+	 */
+	public static function generateUUIDv7(): string {
+		try {
+			$milliseconds = (int)floor(microtime(true) * 1000);
+			$randomBytes = random_bytes(10);
+			$packedTime = pack('J', $milliseconds);
+			$timeBytes = substr($packedTime, 2, 6);
+			$randomBytes[0] = chr((ord($randomBytes[0]) & 0x0f) | 0x70);
+			$randomBytes[2] = chr((ord($randomBytes[2]) & 0x3f) | 0x80);
+			$uuidBytes = $timeBytes . $randomBytes;
+			$hex = bin2hex($uuidBytes);
+			return sprintf('%s-%s-%s-%s-%s', substr($hex, 0, 8), substr($hex, 8, 4), substr($hex, 12, 4), substr($hex, 16, 4), substr($hex, 20, 12));
+		} catch( RandomException $e ) {
+			throw new SystemException(__FILE__, __LINE__, $e->getMessage(), $e->getCode(), $e->getPrevious());
+		}
+	}
+
 
 	/**
 	 * Encrypts a string and returns the encrypted string
@@ -195,7 +203,7 @@ class StringHelper {
 			// Append IV and Authentication Tag directly to the data stream
 			return $iv . $tag . $ciphertext;
 		} catch( Exception $e ) {
-			throw new SystemException($e->getFile(), $e->getLine(), $e->getMessage(), $e->getCode(), $e->getPrevious());
+			throw new SystemException(__FILE__, __LINE__, $e->getMessage(), $e->getCode(), $e->getPrevious());
 		}
 
 	}

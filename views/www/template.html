@@ -15,6 +15,7 @@ TemplateData::addToHook("head_css", '<link rel="stylesheet" href="' . PATH_SRC .
 TemplateData::addToHook("head_css", '<link rel="stylesheet" href="' . PATH_CSS . 'styles.css"/>');
 TemplateData::addToHook("head_js", '<script src="' . PATH_SRC . 'bootstrap-5.3.2/js/bootstrap.bundle.min.js"></script>');
 TemplateData::addToHook("head_js", '<script src="' . PATH_SRC . 'jquery/jquery-3.7.1.min.js"></script>');
+TemplateData::addToHook("head_js", '<script src="' . PATH_JS . 'main.js" defer></script>');
 TemplateData::addTemplateToHook("nav", $menu_template);
 TemplateData::addTemplateToHook("nav", $actor_menu);
 if( TemplateData::getSystemMessage() !== null ) {

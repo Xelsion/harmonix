@@ -21,7 +21,7 @@ use lib\core\exceptions\SystemException;
 class ConnectionManager {
 
 	// the available connections
-	private array $_connections;
+	private array $_connections = array();
 	// the active connections
 	private array $_active_connections = array();
 	// the pdo options for all connections

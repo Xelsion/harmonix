@@ -1,0 +1,96 @@
+pre.code-container {
+	position         : relative;
+	background-color : #1e1e1e;
+	color            : #d4d4d4;
+	padding          : 15px;
+	border-radius    : 6px;
+	overflow-x       : auto;
+	font-family      : "Courier New", Courier, monospace;
+	font-size        : 14px;
+
+	/* Der Code-Block zählt die Zeilen */
+	code {
+		display       : block;
+		counter-reset : line;
+		position      : relative;
+
+		/* Das JavaScript erzeugt diese Zeilen-Klassen automatisch */
+		.line {
+			display      : block;
+			white-space  : pre;
+			position     : relative;
+			padding-left : 45px;
+
+			&::before {
+				counter-increment : line;
+				content           : counter(line);
+				position          : absolute;
+				left              : 0;
+				width             : 30px;
+				text-align        : right;
+				color             : #858585;
+				border-right      : 1px solid #404040;
+				padding-right     : 8px;
+				user-select       : none;
+			}
+
+			&.highlighted {
+				background-color : rgba(255, 255, 0, 0.1);
+				border-left      : 3px solid #ffcc00;
+				margin-left      : -3px;
+			}
+
+			.token-keyword {
+				color       : #c586c0;
+				font-weight : bold;
+			}
+
+			.token-variable {
+				color : #9cdcfe;
+			}
+
+			.token-string {
+				color : #ce9178;
+			}
+
+			.token-comment {
+				color      : #6a9955;
+				font-style : italic;
+			}
+
+			.token-tag {
+				color : #569cd6;
+			}
+		}
+	}
+
+	/* copy to clipboard button */
+	.copy-button {
+		position      : sticky;
+		float         : right;
+		top           : 0;
+		right         : 0;
+		margin-top    : -5px;
+		margin-right  : -5px;
+		z-index       : 99;
+
+		background    : #333333;
+		color         : #ffffff;
+		border        : 1px solid #444444;
+		padding       : 5px 10px;
+		border-radius : 4px;
+		cursor        : pointer;
+		font-size     : 12px;
+		opacity       : 0;
+		transition    : opacity 0.2s, background 0.2s;
+
+		&:hover {
+			background : #444444;
+		}
+	}
+
+	&:hover .copy-button {
+		opacity : 1;
+	}
+
+}

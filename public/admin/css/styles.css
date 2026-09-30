@@ -1,3 +1,4 @@
+@charset "UTF-8";
 /* input field colors */
 /* button default colors */
 /* button positiv colors */
@@ -508,6 +509,21 @@ form select {
 form select:disabled {
   color: #7d7d7d;
   background-color: #282828;
+}
+
+textarea.auto-resize {
+  width: 100%;
+  min-height: 50px; /* Mindesthöhe für die leere Textarea */
+  resize: none; /* Deaktiviert das manuelle Ziehen unten rechts */
+  overflow-y: hidden; /* Versteckt den vertikalen Scrollbalken dauerhaft */
+  font-family: inherit; /* Passt sich Ihrer Schriftart an */
+  font-size: 14px;
+  padding: 10px;
+  border: 1px solid #cccccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+  /* Optional: Sanfter Übergang beim Wachsen */
+  transition: height 0.1s ease;
 }
 
 /* END formular styles */

@@ -77,9 +77,9 @@ class Router {
 						$this->addRoute($sub_domain, $controller_route["route"], $controller_route["controller"], $controller_route["method"]);
 					}
 				}
-			} else if( $file !== "." && $file !== ".." && is_dir($path . DIRECTORY_SEPARATOR . $file) ) {
+			} else if( $file !== "." && $file !== ".." && is_dir($path . $file) ) {
 				// Let's go recursively
-				$this->registerController($sub_domain, $directory . $file . DIRECTORY_SEPARATOR);
+				$this->registerController($sub_domain, $directory . $file);
 			}
 		}
 	}

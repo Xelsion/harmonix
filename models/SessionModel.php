@@ -154,7 +154,7 @@ class SessionModel extends Session {
 			$actor_repo = App::getInstanceOf(ActorRepository::class);
 			$actor = $actor_repo->getByEmail($email);
 			if( $actor->id > 0 && password_verify($password, $actor->password) ) {
-				$session_id = StringHelper::getGuID();
+				$session_id = StringHelper::generateUUIDv7();
 				$date_time = new DateTime();
 				if( $permanent ) {
 					$date_time->modify("+" . $this->cookie_lifetime . " minutes");

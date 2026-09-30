@@ -22,6 +22,7 @@ class QueryBuilder {
 	protected array $where_clauses = [];
 	protected array $after_wheres = [];
 	protected ?DbType $db_type;
+	private bool $prepared = false;
 	private bool $join_open = false;
 	private bool $required_order = false;
 	private bool $order_is_set = false;
@@ -281,10 +282,8 @@ class QueryBuilder {
 			return "";
 		}
 
-		$sql = 'WHERE';
 		$parts = [];
 		$first = true;
-
 		foreach( $this->where_clauses as $clause ) {
 			$logic = $clause['logic'];
 			$data = $clause['data'];
@@ -470,6 +469,7 @@ class QueryBuilder {
 	 */
 	private function addSubquery(self $subquery): string {
 		$this->checkSQL(QBStep::SUBQUERY);
+		$subquery->prepareStatement();
 		$subquery->prefixParameters("sq{$this->subquery_count}");
 		foreach( $subquery->params as $k => $v ) {
 			$this->params[$k] = $v;
@@ -496,6 +496,10 @@ class QueryBuilder {
 		if( is_array($columns) ) {
 			$is_first = true;
 			foreach( $columns as $col => $dir ) {
+				$dir = strtoupper($dir);
+				if( !in_array($dir, ['ASC', 'DESC'], true) ) {
+					throw new SystemException(__FILE__, __LINE__, "Invalid ORDER direction");
+				}
 				$sql .= (($is_first) ? " " : ", ") . $col . " " . $dir;
 				$is_first = false;
 			}
@@ -621,8 +625,9 @@ class QueryBuilder {
 	private function prefixParameters(string $prefix): void {
 		$newParams = [];
 		foreach( $this->params as $key => $value ) {
+			$oldKey = ":" . preg_quote($key, '/');
 			$newKey = "{$prefix}_{$key}";
-			$this->sql = str_replace(":{$key}", ":{$newKey}", $this->sql);
+			$this->sql = preg_replace("/{$oldKey}\b/", ":{$newKey}", $this->sql);
 			$newParams[$newKey] = $value;
 		}
 		$this->params = $newParams;
@@ -635,6 +640,9 @@ class QueryBuilder {
 	 * @throws SystemException
 	 */
 	public function prepareStatement(array $options = []): static {
+		if( $this->prepared ) {
+			return $this;
+		}
 		if( $this->required_order && !$this->order_is_set ) {
 			throw new SystemException(__FILE__, __LINE__, "MSSql requires an order if a limit is set.");
 		}
@@ -646,6 +654,7 @@ class QueryBuilder {
 		$this->sql .= implode("", $this->after_wheres);
 		$this->stmt = $this->pdo->prepare($this->sql, $options);
 		$this->setData($this->params);
+		$this->prepared = true;
 		return $this;
 	}
 
@@ -719,25 +728,7 @@ class QueryBuilder {
 		$order_error = false;
 		$err_msg = "";
 
-		if( $this->alias_required && $step->value !== QBStep::AS->value ) {
-			throw new SystemException(__FILE__, __LINE__, $err_msg = "At this point an alias (As) is required!.");
-		}
-
-		if( $this->group_prepared && $step->value !== QBStep::GROUP->value ) {
-			throw new SystemException(__FILE__, __LINE__, $err_msg = "At this point an Group is required!.");
-		}
-
-		if( !$this->alias_possible && $step->value !== QBStep::AS->value ) {
-			$this->alias_possible = false;
-		}
-
-		if( $this->curr_step->value !== QBStep::NONE->value && $this->query_type->value === QueryType::TRUNCATE->value ) {
-			throw new SystemException(__FILE__, __LINE__, $err_msg = "TRUNCATE does not allow additional SQL parameters");
-		}
-
-		if( $this->join_open && $step->value !== QBStep::JOIN_ON->value && $step->value !== QBStep::AS->value ) {
-			throw new SystemException(__FILE__, __LINE__, $err_msg = "After a JOIN|AS is a ON required");
-		}
+		$this->checkStatements($step);
 
 		switch( $step ) {
 			case QBStep::GROUP:
@@ -749,62 +740,9 @@ class QueryBuilder {
 				}
 				break;
 			case QBStep::SUBQUERY:
-				// SELECT
-				if( $this->query_type === QueryType::SELECT && !in_array($this->curr_step, [
-						QBStep::START,
-						QBStep::FROM,
-						QBStep::WHERE,
-						QBStep::WHERE_ADDS,
-						QBStep::HAVING
-					], true) ) {
+				$err_msg = $this->checkSubquery();
+				if( $err_msg !== null ) {
 					$order_error = true;
-					$err_msg = "Subqueries are only allowed in SELECT, FROM, WHERE or HAVING";
-					break;
-				}
-
-				// INSERT
-				if( $this->query_type === QueryType::INSERT && $this->curr_step === QBStep::VALUES ) {
-					$order_error = true;
-					$err_msg = "Subqueries are not allowed inside INSERT VALUES";
-					break;
-				}
-
-				// UPDATE
-				if( $this->query_type === QueryType::UPDATE && $this->curr_step === QBStep::FROM ) {
-					if( $this->db_type === DbType::Postgres || $this->db_type === DbType::MsSQL ) {
-						break;
-					}
-					$order_error = true;
-					$err_msg = "UPDATE ... FROM subqueries are only supported in PostgreSQL and MSSQL";
-					break;
-				}
-
-				if( $this->query_type === QueryType::UPDATE && !in_array($this->curr_step, [
-						QBStep::VALUES,
-						QBStep::WHERE,
-						QBStep::WHERE_ADDS
-					], true) ) {
-					$order_error = true;
-					$err_msg = "Subqueries in UPDATE statements are only allowed in SET or WHERE clauses";
-					break;
-				}
-
-				// DELETE
-				if( $this->query_type === QueryType::DELETE && !in_array($this->curr_step, [
-						QBStep::WHERE,
-						QBStep::WHERE_ADDS
-					], true) ) {
-					$order_error = true;
-					$err_msg = "Subqueries in DELETE statements are only allowed in WHERE clauses";
-					break;
-				}
-
-
-				// TRUNCATE
-				if( $this->query_type === QueryType::TRUNCATE ) {
-					$order_error = true;
-					$err_msg = "Subqueries are not allowed in TRUNCATE statements";
-					break;
 				}
 				break;
 			case(QBStep::START):
@@ -919,6 +857,83 @@ class QueryBuilder {
 		if( $step->value >= QBStep::NONE->value ) {
 			$this->curr_step = $step;
 		}
+	}
+
+
+	/**
+	 * @param QBStep $step
+	 * @return void
+	 * @throws SystemException
+	 */
+	private function checkStatements(QBStep $step): void {
+		if( $this->alias_required && $step->value !== QBStep::AS->value ) {
+			throw new SystemException(__FILE__, __LINE__, "At this point an alias (As) is required!.");
+		}
+
+		if( $this->group_prepared && $step->value !== QBStep::GROUP->value ) {
+			throw new SystemException(__FILE__, __LINE__, "At this point an Group is required!.");
+		}
+
+		if( $this->alias_possible && $step->value !== QBStep::AS->value ) {
+			$this->alias_possible = false;
+		}
+
+		if( $this->curr_step->value !== QBStep::NONE->value && $this->query_type->value === QueryType::TRUNCATE->value ) {
+			throw new SystemException(__FILE__, __LINE__, "TRUNCATE does not allow additional SQL parameters");
+		}
+
+		if( $this->join_open && $step->value !== QBStep::JOIN_ON->value && $step->value !== QBStep::AS->value ) {
+			throw new SystemException(__FILE__, __LINE__, "After a JOIN|AS is a ON required");
+		}
+	}
+
+	/**
+	 * @return string|null
+	 */
+	private function checkSubquery(): ?string {
+		// SELECT
+		if( $this->query_type === QueryType::SELECT && !in_array($this->curr_step, [
+				QBStep::START,
+				QBStep::FROM,
+				QBStep::WHERE,
+				QBStep::WHERE_ADDS,
+				QBStep::HAVING
+			], true) ) {
+			return "Subqueries are only allowed in SELECT, FROM, WHERE or HAVING";
+		}
+
+		// INSERT
+		if( $this->query_type === QueryType::INSERT && $this->curr_step === QBStep::VALUES ) {
+			return "Subqueries are not allowed inside INSERT VALUES";
+		}
+
+		// UPDATE
+		if( $this->query_type === QueryType::UPDATE && $this->curr_step === QBStep::FROM && $this->db_type !== DbType::Postgres && $this->db_type !== DbType::MsSQL ) {
+			return "UPDATE ... FROM subqueries are only supported in PostgreSQL and MSSQL";
+		}
+
+		if( $this->query_type === QueryType::UPDATE && !in_array($this->curr_step, [
+				QBStep::VALUES,
+				QBStep::WHERE,
+				QBStep::WHERE_ADDS
+			], true) ) {
+			return "Subqueries in UPDATE statements are only allowed in SET or WHERE clauses";
+		}
+
+		// DELETE
+		if( $this->query_type === QueryType::DELETE && !in_array($this->curr_step, [
+				QBStep::WHERE,
+				QBStep::WHERE_ADDS
+			], true) ) {
+			return "Subqueries in DELETE statements are only allowed in WHERE clauses";
+		}
+
+		// TRUNCATE
+		if( $this->query_type === QueryType::TRUNCATE ) {
+			return "Subqueries are not allowed in TRUNCATE statements";
+		}
+
+		return null;
 	}
 
 }

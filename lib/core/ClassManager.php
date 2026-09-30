@@ -71,7 +71,8 @@ class ClassManager {
 			}
 
 			if( !is_null($method) && $method !== "" ) {
-				return new MethodResolver($this, $namespace, $method, $args)->getValue();
+				$instance = new ClassResolver($this, $namespace, $args)->getInstance();
+				return new MethodResolver($this, $instance, $method, $args)->getValue();
 			}
 			return new ClassResolver($this, $namespace, $args)->getInstance();
 		} catch( ReflectionException $e ) {

@@ -1,3 +1,4 @@
+@charset "UTF-8";
 /* input field colors */
 /* button default colors */
 /* button positiv colors */
@@ -510,6 +511,21 @@ form select:disabled {
   background-color: #939393;
 }
 
+textarea.auto-resize {
+  width: 100%;
+  min-height: 50px; /* Mindesthöhe für die leere Textarea */
+  resize: none; /* Deaktiviert das manuelle Ziehen unten rechts */
+  overflow-y: hidden; /* Versteckt den vertikalen Scrollbalken dauerhaft */
+  font-family: inherit; /* Passt sich Ihrer Schriftart an */
+  font-size: 14px;
+  padding: 10px;
+  border: 1px solid #cccccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+  /* Optional: Sanfter Übergang beim Wachsen */
+  transition: height 0.1s ease;
+}
+
 /* END formular styles */
 /* START table styles */
 table {
@@ -560,6 +576,89 @@ table tr.table-col {
 }
 
 /* END tree table styles */
+pre.code-container {
+  position: relative;
+  background-color: #1e1e1e;
+  color: #d4d4d4;
+  padding: 15px;
+  border-radius: 6px;
+  overflow-x: auto;
+  font-family: "Courier New", Courier, monospace;
+  font-size: 14px;
+  /* Der Code-Block zählt die Zeilen */
+  /* copy to clipboard button */
+}
+pre.code-container code {
+  display: block;
+  counter-reset: line;
+  position: relative;
+  /* Das JavaScript erzeugt diese Zeilen-Klassen automatisch */
+}
+pre.code-container code .line {
+  display: block;
+  white-space: pre;
+  position: relative;
+  padding-left: 45px;
+}
+pre.code-container code .line::before {
+  counter-increment: line;
+  content: counter(line);
+  position: absolute;
+  left: 0;
+  width: 30px;
+  text-align: right;
+  color: #858585;
+  border-right: 1px solid #404040;
+  padding-right: 8px;
+  user-select: none;
+}
+pre.code-container code .line.highlighted {
+  background-color: rgba(255, 255, 0, 0.1);
+  border-left: 3px solid #ffcc00;
+  margin-left: -3px;
+}
+pre.code-container code .line .token-keyword {
+  color: #c586c0;
+  font-weight: bold;
+}
+pre.code-container code .line .token-variable {
+  color: #9cdcfe;
+}
+pre.code-container code .line .token-string {
+  color: #ce9178;
+}
+pre.code-container code .line .token-comment {
+  color: #6a9955;
+  font-style: italic;
+}
+pre.code-container code .line .token-tag {
+  color: #569cd6;
+}
+pre.code-container .copy-button {
+  position: sticky;
+  float: right;
+  top: 0;
+  right: 0;
+  margin-top: -5px;
+  margin-right: -5px;
+  z-index: 99;
+  background: #333333;
+  color: #ffffff;
+  border: 1px solid #444444;
+  padding: 5px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  opacity: 0;
+  transition: opacity 0.2s, background 0.2s;
+}
+pre.code-container .copy-button:hover {
+  background: #444444;
+}
+pre.code-container:hover .copy-button {
+  opacity: 1;
+}
+
 .pagination {
   width: fit-content;
   margin: 0 auto;
