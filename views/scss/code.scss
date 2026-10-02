@@ -1,18 +1,53 @@
 pre.code-container {
-	position         : relative;
-	background-color : #1e1e1e;
-	color            : #d4d4d4;
-	padding          : 15px;
-	border-radius    : 6px;
-	overflow-x       : auto;
-	font-family      : "Courier New", Courier, monospace;
-	font-size        : 14px;
+	position      : relative;
+	color         : #d4d4d4;
+	padding       : 15px;
+	border-radius : 6px;
+	overflow-x    : auto;
+	font-family   : "Courier New", Courier, monospace;
+	font-size     : 14px;
+
+	.language-label {
+		position      : absolute;
+		top           : 10px;
+		left          : 15px;
+		background    : #333333;
+		color         : #cccccc;
+		border        : 1px solid #555555;
+		padding       : 3px 8px;
+		border-radius : 4px;
+		font-size     : 11px;
+		font-weight   : bold;
+		font-family   : Arial, sans-serif;
+		user-select   : none;
+	}
+
+	/* copy to clipboard button */
+	.copy-button {
+		position      : absolute;
+		top           : 10px;
+		right         : 15px;
+		background    : #333333;
+		color         : #cccccc;
+		border        : 1px solid #555555;
+		padding       : 3px 8px;
+		border-radius : 4px;
+		cursor        : pointer;
+		font-size     : 11px;
+
+		&:hover {
+			background : #444444;
+		}
+	}
 
 	/* Der Code-Block zählt die Zeilen */
 	code {
-		display       : block;
-		counter-reset : line;
-		position      : relative;
+		display          : block;
+		counter-reset    : line;
+		position         : relative;
+		background-color : #1e1e1e;
+		padding          : 7px 5px;
+		border-radius    : 4px;
 
 		/* Das JavaScript erzeugt diese Zeilen-Klassen automatisch */
 		.line {
@@ -62,35 +97,6 @@ pre.code-container {
 				color : #569cd6;
 			}
 		}
-	}
-
-	/* copy to clipboard button */
-	.copy-button {
-		position      : sticky;
-		float         : right;
-		top           : 0;
-		right         : 0;
-		margin-top    : -5px;
-		margin-right  : -5px;
-		z-index       : 99;
-
-		background    : #333333;
-		color         : #ffffff;
-		border        : 1px solid #444444;
-		padding       : 5px 10px;
-		border-radius : 4px;
-		cursor        : pointer;
-		font-size     : 12px;
-		opacity       : 0;
-		transition    : opacity 0.2s, background 0.2s;
-
-		&:hover {
-			background : #444444;
-		}
-	}
-
-	&:hover .copy-button {
-		opacity : 1;
 	}
 
 }

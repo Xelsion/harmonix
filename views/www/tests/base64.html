@@ -4,6 +4,7 @@ use lib\core\classes\TemplateData;
 use lib\helper\HtmlHelper;
 
 $base64 = TemplateData::get("base64") ?? null;
+TemplateData::addToHook("head_js", '<script src="' . PATH_JS . 'code.js" defer></script>');
 ?>
 <form action="/tests/base64" method="post" enctype="multipart/form-data">
 	<?= HtmlHelper::generateFormToken() ?>
@@ -20,5 +21,35 @@ $base64 = TemplateData::get("base64") ?? null;
 		<div><label for="base64">Base64</label></div>
 		<div><textarea id="base64" class="auto-resize"><?= $base64 ?></textarea></div>
 	<?php endif; ?>
+
+	<pre class="code-container">
+		<code class="php">
+	/**
+	 * Returns the correct rounded currency as float from the given value
+	 *
+	 * @param int|float|string $value
+	 * @return float
+	 */
+	public static function getRoundedCurrency(int|float|string $value): float {
+		if( is_string($value) ) {
+			// if both , and . (eg. 1.235,23 oder 1,235.23)
+			if( str_contains($value, ',') && str_contains($value, '.') ) {
+				if( strpos($value, ',') < strpos($value, '.') ) {
+					// englisch format (1,235.23) -> remove the ','
+					$value = str_replace(',', '', $value);
+				} else {
+					// german format (1.235,23) -> remove the '.' and then replace ',' to '.'
+					$value = str_replace(array('.', ','), array('', '.'), $value);
+				}
+			} else {
+				// only one separator (eg. 1235,23)
+				$value = str_replace(',', '.', $value);
+			}
+			$value = (float)$value;
+		}
+		return round($value * 100) / 100;
+	}
+		</code>
+	</pre>
 </div>
 

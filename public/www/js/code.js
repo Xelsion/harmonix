@@ -1,12 +1,21 @@
 document.addEventListener("DOMContentLoaded", () => {
     // 1. Central dictionary for language keywords
     const languageKeywords = {
-        php: /\b(function|echo|if|else|return|true|false|foreach|as|public|private|protected|class|try|catch|throw|new|mixed|array|string|null)\b/g,
+        php: /\b(function|echo|if|else|return|true|false|foreach|as|public|private|protected|class|try|catch|throw|new|mixed|array|string|int|float|null)\b/g,
         csharp: /\b(public|private|protected|internal|class|struct|interface|void|string|int|var|if|else|return|true|false|try|catch|throw|new|using|namespace|async|await|get|set)\b/g,
         cpp: /\b(int|char|float|double|bool|void|class|struct|public|private|protected|if|else|return|true|false|try|catch|throw|new|delete|namespace|include|using|auto)\b/g,
         java: /\b(public|private|protected|class|interface|void|int|double|boolean|String|if|else|return|true|false|try|catch|throw|new|import|package|final|static)\b/g,
         python: /\b(def|class|if|elif|else|return|True|False|try|except|raise|import|from|as|print|in|is|not|and|or|lambda|None|pass)\b/g,
-        javascript: /\b(const|let|var|function|return|if|else|true|false|try|catch|throw|new|class|import|export|from|async|await|null|undefined|typeof)\b/g
+        js: /\b(const|let|var|function|return|if|else|true|false|try|catch|throw|new|class|import|export|from|async|await|null|undefined|typeof)\b/g
+    };
+
+    const languageNames = {
+        php: "PHP",
+        csharp: "C#",
+        cpp: "C++",
+        java: "Java",
+        python: "Python",
+        js: "JavaScript"
     };
 
     document.querySelectorAll("pre.code-container").forEach((preBlock) => {
@@ -21,10 +30,19 @@ document.addEventListener("DOMContentLoaded", () => {
             lang = foundLang.toLowerCase();
         }
 
-        // 1. Get text content and split into lines
+        // Create Code lable
+        if (lang !== "none") {
+            const languageLabel = document.createElement("div");
+            languageLabel.className = "language-label";
+            languageLabel.textContent = "Language: " + languageNames[lang];
+            preBlock.appendChild(languageLabel);
+        }
+
+
+        // Get text content and split into lines
         let lines = codeBlock.textContent.split("\n");
 
-        // 2. FIXED: Correctly check array elements without causing exceptions
+        // Correctly check array elements without causing exceptions
         while (lines.length > 0 && lines[0].trim() === "") {
             lines.shift();
         }
@@ -32,10 +50,10 @@ document.addEventListener("DOMContentLoaded", () => {
             lines.pop();
         }
 
-        // 3. Convert tabs to 4 spaces early to standardize length measurements
+        // Convert tabs to 4 spaces early to standardize length measurements
         lines = lines.map(line => line.replace(/\t/g, "    "));
 
-        // 4. ROBUST DEDENT: Find the minimum indentation of ANY line that actually contains text
+        // Find the minimum indentation of ANY line that actually contains text
         let minIndent = Infinity;
         lines.forEach(line => {
             if (line.trim() !== "") {
@@ -47,14 +65,14 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
 
-        // 5. Strip exactly that minimum common indentation from all lines
+        // Strip exactly that minimum common indentation from all lines
         if (minIndent > 0 && minIndent !== Infinity) {
             lines = lines.map(line => line.substring(minIndent));
         }
 
         const highlightedLines = (codeBlock.getAttribute('data-highlight') || '').split(',');
 
-        // 6. Build the HTML and apply safe syntax highlighting
+        // Build the HTML and apply safe syntax highlighting
         codeBlock.innerHTML = lines.map((line, index) => {
             const lineNumber = (index + 1).toString();
             const isHighlighted = highlightedLines.includes(lineNumber) ? ' highlighted' : '';
@@ -82,14 +100,14 @@ document.addEventListener("DOMContentLoaded", () => {
                         escapedLine = escapedLine.substring(0, inlineCommentIndex);
                     }
 
-                    // STEP A: Protect Strings using placeholders
+                    // Protect Strings using placeholders
                     const strings = [];
                     escapedLine = escapedLine.replace(/(["'])(.*?)\1/g, (match) => {
                         strings.push(`<span class="token-string">${match}</span>`);
                         return `___STR_PLACEHOLDER_${strings.length - 1}___`;
                     });
 
-                    // STEP B: Protect Variables (PHP only) using placeholders BEFORE keywords are run
+                    // Protect Variables (PHP only) using placeholders BEFORE keywords are run
                     const variables = [];
                     if (lang === "php") {
                         escapedLine = escapedLine.replace(/(\$[a-zA-Z0-9_]+)\b/g, (match) => {
@@ -102,21 +120,21 @@ document.addEventListener("DOMContentLoaded", () => {
                         });
                     }
 
-                    // STEP C: Highlight Keywords safely
+                    // Highlight Keywords safely
                     if (languageKeywords[lang]) {
                         escapedLine = escapedLine.replace(languageKeywords[lang], (match) => {
                             return `<span class="token-keyword">${match}</span>`;
                         });
                     }
 
-                    // STEP D: Restore protected variables (PHP only)
+                    // Restore protected variables (PHP only)
                     if (lang === "php") {
                         variables.forEach((varHtml, i) => {
                             escapedLine = escapedLine.replace(`___VAR_PLACEHOLDER_${i}___`, varHtml);
                         });
                     }
 
-                    // STEP E: Restore protected strings
+                    // Restore protected strings
                     strings.forEach((strHtml, i) => {
                         escapedLine = escapedLine.replace(`___STR_PLACEHOLDER_${i}___`, strHtml);
                     });
@@ -126,10 +144,9 @@ document.addEventListener("DOMContentLoaded", () => {
             }
 
             return `<span class="line${isHighlighted}">${escapedLine || ' '}</span>`;
-        })
-            .join("");
+        }).join("");
 
-        // 7. Create and append the dynamic Copy Button directly to the <pre> block
+        // Create and append the dynamic Copy Button directly to the <pre> block
         const copyBtn = document.createElement("button");
         copyBtn.textContent = "Copy";
         copyBtn.className = "copy-button";
@@ -143,7 +160,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
             navigator.clipboard.writeText(textToCopy).then(() => {
                 copyBtn.textContent = "Copied!";
-
                 setTimeout(() => {
                     copyBtn.textContent = "Copy";
                     isCopying = false; // Unlock button after text resets
